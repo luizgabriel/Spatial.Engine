@@ -1,6 +1,7 @@
 add_library(Spatial.Core
 	src/hello.cpp
 	src/Window.cpp
+	src/WindowManager.cpp
 )
 
 target_include_directories(Spatial.Core PUBLIC include)

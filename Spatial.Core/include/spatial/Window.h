@@ -3,36 +3,41 @@
 #include <GLFW/glfw3.h>
 #include <string_view>
 
-namespace spatial {
+namespace spatial
+{
+	class Window;
+
+	class WindowDrawable {
+	public:
+		virtual void draw(const Window& window) = 0;
+	};
 
 	class Window {
 	private:
 		GLFWwindow* m_windowHandle;
-		Window(int width, int height, std::string_view title);
-
+		WindowDrawable* m_drawable;
+		
 	public:
+		Window(int width, int height, std::string_view title);
 		~Window();
-		Window(Window&& other) noexcept;
-		Window& operator=(Window&& other) noexcept;
 
-		Window(const Window& w) = delete;
-		Window& operator=(const Window& w) = delete;
+		void bindDrawable(WindowDrawable* drawable);
 
-		bool isClosed();
-		std::pair<int, int> getFrameBufferSize();
+		void draw();
+
+		bool isClosed() const;
+
 		void swapBuffers();
 
-		friend class WindowManager;
-	};
+		void makeCurrentContext();
 
-	class WindowManager {
-	public:
-		WindowManager();
-		~WindowManager();
+		std::pair<int, int> getFrameBufferSize() const;
 
-		void poolEvents();
+		Window(Window&& other) = delete;
+		Window(const Window& w) = delete;
 
-		Window createWindow(int width, int height, std::string_view title);
+		Window& operator=(Window&& other) = delete;
+		Window& operator=(const Window& w) = delete;
 	};
 
 }
