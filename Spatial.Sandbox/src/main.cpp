@@ -1,7 +1,8 @@
 #include <iostream>
+#include <spatial/hello.h>
 
 int main()
 {
-    std::cout << "Hello, world!" << std::endl;
+	spatial::hello();
     return 0;
 }
