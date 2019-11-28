@@ -2,39 +2,27 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fmt/format.h>
-
-static void error_callback(int error, const char* description)
-{
-	std::cerr << fmt::format("Error {0}: {1}\n", error, description);
-}
+#include <spatial/Window.h>
 
 int spatial::test()
 {
-	// Setup window
-	glfwSetErrorCallback(error_callback);
-	if (!glfwInit())
-		return 1;
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui OpenGL2 example", NULL, NULL);
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); // Enable vsync
-
+	spatial::WindowManager manager;
+	auto window = manager.createWindow(1280, 720, "Spatial Engine");
 
 	// Main loop
-	while (!glfwWindowShouldClose(window))
+	while (!window.isClosed())
 	{
-		glfwPollEvents();
-
+		manager.poolEvents();
 
 		// Rendering
-		int display_w, display_h;
-		glfwGetFramebufferSize(window, &display_w, &display_h);
+		auto [display_w, display_h] = window.getFrameBufferSize();
+
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(0x00, 0x66, 0x99, 0x00);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glfwSwapBuffers(window);
-	}
 
-	glfwTerminate();
+		window.swapBuffers();
+	}
 
 	return 0;
 }

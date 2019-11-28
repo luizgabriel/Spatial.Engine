@@ -10,4 +10,4 @@ include(dependencies/mathfu)
 include(dependencies/filament)
 include(dependencies/fmt)
 
-set(SPATIAL_CORE_DEPENDENCIES glfw mathfu filament fmt)
+set(SPATIAL_CORE_DEPENDENCIES glfw filament fmt)

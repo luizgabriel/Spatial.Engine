@@ -3,6 +3,6 @@
 
 int main()
 {
-	spatial::hello();
+	spatial::test();
     return 0;
 }

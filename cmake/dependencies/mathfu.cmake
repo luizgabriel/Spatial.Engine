@@ -10,6 +10,7 @@ if(NOT mathfu_POPULATED)
     set(mathfu_enable_simd ON CACHE INTERNAL "")
     set(mathfu_build_benchmarks OFF CACHE INTERNAL "")
     set(mathfu_build_tests OFF CACHE INTERNAL "")
+	set(build)
 
     add_subdirectory(${mathfu_SOURCE_DIR} ${mathfu_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
