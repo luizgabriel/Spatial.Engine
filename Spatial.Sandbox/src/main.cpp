@@ -1,8 +1,7 @@
 #include <iostream>
-#include <spatial/hello.h>
+#include <spatial/EntryPoint.h>
 
 int main()
 {
-	spatial::test();
-    return 0;
+    return spatial::startEngine();
 }

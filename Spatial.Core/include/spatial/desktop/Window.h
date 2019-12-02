@@ -5,23 +5,16 @@
 
 namespace spatial
 {
-	class Window;
-
-	class WindowDrawable {
-	public:
-		virtual void draw(const Window& window) = 0;
-	};
+	class WindowContext;
 
 	class Window {
 	private:
 		GLFWwindow* m_windowHandle;
-		WindowDrawable* m_drawable;
-		
-	public:
 		Window(int width, int height, std::string_view title);
-		~Window();
 
-		void bindDrawable(WindowDrawable* drawable);
+		friend class WindowContext;
+	public:
+		~Window();
 
 		void draw();
 
@@ -33,11 +26,21 @@ namespace spatial
 
 		std::pair<int, int> getFrameBufferSize() const;
 
-		Window(Window&& other) = delete;
+		Window(Window&& other);
 		Window(const Window& w) = delete;
 
-		Window& operator=(Window&& other) = delete;
+		Window& operator=(Window&& other);
 		Window& operator=(const Window& w) = delete;
+	};
+
+	class WindowContext {
+		public:
+			WindowContext();
+			~WindowContext();
+			
+			void pollEvents();
+
+			Window createWindow(int width, int height, std::string_view title);
 	};
 
 }
