@@ -3,6 +3,7 @@ add_library(Spatial.Core
 	src/desktop/WindowContext.cpp
 	src/rendering/RenderingSubsystem.cpp
 	src/EntryPoint.cpp
+	src/Application.cpp
 )
 
 target_include_directories(Spatial.Core PUBLIC include)
