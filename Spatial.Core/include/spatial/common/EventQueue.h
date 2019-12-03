@@ -59,4 +59,4 @@ public:
     }
 };
 
-} // namespace spatial::event
+} // namespace spatial::common

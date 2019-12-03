@@ -1,42 +1,46 @@
 #pragma once
 
+#include <spatial/common/KeyAction.h>
+
 namespace spatial::desktop
 {
 
-struct WindowResized
+struct WindowResizedEvent
 {
     int width, height;
 
-    WindowResized(int width, int height) : width{width}, height{height} {}
+    WindowResizedEvent(int width, int height) : width{width}, height{height} {}
 };
-
-struct WindowClosed
+struct WindowClosedEvent
 {
 };
-
-struct KeyTyped
+struct KeyEvent
 {
-    int key, action;
-    KeyTyped(int key, int action) : key{key}, action{action} {}
+    int key;
+    common::KeyAction action;
+
+    explicit KeyEvent(int key, common::KeyAction action = common::KeyAction::None) : key{key}, action{action} {}
 };
 
-struct MouseMoved
+struct MouseMovedEvent
 {
     double x, y;
-    MouseMoved(double x, double y) : x{x}, y{y} {}
+    MouseMovedEvent(double x, double y) : x{x}, y{y} {}
 };
 
-struct MouseScrolled
+struct MouseScrolledEvent
 {
     double xOffset, yOffset;
 
-    MouseScrolled(double x, double y) : xOffset{x}, yOffset{y} {}
+    MouseScrolledEvent(double x, double y) : xOffset{x}, yOffset{y} {}
 };
 
-struct MouseButton
+struct MouseButtonEvent
 {
-    int button, action;
-    MouseButton(int button, int action) : button{button}, action{action} {}
+    int button;
+    common::KeyAction action;
+
+    MouseButtonEvent(int button, common::KeyAction action) : button{button}, action{action} {}
 };
 
 } // namespace spatial::desktop

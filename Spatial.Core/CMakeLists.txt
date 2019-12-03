@@ -1,7 +1,9 @@
 add_library(Spatial.Core
+	src/common/KeyAction.cpp
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
 	src/rendering/RenderingSubsystem.cpp
+	src/input/InputSubsystem.cpp
 	src/EntryPoint.cpp
 	src/Application.cpp
 )

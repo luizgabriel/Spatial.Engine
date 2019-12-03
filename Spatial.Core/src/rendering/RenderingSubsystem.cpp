@@ -7,7 +7,7 @@ RenderingSubsystem::RenderingSubsystem(desktop::Window &window)
     : m_mainWindow{window}
 {
     m_mainWindow.makeCurrentContext();
-    glClearColor(0x00, 0x33, 0x66, 0xFF);
+    glClearColor(184.0f / 255.0f, 213.0f / 255.0f, 238.0f / 255.0f, 1.0f);
 }
 
 void RenderingSubsystem::onStartFrame()

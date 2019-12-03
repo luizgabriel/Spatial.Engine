@@ -2,6 +2,7 @@
 
 #include <spatial/desktop/Window.h>
 #include <spatial/rendering/RenderingSubsystem.h>
+#include <spatial/input/InputSubsystem.h>
 
 namespace spatial
 {
@@ -15,6 +16,7 @@ private:
     //region Subsystems
 
     RenderingSubsystem m_rendering;
+    InputSubsystem m_input;
 
     //endregion
 
