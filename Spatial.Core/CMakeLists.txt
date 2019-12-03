@@ -1,5 +1,6 @@
 add_library(Spatial.Core
 	src/desktop/Window.cpp
+	src/desktop/WindowContext.cpp
 	src/rendering/RenderingSubsystem.cpp
 	src/EntryPoint.cpp
 )

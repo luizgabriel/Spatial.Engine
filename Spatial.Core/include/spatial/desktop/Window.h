@@ -2,45 +2,82 @@
 
 #include <GLFW/glfw3.h>
 #include <string_view>
+#include <type_traits>
+#include <entt/signal/dispatcher.hpp>
+#include <spatial/common/EventQueue.h>
 
-namespace spatial
+namespace spatial::desktop
 {
-	class WindowContext;
 
-	class Window {
-	private:
-		GLFWwindow* m_windowHandle;
-		Window(int width, int height, std::string_view title);
+class WindowContext;
 
-		friend class WindowContext;
-	public:
-		~Window();
+class Window
+{
+private:
+	GLFWwindow *m_windowHandle;
 
-		void draw();
+	Window(int width, int height, std::string_view title);
 
-		bool isClosed() const;
+	friend class WindowContext;
 
-		void swapBuffers();
+public:
+	~Window();
 
-		void makeCurrentContext();
+	void draw();
 
-		std::pair<int, int> getFrameBufferSize() const;
+	bool isClosed() const;
 
-		Window(Window&& other);
-		Window(const Window& w) = delete;
+	void swapBuffers();
 
-		Window& operator=(Window&& other);
-		Window& operator=(const Window& w) = delete;
-	};
+	void makeCurrentContext();
 
-	class WindowContext {
-		public:
-			WindowContext();
-			~WindowContext();
-			
-			void pollEvents();
+	std::pair<int, int> getFrameBufferSize() const;
 
-			Window createWindow(int width, int height, std::string_view title);
-	};
+	Window(Window &&other);
+	Window(const Window &w) = delete;
 
-}
+	Window &operator=(Window &&other);
+	Window &operator=(const Window &w) = delete;
+
+	void setEventQueue(common::EventQueue *queue);
+};
+
+class WindowContext
+{
+private:
+	common::EventQueue m_eventQueue;
+
+public:
+	WindowContext();
+	~WindowContext();
+
+	void pollEvents();
+
+	Window createWindow(int width, int height, std::string_view title);
+
+	template <typename Event, auto Function>
+	void connect()
+	{
+		m_eventQueue.template connect<Event, Function>();
+	}
+
+	template <typename Event, auto Function, typename Type>
+	void connect(Type *valueOrInstance)
+	{
+		m_eventQueue.template connect<Event, Function, Type>(valueOrInstance);
+	}
+
+	template <typename Event, auto Function>
+	void disconnect()
+	{
+		m_eventQueue.template disconnect<Event, Function>();
+	}
+
+	template <typename Event, auto Function, typename Type>
+	void disconnect(Type *valueOrInstance)
+	{
+		m_eventQueue.template disconnect<Event, Function, Type>(valueOrInstance);
+	}
+};
+
+} // namespace spatial::desktop
