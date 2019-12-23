@@ -11,20 +11,20 @@ namespace spatial::render
 class RenderingSubsystem
 {
 private:
-	filament::Engine* m_engine;
+	desktop::Window m_window;
+	EnginePtr m_engine;
 	RenderPipeline m_pipeline;
 
 public:
-    RenderingSubsystem(desktop::Window* window);
-	~RenderingSubsystem();
+    RenderingSubsystem(desktop::Window&& window);
 
-	filament::Engine* getEngine() const
+	EnginePtr getEngine() const
 	{
 		return m_engine;
 	}
 
 	void onRender();
-	void onWindowResized(const desktop::WindowResized& event);
+	void onWindowResized(const desktop::WindowResizedEvent& event);
 };
 
 } // namespace spatial

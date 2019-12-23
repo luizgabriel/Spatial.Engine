@@ -1,19 +1,21 @@
 #pragma once
 
-#include <filament/Engine.h>
+#include <spatial/render/Engine.h>
+#include <iostream>
+#include <fmt/format.h>
 
 namespace spatial::render
 {
 
-template <typename T>
+template <typename T, const char** RESOURCE_NAME>
 class EngineResource
 {
 private:
-	filament::Engine *m_engine;
+	EnginePtr m_engine;
 	T *m_resource;
 
 public:
-	EngineResource(filament::Engine *engine, T *resource)
+	EngineResource(EnginePtr engine, T *resource)
 		: m_engine{engine}, m_resource{resource}
 	{
 	}
@@ -50,15 +52,26 @@ public:
 
 	~EngineResource()
 	{
-		if (m_resource)
+		if (m_resource) {
+			std::cout << fmt::format("\n[SPATIAL] Cleaned {} filament engine resource\n", *RESOURCE_NAME);
 			m_engine->destroy(m_resource);
+		}
 	}
 };
 
-using SwapChainPtr = EngineResource<filament::SwapChain>;
-using RendererPtr = EngineResource<filament::Renderer>;
-using ScenePtr = EngineResource<filament::Scene>;
-using ViewPtr = EngineResource<filament::View>;
-using CameraPtr = EngineResource<filament::Camera>;
+static const char* gStrSwapChainResourceName = "SwapChain";
+using SwapChainPtr = EngineResource<filament::SwapChain, &gStrSwapChainResourceName>;
+
+static const char* gStrRendererResourceName = "Renderer";
+using RendererPtr = EngineResource<filament::Renderer, &gStrRendererResourceName>;
+
+static const char* gStrSceneResourceName = "Scene";
+using ScenePtr = EngineResource<filament::Scene, &gStrSceneResourceName>;
+
+static const char* gStrViewResourceName = "View";
+using ViewPtr = EngineResource<filament::View, &gStrViewResourceName>;
+
+static const char* gStrCameraResourceName = "Camera";
+using CameraPtr = EngineResource<filament::Camera, &gStrCameraResourceName>;
 
 } // namespace spatial::render

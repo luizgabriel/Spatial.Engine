@@ -16,7 +16,7 @@ void printWindowResized(const desktop::WindowResizedEvent &event)
     std::cout << fmt::format("RESIZE: ({0}, {1})\n", event.width, event.height);
 }
 
-void Application::onWindowClose(const desktop::WindowClosedEvent& event)
+void Application::onWindowClosed(const desktop::WindowClosedEvent& event)
 {
     stop();
 }
@@ -32,10 +32,10 @@ int Application::run()
 
     m_windowContext.connect<desktop::MouseMovedEvent, &printMousePosition>();
     m_windowContext.connect<desktop::WindowResizedEvent, &printWindowResized>();
-    m_windowContext.connect<desktop::WindowClosedEvent, &Application::onWindowClosed>();
-    m_windowContext.connect<desktop::WindowResizedEvent, &RenderingSubsystem::onWindowResized>(m_rendering);
+    m_windowContext.connect<desktop::WindowClosedEvent, &Application::onWindowClosed>(this);
+    m_windowContext.connect<desktop::WindowResizedEvent, &render::RenderingSubsystem::onWindowResized>(&m_rendering);
 
-    while (!m_running)
+    while (m_running)
     {
         m_windowContext.pollEvents();
         m_rendering.onRender();
@@ -46,9 +46,8 @@ int Application::run()
 
 Application::Application()
     : m_windowContext{},
-      m_mainWindow{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
       m_input{m_windowContext},
-      m_rendering{m_mainWindow}
+      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")}
 {
 }
 

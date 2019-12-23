@@ -26,7 +26,8 @@ void InputSubsystem::onMouseButtonEvent(const desktop::MouseButtonEvent &event)
 
 void InputSubsystem::onKeyEvent(const desktop::KeyEvent &event)
 {
-    std::cout << fmt::format("KEY: {0} ({1}) [{2}]\n", static_cast<char>(event.key), event.key, nameOf(event.action));
+    auto key = SDL_GetKeyFromScancode(static_cast<SDL_Scancode>(event.scanCode));
+    std::cout << fmt::format("KEY: {0} ({1}) [{2}]\n", static_cast<char>(key), event.scanCode, nameOf(event.action));
     //TODO: Update global key input state
 }
 

@@ -1,17 +1,14 @@
 #include <spatial/render/RenderingSubsystem.h>
+#include <spatial/render/Engine.h>
 
 namespace spatial::render
 {
 
-RenderingSubsystem::RenderingSubsystem(desktop::Window* window)
-	: m_engine{filament::Engine::create(filament::backend::Backend::OPENGL)},
-	  m_pipeline{window, m_engine}
+RenderingSubsystem::RenderingSubsystem(desktop::Window&& window)
+	: m_window{std::move(window)},
+	  m_engine{createEngine()},
+	  m_pipeline{&m_window, m_engine}
 {
-}
-
-RenderingSubsystem::~RenderingSubsystem()
-{
-	filament::Engine::destroy(&m_engine);
 }
 
 void RenderingSubsystem::onRender()
@@ -21,7 +18,7 @@ void RenderingSubsystem::onRender()
 
 void RenderingSubsystem::onWindowResized(const desktop::WindowResizedEvent &event)
 {
-	m_pipeline.onWindowResize();
+	m_pipeline.onWindowResized();
 }
 
 } // namespace spatial::render

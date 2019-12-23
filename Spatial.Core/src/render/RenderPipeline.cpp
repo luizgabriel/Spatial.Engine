@@ -3,7 +3,7 @@
 namespace spatial::render
 {
 
-RenderPipeline::RenderPipeline(desktop::Window *window, filament::Engine *engine)
+RenderPipeline::RenderPipeline(desktop::Window* window, EnginePtr engine)
 	: m_window{window},
 	  m_engine{engine},
 
@@ -14,7 +14,6 @@ RenderPipeline::RenderPipeline(desktop::Window *window, filament::Engine *engine
 	  m_camera{m_engine, m_engine->createCamera()}
 {
 	auto [w, h] = m_window->getFrameBufferSize();
-	auto [virtualW, virtualH] = m_window->getWindowSize();
 
 	m_camera->setProjection(45.0, double(w) / h, 0.1, 50, filament::Camera::Fov::VERTICAL);
 

@@ -14,8 +14,8 @@ namespace spatial::render
 class RenderPipeline
 {
 private:
-	const desktop::Window* m_window;
-	filament::Engine* m_engine;
+	desktop::Window* m_window;
+	EnginePtr m_engine;
 
 	SwapChainPtr m_swapChain;
 	RendererPtr m_renderer;
@@ -24,7 +24,7 @@ private:
 	CameraPtr m_camera;
 
 public:
-	RenderPipeline(desktop::Window* window, filament::Engine *engine);
+	RenderPipeline(desktop::Window* window, EnginePtr engine);
 
 	void onRender();
 	void onWindowResized();

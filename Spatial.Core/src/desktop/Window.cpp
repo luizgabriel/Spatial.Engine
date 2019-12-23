@@ -10,8 +10,6 @@
 #include <utils/unwindows.h>
 #endif
 
-#include <GLFW/glfw3native.h>
-
 using namespace spatial::common;
 
 namespace spatial::desktop
@@ -22,7 +20,7 @@ Window::Window(int width, int height, std::string_view title)
 		  SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 						   width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
-	assert(m_windowHandle != nullptr, "Could not initialize SDL Window");
+	assert(m_windowHandle != nullptr);
 }
 
 Window::Window(Window &&other) noexcept
@@ -43,19 +41,14 @@ Window::~Window()
 		SDL_DestroyWindow(m_windowHandle);
 }
 
-void Window::swapBuffers()
-{
-	glfwSwapBuffers(m_windowHandle);
-}
-
 void Window::onStartRender()
 {
-	SDL_Delay(16);
+	//
 }
 
 void Window::onEndRender()
 {
-	//
+	SDL_Delay(16);
 }
 
 std::pair<uint32_t, uint32_t> Window::getFrameBufferSize() const
@@ -76,7 +69,9 @@ std::pair<int, int> Window::getWindowSize() const
 
 void *Window::getNativeHandle() const
 {
-	return ::getNativeWindow();
+	SDL_SysWMinfo wmInfo;
+	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
+	return wmInfo.info.win.window;
 }
 
 } // namespace spatial::desktop

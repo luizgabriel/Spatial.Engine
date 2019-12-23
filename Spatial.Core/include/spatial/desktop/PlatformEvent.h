@@ -16,10 +16,12 @@ struct WindowClosedEvent
 };
 struct KeyEvent
 {
-    int key;
+    int scanCode;
+    int repeat;
     common::KeyAction action;
 
-    explicit KeyEvent(int key, common::KeyAction action = common::KeyAction::None) : key{key}, action{action} {}
+    explicit KeyEvent(int scanCode, int repeat = 0, common::KeyAction action = common::KeyAction::None) 
+        : scanCode{scanCode}, repeat{repeat}, action{action} {}
 };
 
 struct MouseMovedEvent

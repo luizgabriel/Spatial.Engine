@@ -13,7 +13,6 @@ private:
     bool m_running;
 
     desktop::WindowContext m_windowContext;
-    desktop::Window m_mainWindow;
 
     //region Subsystems
 

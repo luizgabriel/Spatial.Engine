@@ -2,6 +2,7 @@ add_library(Spatial.Core
 	src/common/KeyAction.cpp
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
+	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
 	src/render/RenderPipeline.cpp
 	src/input/InputSubsystem.cpp
@@ -27,10 +28,12 @@ target_include_directories(
 target_link_libraries(
 	Spatial.Core
 	PUBLIC
-		fmt::fmt
-		entt::entt
-		sdl2::sdl2
-		filament::filament
+		CONAN_PKG::fmt
+		CONAN_PKG::entt
+		CONAN_PKG::filament
+
+		SDL2::SDL2
+		SDL2::SDL2main
 )
 
 find_package(OpenGL REQUIRED)

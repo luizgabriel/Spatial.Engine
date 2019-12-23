@@ -30,45 +30,60 @@ void WindowContext::pollEvents()
             break;
 
         case SDL_KEYDOWN:
-            int scanCode = event.key.keysym.scancode;
-            m_eventQueue.enqueue<desktop::KeyEvent>(scanCode, KeyAction::Pressed);
-
-            if (scanCode == SDL_SCANCODE_ESCAPE)
-                m_eventQueue.enqueue<desktop::WindowClosedEvent>();
+        {
+            int scanCode = static_cast<int>(e.key.keysym.scancode);
+            m_eventQueue.enqueue<desktop::KeyEvent>(scanCode, e.key.repeat, KeyAction::Pressed);
 
             break;
+        }
+
+        case SDL_KEYUP:
+        {
+            int scanCode = static_cast<int>(e.key.keysym.scancode);
+            // TODO: Build spatial key enum class
+            m_eventQueue.enqueue<desktop::KeyEvent>(scanCode, e.key.repeat, KeyAction::Released);
+
+            if (scanCode == SDL_SCANCODE_ESCAPE)
+            {
+                m_eventQueue.enqueue<desktop::WindowClosedEvent>();
+            }
+
+            break;
+        }
 
         case SDL_MOUSEWHEEL:
-            m_eventQueue.enqueue<desktop::MouseScrolledEvent>(event.wheel.x, event.wheel.y);
+            m_eventQueue.enqueue<desktop::MouseScrolledEvent>(e.wheel.x, e.wheel.y);
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            m_eventQueue.enqueue<desktop::MouseButtonEvent>(event.button.button, KeyAction::Pressed);
+            m_eventQueue.enqueue<desktop::MouseButtonEvent>(e.button.button, KeyAction::Pressed);
             break;
 
         case SDL_MOUSEBUTTONUP:
-            m_eventQueue.enqueue<desktop::MouseButtonEvent>(event.button.button, KeyAction::Released);
+            m_eventQueue.enqueue<desktop::MouseButtonEvent>(e.button.button, KeyAction::Released);
             break;
 
         case SDL_MOUSEMOTION:
-            m_eventQueue.enqueue<desktop::MouseButtonEvent>(event.motion.x, event.motion.y);
+            m_eventQueue.enqueue<desktop::MouseMovedEvent>(e.motion.x, e.motion.y);
             break;
 
         case SDL_DROPFILE:
-            //
-            SDL_free(event.drop.file);
+            SDL_free(e.drop.file);
             break;
 
         case SDL_WINDOWEVENT:
-            switch (event.window.event)
+        {
+            switch (e.window.event)
             {
             case SDL_WINDOWEVENT_RESIZED:
-                m_eventQueue.enqueue<desktop::MouseButtonEvent>(event.window.width, event.window.height);
+                m_eventQueue.enqueue<desktop::WindowResizedEvent>(e.window.data1, e.window.data2);
                 break;
             default:
                 break;
             }
+
             break;
+        }
 
         default:
             break;
