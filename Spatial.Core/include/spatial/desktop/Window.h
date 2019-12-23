@@ -1,10 +1,9 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include <string_view>
 #include <type_traits>
-#include <entt/signal/dispatcher.hpp>
 #include <spatial/common/EventQueue.h>
+#include <SDL.h>
 
 namespace spatial::desktop
 {
@@ -14,7 +13,7 @@ class WindowContext;
 class Window
 {
 private:
-	GLFWwindow *m_windowHandle;
+	SDL_Window *m_windowHandle;
 
 	Window(int width, int height, std::string_view title);
 
@@ -23,23 +22,19 @@ private:
 public:
 	~Window();
 
-	void draw();
+	void onStartRender();
+	void onEndRender();
 
-	bool isClosed() const;
+	void* getNativeHandle() const;
 
-	void swapBuffers();
+	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;
+	std::pair<int, int> getWindowSize() const;
 
-	void makeCurrentContext();
-
-	std::pair<int, int> getFrameBufferSize() const;
-
-	Window(Window &&other);
+	Window(Window &&other) noexcept;
 	Window(const Window &w) = delete;
 
-	Window &operator=(Window &&other);
+	Window &operator=(Window &&other) noexcept;
 	Window &operator=(const Window &w) = delete;
-
-	void setEventQueue(common::EventQueue *queue);
 };
 
 class WindowContext

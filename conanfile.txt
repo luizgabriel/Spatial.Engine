@@ -1,0 +1,13 @@
+[requires]
+entt/3.2.1@skypjack/stable
+fmt/6.0.0@bincrafters/stable
+filament/1.4.3@google/stable
+
+[generators]
+cmake_find_package
+
+[imports]
+bin, *.dll -> ./bin
+lib, *.lib* -> ./lib
+lib, *.dylib* -> ./lib
+lib, *.so* -> ./lib

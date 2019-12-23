@@ -1,7 +1,8 @@
 #include <iostream>
-#include <spatial/EntryPoint.h>
+#include <spatial/Application.h>
 
 int main()
 {
-    return spatial::startEngine();
+    spatial::Application app;
+    return app.run();
 }

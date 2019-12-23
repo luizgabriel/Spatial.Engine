@@ -1,4 +1,6 @@
 .vs/
 .vscode/
+.idea/
+dependencies/
 build/
 out/

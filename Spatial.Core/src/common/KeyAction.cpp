@@ -8,7 +8,6 @@ std::string_view nameOf(KeyAction action)
 {
     switch (action)
     {
-    defaut:
     case KeyAction::None:
         return "TYPED";
     case KeyAction::Pressed:

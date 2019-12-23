@@ -1,19 +1,29 @@
-include(FetchContent)
+if(CONAN_EXPORTED)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS)
+else()
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
-set(FETCHCONTENT_QUIET OFF)
+    include(Conan)
+    
+    option(CONAN_COMPILER_TOOLSET "Defaults the toolset to LLVM" "LLVM")
 
-# This will also clean up the CMake ALL_BUILD, INSTALL, RUN_TESTS and ZERO_CHECK projects.
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    conan_cmake_run(
+        CONANFILE conanfile.txt
+        PROFILE clang
+        BUILD missing
+    )
 
-# TODO: Move all dependencies to ExternalProject format
+    # SDL2 can't build with clang
+    conan_cmake_run(
+        REQUIRES sdl2/2.0.9@bincrafters/stable
+        PROFILE gcc
+        BUILD missing
+        GENERATORS cmake_find_package
+    )
 
-include(dependencies/glfw)
-include(dependencies/mathfu)
-#include(dependencies/filament)
-include(dependencies/fmt)
-include(dependencies/entt)
-
-# OpenGL
-find_package(OpenGL REQUIRED)
-
-set(SPATIAL_CORE_DEPENDENCIES OpenGL::GL glfw fmt EnTT)
+    find_package(fmt CONFIG REQUIRED)
+    find_package(entt CONFIG REQUIRED)
+    find_package(filament CONFIG REQUIRED)
+    find_package(sdl2 CONFIG REQUIRED)
+endif()
