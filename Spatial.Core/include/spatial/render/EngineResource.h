@@ -1,8 +1,11 @@
 #pragma once
 
 #include <spatial/render/Engine.h>
+
+#ifdef SPATIAL_DEBUG
 #include <iostream>
 #include <fmt/format.h>
+#endif
 
 namespace spatial::render
 {
@@ -53,7 +56,10 @@ public:
 	~EngineResource()
 	{
 		if (m_resource) {
-			std::cout << fmt::format("\n[SPATIAL] Cleaned {} filament engine resource\n", *RESOURCE_NAME);
+			#ifdef SPATIAL_DEBUG
+			std::cout << fmt::format("\n[SPATIAL] Cleaned {} filament engine resource. ", *RESOURCE_NAME);
+			#endif
+
 			m_engine->destroy(m_resource);
 		}
 	}

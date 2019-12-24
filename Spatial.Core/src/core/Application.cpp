@@ -1,6 +1,6 @@
 #include <fmt/format.h>
 #include <iostream>
-#include <spatial/Application.h>
+#include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
 
 namespace spatial
@@ -35,11 +35,23 @@ int Application::run()
     m_windowContext.connect<desktop::WindowClosedEvent, &Application::onWindowClosed>(this);
     m_windowContext.connect<desktop::WindowResizedEvent, &render::RenderingSubsystem::onWindowResized>(&m_rendering);
 
+    onStartEvent();
+
+    physics::delta_t delta;
+
     while (m_running)
     {
+        delta = m_simulation.getDeltaTime();
+
         m_windowContext.pollEvents();
         m_rendering.onRender();
+
+        onUpdateEvent(delta.count());
+
+        m_simulation.process();
     }
+
+    onFinishEvent();
 
     return 0;
 }
@@ -47,7 +59,8 @@ int Application::run()
 Application::Application()
     : m_windowContext{},
       m_input{m_windowContext},
-      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")}
+      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
+      m_simulation{}
 {
 }
 

@@ -6,7 +6,8 @@ add_library(Spatial.Core
 	src/render/RenderingSubsystem.cpp
 	src/render/RenderPipeline.cpp
 	src/input/InputSubsystem.cpp
-	src/Application.cpp
+	src/physics/SimulationSubsystem.cpp
+	src/core/Application.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -17,6 +18,8 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
+
+# LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_include_directories(
 	Spatial.Core
 	PUBLIC
@@ -39,6 +42,8 @@ target_link_libraries(
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
 
+
+# ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
 	target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_UNIX)
 
@@ -46,11 +51,12 @@ if (UNIX AND NOT APPLE)
 	target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
 elseif(WIN32)
 	target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
-
-	
 elseif(APPLE)
 	target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
 	
 	target_link_libraries(Spatial.Core PRIVATE "-framework Cocoa" "-framework Metal" "-framework CoreVideo")
 endif()
 
+
+# ADD DEBUG/RELEASE FLAGS
+target_compile_definitions(Spatial.Core PUBLIC "$<$<CONFIG:DEBUG>:SPATIAL_DEBUG>")

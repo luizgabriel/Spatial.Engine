@@ -1,8 +1,18 @@
+#include <spatial/spatial.h>
 #include <iostream>
-#include <spatial/Application.h>
+#include <fmt/format.h>
+
+using namespace spatial;
+
+void onUpdate(float delta)
+{
+    std::cout << fmt::format("FPS: {}\n", 1/delta);
+}
 
 int main(int arc, char* argv[])
 {
-    spatial::Application app;
+    Application app;
+    app.onUpdateEvent.connect<&onUpdate>();
+
     return app.run();
 }
