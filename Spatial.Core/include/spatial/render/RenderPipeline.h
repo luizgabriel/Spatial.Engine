@@ -1,10 +1,6 @@
 #pragma once
 
-#include <filament/Engine.h>
-#include <filament/Renderer.h>
-#include <filament/Scene.h>
-#include <filament/View.h>
-#include <spatial/render/EngineResource.h>
+#include <spatial/render/Engine.h>
 #include <spatial/desktop/Window.h>
 #include <vector>
 
@@ -15,23 +11,35 @@ class RenderPipeline
 {
 private:
 	desktop::Window* m_window;
-	EnginePtr m_engine;
+	RenderEngine* m_engine;
 
-	SwapChainPtr m_swapChain;
-	RendererPtr m_renderer;
-	ScenePtr m_scene;
-	ViewPtr m_view;
-	CameraPtr m_camera;
+	SwapChain m_swapChain;
+	Renderer m_renderer;
+	Scene m_scene;
+	View m_view;
+	Camera m_camera;
+
+	std::uint32_t m_skippedFrames;
 
 public:
-	RenderPipeline(desktop::Window* window, EnginePtr engine);
+	RenderPipeline(desktop::Window* window, RenderEngine* engine);
 
 	void onRender();
 	void onWindowResized();
 
-	const RendererPtr &getRenderer() const
+	filament::View* getView() const
 	{
-		return m_renderer;
+		return m_view.get();
+	}
+
+	filament::Camera* getCamera() const
+	{
+		return m_camera.get();
+	}
+
+	std::uint32_t getSkippedFramesCount() const
+	{
+		return m_skippedFrames;
 	}
 };
 

@@ -1,15 +1,49 @@
 #pragma once
 
 #include <filament/Engine.h>
+#include <filament/View.h>
+#include <filament/Renderer.h>
+
+#include <spatial/render/EngineResource.h>
 #include <memory>
 
 namespace spatial::render
 {
 
-using EnginePtr = std::shared_ptr<filament::Engine>;
+extern const char *gStrSwapChainResourceName;
+using SwapChain = EngineResource<filament::SwapChain, &gStrSwapChainResourceName>;
 
-void destroyEngine(filament::Engine* engine);
+extern const char *gStrRendererResourceName;
+using Renderer = EngineResource<filament::Renderer, &gStrRendererResourceName>;
 
-EnginePtr createEngine();
+extern const char *gStrSceneResourceName;
+using Scene = EngineResource<filament::Scene, &gStrSceneResourceName>;
+
+extern const char *gStrViewResourceName;
+using View = EngineResource<filament::View, &gStrViewResourceName>;
+
+extern const char *gStrCameraResourceName;
+using Camera = EngineResource<filament::Camera, &gStrCameraResourceName>;
+
+class RenderEngine
+{
+private:
+    filament::Engine *m_engine;
+
+public:
+    RenderEngine(filament::backend::Backend backend);
+    ~RenderEngine();
+
+    filament::Engine *get() const
+    {
+        return m_engine;
+    }
+
+    SwapChain createSwapChain(void *nativeWindowHandle);
+    Renderer createRenderer();
+    Scene createScene();
+    View createView();
+    Camera createCamera();
+};
 
 } // namespace spatial::render

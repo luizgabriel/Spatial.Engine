@@ -6,8 +6,8 @@ namespace spatial::render
 
 RenderingSubsystem::RenderingSubsystem(desktop::Window&& window)
 	: m_window{std::move(window)},
-	  m_engine{createEngine()},
-	  m_pipeline{&m_window, m_engine}
+	  m_engine{filament::backend::Backend::OPENGL},
+	  m_pipeline{&m_window, &m_engine}
 {
 }
 

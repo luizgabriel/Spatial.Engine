@@ -26,6 +26,9 @@ private:
 public:
     Application();
 
+    Application(const Application& other) = delete;
+    Application &operator=(const Application &other) = delete;
+
     int run();
 
     void stop();
@@ -38,9 +41,14 @@ public:
     common::Event<> onFinishEvent;
     //endregion
 
-    const desktop::WindowContext* getWindowContext()
+    const desktop::WindowContext* getWindowContext() const
     {
         return &m_windowContext;
+    }
+
+    const render::RenderPipeline* getRenderPipeline() const
+    {
+        return m_rendering.getRenderPipeline();
     }
 };
 

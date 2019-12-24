@@ -3,18 +3,19 @@
 namespace spatial::render
 {
 
-RenderPipeline::RenderPipeline(desktop::Window* window, EnginePtr engine)
+RenderPipeline::RenderPipeline(desktop::Window* window, RenderEngine* engine)
 	: m_window{window},
 	  m_engine{engine},
 
-	  m_swapChain{m_engine, m_engine->createSwapChain(m_window->getNativeHandle())},
-	  m_renderer{m_engine, m_engine->createRenderer()},
-	  m_scene{m_engine, m_engine->createScene()},
-	  m_view{m_engine, m_engine->createView()},
-	  m_camera{m_engine, m_engine->createCamera()}
+	  m_swapChain{m_engine->createSwapChain(m_window->getNativeHandle())},
+	  m_renderer{m_engine->createRenderer()},
+	  m_scene{m_engine->createScene()},
+	  m_view{m_engine->createView()},
+	  m_camera{m_engine->createCamera()}
 {
 	auto [w, h] = m_window->getFrameBufferSize();
 
+	m_camera->setExposure(16.0f, 1 / 125.0f, 100.0f);
 	m_camera->setProjection(45.0, double(w) / h, 0.1, 50, filament::Camera::Fov::VERTICAL);
 
 	m_view->setClearColor({.0f, 0.5f, 0.5f, 1.0f});
@@ -37,6 +38,8 @@ void RenderPipeline::onRender()
 	{
 		m_renderer->render(m_view.get_const());
 		m_renderer->endFrame();
+	} else {
+		m_skippedFrames++;
 	}
 
 	m_window->onEndRender();
