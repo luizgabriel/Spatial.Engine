@@ -2,6 +2,6 @@
 
 spatial::core::Application& app()
 {
-    static Application application;
+    static spatial::core::Application application;
     return application;
 }

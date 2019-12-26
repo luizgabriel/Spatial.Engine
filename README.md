@@ -9,7 +9,7 @@ Spatial is a cross-platform c++ game engine created on top off google's [filamen
 
 Most of the dependencies are handled by the [Conan Package Manager](https://conan.io).
 
-When you run the cmake configure command it automagically download its dependencies and builds then for you. 
+When you run the cmake configure command, it automagically downloads its dependencies and builds then for you.
 
 Only the SDL2 dependency is necessary to installed manually. If you are on a gnu based operating system, you're one comand line of distance for installing the SDL2. But if you're on windows, I recomend you to install [VCPKG](https://github.com/microsoft/vcpkg) to make your life easier.
 
@@ -26,7 +26,7 @@ cmake --build . --config Debug --target Spatial.Sandbox
 
 ### Conan
 
-Cmake will automatically install the conan dependencies for you once you configured the profile correctly. This project requires Clang to be built. So you need to create a `clang` profile like this:
+Cmake will automatically install the conan dependencies for you (once you configured the profile correctly). This project requires Clang to be built. So you need to create a `clang` profile like this:
 
 ```
 [settings]
