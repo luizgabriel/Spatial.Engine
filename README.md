@@ -18,7 +18,7 @@ Only the SDL2 dependency is necessary to installed manually. If you are on a gnu
 mkdir out/build && cd out/build
 
 # Generate the configuration files (windows with vcpkg example)
-cmake ../.. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug -T LLVM -DCMAKE_TOOLCHAIN_FILE="%VCKPG_DIR%/scripts/buildsystems/vcpkg.cmake"
+cmake ../.. -G "Visual Studio 16 2019" -A x64 -T LLVM -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE="%VCKPG_DIR%/scripts/buildsystems/vcpkg.cmake"
 
 # Build the engine
 cmake --build . --config Debug --target Spatial.Sandbox
