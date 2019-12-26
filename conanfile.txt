@@ -8,4 +8,4 @@ cmake
 
 [imports]
 # imports filament tools
-# bin, * -> ./bin
+bin, * -> ./bin
