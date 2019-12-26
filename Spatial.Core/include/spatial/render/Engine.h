@@ -34,16 +34,21 @@ public:
     RenderEngine(filament::backend::Backend backend);
     ~RenderEngine();
 
-    filament::Engine *get() const
+    filament::Engine *get()
     {
         return m_engine;
     }
 
-    SwapChain createSwapChain(void *nativeWindowHandle);
-    Renderer createRenderer();
-    Scene createScene();
-    View createView();
-    Camera createCamera();
+    const filament::Engine *get() const
+    {
+        return m_engine;
+    }
+
+    SwapChain createSwapChain(void *nativeWindowHandle) noexcept;
+    Renderer createRenderer() noexcept;
+    Scene createScene() noexcept;
+    View createView() noexcept;
+    Camera createCamera() noexcept;
 };
 
 } // namespace spatial::render

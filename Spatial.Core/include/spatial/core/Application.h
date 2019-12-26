@@ -37,19 +37,34 @@ public:
 
      //region Events
     common::Event<float> onUpdateEvent;
+    common::Event<float> onRenderEvent;
+    common::Event<float> onGuiEvent;
+    
     common::Event<> onStartEvent;
     common::Event<> onFinishEvent;
     //endregion
 
-    const desktop::WindowContext* getWindowContext() const
+    desktop::WindowContext& getWindowContext()
     {
-        return &m_windowContext;
+        return m_windowContext;
     }
 
-    const render::RenderPipeline* getRenderPipeline() const
+    const desktop::WindowContext& getWindowContext() const
     {
-        return m_rendering.getRenderPipeline();
+        return m_windowContext;
     }
+
+    render::RenderingSubsystem& getRenderSys()
+    {
+        return m_rendering;
+    }
+
+    const render::RenderingSubsystem& getRenderSys() const
+    {
+        return m_rendering;
+    }
+    
+    
 };
 
 } // namespace spatial

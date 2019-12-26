@@ -33,7 +33,6 @@ int Application::run()
     m_windowContext.connect<desktop::MouseMovedEvent, &printMousePosition>();
     m_windowContext.connect<desktop::WindowResizedEvent, &printWindowResized>();
     m_windowContext.connect<desktop::WindowClosedEvent, &Application::onWindowClosed>(this);
-    m_windowContext.connect<desktop::WindowResizedEvent, &render::RenderingSubsystem::onWindowResized>(&m_rendering);
 
     onStartEvent();
 
@@ -44,10 +43,10 @@ int Application::run()
         delta = m_simulation.getDeltaTime();
 
         m_windowContext.pollEvents();
-        m_rendering.onRender();
-
+        
         onUpdateEvent(delta.count());
 
+        m_rendering.onRender();
         m_simulation.process();
     }
 

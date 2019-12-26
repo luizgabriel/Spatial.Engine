@@ -27,27 +27,27 @@ RenderEngine::~RenderEngine()
     filament::Engine::destroy(&m_engine);
 }
 
-SwapChain RenderEngine::createSwapChain(void *nativeWindowHandle)
+SwapChain RenderEngine::createSwapChain(void *nativeWindowHandle) noexcept
 {
     return {m_engine, m_engine->createSwapChain(nativeWindowHandle)};
 }
 
-Renderer RenderEngine::createRenderer()
+Renderer RenderEngine::createRenderer() noexcept
 {
     return {m_engine, m_engine->createRenderer()};
 }
 
-Scene RenderEngine::createScene()
+Scene RenderEngine::createScene() noexcept
 {
     return {m_engine, m_engine->createScene()};
 }
 
-View RenderEngine::createView()
+View RenderEngine::createView() noexcept
 {
     return {m_engine, m_engine->createView()};
 }
 
-Camera RenderEngine::createCamera()
+Camera RenderEngine::createCamera() noexcept
 {
     return {m_engine, m_engine->createCamera()};
 }

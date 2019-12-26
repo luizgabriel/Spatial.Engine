@@ -67,7 +67,7 @@ std::pair<int, int> Window::getWindowSize() const
 	return {w, h};
 }
 
-void *Window::getNativeHandle() const
+void *Window::getNativeHandle()
 {
 	SDL_SysWMinfo wmInfo;
 	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);

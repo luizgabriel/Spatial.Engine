@@ -4,7 +4,6 @@ add_library(Spatial.Core
 	src/desktop/WindowContext.cpp
 	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
-	src/render/RenderPipeline.cpp
 	src/input/InputSubsystem.cpp
 	src/physics/SimulationSubsystem.cpp
 	src/core/Application.cpp

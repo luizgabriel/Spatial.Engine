@@ -39,17 +39,22 @@ public:
 
 	EngineResource &operator=(const EngineResource &w) = delete;
 
-	const T *get_const() const
+	const T *get() const
 	{
 		return m_resource;
 	}
 
-	T *get() const
+	T *get()
 	{
 		return m_resource;
 	}
 
-	T *operator->() const
+	T *operator->()
+	{
+		return get();
+	}
+
+	const T *operator->() const
 	{
 		return get();
 	}

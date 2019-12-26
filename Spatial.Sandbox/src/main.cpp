@@ -4,41 +4,78 @@
 
 using namespace spatial;
 
-float debug = 0;
-
 Application& app()
 {
     static Application application;
     return application;
 }
 
-void onStart()
+render::RenderEngine& engine()
 {
-    auto& application = app();
-    auto pipeline = application.getRenderPipeline();
-    auto view = pipeline->getView();
-
-    view->setClearColor({.0f, .86f, 0.98f, 1.0f});
+    return app().getRenderSys().getEngine();
 }
 
-void onUpdate(float delta)
+const desktop::Window& window()
 {
-    auto& application = app();
-    auto pipeline = application.getRenderPipeline();
+    return app().getRenderSys().getWindow();
+}
 
-    if (debug > 2.0f) {
-        std::cout << fmt::format("FPS: {}, Skipped Frames: {}\n", 1/delta, pipeline->getSkippedFramesCount());
-        debug = 0;
-    } else {
-        debug += delta;
+class SandboxGame
+{
+private:
+    float m_debug = 0;
+
+    render::Scene m_scene;
+    render::Camera m_camera;
+
+public:
+    SandboxGame()
+        : m_scene{engine().createScene()},
+          m_camera{engine().createCamera()}
+    {
+        app().onStartEvent.connect<&SandboxGame::onStart>(this);
+        app().onUpdateEvent.connect<&SandboxGame::onUpdate>(this);
     }
-}
 
-int main(int arc, char* argv[])
+    ~SandboxGame()
+    {
+        app().onStartEvent.disconnect<&SandboxGame::onStart>(this);
+        app().onUpdateEvent.disconnect<&SandboxGame::onUpdate>(this);
+    }
+
+    void onStart()
+    {
+        auto [w, h] = window().getFrameBufferSize();
+        auto& view = app().getRenderSys().getMainView();
+
+        m_camera->setExposure(16.0f, 1 / 125.0f, 100.0f);
+        m_camera->setProjection(45.0, double(w) / h, 0.1, 50, filament::Camera::Fov::VERTICAL);
+        
+        view->setCamera(m_camera.get());
+        view->setScene(m_scene.get());
+        view->setViewport({0, 0, w, h});
+        view->setClearTargets(true, true, true);
+        view->setClearColor({.0f, 0x33 / 255.0f, 0x66 / 255.0f, 1.0f});
+    }
+
+    void onUpdate(float delta)
+    {
+        if (m_debug > 2.0f)
+        {
+            std::cout << fmt::format("FPS: {}\n", 1 / delta);
+            m_debug = 0;
+        }
+        else
+        {
+            m_debug += delta;
+        }
+    }
+
+};
+
+int main(int arc, char *argv[])
 {
-    auto& application = app();
-    application.onStartEvent.connect<&onStart>();
-    application.onUpdateEvent.connect<&onUpdate>();
+    SandboxGame game;
 
-    return application.run();
+    return app().run();
 }

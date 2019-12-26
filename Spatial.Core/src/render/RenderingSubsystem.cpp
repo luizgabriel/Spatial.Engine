@@ -7,18 +7,24 @@ namespace spatial::render
 RenderingSubsystem::RenderingSubsystem(desktop::Window&& window)
 	: m_window{std::move(window)},
 	  m_engine{filament::backend::Backend::OPENGL},
-	  m_pipeline{&m_window, &m_engine}
+	  m_swapChain{m_engine.createSwapChain(m_window.getNativeHandle())},
+	  m_renderer{m_engine.createRenderer()},
+	  m_mainView{m_engine.createView()}
 {
 }
 
 void RenderingSubsystem::onRender()
 {
-	m_pipeline.onRender();
-}
+	m_window.onStartRender();
+	
+	if (m_renderer->beginFrame(m_swapChain.get()))
+	{
+		m_renderer->render(m_mainView.get());
+		
+		m_renderer->endFrame();
+	} 
 
-void RenderingSubsystem::onWindowResized(const desktop::WindowResizedEvent &event)
-{
-	m_pipeline.onWindowResized();
+	m_window.onEndRender();
 }
 
 } // namespace spatial::render
