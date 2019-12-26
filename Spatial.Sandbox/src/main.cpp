@@ -1,46 +1,30 @@
-#include <spatial/spatial.h>
-#include <iostream>
-#include <fmt/format.h>
+#include "engine.h"
 
-using namespace spatial;
+namespace sp = spatial::render;
 
-Application& app()
-{
-    static Application application;
-    return application;
-}
-
-render::RenderEngine& engine()
-{
-    return app().getRenderSys().getEngine();
-}
-
-const desktop::Window& window()
-{
-    return app().getRenderSys().getWindow();
-}
-
-class SandboxGame
+class SandboxLayer
 {
 private:
     float m_debug = 0;
 
-    render::Scene m_scene;
-    render::Camera m_camera;
+    sp::Scene m_scene;
+    sp::Camera m_camera;
 
 public:
-    SandboxGame()
+    SandboxLayer()
         : m_scene{engine().createScene()},
           m_camera{engine().createCamera()}
     {
-        app().onStartEvent.connect<&SandboxGame::onStart>(this);
-        app().onUpdateEvent.connect<&SandboxGame::onUpdate>(this);
+        app().onStartEvent.connect<&SandboxLayer::onStart>(this);
+        app().onFinishEvent.connect<&SandboxLayer::onFinish>(this);
+        app().onUpdateEvent.connect<&SandboxLayer::onUpdate>(this);
     }
 
-    ~SandboxGame()
+    ~SandboxLayer()
     {
-        app().onStartEvent.disconnect<&SandboxGame::onStart>(this);
-        app().onUpdateEvent.disconnect<&SandboxGame::onUpdate>(this);
+        app().onStartEvent.disconnect<&SandboxLayer::onStart>(this);
+        app().onFinishEvent.disconnect<&SandboxLayer::onFinish>(this);
+        app().onUpdateEvent.disconnect<&SandboxLayer::onUpdate>(this);
     }
 
     void onStart()
@@ -56,6 +40,11 @@ public:
         view->setViewport({0, 0, w, h});
         view->setClearTargets(true, true, true);
         view->setClearColor({.0f, 0x33 / 255.0f, 0x66 / 255.0f, 1.0f});
+    }
+
+    void onFinish()
+    {
+
     }
 
     void onUpdate(float delta)
@@ -75,7 +64,7 @@ public:
 
 int main(int arc, char *argv[])
 {
-    SandboxGame game;
+    SandboxLayer gameLayer;
 
     return app().run();
 }

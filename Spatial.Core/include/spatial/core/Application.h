@@ -6,8 +6,9 @@
 #include <spatial/input/InputSubsystem.h>
 #include <spatial/physics/SimulationSubsystem.h>
 
-namespace spatial
+namespace spatial::core
 {
+
 class Application final
 {
 private:
@@ -21,12 +22,12 @@ private:
     physics::SimulationSubsystem m_simulation;
     //endregion
 
-    void onWindowClosed(const desktop::WindowClosedEvent& event);
+    void onWindowClosed(const desktop::WindowClosedEvent &event);
 
 public:
     Application();
 
-    Application(const Application& other) = delete;
+    Application(const Application &other) = delete;
     Application &operator=(const Application &other) = delete;
 
     int run();
@@ -35,36 +36,34 @@ public:
 
     bool isRunning() const { return m_running; }
 
-     //region Events
+    //region Events
     common::Event<float> onUpdateEvent;
     common::Event<float> onRenderEvent;
     common::Event<float> onGuiEvent;
-    
+
     common::Event<> onStartEvent;
     common::Event<> onFinishEvent;
     //endregion
 
-    desktop::WindowContext& getWindowContext()
+    desktop::WindowContext &getWindowContext()
     {
         return m_windowContext;
     }
 
-    const desktop::WindowContext& getWindowContext() const
+    const desktop::WindowContext &getWindowContext() const
     {
         return m_windowContext;
     }
 
-    render::RenderingSubsystem& getRenderSys()
+    render::RenderingSubsystem &getRenderSys()
     {
         return m_rendering;
     }
 
-    const render::RenderingSubsystem& getRenderSys() const
+    const render::RenderingSubsystem &getRenderSys() const
     {
         return m_rendering;
     }
-    
-    
 };
 
-} // namespace spatial
+} // namespace spatial::core

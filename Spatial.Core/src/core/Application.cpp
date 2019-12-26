@@ -3,7 +3,7 @@
 #include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
 
-namespace spatial
+namespace spatial::core
 {
 
 void printMousePosition(const desktop::MouseMovedEvent &event)
