@@ -15,11 +15,15 @@ private:
     sp::Scene m_scene;
     fs::path m_assets;
 
+    sp::Material m_material;
+    sp::MaterialInstance m_instance;
+
 public:
     SandboxLayer()
         : m_scene{engine().createScene()},
-          m_camera{engine().createCamera()},
-          m_assets{fs::path{"assets"} / fs::path{"sandbox"}}
+          m_assets{fs::path{"assets"} / fs::path{"sandbox"}},
+          m_material{engine().get()},
+          m_instance{engine().get()}
     {
         app().connectOnStart(this);
         app().connectOnUpdate(this);
@@ -34,7 +38,6 @@ public:
     void onStart()
     {
         auto [w, h] = window().getFrameBufferSize();
-        auto& view = app().getRenderSys().getMainView();
 
         camera()->setExposure(16.0f, 1 / 125.0f, 100.0f);
         camera()->setProjection(45.0, double(w) / h, 0.1, 50, fl::Camera::Fov::VERTICAL);
@@ -46,6 +49,16 @@ public:
         view()->setViewport({0, 0, w, h});
         view()->setClearTargets(true, true, true);
         view()->setClearColor({.0f, 0x33 / 255.0f, 0x66 / 255.0f, 1.0f});
+
+        auto data = read(m_assets / "materials" / "plastic.bin");
+        m_material = engine().createMaterial(data);
+        m_instance = engine().createInstance(m_material);
+
+        fl::math::float3 red{0.8, 0.0, 0.0};
+        m_instance->setParameter("baseColor", fl::RgbType::sRGB, red);
+        m_instance->setParameter("roughness", 0.5f);
+        m_instance->setParameter("clearCoat", 1.0f);
+        m_instance->setParameter("clearCoatRoughness", 0.3f);
     }
 
     void onUpdate(float delta)

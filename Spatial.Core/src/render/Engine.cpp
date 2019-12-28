@@ -12,6 +12,8 @@ const char *gStrRendererResourceName = "Renderer";
 const char *gStrSceneResourceName = "Scene";
 const char *gStrViewResourceName = "View";
 const char *gStrCameraResourceName = "Camera";
+const char *gStrMaterialResourceName = "Material";
+const char *gStrMaterialInstanceResourceName = "Material Instance";
 
 RenderEngine::RenderEngine(filament::backend::Backend backend)
     : m_engine{filament::Engine::create(backend)}
@@ -50,6 +52,24 @@ View RenderEngine::createView() noexcept
 Camera RenderEngine::createCamera() noexcept
 {
     return {m_engine, m_engine->createCamera()};
+}
+
+Material RenderEngine::createMaterial(const std::string& data)
+{
+    return {
+        m_engine,
+        filament::Material::Builder()
+            .package(data.c_str(), data.size())
+            .build(*m_engine)
+    };
+}
+
+MaterialInstance RenderEngine::createInstance(Material& material)
+{
+    return {
+        m_engine,
+        material->createInstance()
+    };
 }
 
 } // namespace spatial::render

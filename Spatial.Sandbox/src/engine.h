@@ -6,7 +6,14 @@
 #include <iostream>
 #include <filesystem>
 
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 spatial::core::Application& app();
+
+std::string read(const std::filesystem::path& filePath);
 
 inline spatial::render::RenderEngine& engine()
 {

@@ -16,7 +16,6 @@ set_property(
 )
 
 add_resources_library(Sandbox.Assets
-    FOLDER sandbox
     MATERIALS
         assets/materials/plastic.mat
     TEXTURES
@@ -24,4 +23,6 @@ add_resources_library(Sandbox.Assets
         assets/textures/pillars_2k.hdr
     DEPENDEES
         Spatial.Sandbox
+    OUTPUT
+        ${CMAKE_BINARY_DIR}/assets/sandbox
 )

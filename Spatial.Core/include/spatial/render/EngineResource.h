@@ -18,10 +18,9 @@ private:
 	T *m_resource;
 
 public:
-	EngineResource(filament::Engine *engine, T *resource)
+	EngineResource(filament::Engine *engine, T *resource = nullptr)
 		: m_engine{engine}, m_resource{resource}
 	{
-		assert(resource != nullptr);
 	}
 
 	EngineResource(EngineResource &&other) noexcept
@@ -35,6 +34,8 @@ public:
 	{
 		m_engine = other.m_engine;
 		m_resource = std::exchange(other.m_resource, nullptr);
+
+		return *this;
 	}
 
 	EngineResource &operator=(const EngineResource &w) = delete;

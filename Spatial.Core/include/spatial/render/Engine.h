@@ -3,6 +3,7 @@
 #include <filament/Engine.h>
 #include <filament/View.h>
 #include <filament/Renderer.h>
+#include <filament/Material.h>
 
 #include <spatial/render/EngineResource.h>
 #include <memory>
@@ -24,6 +25,12 @@ using View = EngineResource<filament::View, &gStrViewResourceName>;
 
 extern const char *gStrCameraResourceName;
 using Camera = EngineResource<filament::Camera, &gStrCameraResourceName>;
+
+extern const char *gStrMaterialResourceName;
+using Material = EngineResource<filament::Material, &gStrMaterialResourceName>;
+
+extern const char *gStrMaterialInstanceResourceName;
+using MaterialInstance = EngineResource<filament::MaterialInstance, &gStrMaterialInstanceResourceName>;
 
 class RenderEngine
 {
@@ -59,6 +66,10 @@ public:
     Scene createScene() noexcept;
     View createView() noexcept;
     Camera createCamera() noexcept;
+
+    Material createMaterial(const std::string& data);
+
+    MaterialInstance createInstance(Material& material);
 };
 
 } // namespace spatial::render
