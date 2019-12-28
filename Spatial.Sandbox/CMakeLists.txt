@@ -18,7 +18,10 @@ set_property(
 add_resources_library(Sandbox.Assets
     FOLDER sandbox
     MATERIALS
-        assets/materials/default.mat
+        assets/materials/plastic.mat
+    TEXTURES
+        assets/textures/spatial_engine_logo.png
+        assets/textures/pillars_2k.hdr
     DEPENDEES
         Spatial.Sandbox
 )

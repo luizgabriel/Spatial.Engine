@@ -1,5 +1,7 @@
 #include <spatial/render/RenderingSubsystem.h>
 #include <spatial/render/Engine.h>
+#include <spatial/desktop/PlatformEvent.h>
+#include <spatial/common/EBus.h>
 
 namespace spatial::render
 {
@@ -9,8 +11,17 @@ RenderingSubsystem::RenderingSubsystem(desktop::Window&& window)
 	  m_engine{filament::backend::Backend::OPENGL},
 	  m_swapChain{m_engine.createSwapChain(m_window.getNativeHandle())},
 	  m_renderer{m_engine.createRenderer()},
-	  m_mainView{m_engine.createView()}
+	  m_mainView{m_engine.createView()},
+	  m_mainCamera{m_engine.createCamera()}
 {
+	m_mainView->setCamera(m_mainCamera.get());
+
+	common::EBus::connect<desktop::WindowResizedEvent>(this);
+}
+
+RenderingSubsystem::~RenderingSubsystem()
+{
+	common::EBus::disconnect<desktop::WindowResizedEvent>(this);
 }
 
 void RenderingSubsystem::onRender()
@@ -25,6 +36,12 @@ void RenderingSubsystem::onRender()
 	} 
 
 	m_window.onEndRender();
+}
+
+void RenderingSubsystem::onEvent(const desktop::WindowResizedEvent& event)
+{
+	m_mainView->setViewport({0, 0, static_cast<uint32_t>(event.width),  static_cast<uint32_t>(event.height)});
+	m_mainCamera->setProjection(45, event.getRatio(), 1.0, 10.0);
 }
 
 } // namespace spatial::render

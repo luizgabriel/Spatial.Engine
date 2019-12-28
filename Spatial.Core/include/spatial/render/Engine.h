@@ -39,9 +39,19 @@ public:
         return m_engine;
     }
 
+    filament::Engine& get_ref()
+    {
+        return *m_engine;
+    }
+
     const filament::Engine *get() const
     {
         return m_engine;
+    }
+
+    const filament::Engine& get_ref() const
+    {
+        return *m_engine;
     }
 
     SwapChain createSwapChain(void *nativeWindowHandle) noexcept;

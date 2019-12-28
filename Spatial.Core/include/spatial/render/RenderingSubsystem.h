@@ -3,7 +3,6 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/Engine.h>
-#include <map>
 
 namespace spatial::render
 {
@@ -17,9 +16,12 @@ private:
 	Renderer m_renderer;
 
 	View m_mainView;
+	Camera m_mainCamera;
 
 public:
     RenderingSubsystem(desktop::Window&& window);
+
+	~RenderingSubsystem();
 
 	void onRender();
 
@@ -52,6 +54,18 @@ public:
 	{
 		return m_mainView;
 	}
+
+	Camera& getMainCamera()
+	{
+		return m_mainCamera;
+	}
+
+	const Camera& getMainCamera() const
+	{
+		return m_mainCamera;
+	}
+
+	void onEvent(const desktop::WindowResizedEvent& event);
 
 };
 

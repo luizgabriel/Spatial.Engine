@@ -1,30 +1,34 @@
 #include "engine.h"
 
 namespace sp = spatial::render;
+namespace fs = std::filesystem;
+namespace fl = filament;
+
+struct Vertex {
+    fl::math::float2 position;
+    fl::math::float2 uv;
+};
 
 class SandboxLayer
 {
 private:
-    float m_debug = 0;
-
     sp::Scene m_scene;
-    sp::Camera m_camera;
+    fs::path m_assets;
 
 public:
     SandboxLayer()
         : m_scene{engine().createScene()},
-          m_camera{engine().createCamera()}
+          m_camera{engine().createCamera()},
+          m_assets{fs::path{"assets"} / fs::path{"sandbox"}}
     {
-        app().onStartEvent.connect<&SandboxLayer::onStart>(this);
-        app().onFinishEvent.connect<&SandboxLayer::onFinish>(this);
-        app().onUpdateEvent.connect<&SandboxLayer::onUpdate>(this);
+        app().connectOnStart(this);
+        app().connectOnUpdate(this);
     }
 
     ~SandboxLayer()
     {
-        app().onStartEvent.disconnect<&SandboxLayer::onStart>(this);
-        app().onFinishEvent.disconnect<&SandboxLayer::onFinish>(this);
-        app().onUpdateEvent.disconnect<&SandboxLayer::onUpdate>(this);
+        app().disconnectOnStart(this);
+        app().disconnectOnUpdate(this);
     }
 
     void onStart()
@@ -32,32 +36,21 @@ public:
         auto [w, h] = window().getFrameBufferSize();
         auto& view = app().getRenderSys().getMainView();
 
-        m_camera->setExposure(16.0f, 1 / 125.0f, 100.0f);
-        m_camera->setProjection(45.0, double(w) / h, 0.1, 50, filament::Camera::Fov::VERTICAL);
+        camera()->setExposure(16.0f, 1 / 125.0f, 100.0f);
+        camera()->setProjection(45.0, double(w) / h, 0.1, 50, fl::Camera::Fov::VERTICAL);
+
+        fl::math::float3 eye{0, 0, 4}, center{0, 0, 0},  up{0, 1, 0};
+        camera()->lookAt(eye, center, up);
         
-        view->setCamera(m_camera.get());
-        view->setScene(m_scene.get());
-        view->setViewport({0, 0, w, h});
-        view->setClearTargets(true, true, true);
-        view->setClearColor({.0f, 0x33 / 255.0f, 0x66 / 255.0f, 1.0f});
-    }
-
-    void onFinish()
-    {
-
+        view()->setScene(m_scene.get());
+        view()->setViewport({0, 0, w, h});
+        view()->setClearTargets(true, true, true);
+        view()->setClearColor({.0f, 0x33 / 255.0f, 0x66 / 255.0f, 1.0f});
     }
 
     void onUpdate(float delta)
     {
-        if (m_debug > 2.0f)
-        {
-            std::cout << fmt::format("FPS: {}\n", 1 / delta);
-            m_debug = 0;
-        }
-        else
-        {
-            m_debug += delta;
-        }
+        
     }
 
 };

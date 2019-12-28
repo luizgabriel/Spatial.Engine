@@ -1,5 +1,6 @@
 add_library(Spatial.Core
 	src/common/KeyAction.cpp
+	src/common/EBus.cpp
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
 	src/render/Engine.cpp

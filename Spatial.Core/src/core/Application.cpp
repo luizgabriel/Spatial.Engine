@@ -2,21 +2,26 @@
 #include <iostream>
 #include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
+#include <spatial/common/EBus.h>
 
 namespace spatial::core
 {
 
-void printMousePosition(const desktop::MouseMovedEvent &event)
+Application::Application()
+    : m_windowContext{},
+      m_input{},
+      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
+      m_simulation{}
 {
-    std::cout << fmt::format("MOUSE: ({0}, {1})\n", event.x, event.y);
+    common::EBus::connect<desktop::WindowClosedEvent>(this);
 }
 
-void printWindowResized(const desktop::WindowResizedEvent &event)
+Application::~Application()
 {
-    std::cout << fmt::format("RESIZE: ({0}, {1})\n", event.width, event.height);
+    common::EBus::disconnect<desktop::WindowClosedEvent>(this);
 }
 
-void Application::onWindowClosed(const desktop::WindowClosedEvent& event)
+void Application::onEvent(const desktop::WindowClosedEvent& event)
 {
     stop();
 }
@@ -28,39 +33,28 @@ void Application::stop()
 
 int Application::run()
 {
+    physics::delta_t delta;
     m_running = true;
 
-    m_windowContext.connect<desktop::MouseMovedEvent, &printMousePosition>();
-    m_windowContext.connect<desktop::WindowResizedEvent, &printWindowResized>();
-    m_windowContext.connect<desktop::WindowClosedEvent, &Application::onWindowClosed>(this);
-
-    onStartEvent();
-
-    physics::delta_t delta;
+    m_startEvent.trigger();
 
     while (m_running)
     {
         delta = m_simulation.getDeltaTime();
 
         m_windowContext.pollEvents();
-        
-        onUpdateEvent(delta.count());
+        common::EBus::update();
+
+        m_updateEvent.trigger(delta.count());
 
         m_rendering.onRender();
         m_simulation.process();
     }
 
-    onFinishEvent();
+    m_finishEvent.trigger();
 
     return 0;
 }
 
-Application::Application()
-    : m_windowContext{},
-      m_input{m_windowContext},
-      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
-      m_simulation{}
-{
-}
 
 } // namespace spatial

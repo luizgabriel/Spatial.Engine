@@ -1,30 +1,32 @@
 #include <spatial/input/InputSubsystem.h>
+#include <spatial/common/EBus.h>
 #include <iostream>
 #include <fmt/format.h>
 
-namespace spatial
+namespace spatial::input
 {
 
-InputSubsystem::InputSubsystem(desktop::WindowContext &windowContext)
-    : m_windowContext{windowContext}
+using namespace common;
+
+InputSubsystem::InputSubsystem()
 {
-    m_windowContext.connect<desktop::MouseButtonEvent, &InputSubsystem::onMouseButtonEvent>(this);
-    m_windowContext.connect<desktop::KeyEvent, &InputSubsystem::onKeyEvent>(this);
+    EBus::connect<desktop::MouseButtonEvent>(this);
+    EBus::connect<desktop::KeyEvent>(this);
 }
 
 InputSubsystem::~InputSubsystem()
 {
-    m_windowContext.disconnect<desktop::MouseButtonEvent, &InputSubsystem::onMouseButtonEvent>(this);
-    m_windowContext.disconnect<desktop::KeyEvent, &InputSubsystem::onKeyEvent>(this);
+    EBus::disconnect<desktop::MouseButtonEvent>(this);
+    EBus::disconnect<desktop::KeyEvent>(this);
 }
 
-void InputSubsystem::onMouseButtonEvent(const desktop::MouseButtonEvent &event)
+void InputSubsystem::onEvent(const desktop::MouseButtonEvent &event)
 {
     std::cout << fmt::format("MOUSE BUTTON: {0} [{1}]\n", event.button, nameOf(event.action));
     //TODO: Update global mouse input state
 }
 
-void InputSubsystem::onKeyEvent(const desktop::KeyEvent &event)
+void InputSubsystem::onEvent(const desktop::KeyEvent &event)
 {
     auto key = SDL_GetKeyFromScancode(static_cast<SDL_Scancode>(event.scanCode));
     std::cout << fmt::format("KEY: {0} ({1}) [{2}]\n", static_cast<char>(key), event.scanCode, nameOf(event.action));

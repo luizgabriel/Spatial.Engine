@@ -2,7 +2,6 @@
 
 #include <string_view>
 #include <type_traits>
-#include <spatial/common/EventQueue.h>
 #include <SDL.h>
 
 namespace spatial::desktop
@@ -39,9 +38,6 @@ public:
 
 class WindowContext
 {
-private:
-	common::EventQueue m_eventQueue;
-
 public:
 	WindowContext();
 	~WindowContext();
@@ -55,30 +51,6 @@ public:
 
 	WindowContext &operator=(WindowContext &&other) = delete;
 	WindowContext &operator=(const WindowContext &w) = delete;
-
-	template <typename Event, auto Function>
-	void connect()
-	{
-		m_eventQueue.template connect<Event, Function>();
-	}
-
-	template <typename Event, auto Function, typename Type>
-	void connect(Type *valueOrInstance)
-	{
-		m_eventQueue.template connect<Event, Function, Type>(valueOrInstance);
-	}
-
-	template <typename Event, auto Function>
-	void disconnect()
-	{
-		m_eventQueue.template disconnect<Event, Function>();
-	}
-
-	template <typename Event, auto Function, typename Type>
-	void disconnect(Type *valueOrInstance)
-	{
-		m_eventQueue.template disconnect<Event, Function, Type>(valueOrInstance);
-	}
 };
 
 } // namespace spatial::desktop

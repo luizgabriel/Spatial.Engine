@@ -10,6 +10,11 @@ struct WindowResizedEvent
     int width, height;
 
     WindowResizedEvent(int width, int height) : width{width}, height{height} {}
+
+    float getRatio() const
+    {
+        return float(width) / float(height);
+    }
 };
 struct WindowClosedEvent
 {

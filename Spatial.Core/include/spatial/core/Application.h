@@ -17,15 +17,21 @@ private:
     desktop::WindowContext m_windowContext;
 
     //region Subsystems
-    InputSubsystem m_input;
+    input::InputSubsystem m_input;
     render::RenderingSubsystem m_rendering;
     physics::SimulationSubsystem m_simulation;
     //endregion
 
-    void onWindowClosed(const desktop::WindowClosedEvent &event);
+    //region Events
+    common::Event<float> m_updateEvent;
+    common::Event<> m_startEvent;
+    common::Event<> m_finishEvent;
+    //endregion
 
 public:
     Application();
+
+    ~Application();
 
     Application(const Application &other) = delete;
     Application &operator=(const Application &other) = delete;
@@ -36,25 +42,51 @@ public:
 
     bool isRunning() const { return m_running; }
 
-    //region Events
-    common::Event<float> onUpdateEvent;
-    common::Event<float> onRenderEvent;
-    common::Event<float> onGuiEvent;
+    void onEvent(const desktop::WindowClosedEvent &event);
 
-    common::Event<> onStartEvent;
-    common::Event<> onFinishEvent;
+    //region On Start Event
+    template<typename Type>
+    void connectOnStart(Type* instance)
+    {
+        m_startEvent.template connect<&Type::onStart, Type>(instance);
+    }
+
+    template<typename Type>
+    void disconnectOnStart(Type* instance)
+    {
+        m_startEvent.template disconnect<&Type::onStart, Type>(instance);
+    }
     //endregion
 
-    desktop::WindowContext &getWindowContext()
+    //region On Finish Event
+    template<typename Type>
+    void connectOnFinish(Type* instance)
     {
-        return m_windowContext;
+        m_finishEvent.template connect<&Type::onFinish, Type>(instance);
     }
 
-    const desktop::WindowContext &getWindowContext() const
+    template<typename Type>
+    void disconnectOnFinish(Type* instance)
     {
-        return m_windowContext;
+        m_finishEvent.template connect<&Type::onFinish, Type>(instance);
+    }
+    //endregion
+
+    //region On Update Event
+    template<typename Type>
+    void connectOnUpdate(Type* instance)
+    {
+        m_updateEvent.template connect<&Type::onUpdate, Type>(instance);
     }
 
+    template<typename Type>
+    void disconnectOnUpdate(Type* instance)
+    {
+        m_updateEvent.template disconnect<&Type::onUpdate, Type>(instance);
+    }
+    //endregion
+
+    //region Getters
     render::RenderingSubsystem &getRenderSys()
     {
         return m_rendering;
@@ -64,6 +96,7 @@ public:
     {
         return m_rendering;
     }
+    //endregion Getters
 };
 
 } // namespace spatial::core

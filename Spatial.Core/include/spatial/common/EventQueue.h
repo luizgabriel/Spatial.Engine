@@ -28,10 +28,19 @@ public:
         m_dispatcher.template sink<Event>().template connect<Function>();
     }
 
-    template <typename Event, auto Function, typename Type>
+    template <typename Event, auto Function = nullptr, typename Type>
     void connect(Type *valueOrInstance)
     {
-        m_dispatcher.template sink<Event>().template connect<Function, Type>(valueOrInstance);
+        auto sink = m_dispatcher.template sink<Event>();
+        if constexpr (std::is_null_pointer<decltype(Function)>::value)
+        {
+            constexpr auto overloaded = static_cast<void (Type::*)(const Event &)>(&Type::onEvent);
+            sink.template connect<overloaded, Type>(valueOrInstance);
+        }
+        else
+        {
+            sink.template connect<Function, Type>(valueOrInstance);
+        }
     }
 
     template <typename Event, auto Function>
@@ -40,10 +49,19 @@ public:
         m_dispatcher.template sink<Event>().template disconnect<Function>();
     }
 
-    template <typename Event, auto Function, typename Type>
+    template <typename Event, auto Function = nullptr, typename Type>
     void disconnect(Type *valueOrInstance)
     {
-        m_dispatcher.template sink<Event>().template disconnect<Function, Type>(valueOrInstance);
+        auto sink = m_dispatcher.template sink<Event>();
+        if constexpr (std::is_null_pointer<decltype(Function)>::value)
+        {
+            constexpr auto overloaded = static_cast<void (Type::*)(const Event &)>(&Type::onEvent);
+            sink.template disconnect<overloaded, Type>(valueOrInstance);
+        }
+        else
+        {
+            sink.template disconnect<Function, Type>(valueOrInstance);
+        }
     }
 
     template <typename Event, typename... Args>
