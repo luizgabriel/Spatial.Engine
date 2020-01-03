@@ -12,7 +12,6 @@ private:
     sp::Scene m_scene;
 
     sp::Material m_material;
-    sp::MaterialInstance m_instance;
 
     sp::Sphere m_sphere;
     sp::Entity m_light;
@@ -20,9 +19,8 @@ private:
 public:
     SandboxLayer()
         : m_assets{fs::path{"assets"} / fs::path{"sandbox"}},
-          m_scene{engine().createScene()},
-          m_material{engine().createMaterial( read(m_assets / "materials" / "plastic.filamat") )},
-          m_instance{engine().createInstance(m_material)},
+          m_scene{createScene(engine())},
+          m_material{createMaterial(engine(), read(m_assets / "materials" / "plastic.filamat"))},
           m_sphere{engine(), m_material, true},
           m_light{}
     {
@@ -49,10 +47,11 @@ public:
         view()->setClearTargets(true, true, true);
         view()->setClearColor({.0f, .0f, .0f, 1.0f});
 
-        m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
-        m_instance->setParameter("roughness", 0.5f);
-        m_instance->setParameter("clearCoat", 1.0f);
-        m_instance->setParameter("clearCoatRoughness", 0.3f);
+        auto& instance = m_sphere.getMaterialInstance();
+        instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
+        instance->setParameter("roughness", 0.5f);
+        instance->setParameter("clearCoat", 1.0f);
+        instance->setParameter("clearCoatRoughness", 0.3f);
 
         m_sphere.setPosition(eye);
         m_sphere.setRadius(1.0f);
@@ -65,7 +64,7 @@ public:
             .sunAngularRadius(1.9f)
             .sunHaloSize(10.0f)
             .sunHaloFalloff(80.0f)
-            .build(engine().get_ref(), m_light.get());
+            .build(engine(), m_light.get());
 
         m_scene->addEntity(m_sphere.getEntity().get());
         m_scene->addEntity(m_light.get());

@@ -2,6 +2,7 @@
 
 #include <spatial/render/Entity.h>
 #include <spatial/render/Engine.h>
+#include <spatial/render/CommonResources.h>
 
 namespace spatial::render
 {

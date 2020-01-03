@@ -2,15 +2,10 @@
 
 #include <filament/Engine.h>
 
-#ifdef SPATIAL_DEBUG
-#include <iostream>
-#include <fmt/format.h>
-#endif
-
 namespace spatial::render
 {
 
-template <typename T, const char **RESOURCE_NAME>
+template <typename T>
 class EngineResource
 {
 private:
@@ -63,13 +58,7 @@ public:
 	~EngineResource()
 	{
 		if (m_resource)
-		{
-#ifdef SPATIAL_DEBUG
-			std::cout << fmt::format("\n[SPATIAL] Cleaned {} filament engine resource. ", *RESOURCE_NAME);
-#endif
-
 			m_engine->destroy(m_resource);
-		}
 	}
 };
 

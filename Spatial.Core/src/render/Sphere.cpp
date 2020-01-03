@@ -29,7 +29,7 @@ static Geometry *gGeometry{nullptr};
 
 Sphere::Sphere(RenderEngine &engine, Material &material, bool culling)
     : m_engine(&engine),
-      m_materialInstance{engine.createInstance(material)},
+      m_materialInstance{engine, material->createInstance()},
       m_renderable{}
 {
     static_assert(sizeof(IcoSphere::Triangle) == sizeof(IcoSphere::Index) * 3,

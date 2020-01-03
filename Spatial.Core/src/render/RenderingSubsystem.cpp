@@ -9,10 +9,10 @@ namespace spatial::render
 RenderingSubsystem::RenderingSubsystem(desktop::Window&& window)
 	: m_window{std::move(window)},
 	  m_engine{filament::backend::Backend::OPENGL},
-	  m_swapChain{m_engine.createSwapChain(m_window.getNativeHandle())},
-	  m_renderer{m_engine.createRenderer()},
-	  m_mainView{m_engine.createView()},
-	  m_mainCamera{m_engine.createCamera()}
+	  m_swapChain{createSwapChain(m_engine, m_window.getNativeHandle())},
+	  m_renderer{createRenderer(m_engine)},
+	  m_mainView{createView(m_engine)},
+	  m_mainCamera{createCamera(m_engine)}
 {
 	m_mainView->setCamera(m_mainCamera.get());
 

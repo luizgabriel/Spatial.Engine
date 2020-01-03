@@ -3,6 +3,7 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/Engine.h>
+#include <spatial/render/CommonResources.h>
 
 namespace spatial::render
 {

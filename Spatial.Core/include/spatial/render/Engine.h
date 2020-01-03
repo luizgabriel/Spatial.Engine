@@ -11,27 +11,6 @@
 namespace spatial::render
 {
 
-extern const char *gStrSwapChainResourceName;
-using SwapChain = EngineResource<filament::SwapChain, &gStrSwapChainResourceName>;
-
-extern const char *gStrRendererResourceName;
-using Renderer = EngineResource<filament::Renderer, &gStrRendererResourceName>;
-
-extern const char *gStrSceneResourceName;
-using Scene = EngineResource<filament::Scene, &gStrSceneResourceName>;
-
-extern const char *gStrViewResourceName;
-using View = EngineResource<filament::View, &gStrViewResourceName>;
-
-extern const char *gStrCameraResourceName;
-using Camera = EngineResource<filament::Camera, &gStrCameraResourceName>;
-
-extern const char *gStrMaterialResourceName;
-using Material = EngineResource<filament::Material, &gStrMaterialResourceName>;
-
-extern const char *gStrMaterialInstanceResourceName;
-using MaterialInstance = EngineResource<filament::MaterialInstance, &gStrMaterialInstanceResourceName>;
-
 class RenderEngine
 {
 private:
@@ -61,14 +40,15 @@ public:
         return *m_engine;
     }
 
-    SwapChain createSwapChain(void *nativeWindowHandle) noexcept;
-    Renderer createRenderer() noexcept;
-    Scene createScene() noexcept;
-    View createView() noexcept;
-    Camera createCamera() noexcept;
-    Material createMaterial(const char* data, size_t size) noexcept;
-    Material createMaterial(const std::vector<char>& data) noexcept;
-    MaterialInstance createInstance(Material& material) noexcept;
+    operator filament::Engine*()
+    {
+        return get();
+    }
+
+    operator filament::Engine&()
+    {
+        return get_ref();
+    }
 };
 
 } // namespace spatial::render

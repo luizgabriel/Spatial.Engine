@@ -3,8 +3,6 @@
 #include <spatial/core/Application.h>
 #include <spatial/render/RenderingSubsystem.h>
 
-#include <filament/Material.h>
-#include <filament/Scene.h>
 #include <utils/EntityManager.h>
 #include <filament/LightManager.h>
 #include <filament/Color.h>
