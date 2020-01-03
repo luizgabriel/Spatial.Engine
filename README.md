@@ -11,7 +11,7 @@ Most of the dependencies are handled by the [Conan Package Manager](https://cona
 
 When you run the cmake configure command, it automagically downloads its dependencies and builds then for you.
 
-Only the SDL2 dependency is necessary to installed manually. If you are on a gnu based operating system, you're one comand line of distance for installing the SDL2. But if you're on windows, I recomend you to install [VCPKG](https://github.com/microsoft/vcpkg) to make your life easier.
+Only the SDL2 dependency is necessary to be installed manually. If you are on a gnu based operating system, you're one comand line of distance for installing the SDL2. But if you're on windows, I recomend you to install [VCPKG](https://github.com/microsoft/vcpkg) to make your life easier.
 
 ```shell
 # Create the output directory
