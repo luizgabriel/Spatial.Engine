@@ -4,7 +4,7 @@
 namespace spatial::common
 {
 
-std::string_view nameOf(KeyAction action)
+std::string nameOf(KeyAction action)
 {
     switch (action)
     {

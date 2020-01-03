@@ -9,6 +9,7 @@ add_library(Spatial.Core
 	src/render/Sphere.cpp
 	src/render/CommonResources.cpp
 	src/input/InputSubsystem.cpp
+	src/input/Input.cpp
 	src/physics/SimulationSubsystem.cpp
 	src/core/Application.cpp
 )

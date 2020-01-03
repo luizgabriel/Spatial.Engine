@@ -3,9 +3,14 @@
 #include <string_view>
 #include <type_traits>
 #include <SDL.h>
+#include <spatial/common/Key.h>
 
 namespace spatial::desktop
 {
+
+common::Key mapKeyFromScancode(SDL_Scancode scanCode);
+
+common::Key mapKeyFromMouseButton(int mouseButton);
 
 class WindowContext;
 

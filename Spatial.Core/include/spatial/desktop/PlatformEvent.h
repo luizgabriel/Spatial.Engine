@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
 
 namespace spatial::desktop
@@ -16,17 +18,21 @@ struct WindowResizedEvent
         return float(width) / float(height);
     }
 };
+
 struct WindowClosedEvent
 {
 };
+
 struct KeyEvent
 {
-    int scanCode;
-    int repeat;
+    common::Key key;
     common::KeyAction action;
+    int repeat;
 
-    explicit KeyEvent(int scanCode, int repeat = 0, common::KeyAction action = common::KeyAction::None) 
-        : scanCode{scanCode}, repeat{repeat}, action{action} {}
+    explicit KeyEvent(common::Key key, common::KeyAction action = common::KeyAction::None, int repeat = 0)
+        : key{key}, action{action}, repeat{repeat}
+    {
+    }
 };
 
 struct MouseMovedEvent
@@ -44,10 +50,10 @@ struct MouseScrolledEvent
 
 struct MouseButtonEvent
 {
-    int button;
+    common::Key button;
     common::KeyAction action;
 
-    MouseButtonEvent(int button, common::KeyAction action) : button{button}, action{action} {}
+    MouseButtonEvent(common::Key button, common::KeyAction action) : button{button}, action{action} {}
 };
 
 } // namespace spatial::desktop

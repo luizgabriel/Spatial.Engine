@@ -1,24 +1,27 @@
 #include "utils.h"
 
-namespace sp = spatial::render;
-namespace fs = std::filesystem;
 namespace fl = filament;
+using namespace spatial;
+using namespace spatial::math;
+using namespace spatial::desktop;
+using namespace spatial::core;
+using namespace spatial::common;
+using namespace spatial::render;
+using namespace spatial::input;
+using namespace std::filesystem;
 
 class SandboxLayer
 {
 private:
-    fs::path m_assets;
-
-    sp::Scene m_scene;
-
-    sp::Material m_material;
-
-    sp::Sphere m_sphere;
-    sp::Entity m_light;
+    path m_assets;
+    Scene m_scene;
+    Material m_material;
+    Sphere m_sphere;
+    Entity m_light;
 
 public:
     SandboxLayer()
-        : m_assets{fs::path{"assets"} / fs::path{"sandbox"}},
+        : m_assets{path{"assets"} / path{"sandbox"}},
           m_scene{createScene(engine())},
           m_material{createMaterial(engine(), read(m_assets / "materials" / "plastic.filamat"))},
           m_sphere{engine(), m_material, true},
@@ -39,7 +42,7 @@ public:
         camera()->setExposure(16.0f, 1 / 125.0f, 100.0f);
         camera()->setProjection(45.0, double(w) / h, 0.1, 50, fl::Camera::Fov::VERTICAL);
 
-        fl::math::float3 eye{0, 0, 4}, center{0, 0, 0}, up{0, 1, 0};
+        float3 eye{0, 0, 4}, center{0, 0, 0}, up{0, 1, 0};
         camera()->lookAt(eye, center, up);
 
         view()->setScene(m_scene.get());
@@ -64,15 +67,18 @@ public:
             .sunAngularRadius(1.9f)
             .sunHaloSize(10.0f)
             .sunHaloFalloff(80.0f)
-            .build(engine(), m_light.get());
+            .build(engine(), m_light);
 
-        m_scene->addEntity(m_sphere.getEntity().get());
-        m_scene->addEntity(m_light.get());
+        m_scene->addEntity(m_sphere.getEntity());
+        m_scene->addEntity(m_light);
     }
 
     void onUpdate(float delta)
     {
-        //
+        if (Input::released(Key::D))
+        {
+            std::cout << "\nHello, world!";
+        }
     }
 
     void onFinish()
@@ -83,7 +89,7 @@ public:
 
 int main(int arc, char *argv[])
 {
-    fs::path executable{argv[0]};
+    path executable{argv[0]};
 
     basePath() = executable.parent_path();
     SandboxLayer gameLayer;

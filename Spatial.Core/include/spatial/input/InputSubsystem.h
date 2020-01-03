@@ -12,6 +12,8 @@ public:
     InputSubsystem();
     ~InputSubsystem();
 
+    void resetInputState();
+
     void onEvent(const desktop::MouseButtonEvent &event);
     void onEvent(const desktop::KeyEvent &event);
 };

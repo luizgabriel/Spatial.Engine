@@ -47,6 +47,7 @@ int Application::run()
 
         m_updateEvent.trigger(delta.count());
 
+        m_input.resetInputState();
         m_rendering.onRender();
         m_simulation.process();
     }

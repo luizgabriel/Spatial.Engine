@@ -2,10 +2,6 @@
 
 #include <utils/EntityManager.h>
 
-#ifdef SPATIAL_DEBUG
-#include <iostream>
-#endif
-
 namespace spatial::render
 {
 
@@ -16,7 +12,7 @@ private:
 
 public:
 	Entity()
-		: m_entity{utils::EntityManager::get().create()}
+		: Entity{utils::EntityManager::get().create()}
 	{
 	}
 
@@ -40,15 +36,15 @@ public:
 		return m_entity;
 	}
 
+	operator utils::Entity()
+	{
+		return get();
+	}
+
 	~Entity()
 	{
 		if (m_entity.isNull())
-		{
-#ifdef SPATIAL_DEBUG
-			std::cout << "\n[SPATIAL] Destroyed entity.";
-#endif
 			utils::EntityManager::get().destroy(m_entity);
-		}
 	}
 };
 
