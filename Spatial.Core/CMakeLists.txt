@@ -5,6 +5,8 @@ add_library(Spatial.Core
 	src/desktop/WindowContext.cpp
 	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
+	src/render/IcoSphere.cpp
+	src/render/Sphere.cpp
 	src/input/InputSubsystem.cpp
 	src/physics/SimulationSubsystem.cpp
 	src/core/Application.cpp
@@ -34,6 +36,7 @@ target_link_libraries(
 		CONAN_PKG::fmt
 		CONAN_PKG::entt
 		CONAN_PKG::filament
+		CONAN_PKG::boost
 
 		SDL2::SDL2
 		SDL2::SDL2main

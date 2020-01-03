@@ -44,6 +44,22 @@ public:
 
     void onEvent(const desktop::WindowClosedEvent &event);
 
+    template<typename Type>
+    void connect(Type* instance)
+    {
+        connectOnStart(instance);
+        connectOnUpdate(instance);
+        connectOnFinish(instance);
+    }
+
+    template<typename Type>
+    void disconnect(Type* instance)
+    {
+        disconnectOnStart(instance);
+        disconnectOnUpdate(instance);
+        disconnectOnFinish(instance);
+    }
+
     //region On Start Event
     template<typename Type>
     void connectOnStart(Type* instance)

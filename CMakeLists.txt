@@ -4,7 +4,7 @@ project(SpatialEngine
     VERSION 1.0.0
 )
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/Cmake)
 include(SetupDependencies)
 
 option(BUILD_SPATIAL_SANDBOX "Build Spatial Sandbox target" ON)

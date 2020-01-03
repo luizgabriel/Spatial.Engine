@@ -54,22 +54,19 @@ Camera RenderEngine::createCamera() noexcept
     return {m_engine, m_engine->createCamera()};
 }
 
-Material RenderEngine::createMaterial(const std::string& data)
+Material RenderEngine::createMaterial(const char *data, size_t size) noexcept
 {
-    return {
-        m_engine,
-        filament::Material::Builder()
-            .package(data.c_str(), data.size())
-            .build(*m_engine)
-    };
+    return {m_engine, filament::Material::Builder().package(data, size).build(*m_engine)};
 }
 
-MaterialInstance RenderEngine::createInstance(Material& material)
+Material RenderEngine::createMaterial(const std::vector<char> &data) noexcept
 {
-    return {
-        m_engine,
-        material->createInstance()
-    };
+    return createMaterial(&data[0], data.size());
+}
+
+MaterialInstance RenderEngine::createInstance(Material &material) noexcept
+{
+    return {m_engine, material->createInstance()};
 }
 
 } // namespace spatial::render

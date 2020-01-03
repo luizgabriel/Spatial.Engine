@@ -2,7 +2,7 @@ include(ResourcesLibrary)
 
 add_executable(Spatial.Sandbox
     src/main.cpp
-    src/engine.cpp
+    src/utils.cpp
 )
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
@@ -24,5 +24,5 @@ add_resources_library(Sandbox.Assets
     DEPENDEES
         Spatial.Sandbox
     OUTPUT
-        ${CMAKE_BINARY_DIR}/assets/sandbox
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/sandbox
 )

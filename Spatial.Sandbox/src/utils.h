@@ -13,7 +13,9 @@
 
 spatial::core::Application& app();
 
-std::string read(const std::filesystem::path& filePath);
+std::vector<char> read(const std::filesystem::path& filePath);
+
+std::filesystem::path& basePath();
 
 inline spatial::render::RenderEngine& engine()
 {

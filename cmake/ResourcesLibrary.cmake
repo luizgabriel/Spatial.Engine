@@ -6,19 +6,19 @@ find_program(CMGEN_PROGRAM cmgen HINTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 function(add_resources_library TARGET_NAME)
     set(oneValueArgs OUTPUT)
     set(multiValueArgs MATERIALS MODELS TEXTURES DEPENDEES)
-    cmake_parse_arguments(RESOURCE_LIBRARY "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(RESLIB "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     
-    foreach(MATERIAL_FILE ${RESOURCE_LIBRARY_MATERIALS})
-        _add_custom_material_command(${MATERIAL_FILE} ${RESOURCE_LIBRARY_OUTPUT})
+    foreach(MATERIAL_FILE ${RESLIB_MATERIALS})
+        _add_custom_material_command(${MATERIAL_FILE} ${RESLIB_OUTPUT})
         list(APPEND MATERIAL_OUTPUT_FILES ${MATERIAL_OUTPUT_FILE})
     endforeach()
 
-    foreach(TEXTURE_FILE ${RESOURCE_LIBRARY_TEXTURES})
+    foreach(TEXTURE_FILE ${RESLIB_TEXTURES})
 
         if (${TEXTURE_FILE} MATCHES ".+\.hdr$")
-            _add_custom_hdr_texture_command(${TEXTURE_FILE} ${RESOURCE_LIBRARY_OUTPUT})
+            _add_custom_hdr_texture_command(${TEXTURE_FILE} ${RESLIB_OUTPUT})
         elseif()
-            _add_custom_texture_command(${TEXTURE_FILE} ${RESOURCE_LIBRARY_OUTPUT})
+            _add_custom_texture_command(${TEXTURE_FILE} ${RESLIB_OUTPUT})
         endif()
 
         list(APPEND TEXTURE_OUTPUT_FILES ${TEXTURE_OUTPUT_FILE})
@@ -30,7 +30,7 @@ function(add_resources_library TARGET_NAME)
             ${TEXTURE_OUTPUT_FILES}
     )
 
-    foreach(DEPENDEE ${RESOURCE_LIBRARY_DEPENDEES})
+    foreach(DEPENDEE ${RESLIB_DEPENDEES})
         add_dependencies(${DEPENDEE} ${TARGET_NAME})
     endforeach()
 
@@ -68,7 +68,7 @@ function(_add_custom_hdr_texture_command TEXTURE_FILE OUTPUT)
     add_custom_command(
         OUTPUT ${TEXTURE_OUTPUT_FILE}
         COMMAND ${CMGEN_PROGRAM} -q --format=ktx --size=256 --extract-blur=0.1 ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE}
-        COMMENT "${CMGEN_PROGRAM} -q --format=ktx --size=256 --extract-blur=0.1 ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE}"
+        COMMENT "${CMGEN_PROGRAM} -q --format=ktx --size=256 --extract-blur=0.1 -x ${TEXTURE_FILE_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE}"
         WORKING_DIRECTORY ${TEXTURE_OUTPUT_FOLDER}
     )
 endfunction()
@@ -78,13 +78,13 @@ function(_add_custom_material_command MATERIAL_FILE OUTPUT)
     string(REGEX REPLACE "\\.[^.]*$" "" MATERIAL_FILE_NAME ${MATERIAL_FILE_NAME})
 
     set(MATERIAL_OUTPUT_FOLDER  "${OUTPUT}/materials")
-    set(MATERIAL_OUTPUT_FILE "${MATERIAL_OUTPUT_FOLDER}/${MATERIAL_FILE_NAME}.bin")
+    set(MATERIAL_OUTPUT_FILE "${MATERIAL_OUTPUT_FOLDER}/${MATERIAL_FILE_NAME}.filamat")
     set(MATERIAL_OUTPUT_FILE "${MATERIAL_OUTPUT_FILE}" PARENT_SCOPE)
 
     add_custom_command(
         OUTPUT ${MATERIAL_OUTPUT_FILE}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MATERIAL_OUTPUT_FOLDER}
-        COMMAND ${MATC_PROGRAM} -a opengl -o ${MATERIAL_OUTPUT_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${MATERIAL_FILE}
+        COMMAND ${MATC_PROGRAM} -a all -p desktop -o ${MATERIAL_OUTPUT_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${MATERIAL_FILE}
         COMMENT "Compiling material: ${MATERIAL_FILE} => ${MATERIAL_OUTPUT_FILE}"
     )
 endfunction()

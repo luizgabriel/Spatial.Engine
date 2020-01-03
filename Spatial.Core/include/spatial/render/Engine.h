@@ -4,7 +4,7 @@
 #include <filament/View.h>
 #include <filament/Renderer.h>
 #include <filament/Material.h>
-
+#include <utils/EntityManager.h>
 #include <spatial/render/EngineResource.h>
 #include <memory>
 
@@ -66,10 +66,9 @@ public:
     Scene createScene() noexcept;
     View createView() noexcept;
     Camera createCamera() noexcept;
-
-    Material createMaterial(const std::string& data);
-
-    MaterialInstance createInstance(Material& material);
+    Material createMaterial(const char* data, size_t size) noexcept;
+    Material createMaterial(const std::vector<char>& data) noexcept;
+    MaterialInstance createInstance(Material& material) noexcept;
 };
 
 } // namespace spatial::render

@@ -8,7 +8,7 @@ namespace spatial::common
 class EBus
 {
 private:
-    static common::EventQueue &get();
+    static common::EventQueue &get() noexcept;
 
 public:
     template <typename Event>

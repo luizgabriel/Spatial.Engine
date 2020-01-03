@@ -3,7 +3,7 @@
 namespace spatial::common
 {
 
-common::EventQueue &EBus::get()
+common::EventQueue &EBus::get() noexcept
 {
     static common::EventQueue queue;
     return queue;
