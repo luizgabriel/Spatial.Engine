@@ -20,7 +20,7 @@ add_resources_library(Sandbox.Assets
         assets/materials/plastic.mat
     TEXTURES
         assets/textures/spatial_engine_logo.png
-        assets/textures/pillars_2k.hdr
+        # assets/textures/pillars_2k.hdr
     DEPENDEES
         Spatial.Sandbox
     OUTPUT

@@ -48,7 +48,7 @@ function(_add_custom_texture_command TEXTURE_FILE OUTPUT)
         OUTPUT ${TEXTURE_OUTPUT_FILE}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${TEXTURE_OUTPUT_FOLDER}
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE} ${TEXTURE_OUTPUT_FILE} 
-        COMMENT "Copying textures: ${TEXTURE_FILE} => ${TEXTURE_OUTPUT_FILE}"
+        COMMENT "Copying texture: ${TEXTURE_FILE} => ${TEXTURE_OUTPUT_FILE}"
     )
 endfunction()
 
@@ -68,7 +68,7 @@ function(_add_custom_hdr_texture_command TEXTURE_FILE OUTPUT)
     add_custom_command(
         OUTPUT ${TEXTURE_OUTPUT_FILE}
         COMMAND ${CMGEN_PROGRAM} -q --format=ktx --size=256 --extract-blur=0.1 ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE}
-        COMMENT "${CMGEN_PROGRAM} -q --format=ktx --size=256 --extract-blur=0.1 -x ${TEXTURE_FILE_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/${TEXTURE_FILE}"
+        COMMENT "Compiling texture: ${TEXTURE_FILE}"
         WORKING_DIRECTORY ${TEXTURE_OUTPUT_FOLDER}
     )
 endfunction()

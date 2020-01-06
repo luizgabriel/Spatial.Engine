@@ -2,6 +2,7 @@
 entt/3.2.1@skypjack/stable
 fmt/6.0.0@bincrafters/stable
 filament/1.4.3@google/stable
+spdlog/1.4.2@bincrafters/stable
 #boost/1.69.0@conan/stable
 
 [generators]

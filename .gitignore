@@ -4,3 +4,4 @@
 dependencies/
 build/
 out/
+*.log

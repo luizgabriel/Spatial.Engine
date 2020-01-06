@@ -3,6 +3,10 @@
 #include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/EBus.h>
+#include <spatial/common/Logger.h>
+
+using namespace spatial::common;
+using namespace spatial::desktop;
 
 namespace spatial::core
 {
@@ -13,15 +17,15 @@ Application::Application()
       m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
       m_simulation{}
 {
-    common::EBus::connect<desktop::WindowClosedEvent>(this);
+    EBus::connect<WindowClosedEvent>(this);
 }
 
 Application::~Application()
 {
-    common::EBus::disconnect<desktop::WindowClosedEvent>(this);
+    EBus::disconnect<WindowClosedEvent>(this);
 }
 
-void Application::onEvent(const desktop::WindowClosedEvent& event)
+void Application::onEvent(const WindowClosedEvent& event)
 {
     stop();
 }
@@ -44,7 +48,7 @@ int Application::run()
 
         m_input.resetInputState();
         m_windowContext.pollEvents();
-        common::EBus::update();
+        EBus::update();
 
         m_updateEvent.trigger(delta.count());
 

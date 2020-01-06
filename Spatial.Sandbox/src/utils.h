@@ -1,11 +1,7 @@
 #pragma once
 
 #include <spatial/spatial.h>
-#include <fmt/format.h>
-
-#include <iostream>
 #include <filesystem>
-
 #include <vector>
 #include <fstream>
 #include <sstream>

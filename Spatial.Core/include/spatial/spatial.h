@@ -2,14 +2,12 @@
 
 #include <spatial/core/Application.h>
 #include <spatial/input/Input.h>
-#include <spatial/common/Key.h>
+#include <spatial/render/Entity.h>
+#include <spatial/common/Logger.h>
 
 #include <utils/EntityManager.h>
 #include <filament/LightManager.h>
 #include <filament/Color.h>
-
-#include <spatial/render/IcoSphere.h>
-#include <spatial/render/Sphere.h>
 
 namespace spatial::math
 {

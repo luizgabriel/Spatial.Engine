@@ -43,7 +43,7 @@ public:
 
 	~Entity()
 	{
-		if (m_entity.isNull())
+		if (!m_entity.isNull())
 			utils::EntityManager::get().destroy(m_entity);
 	}
 };

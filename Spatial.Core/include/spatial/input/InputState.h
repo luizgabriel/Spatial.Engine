@@ -57,6 +57,11 @@ public:
         return pressed(alt1) && pressed(alt2) && pressed(alt3) && released(key);
     }
 
+    bool combined(common::Key alt1, common::Key alt2, common::Key alt3, common::Key alt4, common::Key key) const
+    {
+        return pressed(alt1) && pressed(alt2) && pressed(alt3) && pressed(alt4) && released(key);
+    }
+
     filament::math::float2 getMousePosition() const
     {
         return m_mousePosition;

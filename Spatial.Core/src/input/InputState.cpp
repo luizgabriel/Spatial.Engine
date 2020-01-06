@@ -6,7 +6,7 @@ namespace spatial::input
 using namespace common;
 using namespace filament::math;
 
-InputState()
+InputState::InputState()
     : m_mousePosition{.0f, .0f},
       m_keyPressed{},
       m_keyReleased{}

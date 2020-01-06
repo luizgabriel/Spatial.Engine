@@ -25,7 +25,6 @@ public:
         : m_assets{"assets"},
           m_scene{createScene(engine())},
           m_material{createMaterial(engine(), read(m_assets / "sandbox" / "materials" / "plastic.filamat"))},
-          m_sphere{engine(), m_material, true},
           m_light{},
           c{0}
     {
@@ -73,9 +72,13 @@ public:
     void onUpdate(float delta)
     {
         if (Input::combined(Key::LShift, Key::D))
-        {
-            std::cout << fmt::format("Hello, world! {}\n", ++c);
-        }
+            Logger::info("Hello, world! {}", ++c);
+
+        if (Input::combined(Key::LShift, Key::W))
+            Logger::warn("Hello, world! {}", ++c);
+
+        if (Input::combined(Key::LShift, Key::C))
+            Logger::critical("Hello, world! {}", ++c);
     }
 
     void onFinish()
