@@ -3,10 +3,6 @@
 namespace spatial::common
 {
 
-common::EventQueue &EBus::get() noexcept
-{
-    static common::EventQueue queue;
-    return queue;
-}
+EventQueue EBus::s_queue{};
 
 }

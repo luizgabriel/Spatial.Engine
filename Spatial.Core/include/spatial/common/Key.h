@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace spatial::common
 {
 
@@ -116,5 +118,7 @@ enum class Key {
 
   Count      ///< Keep last -- the total number of keyboard keys
 };
+
+std::string nameOf(Key key);
 
 }

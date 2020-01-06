@@ -16,16 +16,18 @@ private:
     path m_assets;
     Scene m_scene;
     Material m_material;
-    Sphere m_sphere;
     Entity m_light;
+
+    int c;
 
 public:
     SandboxLayer()
-        : m_assets{path{"assets"} / path{"sandbox"}},
+        : m_assets{"assets"},
           m_scene{createScene(engine())},
-          m_material{createMaterial(engine(), read(m_assets / "materials" / "plastic.filamat"))},
+          m_material{createMaterial(engine(), read(m_assets / "sandbox" / "materials" / "plastic.filamat"))},
           m_sphere{engine(), m_material, true},
-          m_light{}
+          m_light{},
+          c{0}
     {
         app().connect(this);
     }
@@ -50,14 +52,10 @@ public:
         view()->setClearTargets(true, true, true);
         view()->setClearColor({.0f, .0f, .0f, 1.0f});
 
-        auto& instance = m_sphere.getMaterialInstance();
-        instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
-        instance->setParameter("roughness", 0.5f);
-        instance->setParameter("clearCoat", 1.0f);
-        instance->setParameter("clearCoatRoughness", 0.3f);
-
-        m_sphere.setPosition(eye);
-        m_sphere.setRadius(1.0f);
+        //instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
+        //instance->setParameter("roughness", 0.5f);
+        //instance->setParameter("clearCoat", 1.0f);
+        //instance->setParameter("clearCoatRoughness", 0.3f);
 
         fl::LightManager::Builder(fl::LightManager::Type::SUN)
             .color(fl::Color::toLinear<fl::ACCURATE>({0.98f, 0.92f, 0.89f}))
@@ -69,15 +67,14 @@ public:
             .sunHaloFalloff(80.0f)
             .build(engine(), m_light);
 
-        m_scene->addEntity(m_sphere.getEntity());
         m_scene->addEntity(m_light);
     }
 
     void onUpdate(float delta)
     {
-        if (Input::released(Key::D))
+        if (Input::combined(Key::LShift, Key::D))
         {
-            std::cout << "\nHello, world!";
+            std::cout << fmt::format("Hello, world! {}\n", ++c);
         }
     }
 
@@ -91,7 +88,7 @@ int main(int arc, char *argv[])
 {
     path executable{argv[0]};
 
-    basePath() = executable.parent_path();
+    g_basePath = executable.parent_path();
     SandboxLayer gameLayer;
 
     return app().run();

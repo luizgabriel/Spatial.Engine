@@ -11,11 +11,11 @@
 #include <sstream>
 #include <string>
 
+extern std::filesystem::path g_basePath;
+
 spatial::core::Application& app();
 
 std::vector<char> read(const std::filesystem::path& filePath);
-
-std::filesystem::path& basePath();
 
 inline spatial::render::RenderEngine& engine()
 {

@@ -18,56 +18,43 @@ private:
     std::bitset<keysCount> m_keyReleased;
 
 public:
-    void set(common::Key key, common::KeyAction action)
+    InputState();
+
+    void set(common::Key key, common::KeyAction action);
+
+    void setPressed(common::Key key);
+
+    void setReleased(common::Key key);
+
+    void reset(common::Key key);
+
+    void reset();
+
+    void setMousePosition(filament::math::float2 position);
+
+    bool released(common::Key key) const
     {
-        if (action == common::KeyAction::Pressed)
-            setPressed(key);
-        else if (action == common::KeyAction::Released)
-            setReleased(key);
-        else
-            reset(key);
+        return m_keyReleased.test(static_cast<size_t>(key));
     }
 
-    void setPressed(common::Key key)
-    {
-        auto flag = static_cast<size_t>(key);
-        m_keyPressed.set(flag);
-        m_keyReleased.reset(flag);
-    }
-
-    void setReleased(common::Key key)
-    {
-        auto flag = static_cast<size_t>(key);
-        m_keyPressed.reset(flag);
-        m_keyReleased.set(flag);
-    }
-
-    void reset(common::Key key)
-    {
-        auto flag = static_cast<size_t>(key);
-        m_keyPressed.reset(flag);
-        m_keyReleased.reset(flag);
-    }
-
-    void reset()
-    {
-        m_keyPressed.reset();
-        m_keyReleased.reset();
-    }
-
-    void setMousePosition(filament::math::float2 position)
-    {
-        m_mousePosition = position;
-    }
-
-    bool isPressed(common::Key key) const
+    bool pressed(common::Key key) const
     {
         return m_keyPressed.test(static_cast<size_t>(key));
     }
 
-    bool isReleased(common::Key key) const
+    bool combined(common::Key alt1, common::Key key) const
     {
-        return m_keyReleased.test(static_cast<size_t>(key));
+        return pressed(alt1) && released(key);
+    }
+
+    bool combined(common::Key alt1, common::Key alt2, common::Key key) const
+    {
+        return pressed(alt1) && pressed(alt2) && released(key);
+    }
+
+    bool combined(common::Key alt1, common::Key alt2, common::Key alt3, common::Key key) const
+    {
+        return pressed(alt1) && pressed(alt2) && pressed(alt3) && released(key);
     }
 
     filament::math::float2 getMousePosition() const

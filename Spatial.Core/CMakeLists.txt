@@ -1,14 +1,14 @@
 add_library(Spatial.Core
+	src/common/Key.cpp
 	src/common/KeyAction.cpp
 	src/common/EBus.cpp
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
 	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
-	src/render/IcoSphere.cpp
-	src/render/Sphere.cpp
 	src/render/CommonResources.cpp
 	src/input/InputSubsystem.cpp
+	src/input/InputState.cpp
 	src/input/Input.cpp
 	src/physics/SimulationSubsystem.cpp
 	src/core/Application.cpp

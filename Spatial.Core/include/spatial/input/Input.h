@@ -10,14 +10,29 @@ class InputSubsystem;
 class Input
 {
 private:
-    static InputState &state();
-    static void set(common::Key key, common::KeyAction action);
-    static void reset();
+    static InputState s_inputState;
 
 public:
-    static bool pressed(common::Key key);
-    static bool released(common::Key key);
-    static filament::math::float2 mouse();
+    static bool pressed(common::Key key)
+    {
+        return s_inputState.pressed(key);
+    }
+
+    template<typename... Args>
+    static bool combined(Args... keys)
+    {
+        return s_inputState.combined(keys...);
+    }
+
+    static bool released(common::Key key)
+    {
+        return s_inputState.released(key);
+    }
+
+    static filament::math::float2 mouse()
+    {
+        return s_inputState.getMousePosition();
+    }
 
     friend class InputSubsystem;
 };

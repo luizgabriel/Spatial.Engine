@@ -10,28 +10,35 @@ using namespace common;
 InputSubsystem::InputSubsystem()
 {
     EBus::connect<desktop::MouseButtonEvent>(this);
+    EBus::connect<desktop::MouseMovedEvent>(this);
     EBus::connect<desktop::KeyEvent>(this);
 }
 
 InputSubsystem::~InputSubsystem()
 {
     EBus::disconnect<desktop::MouseButtonEvent>(this);
+    EBus::disconnect<desktop::MouseMovedEvent>(this);
     EBus::disconnect<desktop::KeyEvent>(this);
 }
 
 void InputSubsystem::resetInputState()
 {
-    Input::reset();
+    Input::s_inputState.reset();
+}
+
+void InputSubsystem::onEvent(const desktop::MouseMovedEvent &event)
+{
+    Input::s_inputState.setMousePosition({event.x, event.y});
 }
 
 void InputSubsystem::onEvent(const desktop::MouseButtonEvent &event)
 {
-    Input::set(event.button, event.action);
+    Input::s_inputState.set(event.button, event.action);
 }
 
 void InputSubsystem::onEvent(const desktop::KeyEvent &event)
 {
-    Input::set(event.key, event.action);
+    Input::s_inputState.set(event.key, event.action);
 }
 
 } // namespace spatial

@@ -42,12 +42,12 @@ int Application::run()
     {
         delta = m_simulation.getDeltaTime();
 
+        m_input.resetInputState();
         m_windowContext.pollEvents();
         common::EBus::update();
 
         m_updateEvent.trigger(delta.count());
 
-        m_input.resetInputState();
         m_rendering.onRender();
         m_simulation.process();
     }
