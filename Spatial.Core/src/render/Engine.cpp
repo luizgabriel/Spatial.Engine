@@ -13,5 +13,4 @@ RenderEngine::~RenderEngine()
     filament::Engine::destroy(&m_engine);
 }
 
-
 } // namespace spatial::render

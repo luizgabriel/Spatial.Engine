@@ -11,7 +11,6 @@ InputState::InputState()
       m_keyPressed{},
       m_keyReleased{}
 {
-
 }
 
 void InputState::set(Key key, KeyAction action)

@@ -11,10 +11,10 @@
 
 namespace spatial::math
 {
-    using namespace filament::math;
+using namespace filament::math;
 }
 
 namespace filament::utils
 {
-    using namespace ::utils;
+using namespace ::utils;
 }

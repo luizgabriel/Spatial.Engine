@@ -25,7 +25,7 @@ Application::~Application()
     EBus::disconnect<WindowClosedEvent>(this);
 }
 
-void Application::onEvent(const WindowClosedEvent& event)
+void Application::onEvent(const WindowClosedEvent &event)
 {
     stop();
 }
@@ -61,5 +61,4 @@ int Application::run()
     return 0;
 }
 
-
-} // namespace spatial
+} // namespace spatial::core

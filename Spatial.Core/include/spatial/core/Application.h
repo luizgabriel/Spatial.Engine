@@ -44,16 +44,16 @@ public:
 
     void onEvent(const desktop::WindowClosedEvent &event);
 
-    template<typename Type>
-    void connect(Type* instance)
+    template <typename Type>
+    void connect(Type *instance)
     {
         connectOnStart(instance);
         connectOnUpdate(instance);
         connectOnFinish(instance);
     }
 
-    template<typename Type>
-    void disconnect(Type* instance)
+    template <typename Type>
+    void disconnect(Type *instance)
     {
         disconnectOnStart(instance);
         disconnectOnUpdate(instance);
@@ -61,42 +61,42 @@ public:
     }
 
     //region On Start Event
-    template<typename Type>
-    void connectOnStart(Type* instance)
+    template <typename Type>
+    void connectOnStart(Type *instance)
     {
         m_startEvent.template connect<&Type::onStart, Type>(instance);
     }
 
-    template<typename Type>
-    void disconnectOnStart(Type* instance)
+    template <typename Type>
+    void disconnectOnStart(Type *instance)
     {
         m_startEvent.template disconnect<&Type::onStart, Type>(instance);
     }
     //endregion
 
     //region On Finish Event
-    template<typename Type>
-    void connectOnFinish(Type* instance)
+    template <typename Type>
+    void connectOnFinish(Type *instance)
     {
         m_finishEvent.template connect<&Type::onFinish, Type>(instance);
     }
 
-    template<typename Type>
-    void disconnectOnFinish(Type* instance)
+    template <typename Type>
+    void disconnectOnFinish(Type *instance)
     {
         m_finishEvent.template connect<&Type::onFinish, Type>(instance);
     }
     //endregion
 
     //region On Update Event
-    template<typename Type>
-    void connectOnUpdate(Type* instance)
+    template <typename Type>
+    void connectOnUpdate(Type *instance)
     {
         m_updateEvent.template connect<&Type::onUpdate, Type>(instance);
     }
 
-    template<typename Type>
-    void disconnectOnUpdate(Type* instance)
+    template <typename Type>
+    void disconnectOnUpdate(Type *instance)
     {
         m_updateEvent.template disconnect<&Type::onUpdate, Type>(instance);
     }

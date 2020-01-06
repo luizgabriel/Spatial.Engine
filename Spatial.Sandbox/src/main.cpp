@@ -13,7 +13,6 @@ using namespace std::filesystem;
 class SandboxLayer
 {
 private:
-    path m_assets;
     Scene m_scene;
     Material m_material;
     Entity m_light;
@@ -22,9 +21,8 @@ private:
 
 public:
     SandboxLayer()
-        : m_assets{"assets"},
-          m_scene{createScene(engine())},
-          m_material{createMaterial(engine(), read(m_assets / "sandbox" / "materials" / "plastic.filamat"))},
+        : m_scene{createScene(engine())},
+          m_material{createMaterial(engine(), read(path{"materials"} / "plastic.filamat"))},
           m_light{},
           c{0}
     {
@@ -79,6 +77,8 @@ public:
 
         if (Input::combined(Key::LShift, Key::C))
             Logger::critical("Hello, world! {}", ++c);
+
+        //Logger::info("FPS: {}", int(1/delta));
     }
 
     void onFinish()
@@ -91,7 +91,7 @@ int main(int arc, char *argv[])
 {
     path executable{argv[0]};
 
-    g_basePath = executable.parent_path();
+    g_basePath = executable.parent_path() / "assets" / "sandbox";
     SandboxLayer gameLayer;
 
     return app().run();

@@ -66,7 +66,6 @@ public:
     {
         return m_mousePosition;
     }
-
 };
 
 } // namespace spatial::input

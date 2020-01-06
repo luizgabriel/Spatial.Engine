@@ -41,4 +41,4 @@ void InputSubsystem::onEvent(const desktop::KeyEvent &event)
     Input::s_inputState.set(event.key, event.action);
 }
 
-} // namespace spatial
+} // namespace spatial::input

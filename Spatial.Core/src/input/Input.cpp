@@ -4,5 +4,4 @@ namespace spatial::input
 {
 
 InputState Input::s_inputState{};
-
 }

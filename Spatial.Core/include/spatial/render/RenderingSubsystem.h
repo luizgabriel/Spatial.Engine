@@ -20,54 +20,53 @@ private:
 	Camera m_mainCamera;
 
 public:
-    RenderingSubsystem(desktop::Window&& window);
+	RenderingSubsystem(desktop::Window &&window);
 
 	~RenderingSubsystem();
 
 	void onRender();
 
-	RenderEngine& getEngine()
+	RenderEngine &getEngine()
 	{
 		return m_engine;
 	}
 
-	const RenderEngine& getEngine() const
+	const RenderEngine &getEngine() const
 	{
 		return m_engine;
 	}
 
-	desktop::Window& getWindow()
+	desktop::Window &getWindow()
 	{
 		return m_window;
 	}
 
-	const desktop::Window& getWindow() const
+	const desktop::Window &getWindow() const
 	{
 		return m_window;
 	}
 
-	View& getMainView()
+	View &getMainView()
 	{
 		return m_mainView;
 	}
 
-	const View& getMainView() const
+	const View &getMainView() const
 	{
 		return m_mainView;
 	}
 
-	Camera& getMainCamera()
+	Camera &getMainCamera()
 	{
 		return m_mainCamera;
 	}
 
-	const Camera& getMainCamera() const
+	const Camera &getMainCamera() const
 	{
 		return m_mainCamera;
 	}
 
-	void onEvent(const desktop::WindowResizedEvent& event);
-
+	void onEvent(const desktop::WindowResizedEvent &event);
 };
 
-} // namespace spatial
+} // namespace spatial::render

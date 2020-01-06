@@ -18,7 +18,7 @@ public:
         return s_inputState.pressed(key);
     }
 
-    template<typename... Args>
+    template <typename... Args>
     static bool combined(Args... keys)
     {
         return s_inputState.combined(keys...);

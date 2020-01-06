@@ -25,7 +25,7 @@ public:
         return m_engine;
     }
 
-    filament::Engine& get_ref()
+    filament::Engine &get_ref()
     {
         return *m_engine;
     }
@@ -35,17 +35,17 @@ public:
         return m_engine;
     }
 
-    const filament::Engine& get_ref() const
+    const filament::Engine &get_ref() const
     {
         return *m_engine;
     }
 
-    operator filament::Engine*()
+    operator filament::Engine *()
     {
         return get();
     }
 
-    operator filament::Engine&()
+    operator filament::Engine &()
     {
         return get_ref();
     }

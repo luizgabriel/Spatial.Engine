@@ -305,14 +305,14 @@ Key mapKeyFromMouseButton(int mouseButton)
 {
     switch (mouseButton)
     {
-        case SDL_BUTTON_LEFT:
-            return Key::MouseLeft;
-        case SDL_BUTTON_RIGHT:
-            return Key::MouseRight;
-        case SDL_BUTTON_MIDDLE:
-            return Key::MouseMiddle;
-        default:
-            return Key::UnknownKey;
+    case SDL_BUTTON_LEFT:
+        return Key::MouseLeft;
+    case SDL_BUTTON_RIGHT:
+        return Key::MouseRight;
+    case SDL_BUTTON_MIDDLE:
+        return Key::MouseMiddle;
+    default:
+        return Key::UnknownKey;
     }
 }
 

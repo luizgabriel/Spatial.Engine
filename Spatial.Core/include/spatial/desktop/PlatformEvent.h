@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
 
