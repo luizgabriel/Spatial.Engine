@@ -25,6 +25,9 @@ public:
     {
         disconnect(*m_app, m_instance, m_flags);
     }
+
+    ApplicationConnector(const ApplicationConnector& other) = delete;
+    ApplicationConnector& operator=(const ApplicationConnector& other) = delete;
 };
 
 }
