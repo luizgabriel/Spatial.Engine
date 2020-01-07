@@ -19,6 +19,16 @@ RenderingSubsystem::RenderingSubsystem(Window &&window)
 	  m_mainCamera{createCamera(m_engine)},
 	  m_uiCamera{createCamera(m_engine)}
 {
+	EBus::connect<WindowResizedEvent>(this);
+}
+
+RenderingSubsystem::~RenderingSubsystem()
+{
+	EBus::disconnect<WindowResizedEvent>(this);
+}
+
+void RenderingSubsystem::onStart()
+{
 	m_mainView->setCamera(m_mainCamera);
 	m_uiView->setCamera(m_uiCamera);
 
@@ -27,13 +37,6 @@ RenderingSubsystem::RenderingSubsystem(Window &&window)
 
 	m_mainView->setClearTargets(true, true, true);
 	m_mainView->setClearColor({.0f, .0f, .0f, 1.0f});
-
-	EBus::connect<WindowResizedEvent>(this);
-}
-
-RenderingSubsystem::~RenderingSubsystem()
-{
-	EBus::disconnect<WindowResizedEvent>(this);
 }
 
 void RenderingSubsystem::onRender()

@@ -1,15 +1,13 @@
 add_library(Spatial.Core
 	src/common/Key.cpp
 	src/common/KeyAction.cpp
-	
 	src/common/Logger.cpp
+
+	src/core/Application.cpp
+	src/core/EBus.cpp
 
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
-
-	src/render/Engine.cpp
-	src/render/RenderingSubsystem.cpp
-	src/render/CommonResources.cpp
 
 	src/input/InputSubsystem.cpp
 	src/input/InputState.cpp
@@ -17,9 +15,9 @@ add_library(Spatial.Core
 
 	src/physics/SimulationSubsystem.cpp
 
-	src/core/Application.cpp
-	src/core/EBus.cpp
-	src/core/SystemSignals.cpp
+	src/render/Engine.cpp
+	src/render/RenderingSubsystem.cpp
+	src/render/CommonResources.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)

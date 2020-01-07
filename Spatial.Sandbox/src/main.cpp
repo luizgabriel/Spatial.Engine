@@ -26,12 +26,6 @@ public:
           m_light{},
           c{0}
     {
-        SystemSignals::connect(this);
-    }
-
-    ~SandboxLayer()
-    {
-        SystemSignals::disconnect(this);
     }
 
     void onStart()
@@ -57,6 +51,8 @@ public:
             .build(engine(), m_light);
 
         m_scene->addEntity(m_light);
+
+        Logger::info("Hello from start!");
     }
 
     void onUpdate(float delta)
@@ -75,16 +71,15 @@ public:
 
     void onFinish()
     {
-        m_scene->remove(m_light);
+        //m_scene->remove(m_light);
     }
 };
 
 int main(int arc, char *argv[])
 {
-    path executable{argv[0]};
-
-    g_basePath = executable.parent_path() / "assets" / "sandbox";
-    SandboxLayer gameLayer;
+    g_basePath      = path{argv[0]}.parent_path() / "assets" / "sandbox";
+    auto layer      = SandboxLayer{};
+    auto connector  = ApplicationConnector{app(), &layer};
 
     return app().run();
 }

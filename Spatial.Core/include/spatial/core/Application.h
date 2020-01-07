@@ -4,14 +4,13 @@
 #include <spatial/render/RenderingSubsystem.h>
 #include <spatial/input/InputSubsystem.h>
 #include <spatial/physics/SimulationSubsystem.h>
+#include <spatial/common/Signal.h>
 
 namespace spatial::core
 {
 
 class Application final
 {
-    struct StartedEvent {};
-
 private:
     bool m_running;
 
@@ -26,6 +25,13 @@ private:
     //endregion
 
 public:
+
+    //region Signals
+    common::Signal<> onStartSignal;
+    common::Signal<float> onUpdateSignal;
+    common::Signal<> onFinishSignal;
+    //endregion
+
     Application();
 
     ~Application();

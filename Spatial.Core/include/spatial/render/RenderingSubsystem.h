@@ -28,6 +28,7 @@ public:
 	RenderingSubsystem(desktop::Window &&window);
 	~RenderingSubsystem();
 
+	void onStart();
 	void onRender();
 
 	RenderEngine &getEngine()

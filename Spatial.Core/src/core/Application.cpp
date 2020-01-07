@@ -1,12 +1,10 @@
-#include <fmt/format.h>
 #include <iostream>
 #include <spatial/core/Application.h>
 #include <spatial/core/EBus.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/common/Logger.h>
-#include <spatial/core/SystemSignals.h>
 
 #include <chrono>
+#include <thread>
 
 using namespace spatial::common;
 using namespace spatial::desktop;
@@ -43,11 +41,10 @@ void Application::stop()
 int Application::run()
 {
     physics::delta_t delta;
-
     m_running = true;
 
-    //Triggers all subscribed to the start signal
-    SystemSignals::s_startSignal();
+    m_rendering.onStart();
+    onStartSignal();
 
     while (m_running)
     {
@@ -60,8 +57,7 @@ int Application::run()
         EBus::update<WindowResizedEvent>();
         EBus::update();
 
-        //Triggers all subscribed to the update signal
-        SystemSignals::s_updateSignal(delta.count());
+        onUpdateSignal(delta.count());
 
         m_rendering.onRender();
 
@@ -69,8 +65,7 @@ int Application::run()
         std::this_thread::sleep_until(m_simulation.getLastTime() + m_desiredDelta);
     }
 
-    //Triggers all subscribers to the finish signal
-    SystemSignals::s_finishSignal();
+    onFinishSignal();
 
     return 0;
 }
