@@ -70,7 +70,7 @@ public:
         if (Input::combined(Key::LShift, Key::C))
             Logger::critical("Hello, world! {}", ++c);
 
-        Logger::info("FPS: {}", int(1/delta));
+        //Logger::info("FPS: {}", int(1/delta));
     }
 
     void onFinish()
