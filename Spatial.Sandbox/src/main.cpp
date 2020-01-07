@@ -26,29 +26,21 @@ public:
           m_light{},
           c{0}
     {
-        app().connect(this);
+        SystemSignals::connect(this);
     }
 
     ~SandboxLayer()
     {
-        app().disconnect(this);
+        SystemSignals::disconnect(this);
     }
 
     void onStart()
     {
-        auto [w, h] = window().getFrameBufferSize();
-
-        camera()->setExposure(16.0f, 1 / 125.0f, 100.0f);
-        camera()->setProjection(45.0, double(w) / h, 0.1, 50, fl::Camera::Fov::VERTICAL);
-
         float3 eye{0, 0, 4}, center{0, 0, 0}, up{0, 1, 0};
         camera()->lookAt(eye, center, up);
 
         view()->setScene(m_scene.get());
-        view()->setViewport({0, 0, w, h});
-        view()->setClearTargets(true, true, true);
-        view()->setClearColor({.0f, .0f, .0f, 1.0f});
-
+        
         //instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
         //instance->setParameter("roughness", 0.5f);
         //instance->setParameter("clearCoat", 1.0f);
@@ -78,12 +70,12 @@ public:
         if (Input::combined(Key::LShift, Key::C))
             Logger::critical("Hello, world! {}", ++c);
 
-        //Logger::info("FPS: {}", int(1/delta));
+        Logger::info("FPS: {}", int(1/delta));
     }
 
     void onFinish()
     {
-        //
+        m_scene->remove(m_light);
     }
 };
 

@@ -55,6 +55,16 @@ public:
 		return get();
 	}
 
+	operator T*()
+	{
+		return get();
+	}
+
+	operator const T*() const
+	{
+		return get();
+	}
+
 	~EngineResource()
 	{
 		if (m_resource)

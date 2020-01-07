@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spatial/core/Application.h>
+#include <spatial/core/SystemSignals.h>
 #include <spatial/input/Input.h>
 #include <spatial/render/Entity.h>
 #include <spatial/common/Logger.h>

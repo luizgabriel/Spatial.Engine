@@ -17,11 +17,15 @@ private:
 	Renderer m_renderer;
 
 	View m_mainView;
+	View m_uiView;
+
 	Camera m_mainCamera;
+	Camera m_uiCamera;
+
+	void setupViewport();
 
 public:
 	RenderingSubsystem(desktop::Window &&window);
-
 	~RenderingSubsystem();
 
 	void onRender();
@@ -56,6 +60,16 @@ public:
 		return m_mainView;
 	}
 
+	View &getUiView()
+	{
+		return m_uiView;
+	}
+
+	const View &getUiView() const
+	{
+		return m_uiView;
+	}
+
 	Camera &getMainCamera()
 	{
 		return m_mainCamera;
@@ -64,6 +78,16 @@ public:
 	const Camera &getMainCamera() const
 	{
 		return m_mainCamera;
+	}
+
+	Camera &getUiCamera()
+	{
+		return m_uiCamera;
+	}
+
+	const Camera &getUiCamera() const
+	{
+		return m_uiCamera;
 	}
 
 	void onEvent(const desktop::WindowResizedEvent &event);

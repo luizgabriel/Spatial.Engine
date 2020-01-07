@@ -1,24 +1,25 @@
 #include <spatial/input/InputSubsystem.h>
-#include <spatial/common/EBus.h>
+#include <spatial/core/EBus.h>
 #include <spatial/input/Input.h>
+
+using namespace spatial::core;
+using namespace spatial::desktop;
 
 namespace spatial::input
 {
 
-using namespace common;
-
 InputSubsystem::InputSubsystem()
 {
-    EBus::connect<desktop::MouseButtonEvent>(this);
-    EBus::connect<desktop::MouseMovedEvent>(this);
-    EBus::connect<desktop::KeyEvent>(this);
+    EBus::connect<MouseButtonEvent>(this);
+    EBus::connect<MouseMovedEvent>(this);
+    EBus::connect<KeyEvent>(this);
 }
 
 InputSubsystem::~InputSubsystem()
 {
-    EBus::disconnect<desktop::MouseButtonEvent>(this);
-    EBus::disconnect<desktop::MouseMovedEvent>(this);
-    EBus::disconnect<desktop::KeyEvent>(this);
+    EBus::disconnect<MouseButtonEvent>(this);
+    EBus::disconnect<MouseMovedEvent>(this);
+    EBus::disconnect<KeyEvent>(this);
 }
 
 void InputSubsystem::resetInputState()
@@ -26,17 +27,17 @@ void InputSubsystem::resetInputState()
     Input::s_inputState.reset();
 }
 
-void InputSubsystem::onEvent(const desktop::MouseMovedEvent &event)
+void InputSubsystem::onEvent(const MouseMovedEvent &event)
 {
     Input::s_inputState.setMousePosition({event.x, event.y});
 }
 
-void InputSubsystem::onEvent(const desktop::MouseButtonEvent &event)
+void InputSubsystem::onEvent(const MouseButtonEvent &event)
 {
     Input::s_inputState.set(event.button, event.action);
 }
 
-void InputSubsystem::onEvent(const desktop::KeyEvent &event)
+void InputSubsystem::onEvent(const KeyEvent &event)
 {
     Input::s_inputState.set(event.key, event.action);
 }

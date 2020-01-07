@@ -15,6 +15,11 @@ public:
   void process();
   delta_t getDeltaTime() const;
 
+  std::chrono::steady_clock::time_point getLastTime() const
+  {
+    return m_LastTime;
+  }
+
 private:
   std::chrono::steady_clock::duration m_TimeStep;
   std::chrono::steady_clock::time_point m_LastTime;

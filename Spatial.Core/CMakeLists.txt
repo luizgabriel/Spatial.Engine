@@ -1,7 +1,7 @@
 add_library(Spatial.Core
 	src/common/Key.cpp
 	src/common/KeyAction.cpp
-	src/common/EBus.cpp
+	
 	src/common/Logger.cpp
 
 	src/desktop/Window.cpp
@@ -18,6 +18,8 @@ add_library(Spatial.Core
 	src/physics/SimulationSubsystem.cpp
 
 	src/core/Application.cpp
+	src/core/EBus.cpp
+	src/core/SystemSignals.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)

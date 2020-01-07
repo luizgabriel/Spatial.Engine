@@ -18,6 +18,7 @@ set_property(
 add_resources_library(Sandbox.Assets
     MATERIALS
         assets/materials/plastic.mat
+        assets/materials/ui_blit.mat
     TEXTURES
         assets/textures/spatial_engine_logo.png
         # assets/textures/pillars_2k.hdr

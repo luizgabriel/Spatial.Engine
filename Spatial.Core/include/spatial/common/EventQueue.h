@@ -32,7 +32,7 @@ public:
     void connect(Type *valueOrInstance)
     {
         auto sink = m_dispatcher.template sink<Event>();
-        if constexpr (std::is_null_pointer<decltype(Function)>::value)
+        if constexpr (std::is_null_pointer_v<decltype(Function)>)
         {
             constexpr auto overloaded = static_cast<void (Type::*)(const Event &)>(&Type::onEvent);
             sink.template connect<overloaded, Type>(valueOrInstance);
@@ -53,7 +53,7 @@ public:
     void disconnect(Type *valueOrInstance)
     {
         auto sink = m_dispatcher.template sink<Event>();
-        if constexpr (std::is_null_pointer<decltype(Function)>::value)
+        if constexpr (std::is_null_pointer_v<decltype(Function)>)
         {
             constexpr auto overloaded = static_cast<void (Type::*)(const Event &)>(&Type::onEvent);
             sink.template disconnect<overloaded, Type>(valueOrInstance);
@@ -75,6 +75,7 @@ public:
     {
         m_dispatcher.template enqueue<Event>(std::template forward<Event>(event));
     }
+
 };
 
 } // namespace spatial::common

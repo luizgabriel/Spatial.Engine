@@ -2,16 +2,15 @@
 
 #include <spatial/common/EventQueue.h>
 
-namespace  spatial::core { class Application; }
-
-namespace spatial::common
+namespace spatial::core
 {
 
 class EBus
 {
 private:
-    static EventQueue s_queue;
+    static common::EventQueue s_queue;
 
+public:
     template <typename Event>
     static void update()
     {
@@ -23,7 +22,6 @@ private:
         s_queue.update();
     }
 
-public:
     template <typename Event, auto Function>
     static void connect()
     {
@@ -59,8 +57,6 @@ public:
     {
         s_queue.template enqueue<Event>(std::template forward<Event>(event));
     }
-
-    friend class spatial::core::Application;
 };
 
 } // namespace spatial::common

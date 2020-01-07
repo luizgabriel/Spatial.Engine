@@ -41,16 +41,6 @@ Window::~Window()
 		SDL_DestroyWindow(m_windowHandle);
 }
 
-void Window::onStartRender()
-{
-	//
-}
-
-void Window::onEndRender()
-{
-	SDL_Delay(16);
-}
-
 std::pair<uint32_t, uint32_t> Window::getFrameBufferSize() const
 {
 	int dsw, dsh;

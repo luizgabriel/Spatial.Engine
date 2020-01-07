@@ -26,9 +26,6 @@ private:
 public:
 	~Window();
 
-	void onStartRender();
-	void onEndRender();
-
 	void *getNativeHandle();
 
 	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;

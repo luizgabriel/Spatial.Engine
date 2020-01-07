@@ -6,7 +6,7 @@ namespace spatial::common
 {
 
 template <typename... Args>
-class Event
+class Signal
 {
     using CallbackFn = void(Args...);
 
@@ -15,19 +15,19 @@ private:
     entt::sink<CallbackFn> m_sink;
 
 public:
-    Event()
+    Signal()
         : m_sigh{}, m_sink{m_sigh}
     {
     }
 
-    void operator()(Args... args) noexcept
+    void operator()(Args&&... args) noexcept
     {
-        trigger(args...);
+        trigger(std::template forward<Args>(args)...);
     }
 
-    void trigger(Args... args)
+    void trigger(Args&&... args)
     {
-        m_sigh.publish(args...);
+        m_sigh.publish(std::template forward<Args>(args)...);
     }
 
     template <auto Function>

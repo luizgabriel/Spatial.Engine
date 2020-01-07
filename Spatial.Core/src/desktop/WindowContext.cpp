@@ -1,9 +1,10 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/common/EBus.h>
+#include <spatial/core/EBus.h>
 #include <spatial/common/Key.h>
 
 using namespace spatial::common;
+using namespace spatial::core;
 
 namespace spatial::desktop
 {
