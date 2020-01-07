@@ -4,6 +4,7 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
+#include <spatial/render/UserInterfaceRenderer.h>
 
 namespace spatial::render
 {
@@ -17,10 +18,9 @@ private:
 	Renderer m_renderer;
 
 	View m_mainView;
-	View m_uiView;
-
 	Camera m_mainCamera;
-	Camera m_uiCamera;
+
+	UserInterfaceRenderer m_ui;
 
 	void setupViewport();
 
@@ -29,16 +29,18 @@ public:
 	~RenderingSubsystem();
 
 	void onStart();
-	void onRender();
 
-	RenderEngine &getEngine()
+	void beforeRender(float delta);
+	void render();
+
+	filament::Engine *getEngine()
 	{
 		return m_engine;
 	}
 
-	const RenderEngine &getEngine() const
+	const filament::Engine *getEngine() const
 	{
-		return m_engine;
+		return m_engine.get();
 	}
 
 	desktop::Window &getWindow()
@@ -51,44 +53,24 @@ public:
 		return m_window;
 	}
 
-	View &getMainView()
+	filament::View *getMainView()
 	{
-		return m_mainView;
+		return m_mainView.get();
 	}
 
-	const View &getMainView() const
+	const filament::View *getMainView() const
 	{
-		return m_mainView;
+		return m_mainView.get();
 	}
 
-	View &getUiView()
+	filament::Camera *getMainCamera()
 	{
-		return m_uiView;
+		return m_mainCamera.get();
 	}
 
-	const View &getUiView() const
+	const filament::Camera *getMainCamera() const
 	{
-		return m_uiView;
-	}
-
-	Camera &getMainCamera()
-	{
-		return m_mainCamera;
-	}
-
-	const Camera &getMainCamera() const
-	{
-		return m_mainCamera;
-	}
-
-	Camera &getUiCamera()
-	{
-		return m_uiCamera;
-	}
-
-	const Camera &getUiCamera() const
-	{
-		return m_uiCamera;
+		return m_mainCamera.get();
 	}
 
 	void onEvent(const desktop::WindowResizedEvent &event);

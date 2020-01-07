@@ -10,14 +10,12 @@ namespace spatial::input
 
 InputSubsystem::InputSubsystem()
 {
-    EBus::connect<MouseButtonEvent>(this);
     EBus::connect<MouseMovedEvent>(this);
     EBus::connect<KeyEvent>(this);
 }
 
 InputSubsystem::~InputSubsystem()
 {
-    EBus::disconnect<MouseButtonEvent>(this);
     EBus::disconnect<MouseMovedEvent>(this);
     EBus::disconnect<KeyEvent>(this);
 }
@@ -30,11 +28,6 @@ void InputSubsystem::resetInputState()
 void InputSubsystem::onEvent(const MouseMovedEvent &event)
 {
     Input::s_inputState.setMousePosition({event.x, event.y});
-}
-
-void InputSubsystem::onEvent(const MouseButtonEvent &event)
-{
-    Input::s_inputState.set(event.button, event.action);
 }
 
 void InputSubsystem::onEvent(const KeyEvent &event)

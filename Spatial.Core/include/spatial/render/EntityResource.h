@@ -24,10 +24,11 @@ public:
         utils::EntityManager::get().destroy(m_entity);
     }
 
-    operator utils::Entity() const
+    utils::Entity get()
     {
         return m_entity;
     }
+
 };
 
 }

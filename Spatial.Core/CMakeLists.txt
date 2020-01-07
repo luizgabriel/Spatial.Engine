@@ -4,6 +4,7 @@ add_library(Spatial.Core
 	src/common/Logger.cpp
 
 	src/core/Application.cpp
+	src/core/Asset.cpp
 	src/core/EBus.cpp
 
 	src/desktop/Window.cpp
@@ -15,9 +16,10 @@ add_library(Spatial.Core
 
 	src/physics/SimulationSubsystem.cpp
 
+	src/render/CommonResources.cpp
 	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
-	src/render/CommonResources.cpp
+	src/render/UserInterfaceRenderer.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -45,6 +47,7 @@ target_link_libraries(
 		CONAN_PKG::entt
 		CONAN_PKG::filament
 		CONAN_PKG::spdlog
+		CONAN_PKG::imgui
 
 		SDL2::SDL2
 		SDL2::SDL2main

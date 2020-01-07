@@ -1,4 +1,10 @@
-#include "utils.h"
+#include <spatial/spatial.h>
+
+#include <filesystem>
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 namespace fl = filament;
 using namespace spatial;
@@ -14,8 +20,8 @@ class SandboxLayer
 {
 private:
     fl::Engine* m_engine;
-    fl::Camera* m_camera;
     fl::View* m_view;
+    fl::Camera* m_camera;
 
     Scene m_scene;
     Material m_material;
@@ -26,11 +32,11 @@ private:
 public:
     SandboxLayer(Application& app)
         : m_engine{app.getRenderSys().getEngine()},
-          m_camera{app.getRenderSys().getMainCamera()},
           m_view{app.getRenderSys().getMainView()},
+          m_camera{app.getRenderSys().getMainCamera()},
 
           m_scene{createScene(m_engine)},
-          m_material{createMaterial(m_engine, read(path{"materials"} / "plastic.filamat"))},
+          m_material{createMaterial(m_engine, Asset::read(path{"materials"} / "plastic.filamat"))},
           m_light{createEntity(m_engine)},
           c{0}
     {
@@ -56,9 +62,9 @@ public:
             .sunAngularRadius(1.9f)
             .sunHaloSize(10.0f)
             .sunHaloFalloff(80.0f)
-            .build(*m_engine, m_light);
+            .build(*m_engine, m_light.get());
 
-        m_scene->addEntity(m_light);
+        m_scene->addEntity(m_light.get());
 
         Logger::info("Hello from start!");
     }
@@ -75,17 +81,20 @@ public:
             Logger::critical("Hello, world! {}", ++c);
 
         //Logger::info("FPS: {}", int(1/delta));
+
+        ImGui::ShowDemoWindow();
     }
 
     void onFinish()
     {
-        m_scene->remove(m_light);
+        m_scene->remove(m_light.get());
     }
 };
 
-int main(int arc, char *argv[])
+int SDL_main(int arc, char *argv[])
 {
-    g_basePath      = path{argv[0]}.parent_path() / "assets" / "sandbox";
+    Asset::init(path{argv[0]}.parent_path() / "assets" / "sandbox");
+
     auto app        = Application{};
     auto layer      = SandboxLayer{app};
     auto connector  = ApplicationConnector{app, &layer};

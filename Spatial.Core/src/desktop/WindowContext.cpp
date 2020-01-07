@@ -56,11 +56,11 @@ void WindowContext::pollEvents()
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            EBus::enqueue<MouseButtonEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed);
+            EBus::enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
             break;
 
         case SDL_MOUSEBUTTONUP:
-            EBus::enqueue<MouseButtonEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released);
+            EBus::enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
             break;
 
         case SDL_MOUSEMOTION:

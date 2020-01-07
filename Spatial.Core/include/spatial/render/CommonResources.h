@@ -5,9 +5,12 @@
 #include <filament/Scene.h>
 #include <filament/View.h>
 #include <filament/Camera.h>
+#include <filament/Texture.h>
 
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/EntityResource.h>
+
+#include <memory>
 
 namespace spatial::render
 {
@@ -19,6 +22,13 @@ using View = EngineResource<filament::View>;
 using Camera = EngineResource<filament::Camera>;
 using Material = EngineResource<filament::Material>;
 using MaterialInstance = EngineResource<filament::MaterialInstance>;
+using Texture = EngineResource<filament::Texture>;
+using VertexBuffer = EngineResource<filament::VertexBuffer>;
+using IndexBuffer = EngineResource<filament::IndexBuffer>;
+
+using SharedVertexBuffer = std::shared_ptr<filament::VertexBuffer>;
+using SharedIndexBuffer = std::shared_ptr<filament::IndexBuffer>;
+using SharedMaterialInstance = std::shared_ptr<filament::MaterialInstance>;
 
 SwapChain createSwapChain(filament::Engine *engine, void *nativeWindowHandle) noexcept;
 
@@ -35,5 +45,13 @@ Material createMaterial(filament::Engine *engine, const char *data, size_t size)
 Material createMaterial(filament::Engine *engine, const std::vector<char> &data) noexcept;
 
 EntityResource createEntity(filament::Engine *engine) noexcept;
+
+template<typename T>
+std::shared_ptr<T> createSharedResource(filament::Engine *engine, T* instance)
+{
+    return std::shared_ptr<T>{instance, [=](T* res){
+        engine->destroy(res);
+    }};
+}
 
 } // namespace spatial::render

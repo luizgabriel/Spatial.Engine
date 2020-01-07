@@ -13,13 +13,15 @@ private:
 	T *m_resource;
 
 public:
-	EngineResource(filament::Engine *engine, T *resource = nullptr)
-		: m_engine{engine}, m_resource{resource}
+	EngineResource(filament::Engine *engine = nullptr, T *resource = nullptr)
+		: m_engine{engine},
+		  m_resource{resource}
 	{
 	}
 
 	EngineResource(EngineResource &&other) noexcept
-		: m_engine{other.m_engine}, m_resource{std::exchange(other.m_resource, nullptr)}
+		: m_engine{other.m_engine},
+		  m_resource{std::exchange(other.m_resource, nullptr)}
 	{
 	}
 
@@ -27,7 +29,7 @@ public:
 
 	EngineResource &operator=(EngineResource &&other) noexcept
 	{
-		m_engine = other.m_engine;
+		m_engine->destroy(m_resource);
 		m_resource = std::exchange(other.m_resource, nullptr);
 
 		return *this;
@@ -55,12 +57,7 @@ public:
 		return get();
 	}
 
-	operator T*()
-	{
-		return get();
-	}
-
-	operator const T*() const
+	operator T *()
 	{
 		return get();
 	}

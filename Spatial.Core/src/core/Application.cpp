@@ -57,9 +57,11 @@ int Application::run()
         EBus::update<WindowResizedEvent>();
         EBus::update();
 
+        m_rendering.beforeRender(delta.count());
+        
         onUpdateSignal(delta.count());
 
-        m_rendering.onRender();
+        m_rendering.render();
 
         //Forces the Frame Rate
         std::this_thread::sleep_until(m_simulation.getLastTime() + m_desiredDelta);

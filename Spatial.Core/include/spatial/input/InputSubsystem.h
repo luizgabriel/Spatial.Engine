@@ -15,7 +15,6 @@ public:
 
     void resetInputState();
 
-    void onEvent(const desktop::MouseButtonEvent &event);
     void onEvent(const desktop::MouseMovedEvent &event);
     void onEvent(const desktop::KeyEvent &event);
 

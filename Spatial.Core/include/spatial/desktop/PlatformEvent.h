@@ -47,12 +47,4 @@ struct MouseScrolledEvent
     MouseScrolledEvent(double x, double y) : xOffset{x}, yOffset{y} {}
 };
 
-struct MouseButtonEvent
-{
-    common::Key button;
-    common::KeyAction action;
-
-    MouseButtonEvent(common::Key button, common::KeyAction action) : button{button}, action{action} {}
-};
-
 } // namespace spatial::desktop
