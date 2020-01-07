@@ -13,17 +13,25 @@ using namespace std::filesystem;
 class SandboxLayer
 {
 private:
+    fl::Engine* m_engine;
+    fl::Camera* m_camera;
+    fl::View* m_view;
+
     Scene m_scene;
     Material m_material;
-    Entity m_light;
+    EntityResource m_light;
 
     int c;
 
 public:
-    SandboxLayer()
-        : m_scene{createScene(engine())},
-          m_material{createMaterial(engine(), read(path{"materials"} / "plastic.filamat"))},
-          m_light{},
+    SandboxLayer(Application& app)
+        : m_engine{app.getRenderSys().getEngine()},
+          m_camera{app.getRenderSys().getMainCamera()},
+          m_view{app.getRenderSys().getMainView()},
+
+          m_scene{createScene(m_engine)},
+          m_material{createMaterial(m_engine, read(path{"materials"} / "plastic.filamat"))},
+          m_light{createEntity(m_engine)},
           c{0}
     {
     }
@@ -31,9 +39,9 @@ public:
     void onStart()
     {
         float3 eye{0, 0, 4}, center{0, 0, 0}, up{0, 1, 0};
-        camera()->lookAt(eye, center, up);
+        m_camera->lookAt(eye, center, up);
 
-        view()->setScene(m_scene.get());
+        m_view->setScene(m_scene.get());
         
         //instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
         //instance->setParameter("roughness", 0.5f);
@@ -48,7 +56,7 @@ public:
             .sunAngularRadius(1.9f)
             .sunHaloSize(10.0f)
             .sunHaloFalloff(80.0f)
-            .build(engine(), m_light);
+            .build(*m_engine, m_light);
 
         m_scene->addEntity(m_light);
 
@@ -71,15 +79,16 @@ public:
 
     void onFinish()
     {
-        //m_scene->remove(m_light);
+        m_scene->remove(m_light);
     }
 };
 
 int main(int arc, char *argv[])
 {
     g_basePath      = path{argv[0]}.parent_path() / "assets" / "sandbox";
-    auto layer      = SandboxLayer{};
-    auto connector  = ApplicationConnector{app(), &layer};
+    auto app        = Application{};
+    auto layer      = SandboxLayer{app};
+    auto connector  = ApplicationConnector{app, &layer};
 
-    return app().run();
+    return app.run();
 }

@@ -42,4 +42,9 @@ Material createMaterial(filament::Engine *engine, const std::vector<char> &data)
     return createMaterial(engine, &data[0], data.size());
 }
 
+EntityResource createEntity(filament::Engine *engine) noexcept
+{
+    return EntityResource{engine};
+}
+
 }

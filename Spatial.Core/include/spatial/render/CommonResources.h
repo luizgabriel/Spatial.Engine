@@ -7,6 +7,7 @@
 #include <filament/Camera.h>
 
 #include <spatial/render/EngineResource.h>
+#include <spatial/render/EntityResource.h>
 
 namespace spatial::render
 {
@@ -32,5 +33,7 @@ Camera createCamera(filament::Engine *engine) noexcept;
 Material createMaterial(filament::Engine *engine, const char *data, size_t size) noexcept;
 
 Material createMaterial(filament::Engine *engine, const std::vector<char> &data) noexcept;
+
+EntityResource createEntity(filament::Engine *engine) noexcept;
 
 } // namespace spatial::render
