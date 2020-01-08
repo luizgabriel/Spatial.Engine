@@ -20,12 +20,12 @@ public:
     {
     }
 
-    void operator()(Args&&... args) noexcept
+    void operator()(Args... args) noexcept
     {
         trigger(std::template forward<Args>(args)...);
     }
 
-    void trigger(Args&&... args)
+    void trigger(Args... args)
     {
         m_sigh.publish(std::template forward<Args>(args)...);
     }

@@ -4,5 +4,6 @@
 dependencies/
 build/
 out/
+imgui_log.txt
 *.log
 *.ini

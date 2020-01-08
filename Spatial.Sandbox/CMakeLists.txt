@@ -14,15 +14,22 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
-add_resources_library(Sandbox.Assets
+add_resources_library(Sandbox.Assets.Materials
     MATERIALS
         assets/materials/plastic.mat
         assets/materials/ui_blit.mat
-    TEXTURES
-        assets/textures/spatial_engine_logo.png
-        # assets/textures/pillars_2k.hdr
     DEPENDEES
         Spatial.Sandbox
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/sandbox
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/materials
+)
+
+add_resources_library(Sandbox.Assets.Fonts
+    COPY
+        assets/fonts/Roboto-Regular.ttf
+        assets/fonts/Roboto-Medium.ttf
+    DEPENDEES
+        Spatial.Sandbox
+    OUTPUT
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/fonts
 )

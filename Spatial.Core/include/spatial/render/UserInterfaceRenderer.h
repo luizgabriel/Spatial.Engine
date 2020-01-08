@@ -21,12 +21,13 @@ private:
     EntityResource m_entity;
     Texture m_texture;
 
-    std::vector<SharedVertexBuffer> m_vertexBuffers;
-    std::vector<SharedIndexBuffer> m_indexBuffers;
-    std::vector<SharedMaterialInstance> m_materialInstances;
+    std::vector<filament::VertexBuffer*> m_vertexBuffers;
+    std::vector<filament::IndexBuffer*> m_indexBuffers;
+    std::vector<filament::MaterialInstance*> m_materialInstances;
 
-    void renderDrawData(ImDrawData *imguiData);
-    void createBuffers(int numRequiredBuffers);
+    void renderDrawData();
+    void createBuffers(size_t numRequiredBuffers);
+    void createMaterialInstances(size_t numRequiredInstances);
     void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert> &vb, const ImVector<ImDrawIdx> &ib);
 
 public:

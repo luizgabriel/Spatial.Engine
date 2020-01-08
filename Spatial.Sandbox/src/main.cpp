@@ -93,7 +93,7 @@ public:
 
 int SDL_main(int arc, char *argv[])
 {
-    Asset::init(path{argv[0]}.parent_path() / "assets" / "sandbox");
+    Asset::init(path{argv[0]}.parent_path() / "assets");
 
     auto app        = Application{};
     auto layer      = SandboxLayer{app};

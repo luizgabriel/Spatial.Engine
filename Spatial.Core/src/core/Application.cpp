@@ -8,13 +8,16 @@
 
 using namespace spatial::common;
 using namespace spatial::desktop;
+using namespace std::chrono_literals;
+
+namespace chr = std::chrono;
 
 namespace spatial::core
 {
 
 Application::Application()
     : m_running{false},
-      m_desiredDelta{1.0f / 120.0f},
+      m_desiredDelta{1.0f / 60.0f},
       m_windowContext{},
       m_input{},
       m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
@@ -40,7 +43,6 @@ void Application::stop()
 
 int Application::run()
 {
-    physics::delta_t delta;
     m_running = true;
 
     m_input.onStart();
@@ -50,23 +52,24 @@ int Application::run()
 
     while (m_running)
     {
-        delta = m_simulation.getDeltaTime();
         m_simulation.process();
         m_input.resetInputState();
         m_windowContext.pollEvents();
 
-        m_rendering.beforeRender(delta.count());
+        auto delta = m_simulation.getDeltaTime().count();
+
+        m_rendering.beforeRender(delta);
 
         //Triggers all queued events
         EBus::update<WindowResizedEvent>();
         EBus::update();
         
-        onUpdateSignal(delta.count());
+        onUpdateSignal(delta);
 
         m_rendering.render();
 
         //Forces the Frame Rate
-        std::this_thread::sleep_until(m_simulation.getLastTime() + m_desiredDelta);
+        std::this_thread::sleep_for(10msS);
     }
 
     onFinishSignal();
