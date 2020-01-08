@@ -21,6 +21,7 @@ Window::Window(int width, int height, std::string_view title)
 						   width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
 	assert(m_windowHandle != nullptr);
+	//SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
 }
 
 Window::Window(Window &&other) noexcept
@@ -55,6 +56,11 @@ std::pair<int, int> Window::getWindowSize() const
 	SDL_GetWindowSize(m_windowHandle, &w, &h);
 
 	return {w, h};
+}
+
+bool Window::hasFocus() const
+{
+	return (SDL_GetWindowFlags(m_windowHandle) & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
 void *Window::getNativeHandle()

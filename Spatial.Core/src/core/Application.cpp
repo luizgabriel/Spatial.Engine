@@ -69,7 +69,7 @@ int Application::run()
         m_rendering.render();
 
         //Forces the Frame Rate
-        std::this_thread::sleep_for(10msS);
+        std::this_thread::sleep_for(10ms);
     }
 
     onFinishSignal();

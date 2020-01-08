@@ -20,10 +20,6 @@ RenderingSubsystem::RenderingSubsystem(Window &&window)
 {
 	m_mainView->setCamera(m_mainCamera);
 
-#ifdef SPATIAL_PLATFORM_WINDOWS
-	m_ui.setNativeWindow(m_window.getNativeHandle());
-#endif
-
 	EBus::connect<WindowResizedEvent>(this);
 }
 
@@ -68,15 +64,16 @@ void RenderingSubsystem::onEvent(const WindowResizedEvent &event)
 
 void RenderingSubsystem::setupViewport()
 {
-	auto [w, h] = m_window.getFrameBufferSize();
-	auto [vw, vh] = m_window.getWindowSize();
-	m_mainView->setViewport({0, 0, w, h});
+	auto [w, h] = m_window.getWindowSize();
+	auto [dw, dh] = m_window.getFrameBufferSize();
+	
+	m_mainView->setViewport({0, 0, dw, dh});
 	m_mainCamera->setProjection(
-		45.0, double(w) / h, 0.1, 50,
+		45.0, double(dw) / dh, 0.1, 50,
 		filament::Camera::Fov::VERTICAL);
 
-	auto dpiX = (float)w / vw;
-	auto dpiY = (float)h / vh;
+	auto dpiX = w > 0 ? float(dw) / w : .0f;
+	auto dpiY = h > 0 ? float(dh) / h : .0f;
 	m_ui.setViewport(w, h, dpiX, dpiY);
 }
 

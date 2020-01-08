@@ -37,7 +37,6 @@ public:
     void onStart();
 
     void setViewport(std::uint32_t width, std::uint32_t height, float dpiX, float dpiY);
-    void setNativeWindow(void *handle);
 
     void beforeRender(float delta);
     void render();

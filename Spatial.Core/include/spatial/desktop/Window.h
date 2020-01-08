@@ -30,6 +30,7 @@ public:
 
 	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;
+	bool hasFocus() const;
 
 	Window(Window &&other) noexcept;
 	Window(const Window &w) = delete;
