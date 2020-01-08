@@ -32,6 +32,9 @@ void WindowContext::pollEvents()
             EBus::enqueue<WindowClosedEvent>();
             break;
 
+        case SDL_TEXTINPUT:
+            EBus::enqueue<TextEvent>(std::string{e.text.text});
+
         case SDL_KEYDOWN:
         {
             auto key = mapKeyFromScancode(e.key.keysym.scancode);

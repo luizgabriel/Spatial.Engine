@@ -43,7 +43,9 @@ int Application::run()
     physics::delta_t delta;
     m_running = true;
 
+    m_input.onStart();
     m_rendering.onStart();
+    
     onStartSignal();
 
     while (m_running)
@@ -53,11 +55,11 @@ int Application::run()
         m_input.resetInputState();
         m_windowContext.pollEvents();
 
+        m_rendering.beforeRender(delta.count());
+
         //Triggers all queued events
         EBus::update<WindowResizedEvent>();
         EBus::update();
-
-        m_rendering.beforeRender(delta.count());
         
         onUpdateSignal(delta.count());
 

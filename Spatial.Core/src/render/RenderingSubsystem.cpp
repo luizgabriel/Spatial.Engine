@@ -20,6 +20,10 @@ RenderingSubsystem::RenderingSubsystem(Window &&window)
 {
 	m_mainView->setCamera(m_mainCamera);
 
+#ifdef SPATIAL_PLATFORM_WINDOWS
+	m_ui.setNativeWindow(m_window.getNativeHandle());
+#endif
+
 	EBus::connect<WindowResizedEvent>(this);
 }
 
@@ -30,12 +34,13 @@ RenderingSubsystem::~RenderingSubsystem()
 
 void RenderingSubsystem::onStart()
 {
+	m_ui.onStart();
+
 	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
-
-	setupViewport();
-
 	m_mainView->setClearTargets(true, true, true);
 	m_mainView->setClearColor({.0f, .0f, .0f, 1.0f});
+
+	setupViewport();
 }
 
 void RenderingSubsystem::beforeRender(float delta)
@@ -68,11 +73,10 @@ void RenderingSubsystem::setupViewport()
 	m_mainView->setViewport({0, 0, w, h});
 	m_mainCamera->setProjection(
 		45.0, double(w) / h, 0.1, 50,
-		filament::Camera::Fov::VERTICAL
-	);
+		filament::Camera::Fov::VERTICAL);
 
-	auto dpiX = (float) w / vw;
-	auto dpiY = (float) h / vh;
+	auto dpiX = (float)w / vw;
+	auto dpiY = (float)h / vh;
 	m_ui.setViewport(w, h, dpiX, dpiY);
 }
 

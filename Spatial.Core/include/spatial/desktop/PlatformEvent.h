@@ -34,6 +34,16 @@ struct KeyEvent
     }
 };
 
+struct TextEvent
+{
+    std::string text;
+
+    explicit TextEvent(std::string&& text)
+        : text{text}
+    {
+    }
+};
+
 struct MouseMovedEvent
 {
     double x, y;

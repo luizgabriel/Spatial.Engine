@@ -20,6 +20,7 @@ add_library(Spatial.Core
 	src/render/Engine.cpp
 	src/render/RenderingSubsystem.cpp
 	src/render/UserInterfaceRenderer.cpp
+	src/render/ImGuiHelpers.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)

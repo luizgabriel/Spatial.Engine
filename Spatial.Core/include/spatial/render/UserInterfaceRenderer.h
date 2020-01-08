@@ -27,14 +27,16 @@ private:
 
     void renderDrawData(ImDrawData *imguiData);
     void createBuffers(int numRequiredBuffers);
-    void populateVertexData(size_t bufferIndex, size_t vbSizeInBytes, void *vbData,
-                            size_t ibSizeInBytes, void *ibData);
+    void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert> &vb, const ImVector<ImDrawIdx> &ib);
 
 public:
     UserInterfaceRenderer(filament::Engine *engine);
     ~UserInterfaceRenderer();
 
+    void onStart();
+
     void setViewport(std::uint32_t width, std::uint32_t height, float dpiX, float dpiY);
+    void setNativeWindow(void *handle);
 
     void beforeRender(float delta);
     void render();
