@@ -56,10 +56,10 @@ Enum operator~(Enum rhs)
 }
 
 template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
-bool check(Enum flags, Enum e)
+constexpr bool check(Enum flags, Enum e)
 {
     return (flags & e) == e;
 }
 
 #define ENABLE_BITMASK_OPERATORS(TYPE) \
-template<> struct EnableBitMasksOperators<TYPE> : public std::true_type {};
+    template<> struct EnableBitMasksOperators<TYPE> : public std::true_type {}

@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <SDL.h>
 #include <spatial/common/Key.h>
+#include <spatial/common/EventQueue.h>
 
 namespace spatial::desktop
 {
@@ -45,7 +46,7 @@ public:
 	WindowContext();
 	~WindowContext();
 
-	void pollEvents();
+	void pollEvents(common::EventQueue& queue);
 
 	Window createWindow(int width, int height, std::string_view title);
 

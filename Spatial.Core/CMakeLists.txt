@@ -1,11 +1,11 @@
 add_library(Spatial.Core
 	src/common/Key.cpp
 	src/common/KeyAction.cpp
-	src/common/Logger.cpp
 
 	src/core/Application.cpp
 	src/core/Asset.cpp
-	src/core/EBus.cpp
+	src/core/Logger.cpp
+	src/core/Clock.cpp
 
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
@@ -13,8 +13,6 @@ add_library(Spatial.Core
 	src/input/InputSubsystem.cpp
 	src/input/InputState.cpp
 	src/input/Input.cpp
-
-	src/physics/SimulationSubsystem.cpp
 
 	src/render/CommonResources.cpp
 	src/render/Engine.cpp
@@ -49,6 +47,7 @@ target_link_libraries(
 		CONAN_PKG::filament
 		CONAN_PKG::spdlog
 		CONAN_PKG::imgui
+		CONAN_PKG::boost_tti
 
 		SDL2::SDL2
 		SDL2::SDL2main

@@ -1,25 +1,25 @@
-#include <spatial/physics/SimulationSubsystem.h>
+#include <spatial/core/Clock.h>
 
-namespace spatial::physics
+namespace spatial::core
 {
 
 using namespace std::chrono;
 
-SimulationSubsystem::SimulationSubsystem()
+Clock::Clock()
     : m_TimeStep(steady_clock::duration::zero()),
       m_LastTime(steady_clock::now())
 {
 }
 
-void SimulationSubsystem::process()
+void Clock::tick()
 {
     m_TimeStep = steady_clock::now() - m_LastTime;
     m_LastTime = steady_clock::now();
 }
 
-delta_t SimulationSubsystem::getDeltaTime() const
+delta_t Clock::getDeltaTime() const
 {
     return duration_cast<duration<float>>(m_TimeStep);
 }
 
-} // namespace spatial::physics
+} // namespace spatial::core

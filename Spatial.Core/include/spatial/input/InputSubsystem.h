@@ -3,19 +3,26 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
 #include <spatial/input/InputState.h>
+#include <spatial/core/ApplicationConnector.h>
 
 namespace spatial::input
 {
 
 class InputSubsystem
 {
+    using self_t = InputSubsystem;
+
+private:
+    core::EventConnector<desktop::MouseMovedEvent, self_t> m_mouseEventConnector;
+    core::EventConnector<desktop::KeyEvent, self_t> m_keyEventConnector;
+    core::EventConnector<desktop::TextEvent, self_t> m_textEventConnector;
+    core::SignalsConnector<self_t> m_signalsConnector;
+
 public:
-    InputSubsystem();
-    ~InputSubsystem();
+    InputSubsystem(core::Application* app);
 
     void onStart();
-
-    void resetInputState();
+    void onStartFrame(float delta);
 
     void onEvent(const desktop::MouseMovedEvent &event);
     void onEvent(const desktop::KeyEvent &event);

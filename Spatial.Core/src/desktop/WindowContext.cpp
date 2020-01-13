@@ -1,10 +1,8 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/core/EBus.h>
 #include <spatial/common/Key.h>
 
 using namespace spatial::common;
-using namespace spatial::core;
 
 namespace spatial::desktop
 {
@@ -20,7 +18,7 @@ WindowContext::~WindowContext()
     SDL_Quit();
 }
 
-void WindowContext::pollEvents()
+void WindowContext::pollEvents(common::EventQueue& queue)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
@@ -29,16 +27,16 @@ void WindowContext::pollEvents()
         {
 
         case SDL_QUIT:
-            EBus::enqueue<WindowClosedEvent>();
+            queue.enqueue<WindowClosedEvent>();
             break;
 
         case SDL_TEXTINPUT:
-            EBus::enqueue<TextEvent>(std::string{e.text.text});
+            queue.enqueue<TextEvent>(std::string{e.text.text});
 
         case SDL_KEYDOWN:
         {
             auto key = mapKeyFromScancode(e.key.keysym.scancode);
-            EBus::enqueue<KeyEvent>(key, KeyAction::Pressed, e.key.repeat);
+            queue.enqueue<KeyEvent>(key, KeyAction::Pressed, e.key.repeat);
 
             break;
         }
@@ -46,28 +44,28 @@ void WindowContext::pollEvents()
         case SDL_KEYUP:
         {
             auto key = mapKeyFromScancode(e.key.keysym.scancode);
-            EBus::enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
+            queue.enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
 
             if (key == Key::Escape)
-                EBus::enqueue<WindowClosedEvent>();
+                queue.enqueue<WindowClosedEvent>();
 
             break;
         }
 
         case SDL_MOUSEWHEEL:
-            EBus::enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
+            queue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            EBus::enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
+            queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
             break;
 
         case SDL_MOUSEBUTTONUP:
-            EBus::enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
+            queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
             break;
 
         case SDL_MOUSEMOTION:
-            EBus::enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
+            queue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
             break;
 
         case SDL_DROPFILE:
@@ -79,7 +77,7 @@ void WindowContext::pollEvents()
             switch (e.window.event)
             {
             case SDL_WINDOWEVENT_RESIZED:
-                EBus::enqueue<WindowResizedEvent>(e.window.data1, e.window.data2);
+                queue.enqueue<WindowResizedEvent>(e.window.data1, e.window.data2);
                 break;
             default:
                 break;

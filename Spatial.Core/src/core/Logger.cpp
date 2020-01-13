@@ -1,13 +1,14 @@
-#include <spatial/common/Logger.h>
+#include <spatial/core/Logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
 #include <memory>
 
-namespace spatial::common
+namespace spatial::core
 {
 
-spdlog::logger Logger::s_logger{[] {
+spdlog::logger createDefaultLogger(const std::string &output)
+{
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     console_sink->set_level(spdlog::level::info);
     console_sink->set_pattern("[SPATIAL] [%^%l%$] %v");
@@ -16,8 +17,9 @@ spdlog::logger Logger::s_logger{[] {
     file_sink->set_level(spdlog::level::warn);
 
     auto logger = spdlog::logger("spatial", {console_sink, file_sink});
-    s_logger.set_level(spdlog::level::debug);
+    logger.set_level(spdlog::level::debug);
 
     return logger;
-}()};
 }
+
+} // namespace spatial::core

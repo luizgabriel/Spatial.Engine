@@ -1,5 +1,4 @@
 #include <spatial/input/InputSubsystem.h>
-#include <spatial/core/EBus.h>
 #include <spatial/input/Input.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
@@ -12,18 +11,12 @@ using namespace spatial::common;
 namespace spatial::input
 {
 
-InputSubsystem::InputSubsystem()
+InputSubsystem::InputSubsystem(Application* app)
+    : m_mouseEventConnector{app, this},
+      m_keyEventConnector{app, this},
+      m_textEventConnector{app, this},
+      m_signalsConnector{app, this}
 {
-    EBus::connect<MouseMovedEvent>(this);
-    EBus::connect<KeyEvent>(this);
-    EBus::connect<TextEvent>(this);
-}
-
-InputSubsystem::~InputSubsystem()
-{
-    EBus::disconnect<MouseMovedEvent>(this);
-    EBus::disconnect<KeyEvent>(this);
-    EBus::disconnect<TextEvent>(this);
 }
 
 void InputSubsystem::onStart()
@@ -57,7 +50,7 @@ void InputSubsystem::onStart()
     io.KeyMap[ImGuiKey_Z] = (int) Key::Z;
 }
 
-void InputSubsystem::resetInputState()
+void InputSubsystem::onStartFrame(float delta)
 {
     Input::s_inputState.reset();
 }

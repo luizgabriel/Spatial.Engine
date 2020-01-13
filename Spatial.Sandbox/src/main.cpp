@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 
-#include <imgui_internal.h>
 
 namespace fl = filament;
 using namespace spatial;
@@ -110,9 +109,11 @@ bool BeginSpatialEngine(bool *opened)
 
 } // namespace ImGui
 
-class SandboxLayer
+class Sandbox
 {
 private:
+    SignalsConnector<Sandbox> m_signalsConnector;
+
     fl::Engine *m_engine;
     fl::View *m_view;
     fl::Camera *m_camera;
@@ -124,10 +125,12 @@ private:
     bool m_showEngineGui;
 
 public:
-    SandboxLayer(Application &app)
-        : m_engine{app.getRenderSys().getEngine()},
-          m_view{app.getRenderSys().getMainView()},
-          m_camera{app.getRenderSys().getMainCamera()},
+    Sandbox(Application *app, RenderingSubsystem* rendering)
+        : m_signalsConnector{app, this},
+
+          m_engine{rendering->getEngine()},
+          m_view{rendering->getMainView()},
+          m_camera{rendering->getMainCamera()},
 
           m_scene{createScene(m_engine)},
           m_material{createMaterial(m_engine, Asset::read(path{"materials"} / "plastic.filamat"))},
@@ -159,24 +162,17 @@ public:
             .build(*m_engine, m_light.get());
 
         m_scene->addEntity(m_light.get());
-
-        Logger::info("Hello from start!");
     }
 
-    void onUpdate(float delta)
+    void onUpdateFrame(float delta)
     {
         if (Input::released(Key::G))
             m_showEngineGui = !m_showEngineGui;
 
-        if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_showEngineGui)) {
+        if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_showEngineGui))
+        {
             ImGui::End();
         }
-        
-    }
-
-    void onFinish()
-    {
-        m_scene->remove(m_light.get());
     }
 };
 
@@ -185,8 +181,10 @@ int SDL_main(int arc, char *argv[])
     Asset::init(path{argv[0]}.parent_path() / "assets");
 
     auto app = Application{};
-    auto layer = SandboxLayer{app};
-    auto connector = ApplicationConnector{app, &layer};
+    auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
+    auto rendering = RenderingSubsystem{&app, std::move(window)};
+    auto input = InputSubsystem{&app};
+    auto sandbox = Sandbox{&app, &rendering};
 
     return app.run();
 }

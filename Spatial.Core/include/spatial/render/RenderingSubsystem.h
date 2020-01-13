@@ -5,13 +5,19 @@
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
 #include <spatial/render/UserInterfaceRenderer.h>
+#include <spatial/core/ApplicationConnector.h>
 
 namespace spatial::render
 {
 
 class RenderingSubsystem
 {
+	using self_t = RenderingSubsystem;
+
 private:
+	core::SignalsConnector<self_t> m_signalsConnector;
+	core::EventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedEventConnector;
+
 	desktop::Window m_window;
 	RenderEngine m_engine;
 	SwapChain m_swapChain;
@@ -25,13 +31,12 @@ private:
 	void setupViewport();
 
 public:
-	RenderingSubsystem(desktop::Window &&window);
-	~RenderingSubsystem();
+	RenderingSubsystem(core::Application* app, desktop::Window &&window);
 
 	void onStart();
 
-	void beforeRender(float delta);
-	void render();
+	void onStartFrame(float delta);
+	void onEndFrame(float delta);
 
 	filament::Engine *getEngine()
 	{

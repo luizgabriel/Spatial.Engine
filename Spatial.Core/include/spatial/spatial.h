@@ -4,19 +4,21 @@
 #include <spatial/core/ApplicationEvents.h>
 #include <spatial/core/ApplicationConnector.h>
 #include <spatial/core/Asset.h>
+
+#include <spatial/render/RenderingSubsystem.h>
+#include <spatial/input/InputSubsystem.h>
 #include <spatial/input/Input.h>
-#include <spatial/common/Logger.h>
 
 #include <utils/EntityManager.h>
 #include <filament/LightManager.h>
 #include <filament/Color.h>
 
-namespace spatial::math
+namespace spatial
 {
-using namespace filament::math;
+    namespace math = filament::math;
 }
 
-namespace filament::utils
+namespace filament
 {
-using namespace ::utils;
+    namespace utils = ::utils;
 }

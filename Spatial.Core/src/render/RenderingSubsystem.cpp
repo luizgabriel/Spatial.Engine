@@ -1,7 +1,6 @@
 #include <spatial/render/RenderingSubsystem.h>
 #include <spatial/render/Engine.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/core/EBus.h>
 
 using namespace spatial::desktop;
 using namespace spatial::core;
@@ -9,8 +8,11 @@ using namespace spatial::core;
 namespace spatial::render
 {
 
-RenderingSubsystem::RenderingSubsystem(Window &&window)
-	: m_window{std::move(window)},
+RenderingSubsystem::RenderingSubsystem(Application *app, Window &&window)
+	: m_signalsConnector{app, this},
+	  m_windowResizedEventConnector{app, this},
+
+	  m_window{std::move(window)},
 	  m_engine{filament::backend::Backend::OPENGL},
 	  m_swapChain{createSwapChain(m_engine, m_window.getNativeHandle())},
 	  m_renderer{createRenderer(m_engine)},
@@ -19,13 +21,6 @@ RenderingSubsystem::RenderingSubsystem(Window &&window)
 	  m_ui{m_engine}
 {
 	m_mainView->setCamera(m_mainCamera);
-
-	EBus::connect<WindowResizedEvent>(this);
-}
-
-RenderingSubsystem::~RenderingSubsystem()
-{
-	EBus::disconnect<WindowResizedEvent>(this);
 }
 
 void RenderingSubsystem::onStart()
@@ -39,12 +34,12 @@ void RenderingSubsystem::onStart()
 	setupViewport();
 }
 
-void RenderingSubsystem::beforeRender(float delta)
+void RenderingSubsystem::onStartFrame(float delta)
 {
-	m_ui.beforeRender(delta);
+	m_ui.onStartFrame(delta);
 }
 
-void RenderingSubsystem::render()
+void RenderingSubsystem::onEndFrame(float delta)
 {
 	m_ui.render();
 
@@ -66,7 +61,7 @@ void RenderingSubsystem::setupViewport()
 {
 	auto [w, h] = m_window.getWindowSize();
 	auto [dw, dh] = m_window.getFrameBufferSize();
-	
+
 	m_mainView->setViewport({0, 0, dw, dh});
 	m_mainCamera->setProjection(
 		45.0, double(dw) / dh, 0.1, 50,

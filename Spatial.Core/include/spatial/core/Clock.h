@@ -2,17 +2,18 @@
 
 #include <chrono>
 
-namespace spatial::physics
+namespace spatial::core
 {
 
 using delta_t = std::chrono::duration<float>;
 
-class SimulationSubsystem
+
+class Clock
 {
 public:
-  SimulationSubsystem();
+  Clock();
 
-  void process();
+  void tick();
   delta_t getDeltaTime() const;
 
   std::chrono::steady_clock::time_point getLastTime() const
@@ -25,4 +26,4 @@ private:
   std::chrono::steady_clock::time_point m_LastTime;
 };
 
-} // namespace spatial::physics
+} // namespace spatial::core

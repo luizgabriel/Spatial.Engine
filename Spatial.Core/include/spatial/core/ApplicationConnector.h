@@ -7,27 +7,49 @@ namespace spatial::core
 {
 
 template <typename Handler>
-class ApplicationConnector
+class SignalsConnector
 {
 private:
     Application* m_app;
     Handler *m_instance;
-    ApplicationEvents m_flags;
 
 public:
-    ApplicationConnector(Application& app, Handler *instance, ApplicationEvents flags = ApplicationEvents::All)
-        : m_app{&app}, m_instance{instance}, m_flags{flags}
+    SignalsConnector(Application* app, Handler *instance)
+        : m_app{app}, m_instance{instance}
     {
-        connect(*m_app, m_instance, m_flags);
+        connect(m_app, m_instance);
     }
 
-    ~ApplicationConnector()
+    ~SignalsConnector()
     {
-        disconnect(*m_app, m_instance, m_flags);
+        disconnect(m_app, m_instance);
     }
 
-    ApplicationConnector(const ApplicationConnector& other) = delete;
-    ApplicationConnector& operator=(const ApplicationConnector& other) = delete;
+    SignalsConnector(const SignalsConnector& other) = delete;
+    SignalsConnector& operator=(const SignalsConnector& other) = delete;
+};
+
+template <typename Event, typename Handler>
+class EventConnector
+{
+private:
+    Application* m_app;
+    Handler *m_instance;
+
+public:
+    EventConnector(Application* app, Handler *instance)
+        : m_app{app}, m_instance{instance}
+    {
+        connect<Event>(m_app, m_instance);
+    }
+
+    ~EventConnector()
+    {
+        disconnect<Event>(m_app, m_instance);
+    }
+
+    EventConnector(const EventConnector& other) = delete;
+    EventConnector& operator=(const EventConnector& other) = delete;
 };
 
 }

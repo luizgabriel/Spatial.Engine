@@ -1,53 +1,100 @@
 #pragma once
 
 #include <spatial/core/Application.h>
-#include <spatial/common/EnumBitMasks.h>
+#include <boost/tti/has_member_function.hpp>
 
 namespace spatial::core
 {
 
-enum class ApplicationEvents: std::uint8_t
-{
-    None = 0,
-    OnStart = 1,
-    OnUpdate = 2,
-    OnFinish = 4,
-    All = 7
-};
+BOOST_TTI_HAS_MEMBER_FUNCTION(onStart);
+BOOST_TTI_HAS_MEMBER_FUNCTION(onStartFrame);
+BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdateFrame);
+BOOST_TTI_HAS_MEMBER_FUNCTION(onEndFrame);
+BOOST_TTI_HAS_MEMBER_FUNCTION(onFinish);
 
+template <typename T>
+constexpr bool has_mem_func_on_start_v = has_member_function_onStart<T, void>::value;
 
-template<typename Type>
-void connect(Application& app, Type* instance, ApplicationEvents flags = ApplicationEvents::All)
+template <typename T>
+constexpr bool has_mem_func_on_start_frame_v = has_member_function_onStartFrame<T, void, boost::mpl::vector<float>>::value;
+
+template <typename T>
+constexpr bool has_mem_func_on_update_frame_v = has_member_function_onUpdateFrame<T, void, boost::mpl::vector<float>>::value;
+
+template <typename T>
+constexpr bool has_mem_func_on_end_frame_v = has_member_function_onEndFrame<T, void, boost::mpl::vector<float>>::value;
+
+template <typename T>
+constexpr bool has_mem_func_on_finish_v = has_member_function_onFinish<T, void>::value;
+
+template <typename Handler>
+void connect(Application *app, Handler *instance) noexcept
 {
-    if (check(flags, ApplicationEvents::OnStart)) {
-        app.onStartSignal.template connect<&Type::onStart, Type>(instance);
+    if constexpr(has_mem_func_on_start_v<Handler>)
+    {
+        app->getStartSignal().connect<&Handler::onStart>(instance);
     }
 
-    if (check(flags, ApplicationEvents::OnUpdate)) {
-        app.onUpdateSignal.template connect<&Type::onUpdate, Type>(instance);
+    if constexpr(has_mem_func_on_start_frame_v<Handler>)
+    {
+        app->getFrameStartSignal().connect<&Handler::onStartFrame>(instance);
     }
 
-    if (check(flags, ApplicationEvents::OnFinish)) {
-        app.onFinishSignal.template connect<&Type::onFinish, Type>(instance);
+    if constexpr(has_mem_func_on_update_frame_v<Handler>)
+    {
+        app->getUpdateSignal().connect<&Handler::onUpdateFrame, Handler>(instance);
+    }
+
+    if constexpr(has_mem_func_on_end_frame_v<Handler>)
+    {
+        app->getFrameEndSignal().connect<&Handler::onEndFrame>(instance);
+    }
+
+    if constexpr(has_mem_func_on_finish_v<Handler>)
+    {
+        app->getFinishSignal().connect<&Handler::onFinish>(instance);
     }
 }
 
-template<typename Type>
-void disconnect(Application& app, Type* instance, ApplicationEvents flags = ApplicationEvents::All)
+template <typename Handler>
+void disconnect(Application *app, Handler *instance) noexcept
 {
-    if (check(flags, ApplicationEvents::OnStart)) {
-        app.onStartSignal.template disconnect<&Type::onStart, Type>(instance);
+    if constexpr(has_mem_func_on_start_v<Handler>)
+    {
+        app->getStartSignal().disconnect<&Handler::onStart>(instance);
     }
 
-    if (check(flags, ApplicationEvents::OnUpdate)) {
-        app.onUpdateSignal.template disconnect<&Type::onUpdate, Type>(instance);
+    if constexpr(has_mem_func_on_start_frame_v<Handler>)
+    {
+        app->getFrameStartSignal().disconnect<&Handler::onStartFrame>(instance);
     }
 
-    if (check(flags, ApplicationEvents::OnFinish)) {
-        app.onFinishSignal.template disconnect<&Type::onFinish, Type>(instance);
+    if constexpr(has_mem_func_on_update_frame_v<Handler>)
+    {
+        app->getUpdateSignal().disconnect<&Handler::onUpdateFrame, Handler>(instance);
+    }
+
+    if constexpr(has_mem_func_on_end_frame_v<Handler>)
+    {
+        app->getFrameEndSignal().disconnect<&Handler::onEndFrame>(instance);
+    }
+
+    if constexpr(has_mem_func_on_finish_v<Handler>)
+    {
+        app->getFinishSignal().disconnect<&Handler::onFinish>(instance);
     }
 }
 
+template <typename Event, typename Handler>
+void connect(Application *app, Handler *instance) noexcept
+{
+    app->getEBus().template connect<Event>(instance);
 }
 
-ENABLE_BITMASK_OPERATORS(spatial::core::ApplicationEvents)
+template <typename Event, typename Handler>
+void disconnect(Application *app, Handler *instance) noexcept
+{
+    app->getEBus().template disconnect<Event>(instance);
+}
+
+} // namespace spatial::core

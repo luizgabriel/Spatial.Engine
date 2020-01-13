@@ -121,7 +121,7 @@ void UserInterfaceRenderer::setViewport(std::uint32_t width, std::uint32_t heigh
 	imguiRefreshViewport(width, height, dpiX, dpiY);
 }
 
-void UserInterfaceRenderer::beforeRender(float delta)
+void UserInterfaceRenderer::onStartFrame(float delta)
 {
 	imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();

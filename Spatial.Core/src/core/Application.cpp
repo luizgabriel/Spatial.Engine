@@ -1,6 +1,5 @@
 #include <iostream>
 #include <spatial/core/Application.h>
-#include <spatial/core/EBus.h>
 #include <spatial/desktop/PlatformEvent.h>
 
 #include <chrono>
@@ -18,17 +17,17 @@ namespace spatial::core
 Application::Application()
     : m_running{false},
       m_desiredDelta{1.0f / 60.0f},
-      m_windowContext{},
-      m_input{},
-      m_rendering{m_windowContext.createWindow(1280, 720, "Spatial Engine")},
-      m_simulation{}
+      m_ebus{},
+      m_logger{createDefaultLogger("spatial.log")},
+      m_clock{},
+      m_windowContext{}
 {
-    EBus::connect<WindowClosedEvent>(this);
+    m_ebus.connect<WindowClosedEvent>(this);
 }
 
 Application::~Application()
 {
-    EBus::disconnect<WindowClosedEvent>(this);
+    m_ebus.disconnect<WindowClosedEvent>(this);
 }
 
 void Application::onEvent(const WindowClosedEvent &event)
@@ -45,41 +44,38 @@ int Application::run()
 {
     m_running = true;
 
-    m_input.onStart();
-    m_rendering.onStart();
-    
-    onStartSignal();
+    m_startSignal.trigger();
 
     while (m_running)
     {
-        m_simulation.process();
-        m_input.resetInputState();
-        m_windowContext.pollEvents();
+        auto delta = m_clock.getDeltaTime().count();
 
-        auto delta = m_simulation.getDeltaTime().count();
+        m_windowContext.pollEvents(m_ebus);
 
-        m_rendering.beforeRender(delta);
+        m_frameStartSignal.trigger(delta);
 
         //Triggers all queued events
-        EBus::update<WindowResizedEvent>();
-        EBus::update();
+        m_ebus.update<WindowResizedEvent>();
+        m_ebus.update();
         
-        onUpdateSignal(delta);
+        m_updateSignal.trigger(delta);
 
-        m_rendering.render();
+        m_frameEndSignal.trigger(delta);
 
         //Forces the Frame Rate
         std::this_thread::sleep_for(10ms);
+
+        m_clock.tick();
     }
 
-    onFinishSignal();
+    m_finishSignal.trigger();
 
     return 0;
 }
 
 void Application::setMaxFPS(std::uint16_t fps)
 {
-    m_desiredDelta = physics::delta_t{ 1.0f / float(fps) };
+    m_desiredDelta = chr::duration<float>{1.0f / fps};
 }
 
 } // namespace spatial::core

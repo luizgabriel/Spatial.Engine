@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 #include <imgui.h>
+#include <imgui_internal.h>
+
 
 namespace spatial::render
 {
@@ -38,7 +40,7 @@ public:
 
     void setViewport(std::uint32_t width, std::uint32_t height, float dpiX, float dpiY);
 
-    void beforeRender(float delta);
+    void onStartFrame(float delta);
     void render();
 
     const filament::View* getView() const
