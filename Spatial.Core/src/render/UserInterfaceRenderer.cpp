@@ -44,6 +44,10 @@ void UserInterfaceRenderer::onStart()
 		fl::TextureSampler::MagFilter::LINEAR
 	});
 
+	auto &io = ImGui::GetIO();
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 	auto &style = ImGui::GetStyle();
 
 	ImGui::StyleColorsDark();

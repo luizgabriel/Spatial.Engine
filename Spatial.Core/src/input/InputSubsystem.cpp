@@ -24,8 +24,6 @@ void InputSubsystem::onStart()
     auto &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     io.KeyMap[ImGuiKey_Tab] = (int) Key::Tab;
     io.KeyMap[ImGuiKey_LeftArrow] = (int) Key::Left;

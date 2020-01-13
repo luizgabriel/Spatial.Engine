@@ -32,8 +32,8 @@ void SpatialDockLayout(ImGuiID dockspaceId)
     auto dockRight = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Right, 0.20f, NULL, &dockId);
     auto dockBottom = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Down, 0.20f, NULL, &dockId);
 
-    ImGui::DockBuilderDockWindow("Log", dockBottom);
-    ImGui::DockBuilderDockWindow("Material Options", dockRight);
+    ImGui::DockBuilderDockWindow("Console", dockBottom);
+    ImGui::DockBuilderDockWindow("Properties", dockRight);
     ImGui::DockBuilderFinish(dockspaceId);
 }
 
@@ -78,8 +78,8 @@ bool BeginSpatialEngine(bool *opened)
 
         if (ImGui::BeginMenu("Janelas"))
         {
-            ImGui::MenuItem("Material Options", NULL, &gOpenedMaterialOptions);
-            ImGui::MenuItem("Log", NULL, &gOpenedLogging);
+            ImGui::MenuItem("Properties", NULL, &gOpenedMaterialOptions);
+            ImGui::MenuItem("Console", NULL, &gOpenedLogging);
             ImGui::EndMenu();
         }
 
@@ -88,7 +88,7 @@ bool BeginSpatialEngine(bool *opened)
 
     if (gOpenedMaterialOptions)
     {
-        if (ImGui::Begin("Material Options", &gOpenedMaterialOptions))
+        if (ImGui::Begin("Properties", &gOpenedMaterialOptions))
         {
         }
         ImGui::End();
@@ -97,8 +97,19 @@ bool BeginSpatialEngine(bool *opened)
     if (gOpenedLogging)
     {
         ImGui::SetNextWindowSize(ImVec2(1018, 129), ImGuiCond_FirstUseEver);
-        if (ImGui::Begin("Log", &gOpenedLogging))
+        if (ImGui::Begin("Console", &gOpenedLogging))
         {
+            ImGui::SameLine();
+            if (ImGui::Button("Clear")) {
+                //
+            }
+
+            ImGui::Separator();
+            ImGui::BeginChild("scrolling", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
+
+
+
+            ImGui::EndChild();
         }
 
         ImGui::End();
@@ -176,7 +187,7 @@ public:
     }
 };
 
-int SDL_main(int arc, char *argv[])
+int main(int arc, char *argv[])
 {
     Asset::init(path{argv[0]}.parent_path() / "assets");
 
