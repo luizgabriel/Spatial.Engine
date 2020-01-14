@@ -14,7 +14,7 @@ Most of the dependencies are handled by the [Conan Package Manager](https://cona
 Cmake will automatically install the conan dependencies for you (once you configured the profile correctly). 
 This project requires [LLVM](http://releases.llvm.org/download.html) to be built. So you need to create a `clang` profile like this:
 
-```toml
+```
 [settings]
 os=Windows
 os_build=Windows
