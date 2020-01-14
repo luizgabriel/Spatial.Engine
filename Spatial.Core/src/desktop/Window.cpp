@@ -31,6 +31,9 @@ Window::Window(Window &&other) noexcept
 
 Window &Window::operator=(Window &&other) noexcept
 {
+	if (m_windowHandle)
+		SDL_DestroyWindow(m_windowHandle);
+
 	m_windowHandle = std::exchange(other.m_windowHandle, nullptr);
 
 	return *this;
@@ -44,6 +47,8 @@ Window::~Window()
 
 std::pair<uint32_t, uint32_t> Window::getFrameBufferSize() const
 {
+	assert(m_windowHandle != nullptr);
+
 	int dsw, dsh;
 	SDL_GL_GetDrawableSize(m_windowHandle, &dsw, &dsh);
 
@@ -52,6 +57,8 @@ std::pair<uint32_t, uint32_t> Window::getFrameBufferSize() const
 
 std::pair<int, int> Window::getWindowSize() const
 {
+	assert(m_windowHandle != nullptr);
+
 	int w, h;
 	SDL_GetWindowSize(m_windowHandle, &w, &h);
 
@@ -60,11 +67,15 @@ std::pair<int, int> Window::getWindowSize() const
 
 bool Window::hasFocus() const
 {
+	assert(m_windowHandle != nullptr);
+	
 	return (SDL_GetWindowFlags(m_windowHandle) & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
 void *Window::getNativeHandle()
 {
+	assert(m_windowHandle != nullptr);
+
 	SDL_SysWMinfo wmInfo;
 	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
 	return wmInfo.info.win.window;

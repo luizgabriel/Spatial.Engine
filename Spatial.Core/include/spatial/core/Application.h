@@ -91,7 +91,7 @@ public:
      * The window context is responsible for creating windows.
      * Its lifetime should last longer than all windows
      */
-    auto& getWindowContext() { return m_windowContext; }
+    auto &getWindowContext() { return m_windowContext; }
     //endregion Getters
 };
 

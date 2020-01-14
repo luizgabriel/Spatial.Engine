@@ -16,7 +16,7 @@ namespace fl = filament;
 namespace spatial::render
 {
 
-UserInterfaceSystem::UserInterfaceSystem(Application *app, RenderingSystem* rendering)
+UserInterfaceSystem::UserInterfaceSystem(Application *app, RenderingSystem *rendering)
 	: m_signalsConnector{app, this},
 	  m_windowResizedEventConnector{app, this},
 	  m_window{&rendering->getWindow()},

@@ -7,7 +7,6 @@ namespace spatial::core
 
 using delta_t = std::chrono::duration<float>;
 
-
 class Clock
 {
 public:

@@ -18,7 +18,7 @@ WindowContext::~WindowContext()
     SDL_Quit();
 }
 
-void WindowContext::pollEvents(common::EventQueue& queue)
+void WindowContext::pollEvents(common::EventQueue &queue)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)

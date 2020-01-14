@@ -28,7 +28,6 @@ public:
     {
         return m_entity;
     }
-
 };
 
-}
+} // namespace spatial::render

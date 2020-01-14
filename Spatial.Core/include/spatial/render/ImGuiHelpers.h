@@ -17,9 +17,9 @@ std::pair<int, int> imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-filament::VertexBuffer* imguiCreateVertexBuffer(filament::Engine *engine, size_t capacity);
+filament::VertexBuffer *imguiCreateVertexBuffer(filament::Engine *engine, size_t capacity);
 
-filament::IndexBuffer* imguiCreateIndexBuffer(filament::Engine *engine, size_t capacity);
+filament::IndexBuffer *imguiCreateIndexBuffer(filament::Engine *engine, size_t capacity);
 
 uint64_t imguiMakeScissorKey(int fbheight, const ImVec4 &clipRect);
 
@@ -37,7 +37,7 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 	auto callback = [](void *buffer, size_t size, void *user) {
 		auto alloc = std::allocator<ImGuiType>();
 		auto nVec = size / sizeof(ImGuiType);
-		alloc.deallocate(reinterpret_cast<ImGuiType*>(buffer), nVec);
+		alloc.deallocate(reinterpret_cast<ImGuiType *>(buffer), nVec);
 	};
 
 	auto nVecBytes = nVec * sizeof(ImGuiType);

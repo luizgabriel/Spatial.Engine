@@ -6,7 +6,7 @@
 #include <spatial/render/CommonResources.h>
 #include <spatial/core/ApplicationConnector.h>
 
-#include <array>
+#include <vector>
 
 namespace spatial::render
 {
@@ -25,9 +25,9 @@ private:
 	Renderer m_renderer;
 
 	Camera m_mainCamera;
-	filament::View* m_mainView;
+	filament::View *m_mainView;
 
-	std::vector<filament::View*> m_views;
+	std::vector<filament::View *> m_views;
 
 	void setupViewport();
 
@@ -45,14 +45,14 @@ public:
 	 * \brief Pushes a view to the renderer
 	 * The rendering system will now be the owner of the view resource. 
 	 */
-	void pushView(View&& view);
+	void pushView(View &&view);
 
 	/**
 	 * \brief Pushes a view to the renderer
 	 * The rendering system will now be the owner of the view resource. 
 	 * When this system is destructed, pushed views are destroyed.
 	 */
-	void pushView(filament::View* view);
+	void pushView(filament::View *view);
 
 	//region Getters
 	filament::Engine *getEngine()

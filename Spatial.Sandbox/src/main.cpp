@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace fl = filament;
 using namespace spatial;
 using namespace spatial::math;
@@ -81,7 +80,6 @@ bool BeginSpatialEngine(bool *openedPropertiesPtr)
     {
         if (ImGui::Begin("Properties", openedPropertiesPtr))
         {
-
         }
         ImGui::End();
     }
@@ -110,7 +108,7 @@ private:
     bool m_openedPropertiesWindow;
 
 public:
-    Sandbox(Application *app, RenderingSystem* rendering)
+    Sandbox(Application *app, RenderingSystem *rendering)
         : m_signalsConnector{app, this},
 
           m_engine{rendering->getEngine()},
