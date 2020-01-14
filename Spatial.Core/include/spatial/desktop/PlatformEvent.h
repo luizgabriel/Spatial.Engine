@@ -2,19 +2,24 @@
 
 #include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
+#include <math/vec2.h>
 
 namespace spatial::desktop
 {
 
 struct WindowResizedEvent
 {
-    int width, height;
+    std::uint32_t width, height;
 
-    WindowResizedEvent(int width, int height) : width{width}, height{height} {}
+    WindowResizedEvent(std::uint32_t width, std::uint32_t height)
+        : width{width},
+          height{height}
+    {
+    }
 
     float getRatio() const
     {
-        return float(width) / float(height);
+        return float(width) / height;
     }
 };
 
@@ -38,7 +43,7 @@ struct TextEvent
 {
     std::string text;
 
-    explicit TextEvent(std::string&& text)
+    explicit TextEvent(std::string &&text)
         : text{text}
     {
     }

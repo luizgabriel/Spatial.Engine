@@ -8,6 +8,7 @@
 #include <filesystem>
 
 using namespace spatial::common;
+using namespace spatial::desktop;
 namespace fs = std::filesystem;
 namespace fl = filament;
 
@@ -16,37 +17,36 @@ namespace spatial::render
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine *engine)
 	: m_engine{engine},
+	  m_view{m_engine->createView()},
 	  m_scene{createScene(m_engine)},
-	  m_view{createView(m_engine)},
 	  m_camera{createCamera(m_engine)},
 	  m_material{createMaterial(m_engine, fs::path{"ui_blit.filamat"})},
 	  m_entity{m_engine},
 	  m_texture{m_engine}
 {
-	m_view->setCamera(m_camera);
-	m_view->setScene(m_scene);
+	m_view->setCamera(m_camera.get());
+	m_view->setScene(m_scene.get());
 	m_scene->addEntity(m_entity.get());
 
 	m_view->setClearTargets(false, false, false);
-    m_view->setRenderTarget(fl::View::TargetBufferFlags::DEPTH_AND_STENCIL);
-    m_view->setPostProcessingEnabled(false);
-    m_view->setShadowsEnabled(false);
+	m_view->setRenderTarget(fl::View::TargetBufferFlags::DEPTH_AND_STENCIL);
+	m_view->setPostProcessingEnabled(false);
+	m_view->setShadowsEnabled(false);
 
 	ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::onStart()
+void UserInterfaceRenderer::setup()
 {
 	m_texture = imguiCreateTextureAtlas(m_engine);
 
-	m_material->setDefaultParameter("albedo", m_texture, {
-		fl::TextureSampler::MinFilter::LINEAR,
-		fl::TextureSampler::MagFilter::LINEAR
-	});
+	m_material->setDefaultParameter(
+		"albedo", m_texture.get(),
+		{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
 	auto &io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	auto &style = ImGui::GetStyle();
 
@@ -99,24 +99,27 @@ void UserInterfaceRenderer::onStart()
 
 UserInterfaceRenderer::~UserInterfaceRenderer()
 {
-	for (auto vb : m_vertexBuffers) {
-        m_engine->destroy(vb);
-    }
-	
-    for (auto ib : m_indexBuffers) {
-        m_engine->destroy(ib);
-    }
+	for (auto vb : m_vertexBuffers)
+	{
+		m_engine->destroy(vb);
+	}
 
-	for (auto mi : m_materialInstances) {
-        m_engine->destroy(mi);
-    }
+	for (auto ib : m_indexBuffers)
+	{
+		m_engine->destroy(ib);
+	}
+
+	for (auto mi : m_materialInstances)
+	{
+		m_engine->destroy(mi);
+	}
 
 	ImGui::DestroyContext();
 }
 
-void UserInterfaceRenderer::setViewport(std::uint32_t width, std::uint32_t height, float dpiX, float dpiY)
+void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float dpiY)
 {
-	m_view->setViewport({0, 0, width, height});
+	m_view->setViewport({0, 0, static_cast<uint32_t>(width), static_cast<uint32_t>(height)});
 	m_camera->setProjection(
 		fl::Camera::Projection::ORTHO,
 		0.0, width / dpiX, height / dpiY,
@@ -125,13 +128,13 @@ void UserInterfaceRenderer::setViewport(std::uint32_t width, std::uint32_t heigh
 	imguiRefreshViewport(width, height, dpiX, dpiY);
 }
 
-void UserInterfaceRenderer::onStartFrame(float delta)
+void UserInterfaceRenderer::beforeRender(float delta)
 {
 	imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();
 }
 
-void UserInterfaceRenderer::render()
+void UserInterfaceRenderer::dispatchCommands()
 {
 	// Avoid rendering when minimized and scale coordinates for retina displays.
 	if (imguiIsMinimized())

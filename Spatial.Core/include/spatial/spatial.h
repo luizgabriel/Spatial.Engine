@@ -5,8 +5,10 @@
 #include <spatial/core/ApplicationConnector.h>
 #include <spatial/core/Asset.h>
 
-#include <spatial/render/RenderingSubsystem.h>
-#include <spatial/input/InputSubsystem.h>
+#include <spatial/render/RenderingSystem.h>
+#include <spatial/render/UserInterfaceSystem.h>
+
+#include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
 
 #include <utils/EntityManager.h>

@@ -5,7 +5,7 @@
 namespace spatial::input
 {
 
-class InputSubsystem;
+class InputSystem;
 
 class Input
 {
@@ -34,7 +34,7 @@ public:
         return s_inputState.getMousePosition();
     }
 
-    friend class InputSubsystem;
+    friend class InputSystem;
 };
 
 } // namespace spatial::input

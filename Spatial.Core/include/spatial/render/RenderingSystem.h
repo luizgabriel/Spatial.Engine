@@ -4,15 +4,16 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
-#include <spatial/render/UserInterfaceRenderer.h>
 #include <spatial/core/ApplicationConnector.h>
+
+#include <array>
 
 namespace spatial::render
 {
 
-class RenderingSubsystem
+class RenderingSystem
 {
-	using self_t = RenderingSubsystem;
+	using self_t = RenderingSystem;
 
 private:
 	core::SignalsConnector<self_t> m_signalsConnector;
@@ -23,27 +24,38 @@ private:
 	SwapChain m_swapChain;
 	Renderer m_renderer;
 
-	View m_mainView;
 	Camera m_mainCamera;
+	filament::View* m_mainView;
 
-	UserInterfaceRenderer m_ui;
+	std::vector<filament::View*> m_views;
 
 	void setupViewport();
 
 public:
-	RenderingSubsystem(core::Application* app, desktop::Window &&window);
+	RenderingSystem(core::Application *app, desktop::Window &&window);
+	~RenderingSystem();
 
 	void onStart();
 
-	void onStartFrame(float delta);
 	void onEndFrame(float delta);
 
-	filament::Engine *getEngine()
-	{
-		return m_engine;
-	}
+	void onEvent(const desktop::WindowResizedEvent &event);
 
-	const filament::Engine *getEngine() const
+	/**
+	 * \brief Pushes a view to the renderer
+	 * The rendering system will now be the owner of the view resource. 
+	 */
+	void pushView(View&& view);
+
+	/**
+	 * \brief Pushes a view to the renderer
+	 * The rendering system will now be the owner of the view resource. 
+	 * When this system is destructed, pushed views are destroyed.
+	 */
+	void pushView(filament::View* view);
+
+	//region Getters
+	filament::Engine *getEngine()
 	{
 		return m_engine.get();
 	}
@@ -53,32 +65,16 @@ public:
 		return m_window;
 	}
 
-	const desktop::Window &getWindow() const
-	{
-		return m_window;
-	}
-
 	filament::View *getMainView()
 	{
-		return m_mainView.get();
-	}
-
-	const filament::View *getMainView() const
-	{
-		return m_mainView.get();
+		return m_mainView;
 	}
 
 	filament::Camera *getMainCamera()
 	{
 		return m_mainCamera.get();
 	}
-
-	const filament::Camera *getMainCamera() const
-	{
-		return m_mainCamera.get();
-	}
-
-	void onEvent(const desktop::WindowResizedEvent &event);
+	//endregion
 };
 
 } // namespace spatial::render

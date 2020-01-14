@@ -8,9 +8,9 @@
 namespace spatial::input
 {
 
-class InputSubsystem
+class InputSystem
 {
-    using self_t = InputSubsystem;
+    using self_t = InputSystem;
 
 private:
     core::EventConnector<desktop::MouseMovedEvent, self_t> m_mouseEventConnector;
@@ -19,7 +19,7 @@ private:
     core::SignalsConnector<self_t> m_signalsConnector;
 
 public:
-    InputSubsystem(core::Application* app);
+    InputSystem(core::Application* app);
 
     void onStart();
     void onStartFrame(float delta);

@@ -20,9 +20,6 @@ using namespace std::filesystem;
 namespace ImGui
 {
 
-bool gOpenedLogging = true;
-bool gOpenedMaterialOptions = true;
-
 void SpatialDockLayout(ImGuiID dockspaceId)
 {
     ImGui::DockBuilderRemoveNode(dockspaceId); // Clear out existing layout
@@ -30,14 +27,13 @@ void SpatialDockLayout(ImGuiID dockspaceId)
 
     auto dockId = dockspaceId;
     auto dockRight = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Right, 0.20f, NULL, &dockId);
-    auto dockBottom = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Down, 0.20f, NULL, &dockId);
+    //auto dockBottom = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Down, 0.20f, NULL, &dockId);
 
-    ImGui::DockBuilderDockWindow("Console", dockBottom);
     ImGui::DockBuilderDockWindow("Properties", dockRight);
     ImGui::DockBuilderFinish(dockspaceId);
 }
 
-bool BeginSpatialEngine(bool *opened)
+bool BeginSpatialEngine(bool *openedPropertiesPtr)
 {
     static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_PassthruCentralNode;
     static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
@@ -50,13 +46,8 @@ bool BeginSpatialEngine(bool *opened)
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-    // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-    // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-    // all active windows docked into it will lose their parent and become undocked.
-    // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-    // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpace", opened, windowFlags);
+    ImGui::Begin("DockSpace", nullptr, windowFlags);
     ImGui::PopStyleVar();
 
     ImGui::PopStyleVar(2);
@@ -73,45 +64,25 @@ bool BeginSpatialEngine(bool *opened)
 
     if (ImGui::BeginMainMenuBar())
     {
-        //ImGui::Text("Spatial Engine");
-        //ImGui::Separator();
+        ImGui::Text("Spatial Engine");
+        ImGui::Separator();
 
-        if (ImGui::BeginMenu("Janelas"))
+        if (ImGui::BeginMenu("Options"))
         {
-            ImGui::MenuItem("Properties", NULL, &gOpenedMaterialOptions);
-            ImGui::MenuItem("Console", NULL, &gOpenedLogging);
+            ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
+            //ImGui::MenuItem("Console", NULL, &gOpenedLogging);
             ImGui::EndMenu();
         }
 
         ImGui::EndMainMenuBar();
     }
 
-    if (gOpenedMaterialOptions)
+    if (*openedPropertiesPtr)
     {
-        if (ImGui::Begin("Properties", &gOpenedMaterialOptions))
+        if (ImGui::Begin("Properties", openedPropertiesPtr))
         {
+
         }
-        ImGui::End();
-    }
-
-    if (gOpenedLogging)
-    {
-        ImGui::SetNextWindowSize(ImVec2(1018, 129), ImGuiCond_FirstUseEver);
-        if (ImGui::Begin("Console", &gOpenedLogging))
-        {
-            ImGui::SameLine();
-            if (ImGui::Button("Clear")) {
-                //
-            }
-
-            ImGui::Separator();
-            ImGui::BeginChild("scrolling", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
-
-
-
-            ImGui::EndChild();
-        }
-
         ImGui::End();
     }
 
@@ -131,12 +102,15 @@ private:
 
     Scene m_scene;
     Material m_material;
+    MaterialInstance m_instance;
+
     EntityResource m_light;
 
     bool m_showEngineGui;
+    bool m_openedPropertiesWindow;
 
 public:
-    Sandbox(Application *app, RenderingSubsystem* rendering)
+    Sandbox(Application *app, RenderingSystem* rendering)
         : m_signalsConnector{app, this},
 
           m_engine{rendering->getEngine()},
@@ -145,8 +119,11 @@ public:
 
           m_scene{createScene(m_engine)},
           m_material{createMaterial(m_engine, Asset::read(path{"materials"} / "plastic.filamat"))},
+          m_instance{m_engine, m_material->createInstance()},
+
           m_light{createEntity(m_engine)},
-          m_showEngineGui{true}
+          m_showEngineGui{true},
+          m_openedPropertiesWindow{true}
     {
     }
 
@@ -157,10 +134,10 @@ public:
 
         m_view->setScene(m_scene.get());
 
-        //instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
-        //instance->setParameter("roughness", 0.5f);
-        //instance->setParameter("clearCoat", 1.0f);
-        //instance->setParameter("clearCoatRoughness", 0.3f);
+        m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
+        m_instance->setParameter("roughness", 0.5f);
+        m_instance->setParameter("clearCoat", 1.0f);
+        m_instance->setParameter("clearCoatRoughness", 0.3f);
 
         fl::LightManager::Builder(fl::LightManager::Type::SUN)
             .color(fl::Color::toLinear<fl::ACCURATE>({0.98f, 0.92f, 0.89f}))
@@ -180,7 +157,7 @@ public:
         if (Input::released(Key::G))
             m_showEngineGui = !m_showEngineGui;
 
-        if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_showEngineGui))
+        if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_openedPropertiesWindow))
         {
             ImGui::End();
         }
@@ -193,9 +170,10 @@ int main(int arc, char *argv[])
 
     auto app = Application{};
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
-    auto rendering = RenderingSubsystem{&app, std::move(window)};
-    auto input = InputSubsystem{&app};
+    auto rendering = RenderingSystem{&app, std::move(window)};
+    auto input = InputSystem{&app};
     auto sandbox = Sandbox{&app, &rendering};
+    auto ui = UserInterfaceSystem(&app, &rendering);
 
     return app.run();
 }

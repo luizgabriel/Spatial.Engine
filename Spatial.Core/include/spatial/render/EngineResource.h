@@ -21,7 +21,7 @@ public:
 
 	EngineResource(EngineResource &&other) noexcept
 		: m_engine{other.m_engine},
-		  m_resource{std::exchange(other.m_resource, nullptr)}
+		  m_resource{other.extract()}
 	{
 	}
 
@@ -30,12 +30,17 @@ public:
 	EngineResource &operator=(EngineResource &&other) noexcept
 	{
 		m_engine->destroy(m_resource);
-		m_resource = std::exchange(other.m_resource, nullptr);
+		m_resource = other.extract();
 
 		return *this;
 	}
 
 	EngineResource &operator=(const EngineResource &w) = delete;
+
+	T* extract()
+	{
+		return std::exchange(m_resource, nullptr);
+	}
 
 	const T *get() const
 	{
@@ -53,11 +58,6 @@ public:
 	}
 
 	const T *operator->() const
-	{
-		return get();
-	}
-
-	operator T *()
 	{
 		return get();
 	}

@@ -1,4 +1,4 @@
-#include <spatial/input/InputSubsystem.h>
+#include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
@@ -11,7 +11,7 @@ using namespace spatial::common;
 namespace spatial::input
 {
 
-InputSubsystem::InputSubsystem(Application* app)
+InputSystem::InputSystem(Application* app)
     : m_mouseEventConnector{app, this},
       m_keyEventConnector{app, this},
       m_textEventConnector{app, this},
@@ -19,7 +19,7 @@ InputSubsystem::InputSubsystem(Application* app)
 {
 }
 
-void InputSubsystem::onStart()
+void InputSystem::onStart()
 {
     auto &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -48,12 +48,12 @@ void InputSubsystem::onStart()
     io.KeyMap[ImGuiKey_Z] = (int) Key::Z;
 }
 
-void InputSubsystem::onStartFrame(float delta)
+void InputSystem::onStartFrame(float delta)
 {
     Input::s_inputState.reset();
 }
 
-void InputSubsystem::onEvent(const MouseMovedEvent &event)
+void InputSystem::onEvent(const MouseMovedEvent &event)
 {
     Input::s_inputState.setMousePosition({event.x, event.y});
 
@@ -61,7 +61,7 @@ void InputSubsystem::onEvent(const MouseMovedEvent &event)
     io.MousePos = ImVec2(event.x, event.y);
 }
 
-void InputSubsystem::onEvent(const KeyEvent &event)
+void InputSystem::onEvent(const KeyEvent &event)
 {
     auto key = event.key;
     Input::s_inputState.set(key, event.action);
@@ -79,7 +79,7 @@ void InputSubsystem::onEvent(const KeyEvent &event)
     io.KeySuper = (key == Key::System) && pressed;
 }
 
-void InputSubsystem::onEvent(const TextEvent &event)
+void InputSystem::onEvent(const TextEvent &event)
 {
     auto &io = ImGui::GetIO();
     io.AddInputCharactersUTF8(event.text.c_str());

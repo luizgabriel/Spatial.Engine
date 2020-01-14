@@ -15,6 +15,7 @@
 namespace spatial::render
 {
 
+//Scoped Pointers
 using SwapChain = EngineResource<filament::SwapChain>;
 using Renderer = EngineResource<filament::Renderer>;
 using Scene = EngineResource<filament::Scene>;
@@ -26,6 +27,7 @@ using Texture = EngineResource<filament::Texture>;
 using VertexBuffer = EngineResource<filament::VertexBuffer>;
 using IndexBuffer = EngineResource<filament::IndexBuffer>;
 
+//Shared Pointers
 using SharedVertexBuffer = std::shared_ptr<filament::VertexBuffer>;
 using SharedIndexBuffer = std::shared_ptr<filament::IndexBuffer>;
 using SharedMaterialInstance = std::shared_ptr<filament::MaterialInstance>;

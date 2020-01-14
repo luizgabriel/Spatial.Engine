@@ -20,12 +20,17 @@ public:
     RenderEngine(filament::backend::Backend backend);
     ~RenderEngine();
 
+    filament::View* createView()
+    {
+        return m_engine->createView();
+    }
+
     filament::Engine *get()
     {
         return m_engine;
     }
 
-    filament::Engine &get_ref()
+    filament::Engine &ref()
     {
         return *m_engine;
     }
@@ -35,20 +40,11 @@ public:
         return m_engine;
     }
 
-    const filament::Engine &get_ref() const
+    const filament::Engine &ref() const
     {
         return *m_engine;
     }
 
-    operator filament::Engine *()
-    {
-        return get();
-    }
-
-    operator filament::Engine &()
-    {
-        return get_ref();
-    }
 };
 
 } // namespace spatial::render

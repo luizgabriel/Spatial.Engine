@@ -21,7 +21,7 @@ Window::Window(int width, int height, std::string_view title)
 						   width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
 	assert(m_windowHandle != nullptr);
-	//SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
+	SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
 }
 
 Window::Window(Window &&other) noexcept

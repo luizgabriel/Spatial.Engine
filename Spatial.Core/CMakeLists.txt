@@ -10,13 +10,14 @@ add_library(Spatial.Core
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
 
-	src/input/InputSubsystem.cpp
+	src/input/InputSystem.cpp
 	src/input/InputState.cpp
 	src/input/Input.cpp
 
 	src/render/CommonResources.cpp
 	src/render/Engine.cpp
-	src/render/RenderingSubsystem.cpp
+	src/render/RenderingSystem.cpp
+	src/render/UserInterfaceSystem.cpp
 	src/render/UserInterfaceRenderer.cpp
 	src/render/ImGuiHelpers.cpp
 )
