@@ -34,9 +34,12 @@ Notice that the `compiler.toolset=LLVM` is necessary to inform Visual Studio to 
 
 ### Installing the Dependencies
 
-In a bash terminal (on windows you may use git bash or wls bash), run:
+Most dependencies are nicelly resolved by conan, but SDL2 is still necessary to be installed manually. 
+If you're using MacOS you can install SDL2 by `brew` commands. If you're using linux you can install it by `apt-get` or `yum` commands. 
+If you're on windows I recomend you to install [VCPKG](https://github.com/microsoft/vcpkg).
+Finally, in a bash terminal (on windows you may use git bash or wls bash), run:
 
-```
+```shell
 ./Scripts/SetupDependencies.sh
 ```
 
