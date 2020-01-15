@@ -41,7 +41,7 @@ done
 
 while :
 do
-    read -r -p "Enter the VPKG executable path > " vcpkg_exe
+    read -r -p "Enter the VCPKG executable path > " vcpkg_exe
     #check already exists
     [[ -e "$vcpkg_exe" ]] || err "$vcpkg_exe does not exists" || continue
 
