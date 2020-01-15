@@ -16,7 +16,8 @@ class UserInterfaceSystem
 private:
     core::SignalsConnector<self_t> m_signalsConnector;
     core::EventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedEventConnector;
-    desktop::Window *m_window;
+    
+    const desktop::Window *m_window;
     UserInterfaceRenderer m_ui;
 
     void setupViewport();

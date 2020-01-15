@@ -17,7 +17,7 @@ namespace spatial::render
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine *engine)
 	: m_engine{engine},
-	  m_view{m_engine->createView()},
+	  m_view{createSharedResource(m_engine, m_engine->createView())},
 	  m_scene{createScene(m_engine)},
 	  m_camera{createCamera(m_engine)},
 	  m_material{createMaterial(m_engine, fs::path{"ui_blit.filamat"})},

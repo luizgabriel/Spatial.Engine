@@ -20,11 +20,6 @@ public:
     RenderEngine(filament::backend::Backend backend);
     ~RenderEngine();
 
-    filament::View* createView()
-    {
-        return m_engine->createView();
-    }
-
     filament::Engine *get()
     {
         return m_engine;

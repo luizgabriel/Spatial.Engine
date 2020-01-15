@@ -22,7 +22,7 @@ UserInterfaceSystem::UserInterfaceSystem(Application *app, RenderingSystem *rend
 	  m_window{&rendering->getWindow()},
 	  m_ui{rendering->getEngine()}
 {
-	rendering->pushView(m_ui.getView());
+	rendering->registerView(m_ui.getView());
 }
 
 void UserInterfaceSystem::onStart()

@@ -95,9 +95,9 @@ private:
     SignalsConnector<Sandbox> m_signalsConnector;
 
     fl::Engine *m_engine;
-    fl::View *m_view;
     fl::Camera *m_camera;
 
+    SharedView m_view;
     Scene m_scene;
     Material m_material;
     MaterialInstance m_instance;
@@ -112,9 +112,9 @@ public:
         : m_signalsConnector{app, this},
 
           m_engine{rendering->getEngine()},
-          m_view{rendering->getMainView()},
           m_camera{rendering->getMainCamera()},
 
+          m_view{rendering->getMainView()},
           m_scene{createScene(m_engine)},
           m_material{createMaterial(m_engine, Asset::read(path{"materials"} / "plastic.filamat"))},
           m_instance{m_engine, m_material->createInstance()},
@@ -171,7 +171,7 @@ int main(int arc, char *argv[])
     auto rendering = RenderingSystem{&app, std::move(window)};
     auto input = InputSystem{&app};
     auto sandbox = Sandbox{&app, &rendering};
-    auto ui = UserInterfaceSystem(&app, &rendering);
+    auto ui = UserInterfaceSystem{&app, &rendering};
 
     return app.run();
 }

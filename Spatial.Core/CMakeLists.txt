@@ -49,6 +49,7 @@ target_link_libraries(
 		CONAN_PKG::spdlog
 		CONAN_PKG::imgui
 		CONAN_PKG::boost_tti
+		CONAN_PKG::Assimp
 
 		SDL2::SDL2
 		SDL2::SDL2main

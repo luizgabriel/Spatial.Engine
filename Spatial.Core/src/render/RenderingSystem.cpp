@@ -17,18 +17,10 @@ RenderingSystem::RenderingSystem(Application *app, Window &&window)
 	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
 	  m_renderer{createRenderer(m_engine.get())},
 	  m_mainCamera{createCamera(m_engine.get())},
-	  m_mainView{m_engine.createView()},
+	  m_mainView{createSharedResource(m_engine.get(), m_engine.get()->createView())},
 	  m_views{5}
 {
-	pushView(m_mainView);
-}
-
-RenderingSystem::~RenderingSystem()
-{
-	auto& engine = m_engine.ref();
-
-	for (auto viewPtr : m_views)
-		engine.destroy(viewPtr);
+	registerView(m_mainView);
 }
 
 void RenderingSystem::onStart()
@@ -46,8 +38,8 @@ void RenderingSystem::onEndFrame(float delta)
 {
 	if (m_renderer->beginFrame(m_swapChain.get()))
 	{
-		for (auto &view : m_views)
-			m_renderer->render(view);
+		for (const auto &view : m_views)
+			m_renderer->render(view.get());
 
 		m_renderer->endFrame();
 	}
@@ -58,12 +50,7 @@ void RenderingSystem::onEvent(const WindowResizedEvent &event)
 	setupViewport();
 }
 
-void RenderingSystem::pushView(View&& view)
-{
-	m_views.push_back(view.extract());
-}
-
-void RenderingSystem::pushView(filament::View *view)
+void RenderingSystem::registerView(const SharedView view)
 {
 	m_views.push_back(view);
 }

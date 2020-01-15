@@ -30,26 +30,57 @@ using IndexBuffer = EngineResource<filament::IndexBuffer>;
 //Shared Pointers
 using SharedVertexBuffer = std::shared_ptr<filament::VertexBuffer>;
 using SharedIndexBuffer = std::shared_ptr<filament::IndexBuffer>;
+using SharedMaterial = std::shared_ptr<filament::Material>;
 using SharedMaterialInstance = std::shared_ptr<filament::MaterialInstance>;
+using SharedView = std::shared_ptr<filament::View>;
+using SharedTexture = std::shared_ptr<filament::Texture>;
+using SharedCamera = std::shared_ptr<filament::Camera>;
 
+/**
+ * \brief Creates a scoped pointer of the filament::SwapChain 
+ */
 SwapChain createSwapChain(filament::Engine *engine, void *nativeWindowHandle) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::Renderer 
+ */
 Renderer createRenderer(filament::Engine *engine) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::Scene 
+ */
 Scene createScene(filament::Engine *engine) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::View 
+ */
 View createView(filament::Engine *engine) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::Camera 
+ */
 Camera createCamera(filament::Engine *engine) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::Material 
+ */
 Material createMaterial(filament::Engine *engine, const char *data, size_t size) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the filament::Material 
+ */
 Material createMaterial(filament::Engine *engine, const std::vector<char> &data) noexcept;
 
+/**
+ * \brief Creates a scoped pointer of the utils::Entity
+ */
 EntityResource createEntity(filament::Engine *engine) noexcept;
 
+/**
+ * \brief Creates a shared pointer of any T-type instance of filament 
+ */
 template<typename T>
-std::shared_ptr<T> createSharedResource(filament::Engine *engine, T* instance)
+std::shared_ptr<T> createSharedResource(filament::Engine *engine, T* instance) noexcept
 {
     return std::shared_ptr<T>{instance, [=](T* res){
         engine->destroy(res);

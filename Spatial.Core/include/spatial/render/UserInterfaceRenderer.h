@@ -14,7 +14,7 @@ class UserInterfaceRenderer
 private:
     filament::Engine *m_engine;
 
-    filament::View *m_view;
+    SharedView m_view;
     Scene m_scene;
     Camera m_camera;
     Material m_material;
@@ -52,7 +52,7 @@ public:
      */
     void dispatchCommands();
 
-    filament::View *getView()
+    const SharedView getView()
     {
         return m_view;
     }

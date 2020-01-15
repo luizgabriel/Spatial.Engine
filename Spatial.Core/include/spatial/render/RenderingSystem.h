@@ -25,15 +25,14 @@ private:
 	Renderer m_renderer;
 
 	Camera m_mainCamera;
-	filament::View *m_mainView;
+	SharedView m_mainView;
 
-	std::vector<filament::View *> m_views;
+	std::vector<SharedView> m_views;
 
 	void setupViewport();
 
 public:
 	RenderingSystem(core::Application *app, desktop::Window &&window);
-	~RenderingSystem();
 
 	void onStart();
 
@@ -43,16 +42,8 @@ public:
 
 	/**
 	 * \brief Pushes a view to the renderer
-	 * The rendering system will now be the owner of the view resource. 
 	 */
-	void pushView(View &&view);
-
-	/**
-	 * \brief Pushes a view to the renderer
-	 * The rendering system will now be the owner of the view resource. 
-	 * When this system is destructed, pushed views are destroyed.
-	 */
-	void pushView(filament::View *view);
+	void registerView(const SharedView view);
 
 	//region Getters
 	filament::Engine *getEngine()
@@ -60,12 +51,12 @@ public:
 		return m_engine.get();
 	}
 
-	desktop::Window &getWindow()
+	const desktop::Window &getWindow()
 	{
 		return m_window;
 	}
 
-	filament::View *getMainView()
+	const SharedView getMainView()
 	{
 		return m_mainView;
 	}
