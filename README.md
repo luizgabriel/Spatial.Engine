@@ -11,8 +11,8 @@ Most of the dependencies are handled by the [Conan Package Manager](https://cona
 
 ### Configuring the Conan Profile
 
-Cmake will automatically install the conan dependencies for you (once you configured the profile correctly). 
-This project requires [LLVM](http://releases.llvm.org/download.html) to be built. So you need to create a `clang` profile like this:
+This project requires [LLVM](http://releases.llvm.org/download.html) to be built.
+So you need to create a `clang` profile like this:
 
 ```
 [settings]
@@ -43,16 +43,18 @@ Finally, in a bash terminal (on windows you may use git bash or wls bash), run:
 ./Scripts/SetupDependencies.sh
 ```
 
+This shell script will clone all our custom conan dependencies and export them for you.
+
 ### Cmake
 
-This project is configured using [Cmake](https://cmake.org/download/).
+This project is configured using [CMake](https://cmake.org/download/).
 When you run the cmake configure command, it automagically downloads its dependencies and builds then for you (when everything else is well configured).
 
 ```shell
 # Create the output directory
 mkdir out/build && cd out/build
 
-# Generate the configuration files (windows with vcpkg example)
+# Generate the configuration files (example with windows and vcpkg)
 cmake ../.. -G "Visual Studio 16 2019" -A x64 -T LLVM \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_TOOLCHAIN_FILE="%VCKPG_DIR%/scripts/buildsystems/vcpkg.cmake" # You can ignore this line if your not using vcpkg to install sdl2
