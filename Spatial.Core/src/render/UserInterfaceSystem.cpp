@@ -1,28 +1,20 @@
 #include <spatial/render/UserInterfaceSystem.h>
-#include <spatial/render/ImGuiHelpers.h>
-
-#include <filament/VertexBuffer.h>
-#include <filament/IndexBuffer.h>
-#include <filament/RenderableManager.h>
-
-#include <filesystem>
 
 using namespace spatial::core;
 using namespace spatial::common;
 using namespace spatial::desktop;
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial::render
 {
 
-UserInterfaceSystem::UserInterfaceSystem(Application *app, RenderingSystem *rendering)
+UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rendering)
 	: m_signalsConnector{app, this},
-	  m_windowResizedEventConnector{app, this},
-	  m_window{&rendering->getWindow()},
-	  m_ui{rendering->getEngine()}
+	  m_windowResizedConnector{app, this},
+	  m_ui{rendering.getEngine()},
+	  m_window{&rendering.getWindow()}
 {
-	rendering->registerView(m_ui.getView());
+	rendering.registerView(m_ui.getView());
 }
 
 void UserInterfaceSystem::onStart()

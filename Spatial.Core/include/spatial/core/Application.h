@@ -18,7 +18,6 @@ private:
     std::chrono::duration<float> m_desiredDelta;
 
     common::EventQueue m_ebus;
-    spdlog::logger m_logger;
     Clock m_clock;
 
     desktop::WindowContext m_windowContext;
@@ -82,16 +81,11 @@ public:
     auto &getEBus() { return m_ebus; }
 
     /**
-     * \brief Gets the main logger 
-     */
-    auto &getLogger() { return m_logger; }
-
-    /**
      * \brief Gets the window context
      * The window context is responsible for creating windows.
      * Its lifetime should last longer than all windows
      */
-    auto &getWindowContext() { return m_windowContext; }
+    const auto &getWindowContext() { return m_windowContext; }
     //endregion Getters
 };
 

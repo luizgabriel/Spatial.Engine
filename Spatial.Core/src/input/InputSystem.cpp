@@ -11,10 +11,10 @@ using namespace spatial::common;
 namespace spatial::input
 {
 
-InputSystem::InputSystem(Application* app)
-    : m_mouseEventConnector{app, this},
-      m_keyEventConnector{app, this},
-      m_textEventConnector{app, this},
+InputSystem::InputSystem(Application& app)
+    : m_mouseConnector{app, this},
+      m_keyConnector{app, this},
+      m_textConnector{app, this},
       m_signalsConnector{app, this}
 {
 }

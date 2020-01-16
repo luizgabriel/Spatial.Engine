@@ -92,7 +92,8 @@ bool BeginSpatialEngine(bool *openedPropertiesPtr)
 class Sandbox
 {
 private:
-    SignalsConnector<Sandbox> m_signalsConnector;
+    AppSignalsConnector<Sandbox> m_signalsConnector;
+    Logger m_logger;
 
     fl::Engine *m_engine;
     fl::Camera *m_camera;
@@ -108,13 +109,14 @@ private:
     bool m_openedPropertiesWindow;
 
 public:
-    Sandbox(Application *app, RenderingSystem *rendering)
+    Sandbox(Application& app, RenderingSystem& rendering)
         : m_signalsConnector{app, this},
 
-          m_engine{rendering->getEngine()},
-          m_camera{rendering->getMainCamera()},
+          m_logger{createDefaultLogger("sandbox.log")},
+          m_engine{rendering.getEngine()},
+          m_camera{rendering.getMainCamera()},
 
-          m_view{rendering->getMainView()},
+          m_view{rendering.getMainView()},
           m_scene{createScene(m_engine)},
           m_material{createMaterial(m_engine, Asset::read(path{"materials"} / "plastic.filamat"))},
           m_instance{m_engine, m_material->createInstance()},
@@ -148,12 +150,20 @@ public:
             .build(*m_engine, m_light.get());
 
         m_scene->addEntity(m_light.get());
+
+        m_logger.info("Started");
     }
 
     void onUpdateFrame(float delta)
     {
-        if (Input::released(Key::G))
+        if (Input::released(Key::G)) {
             m_showEngineGui = !m_showEngineGui;
+            if (m_showEngineGui) {
+                m_logger.info("[UI] opened");
+            } else {
+                m_logger.info("[UI] closed");
+            }
+        }
 
         if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_openedPropertiesWindow))
         {
@@ -168,10 +178,10 @@ int main(int arc, char *argv[])
 
     auto app = Application{};
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
-    auto rendering = RenderingSystem{&app, std::move(window)};
-    auto input = InputSystem{&app};
-    auto sandbox = Sandbox{&app, &rendering};
-    auto ui = UserInterfaceSystem{&app, &rendering};
+    auto rendering = RenderingSystem{app, std::move(window)};
+    auto input = InputSystem{app};
+    auto sandbox = Sandbox{app, rendering};
+    auto ui = UserInterfaceSystem{app, rendering};
 
     return app.run();
 }

@@ -9,9 +9,9 @@
 namespace spatial::desktop
 {
 
-common::Key mapKeyFromScancode(SDL_Scancode scanCode);
+common::Key mapKeyFromScancode(SDL_Scancode scanCode) noexcept;
 
-common::Key mapKeyFromMouseButton(int mouseButton);
+common::Key mapKeyFromMouseButton(int mouseButton) noexcept;
 
 class WindowContext;
 
@@ -48,7 +48,7 @@ public:
 
 	void pollEvents(common::EventQueue& queue);
 
-	Window createWindow(int width, int height, std::string_view title);
+	Window createWindow(int width, int height, std::string_view title) const noexcept;
 
 	WindowContext(const WindowContext &c) = delete;
 	WindowContext(const WindowContext &&c) = delete;

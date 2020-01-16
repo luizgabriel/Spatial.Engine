@@ -16,8 +16,8 @@ class RenderingSystem
 	using self_t = RenderingSystem;
 
 private:
-	core::SignalsConnector<self_t> m_signalsConnector;
-	core::EventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedEventConnector;
+	core::AppSignalsConnector<self_t> m_signalsConnector;
+	core::AppEventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedConnector;
 
 	desktop::Window m_window;
 	RenderEngine m_engine;
@@ -32,7 +32,12 @@ private:
 	void setupViewport();
 
 public:
-	RenderingSystem(core::Application *app, desktop::Window &&window);
+	RenderingSystem(core::Application &app, desktop::Window &&window)
+		: RenderingSystem::RenderingSystem(app, std::move(window), filament::backend::Backend::OPENGL)
+	{
+	}
+
+	RenderingSystem(core::Application &app, desktop::Window &&window, filament::backend::Backend backend);
 
 	void onStart();
 

@@ -4,16 +4,17 @@
 
 using namespace spatial::desktop;
 using namespace spatial::core;
+namespace fl = filament;
 
 namespace spatial::render
 {
 
-RenderingSystem::RenderingSystem(Application *app, Window &&window)
+RenderingSystem::RenderingSystem(Application& app, Window &&window, fl::backend::Backend backend)
 	: m_signalsConnector{app, this},
-	  m_windowResizedEventConnector{app, this},
+	  m_windowResizedConnector{app, this},
 
 	  m_window{std::move(window)},
-	  m_engine{filament::backend::Backend::OPENGL},
+	  m_engine{backend},
 	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
 	  m_renderer{createRenderer(m_engine.get())},
 	  m_mainCamera{createCamera(m_engine.get())},
@@ -62,7 +63,7 @@ void RenderingSystem::setupViewport()
 	m_mainView->setViewport({0, 0, dw, dh});
 	m_mainCamera->setProjection(
 		45.0, double(dw) / dh, 0.1, 50,
-		filament::Camera::Fov::VERTICAL);
+		fl::Camera::Fov::VERTICAL);
 }
 
 } // namespace spatial::render

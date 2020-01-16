@@ -2,54 +2,44 @@
 
 #include <spatial/core/Application.h>
 #include <spatial/core/ApplicationEvents.h>
+#include <spatial/common/EventConnector.h>
 
 namespace spatial::core
 {
 
 template <typename Handler>
-class SignalsConnector
+class AppSignalsConnector
 {
 private:
     Application *m_app;
-    Handler *m_instance;
+    Handler *m_handler;
 
 public:
-    SignalsConnector(Application *app, Handler *instance)
-        : m_app{app}, m_instance{instance}
+    AppSignalsConnector(Application &app, Handler *handler)
+        : m_app{&app}, m_handler{handler}
     {
-        connect(m_app, m_instance);
+        connect(*m_app, m_handler);
     }
 
-    ~SignalsConnector()
+    ~AppSignalsConnector()
     {
-        disconnect(m_app, m_instance);
+        disconnect(*m_app, m_handler);
     }
 
-    SignalsConnector(const SignalsConnector &other) = delete;
-    SignalsConnector &operator=(const SignalsConnector &other) = delete;
+    AppSignalsConnector(const AppSignalsConnector &other) = delete;
+    AppSignalsConnector &operator=(const AppSignalsConnector &other) = delete;
 };
 
 template <typename Event, typename Handler>
-class EventConnector
+class AppEventConnector : public common::EventConnector<Event, Handler>
 {
-private:
-    Application *m_app;
-    Handler *m_instance;
+    using Base = common::EventConnector<Event, Handler>;
 
 public:
-    EventConnector(Application *app, Handler *instance)
-        : m_app{app}, m_instance{instance}
+    AppEventConnector(Application &app, Handler *instance)
+        : Base::EventConnector(app.getEBus(), instance)
     {
-        connect<Event>(m_app, m_instance);
     }
-
-    ~EventConnector()
-    {
-        disconnect<Event>(m_app, m_instance);
-    }
-
-    EventConnector(const EventConnector &other) = delete;
-    EventConnector &operator=(const EventConnector &other) = delete;
 };
 
 } // namespace spatial::core

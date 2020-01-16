@@ -14,16 +14,17 @@ class UserInterfaceSystem
     using self_t = UserInterfaceSystem;
 
 private:
-    core::SignalsConnector<self_t> m_signalsConnector;
-    core::EventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedEventConnector;
+    core::AppSignalsConnector<self_t> m_signalsConnector;
+    core::AppEventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedConnector;
     
-    const desktop::Window *m_window;
     UserInterfaceRenderer m_ui;
+
+    const desktop::Window *m_window;
 
     void setupViewport();
 
 public:
-    UserInterfaceSystem(core::Application *app, RenderingSystem *rendering);
+    UserInterfaceSystem(core::Application& app, RenderingSystem& rendering);
 
     void onStart();
 

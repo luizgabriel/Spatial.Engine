@@ -89,12 +89,12 @@ void WindowContext::pollEvents(common::EventQueue &queue)
     }
 }
 
-Window WindowContext::createWindow(int width, int height, std::string_view title)
+Window WindowContext::createWindow(int width, int height, std::string_view title) const noexcept
 {
     return Window{width, height, title};
 }
 
-Key mapKeyFromScancode(SDL_Scancode scanCode)
+Key mapKeyFromScancode(SDL_Scancode scanCode) noexcept
 {
     switch (scanCode)
     {
@@ -303,7 +303,7 @@ Key mapKeyFromScancode(SDL_Scancode scanCode)
     }
 }
 
-Key mapKeyFromMouseButton(int mouseButton)
+Key mapKeyFromMouseButton(int mouseButton) noexcept
 {
     switch (mouseButton)
     {

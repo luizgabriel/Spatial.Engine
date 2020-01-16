@@ -18,7 +18,6 @@ Application::Application()
     : m_running{false},
       m_desiredDelta{1.0f / 60.0f},
       m_ebus{},
-      m_logger{createDefaultLogger("spatial.log")},
       m_clock{},
       m_windowContext{}
 {

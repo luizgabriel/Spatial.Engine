@@ -5,6 +5,8 @@
 namespace spatial::core
 {
 
-spdlog::logger createDefaultLogger(const std::string& output);
+using Logger = spdlog::logger;
+
+Logger createDefaultLogger(const std::string& output);
 
 } // namespace spatial::common

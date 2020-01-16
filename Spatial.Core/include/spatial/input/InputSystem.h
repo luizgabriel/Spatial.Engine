@@ -13,13 +13,13 @@ class InputSystem
     using self_t = InputSystem;
 
 private:
-    core::EventConnector<desktop::MouseMovedEvent, self_t> m_mouseEventConnector;
-    core::EventConnector<desktop::KeyEvent, self_t> m_keyEventConnector;
-    core::EventConnector<desktop::TextEvent, self_t> m_textEventConnector;
-    core::SignalsConnector<self_t> m_signalsConnector;
+    core::AppEventConnector<desktop::MouseMovedEvent, self_t> m_mouseConnector;
+    core::AppEventConnector<desktop::KeyEvent, self_t> m_keyConnector;
+    core::AppEventConnector<desktop::TextEvent, self_t> m_textConnector;
+    core::AppSignalsConnector<self_t> m_signalsConnector;
 
 public:
-    InputSystem(core::Application* app);
+    InputSystem(core::Application& app);
 
     void onStart();
     void onStartFrame(float delta);
