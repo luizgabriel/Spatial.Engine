@@ -7,8 +7,6 @@
 namespace spatial::render
 {
 
-Material createMaterial(filament::Engine *engine, const std::filesystem::path &name);
-
 void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scaleX, float scaleY);
 
 void imguiRefreshDeltaTime(float delta);
@@ -23,7 +21,7 @@ filament::IndexBuffer *imguiCreateIndexBuffer(filament::Engine *engine, size_t c
 
 uint64_t imguiMakeScissorKey(int fbheight, const ImVec4 &clipRect);
 
-Texture imguiCreateTextureAtlas(filament::Engine *engine);
+Texture imguiCreateTextureAtlas(filament::Engine *engine, const std::filesystem::path& font);
 
 template <typename FilamentType, typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType> &imVector)

@@ -12,12 +12,6 @@ using namespace spatial::core;
 namespace spatial::render
 {
 
-Material createMaterial(fl::Engine *engine, const fs::path &name)
-{
-	auto data = Asset::read(fs::path{"materials"} / name);
-	return createMaterial(engine, data);
-}
-
 void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scaleX, float scaleY)
 {
 	ImGuiIO &io = ImGui::GetIO();
@@ -82,14 +76,14 @@ uint64_t imguiMakeScissorKey(int fbheight, const ImVec4 &clipRect)
 		   ((uint64_t)height << 48ull);
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine *engine)
+Texture imguiCreateTextureAtlas(fl::Engine *engine, const fs::path& font)
 {
 	auto &io = ImGui::GetIO();
 
-	auto fontPath = Asset::absolute(fs::path{"fonts"} / "Roboto-Medium.ttf");
+	auto fontPath = Asset::absolute(font);
 	if (fs::exists(fontPath))
 	{
-		auto filePath = fontPath.generic_string();
+		const auto& filePath = fontPath.generic_string();
 		io.Fonts->AddFontFromFileTTF(filePath.c_str(), 16.0f);
 	}
 

@@ -20,6 +20,7 @@ add_library(Spatial.Core
 	src/render/UserInterfaceSystem.cpp
 	src/render/UserInterfaceRenderer.cpp
 	src/render/ImGuiHelpers.cpp
+	src/render/ResourceLoaders.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -49,7 +50,6 @@ target_link_libraries(
 		CONAN_PKG::spdlog
 		CONAN_PKG::imgui
 		CONAN_PKG::boost_tti
-		CONAN_PKG::Assimp
 
 		SDL2::SDL2
 		SDL2::SDL2main
@@ -67,6 +67,8 @@ if (UNIX AND NOT APPLE)
 	target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
 elseif(WIN32)
 	target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
+
+	target_link_libraries(Spatial.Core PRIVATE Shlwapi)
 elseif(APPLE)
 	target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
 	

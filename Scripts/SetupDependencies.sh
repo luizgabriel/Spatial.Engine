@@ -23,9 +23,6 @@ conan_export luizgabriel conan-filament google/stable
 # Download and configure imgui
 conan_export luizgabriel conan-imgui ocornut/testing
 
-# Download and configure assimp
-conan_export jacmoe conan-assimp ocornut/testing
-
 # Once exported, the the projects are no longer necessary
 cd ..
 rm -rf __tmp

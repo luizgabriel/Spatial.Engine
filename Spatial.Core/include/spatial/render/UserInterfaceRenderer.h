@@ -6,6 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include <filesystem>
+
 namespace spatial::render
 {
 
@@ -14,7 +16,7 @@ class UserInterfaceRenderer
 private:
     filament::Engine *m_engine;
 
-    SharedView m_view;
+    View m_view;
     Scene m_scene;
     Camera m_camera;
     Material m_material;
@@ -39,7 +41,7 @@ public:
     /**
      * \brief Should be called when applications runs
      */
-    void setup();
+    void setup(const std::filesystem::path& fontPath);
 
     /**
      * \brief Should be called every frame start
@@ -52,10 +54,12 @@ public:
      */
     void dispatchCommands();
 
-    const SharedView getView()
+    //region Getters
+    const auto getView()
     {
-        return m_view;
+        return m_view.get();
     }
+    //endregion
 };
 
 } // namespace spatial::render

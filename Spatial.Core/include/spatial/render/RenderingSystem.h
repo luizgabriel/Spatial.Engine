@@ -1,10 +1,12 @@
 #pragma once
 
+#include <spatial/core/Application.h>
+
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
+
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
-#include <spatial/core/ApplicationConnector.h>
 
 #include <vector>
 
@@ -13,29 +15,21 @@ namespace spatial::render
 
 class RenderingSystem
 {
-	using self_t = RenderingSystem;
-
 private:
-	core::AppSignalsConnector<self_t> m_signalsConnector;
-	core::AppEventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedConnector;
-
 	desktop::Window m_window;
 	RenderEngine m_engine;
 	SwapChain m_swapChain;
 	Renderer m_renderer;
 
 	Camera m_mainCamera;
-	SharedView m_mainView;
+	View m_mainView;
 
-	std::vector<SharedView> m_views;
+	std::vector<filament::View*> m_views;
 
 	void setupViewport();
 
 public:
-	RenderingSystem(core::Application &app, desktop::Window &&window)
-		: RenderingSystem::RenderingSystem(app, std::move(window), filament::backend::Backend::OPENGL)
-	{
-	}
+	RenderingSystem(core::Application &app, desktop::Window &&window);
 
 	RenderingSystem(core::Application &app, desktop::Window &&window, filament::backend::Backend backend);
 
@@ -46,27 +40,27 @@ public:
 	void onEvent(const desktop::WindowResizedEvent &event);
 
 	/**
-	 * \brief Pushes a view to the renderer
+	 * \brief Register a view to the renderer
 	 */
-	void registerView(const SharedView view);
+	void pushView(filament::View* view);
 
 	//region Getters
-	filament::Engine *getEngine()
+	auto getEngine()
 	{
 		return m_engine.get();
 	}
 
-	const desktop::Window &getWindow()
+	const auto &getWindow()
 	{
 		return m_window;
 	}
 
-	const SharedView getMainView()
+	const auto getMainView()
 	{
-		return m_mainView;
+		return m_mainView.get();
 	}
 
-	filament::Camera *getMainCamera()
+	auto getMainCamera()
 	{
 		return m_mainCamera.get();
 	}

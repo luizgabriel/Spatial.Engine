@@ -1,8 +1,10 @@
 #pragma once
 
-#include <spatial/render/CommonResources.h>
+#include <spatial/core/Application.h>
+
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/core/ApplicationConnector.h>
+
+#include <spatial/render/CommonResources.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/UserInterfaceRenderer.h>
 
@@ -11,12 +13,7 @@ namespace spatial::render
 
 class UserInterfaceSystem
 {
-    using self_t = UserInterfaceSystem;
-
 private:
-    core::AppSignalsConnector<self_t> m_signalsConnector;
-    core::AppEventConnector<desktop::WindowResizedEvent, self_t> m_windowResizedConnector;
-    
     UserInterfaceRenderer m_ui;
 
     const desktop::Window *m_window;

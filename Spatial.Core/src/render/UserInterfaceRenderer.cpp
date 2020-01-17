@@ -1,5 +1,6 @@
 #include <spatial/render/UserInterfaceRenderer.h>
 #include <spatial/render/ImGuiHelpers.h>
+#include <spatial/render/ResourceLoaders.h>
 
 #include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
@@ -17,11 +18,11 @@ namespace spatial::render
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine *engine)
 	: m_engine{engine},
-	  m_view{createSharedResource(m_engine, m_engine->createView())},
+	  m_view{createView(m_engine)},
 	  m_scene{createScene(m_engine)},
 	  m_camera{createCamera(m_engine)},
-	  m_material{createMaterial(m_engine, fs::path{"ui_blit.filamat"})},
-	  m_entity{m_engine},
+	  m_material{createMaterial(m_engine, "materials/ui_blit.filamat")},
+	  m_entity{createEntity(m_engine)},
 	  m_texture{m_engine}
 {
 	m_view->setCamera(m_camera.get());
@@ -36,9 +37,9 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine *engine)
 	ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setup()
+void UserInterfaceRenderer::setup(const fs::path& fontPath)
 {
-	m_texture = imguiCreateTextureAtlas(m_engine);
+	m_texture = imguiCreateTextureAtlas(m_engine, fontPath);
 
 	m_material->setDefaultParameter(
 		"albedo", m_texture.get(),

@@ -3,8 +3,7 @@ entt/3.2.1@skypjack/stable
 fmt/6.0.0@bincrafters/stable
 spdlog/1.4.2@bincrafters/stable 
 boost_tti/1.69.0@bincrafters/stable
-Assimp/4.1.0@jacmoe/testing # https://github.com/jacmoe/conan-assimp
-filament/1.4.3@google/stable # https://github.com/luizgabriel/conan-filament
+filament/1.4.4@google/stable # https://github.com/luizgabriel/conan-filament
 imgui/docking@ocornut/testing # https://github.com/luizgabriel/conan-imgui
 
 

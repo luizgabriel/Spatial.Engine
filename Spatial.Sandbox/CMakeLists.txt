@@ -2,6 +2,8 @@ include(ResourcesLibrary)
 
 add_executable(Spatial.Sandbox
     src/main.cpp
+    src/Sandbox.cpp
+    src/SandboxInterface.cpp
 )
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
@@ -15,21 +17,30 @@ set_property(
 )
 
 add_resources_library(Sandbox.Assets.Materials
-    MATERIALS
+    MATERIAL
         assets/materials/plastic.mat
         assets/materials/ui_blit.mat
-    DEPENDEES
-        Spatial.Sandbox
     OUTPUT
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/materials
+    DEPENDEES
+        Spatial.Sandbox
+)
+
+add_resources_library(Sandbox.Assets.Models
+    MODEL
+        assets/models/sphere.fbx
+    OUTPUT
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/models
+    DEPENDEES
+        Spatial.Sandbox
 )
 
 add_resources_library(Sandbox.Assets.Fonts
     COPY
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
-    DEPENDEES
-        Spatial.Sandbox
     OUTPUT
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/fonts
+    DEPENDEES
+        Spatial.Sandbox
 )

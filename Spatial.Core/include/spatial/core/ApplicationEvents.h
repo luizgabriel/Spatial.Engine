@@ -85,4 +85,16 @@ void disconnect(Application& app, Handler *instance) noexcept
     }
 }
 
+template <typename Event, typename Handler>
+void connect(Application& app, Handler *instance)
+{
+    app.getEBus().template connect<Event>(instance);
+}
+
+template <typename Event, typename Handler>
+void disconnect(Application& app, Handler *instance)
+{
+    app.getEBus().template disconnect<Event>(instance);
+}
+
 } // namespace spatial::core

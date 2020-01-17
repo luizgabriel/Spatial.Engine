@@ -1,26 +1,30 @@
 #include <spatial/render/UserInterfaceSystem.h>
+#include <spatial/core/ApplicationEvents.h>
+
+#include <filesystem>
 
 using namespace spatial::core;
 using namespace spatial::common;
 using namespace spatial::desktop;
 namespace fl = filament;
+namespace fs = std::filesystem;
 
 namespace spatial::render
 {
 
 UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rendering)
-	: m_signalsConnector{app, this},
-	  m_windowResizedConnector{app, this},
-	  m_ui{rendering.getEngine()},
+	: m_ui{rendering.getEngine()},
 	  m_window{&rendering.getWindow()}
 {
-	rendering.registerView(m_ui.getView());
+	connect(app, this);
+	connect<desktop::WindowResizedEvent>(app, this);
+	rendering.pushView(m_ui.getView());
 }
 
 void UserInterfaceSystem::onStart()
 {
 	setupViewport();
-	m_ui.setup();
+	m_ui.setup(fs::path{"fonts"} / "Roboto-Medium.ttf");
 }
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent &event)
