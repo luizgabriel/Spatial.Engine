@@ -62,16 +62,6 @@ View createView(filament::Engine *engine) noexcept;
 Camera createCamera(filament::Engine *engine) noexcept;
 
 /**
- * \brief Creates a scoped pointer of the filament::Material 
- */
-Material createMaterial(filament::Engine *engine, const char *data, size_t size) noexcept;
-
-/**
- * \brief Creates a scoped pointer of the filament::Material 
- */
-Material createMaterial(filament::Engine *engine, const std::vector<char> &data) noexcept;
-
-/**
  * \brief Creates a scoped pointer of the utils::Entity
  */
 EntityResource createEntity(filament::Engine *engine) noexcept;

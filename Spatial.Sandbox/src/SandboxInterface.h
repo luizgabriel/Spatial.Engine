@@ -14,31 +14,38 @@ bool BeginSpatialEngine(bool *openedPropertiesPtr);
 namespace spatial::sandbox
 {
 
-class Sandbox;
-
 class SandboxInterface
 {
+    struct CameraData
+    {
+        math::float3 eye;
+        math::float3 center;
+    };
+
+    struct ViewData {
+        math::float4 clearColor;
+    };
+
+    struct MaterialData {
+        float metallic;
+        float roughness;
+        float clearCoat;
+        float clearCoatRoughness;
+    };
+
 private:
-    filament::View* m_view;
-    filament::Camera* m_camera;
-
-    math::float3 m_cameraEye;
-    math::float3 m_cameraCenter;
-    math::float4 m_clearColor;
-    math::float3 m_spherePosition;
-    float m_sphereScale;
-    float m_sphereRotation;
-
     bool m_showEngineGui;
     bool m_openedPropertiesWindow;
 
 public:
+    CameraData cameraData;
+    ViewData viewData;
+    MaterialData materialData;
+
     SandboxInterface(core::Application& app);
 
     void onStart();
     void onUpdateFrame(float delta);
-
-    friend class Sandbox;
 };
 
 }

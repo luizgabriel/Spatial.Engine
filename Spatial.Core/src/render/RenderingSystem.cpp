@@ -64,7 +64,7 @@ void RenderingSystem::setupViewport()
 
 	m_mainView->setViewport({0, 0, dw, dh});
 	m_mainCamera->setProjection(
-		45.0, double(dw) / dh, 0.1, 1000.0f,
+		45.0, double(dw) / dh, 0.1, 1000000.0f,
 		fl::Camera::Fov::VERTICAL);
 }
 

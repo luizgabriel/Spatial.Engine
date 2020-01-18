@@ -75,15 +75,12 @@ namespace spatial::sandbox
 {
 
 SandboxInterface::SandboxInterface(core::Application &app)
-    : m_cameraEye{4, 0, -4},
-      m_cameraCenter{0, 0, -4},
-      m_clearColor{1.0f, 1.0f, 1.0f, 1.0f},
-      m_spherePosition{ 0, 0, 0 },
-      m_sphereScale{ 1.0f },
-      m_sphereRotation{ .0f },
+    : m_showEngineGui{true},
+      m_openedPropertiesWindow{true},
 
-      m_showEngineGui{true},
-      m_openedPropertiesWindow{true}
+      cameraData{},
+      viewData{},
+      materialData{}
 {
     connect(app, this);
 }
@@ -104,18 +101,21 @@ void SandboxInterface::onUpdateFrame(float delta)
             if (ImGui::Begin("Properties", &m_openedPropertiesWindow))
             {
                 ImGui::Text("View Controls");
-                ImGui::ColorPicker4("Clear color", &m_clearColor[0]);
+                ImGui::ColorPicker4("Clear color", &viewData.clearColor[0]);
 
                 ImGui::Separator();
                 ImGui::Text("Camera Controls");
-                ImGui::InputFloat3("Camera eye", &m_cameraEye[0]);
-                ImGui::InputFloat3("Camera center", &m_cameraCenter[0]);
+                ImGui::InputFloat3("Camera center", &cameraData.center[0]);
+                ImGui::SliderFloat("X-Distance", &cameraData.eye[0], -5000.0f, 5000.0f);
+                ImGui::SliderFloat("Y-Distance", &cameraData.eye[1], -5000.0f, 5000.0f);
+                ImGui::SliderFloat("Z-Distance", &cameraData.eye[2], -5000.0f, 5000.0f);
 
                 ImGui::Separator();
-                ImGui::Text("Mesh Controls");
-                ImGui::InputFloat3("Mesh position", &m_spherePosition[0]);
-                ImGui::SliderFloat("Mesh scale", &m_sphereScale, 1.0f, 100.0f);
-                ImGui::SliderAngle("Rotation", &m_sphereRotation);
+                ImGui::Text("Material Properties");
+                ImGui::SliderFloat("Metallic", &materialData.metallic, .0f, 1.0f);
+                ImGui::SliderFloat("Roughness", &materialData.roughness, .0f, 1.0f);
+                ImGui::SliderFloat("Clearcoat", &materialData.clearCoat, .0f, 1.0f);
+                ImGui::SliderFloat("Clearcoat Roughness", &materialData.clearCoatRoughness, .0f, 1.0f);
             }
             ImGui::End();
         }

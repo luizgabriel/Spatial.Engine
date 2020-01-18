@@ -8,7 +8,7 @@ else()
         CONANFILE conanfile.txt
         PROFILE clang
         BUILD missing
-        BASIC_SETUP CMAKE_TARGETS
+        BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     )    
 endif()
 

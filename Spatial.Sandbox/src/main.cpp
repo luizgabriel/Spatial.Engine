@@ -13,7 +13,8 @@ using namespace spatial::sandbox;
 
 int main(int arc, char *argv[])
 {
-    Asset::init(path{argv[0]}.parent_path() / "assets");
+    auto binaryPath = path{argv[0]}.parent_path();
+    Asset::init(binaryPath.parent_path() / "assets");
 
     auto app = Application{};
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");

@@ -1,8 +1,8 @@
 include(CMakeParseArguments)
 
-find_program(MATC_PROGRAM matc HINTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-find_program(CMGEN_PROGRAM cmgen HINTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-find_program(FILAMESH_PROGRAM filamesh HINTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+find_program(MATC_PROGRAM matc HINTS ${CMAKE_BINARY_DIR})
+find_program(CMGEN_PROGRAM cmgen HINTS ${CMAKE_BINARY_DIR})
+find_program(FILAMESH_PROGRAM filamesh HINTS ${CMAKE_BINARY_DIR})
 
 function(add_resources_library TARGET_NAME)
     set(oneValueArgs OUTPUT)
@@ -78,7 +78,7 @@ function(_add_custom_model_command MODEL_FILE OUTPUT)
 
     add_custom_command(
         OUTPUT ${MODEL_OUTPUT_FILE}
-        COMMAND ${FILAMESH_PROGRAM} -c ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_FILE} ${MODEL_OUTPUT_FILE} 
+        COMMAND ${FILAMESH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_FILE} ${MODEL_OUTPUT_FILE} 
         COMMENT "Compiling model: ${MODEL_FILE} => ${MODEL_OUTPUT_FILE}"
     )
 endfunction()

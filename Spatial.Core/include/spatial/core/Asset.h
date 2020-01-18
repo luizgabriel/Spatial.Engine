@@ -22,8 +22,6 @@ public:
         return s_basePath / relative;
     }
 
-    static std::vector<char> read(const std::filesystem::path &filePath);
-
 };
 
 } // namespace spatial::core

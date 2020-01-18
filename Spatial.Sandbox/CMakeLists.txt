@@ -18,10 +18,11 @@ set_property(
 
 add_resources_library(Sandbox.Assets.Materials
     MATERIAL
+        assets/materials/default.mat
         assets/materials/plastic.mat
         assets/materials/ui_blit.mat
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/materials
+        ${CMAKE_CURRENT_BINARY_DIR}/assets/materials
     DEPENDEES
         Spatial.Sandbox
 )
@@ -29,8 +30,9 @@ add_resources_library(Sandbox.Assets.Materials
 add_resources_library(Sandbox.Assets.Models
     MODEL
         assets/models/sphere.fbx
+        assets/models/debug_cube.fbx
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/models
+        ${CMAKE_CURRENT_BINARY_DIR}/assets/models
     DEPENDEES
         Spatial.Sandbox
 )
@@ -39,8 +41,18 @@ add_resources_library(Sandbox.Assets.Fonts
     COPY
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
+        assets/textures/debug_cube.png
     OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/fonts
+        ${CMAKE_CURRENT_BINARY_DIR}/assets/fonts
+    DEPENDEES
+        Spatial.Sandbox
+)
+
+add_resources_library(Sandbox.Assets.Textures
+    COPY
+        assets/textures/debug_cube.png
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
     DEPENDEES
         Spatial.Sandbox
 )
