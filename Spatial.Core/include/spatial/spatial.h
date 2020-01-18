@@ -6,8 +6,9 @@
 #include <spatial/core/Asset.h>
 
 #include <spatial/render/RenderingSystem.h>
-#include <spatial/render/UserInterfaceSystem.h>
 #include <spatial/render/ResourceLoaders.h>
+
+#include <spatial/ui/UserInterfaceSystem.h>
 
 #include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>

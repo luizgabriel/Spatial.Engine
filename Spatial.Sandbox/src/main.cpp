@@ -9,6 +9,7 @@ using namespace std::filesystem;
 using namespace spatial::core;
 using namespace spatial::render;
 using namespace spatial::input;
+using namespace spatial::ui;
 using namespace spatial::sandbox;
 
 int main(int arc, char *argv[])

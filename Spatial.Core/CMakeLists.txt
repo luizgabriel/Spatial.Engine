@@ -17,10 +17,12 @@ add_library(Spatial.Core
 	src/render/CommonResources.cpp
 	src/render/Engine.cpp
 	src/render/RenderingSystem.cpp
-	src/render/UserInterfaceSystem.cpp
-	src/render/UserInterfaceRenderer.cpp
-	src/render/ImGuiHelpers.cpp
 	src/render/ResourceLoaders.cpp
+
+	src/ui/ImGuiHelpers.cpp
+	src/ui/UserInterfaceSystem.cpp
+	src/ui/UserInterfaceRenderer.cpp
+	src/ui/UserInterfaceInput.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
