@@ -74,7 +74,7 @@ bool BeginSpatialEngine(bool *openedPropertiesPtr)
 namespace spatial::sandbox
 {
 
-SandboxInterface::SandboxInterface(core::Application &app)
+SandboxInterface::SandboxInterface()
     : m_showEngineGui{true},
       m_openedPropertiesWindow{true},
 
@@ -82,14 +82,9 @@ SandboxInterface::SandboxInterface(core::Application &app)
       viewData{},
       materialData{}
 {
-    connect(app, this);
 }
 
-void SandboxInterface::onStart()
-{
-}
-
-void SandboxInterface::onUpdateFrame(float delta)
+void SandboxInterface::render()
 {
     if (Input::released(Key::G))
         m_showEngineGui = !m_showEngineGui;

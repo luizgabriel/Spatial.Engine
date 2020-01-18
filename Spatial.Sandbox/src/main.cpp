@@ -20,8 +20,7 @@ int main(int arc, char *argv[])
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
     auto rendering = RenderingSystem{app, std::move(window)};
     auto input = InputSystem{app};
-    auto sandboxInterface = SandboxInterface{app};
-    auto sandbox = Sandbox{app, rendering, sandboxInterface};
+    auto sandbox = Sandbox{app, rendering};
     auto ui = UserInterfaceSystem{app, rendering};
 
     return app.run();

@@ -8,8 +8,8 @@ namespace fl = filament;
 namespace spatial::sandbox
 {
 
-Sandbox::Sandbox(Application &app, RenderingSystem &rendering, SandboxInterface &interface)
-    : m_interface{&interface},
+Sandbox::Sandbox(Application &app, RenderingSystem &rendering)
+    : m_interface{},
 
       m_engine{rendering.getEngine()},
       m_camera{rendering.getMainCamera()},
@@ -43,9 +43,11 @@ void Sandbox::onStart()
 
 void Sandbox::onUpdateFrame(float delta)
 {
-    auto& cameraData = m_interface->cameraData;
-    auto& viewData = m_interface->viewData;
-    auto& materialData =  m_interface->materialData;
+    m_interface.render();
+
+    auto& cameraData = m_interface.cameraData;
+    auto& viewData = m_interface.viewData;
+    auto& materialData =  m_interface.materialData;
 
     m_camera->lookAt(cameraData.eye, cameraData.center, {0, 1.0f, .0f});
     m_view->setClearColor(viewData.clearColor);

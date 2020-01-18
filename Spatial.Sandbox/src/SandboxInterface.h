@@ -42,10 +42,9 @@ public:
     ViewData viewData;
     MaterialData materialData;
 
-    SandboxInterface(core::Application& app);
+    SandboxInterface();
 
-    void onStart();
-    void onUpdateFrame(float delta);
+    void render();
 };
 
 }

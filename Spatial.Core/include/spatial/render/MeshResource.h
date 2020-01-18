@@ -29,8 +29,21 @@ public:
     {
     }
 
-    MeshResource(MeshResource &&other) noexcept = default;
-    MeshResource &operator=(MeshResource &&other) noexcept = default;
+    MeshResource(MeshResource &&other) noexcept
+        : m_entity{std::move(other.m_entity)},
+          m_vertexBuffer{std::move(other.m_vertexBuffer)},
+          m_indexBuffer{std::move(other.m_indexBuffer)}
+    {
+    }
+
+    MeshResource &operator=(MeshResource &&other) noexcept
+    {
+        m_entity = std::move(other.m_entity);
+        m_vertexBuffer = std::move(other.m_vertexBuffer);
+        m_indexBuffer = std::move(other.m_indexBuffer);
+
+        return *this;
+    }
 
     MeshResource(MeshResource &other) = delete;
     MeshResource &operator=(const MeshResource &w) = delete;
@@ -46,12 +59,12 @@ public:
         return m_entity.get();
     }
 
-    filament::VertexBuffer* getVertexBuffer()
+    filament::VertexBuffer *getVertexBuffer()
     {
         return m_vertexBuffer.get();
     }
 
-    filament::IndexBuffer* getIndexBuffer()
+    filament::IndexBuffer *getIndexBuffer()
     {
         return m_indexBuffer.get();
     }

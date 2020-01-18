@@ -23,9 +23,9 @@ private:
     EntityResource m_entity;
     Texture m_texture;
 
-    std::vector<filament::VertexBuffer *> m_vertexBuffers;
-    std::vector<filament::IndexBuffer *> m_indexBuffers;
-    std::vector<filament::MaterialInstance *> m_materialInstances;
+    std::vector<SharedVertexBuffer> m_vertexBuffers;
+    std::vector<SharedIndexBuffer> m_indexBuffers;
+    std::vector<SharedMaterialInstance> m_materialInstances;
 
     void renderDrawData();
     void createBuffers(size_t numRequiredBuffers);

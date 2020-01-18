@@ -11,7 +11,7 @@ namespace spatial::sandbox
 class Sandbox
 {
 private:
-    SandboxInterface* m_interface;
+    SandboxInterface m_interface;
 
     fl::Engine* m_engine;
     fl::Camera* m_camera;
@@ -25,7 +25,7 @@ private:
     render::MeshResource m_sphereMesh;
 
 public:
-    Sandbox(core::Application& app, render::RenderingSystem& rendering, SandboxInterface& interface);
+    Sandbox(core::Application& app, render::RenderingSystem& rendering);
 
     void onStart();
 

@@ -100,21 +100,6 @@ void UserInterfaceRenderer::setup(const fs::path& fontPath)
 
 UserInterfaceRenderer::~UserInterfaceRenderer()
 {
-	for (auto vb : m_vertexBuffers)
-	{
-		m_engine->destroy(vb);
-	}
-
-	for (auto ib : m_indexBuffers)
-	{
-		m_engine->destroy(ib);
-	}
-
-	for (auto mi : m_materialInstances)
-	{
-		m_engine->destroy(mi);
-	}
-
 	ImGui::DestroyContext();
 }
 
@@ -181,7 +166,7 @@ void UserInterfaceRenderer::renderDrawData()
 	size_t matIndex = 0;
 	for (auto &pair : scissorRects)
 	{
-		pair.second = m_materialInstances[matIndex++];
+		pair.second = m_materialInstances[matIndex++].get();
 		uint32_t left = (pair.first >> 0ull) & 0xffffull;
 		uint32_t bottom = (pair.first >> 16ull) & 0xffffull;
 		uint32_t width = (pair.first >> 32ull) & 0xffffull;
@@ -211,7 +196,7 @@ void UserInterfaceRenderer::renderDrawData()
 				auto miter = scissorRects.find(skey);
 				assert(miter != scissorRects.end());
 				rbuilder.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
-								  m_vertexBuffers[bufferIndex], m_indexBuffers[bufferIndex],
+								  m_vertexBuffers[bufferIndex].get(), m_indexBuffers[bufferIndex].get(),
 								  indexOffset, pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, miter->second);
@@ -238,7 +223,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 		for (size_t i = previousSize; i < m_vertexBuffers.size(); i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_vertexBuffers[i] = imguiCreateVertexBuffer(m_engine, 1000);
+			m_vertexBuffers[i] = createSharedResource(m_engine, imguiCreateVertexBuffer(m_engine, 1000));
 		}
 	}
 
@@ -249,7 +234,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 		for (size_t i = previousSize; i < m_indexBuffers.size(); i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_indexBuffers[i] = imguiCreateIndexBuffer(m_engine, 5000);
+			m_indexBuffers[i] = createSharedResource(m_engine, imguiCreateIndexBuffer(m_engine, 5000));
 		}
 	}
 }
@@ -262,7 +247,7 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 		m_materialInstances.resize(numRequiredInstances);
 		for (size_t i = previousSize; i < m_materialInstances.size(); i++)
 		{
-			m_materialInstances[i] = m_material->createInstance();
+			m_materialInstances[i] = createSharedResource(m_engine, m_material->createInstance());
 		}
 	}
 }
@@ -274,7 +259,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	{
 		size_t capacityVertCount = m_vertexBuffers[bufferIndex]->getVertexCount();
 		if (vb.Size > capacityVertCount)
-			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(m_engine, vb.Size);
+			m_vertexBuffers[bufferIndex] = createSharedResource(m_engine, imguiCreateVertexBuffer(m_engine, vb.Size));
 
 		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
 		m_vertexBuffers[bufferIndex]->setBufferAt(*m_engine, 0, std::move(vbDescriptor));
@@ -285,7 +270,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	{
 		size_t capacityIndexCount = m_indexBuffers[bufferIndex]->getIndexCount();
 		if (ib.Size > capacityIndexCount)
-			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(m_engine, ib.Size);
+			m_indexBuffers[bufferIndex] = createSharedResource(m_engine, imguiCreateIndexBuffer(m_engine, ib.Size));
 
 		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);
 		m_indexBuffers[bufferIndex]->setBuffer(*m_engine, std::move(ibDescriptor));
