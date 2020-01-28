@@ -41,7 +41,6 @@ add_resources_library(Sandbox.Assets.Fonts
     COPY
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
-        assets/textures/debug_cube.png
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/assets/fonts
     DEPENDEES
@@ -51,6 +50,15 @@ add_resources_library(Sandbox.Assets.Fonts
 add_resources_library(Sandbox.Assets.Textures
     COPY
         assets/textures/debug_cube.png
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
+    DEPENDEES
+        Spatial.Sandbox
+)
+
+add_resources_library(Sandbox.Assets.Skyboxes
+    SKYBOX
+        assets/textures/pillars_2k.hdr
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
     DEPENDEES
