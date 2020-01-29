@@ -6,32 +6,32 @@
 namespace spatial::render
 {
 
-class EntityResource
+class Entity
 {
 private:
     filament::Engine *m_engine;
     utils::Entity m_entity;
 
 public:
-    EntityResource(filament::Engine *engine)
+    Entity(filament::Engine *engine)
         : m_engine{engine},
           m_entity{}
     {
     }
 
-    EntityResource(filament::Engine *engine, utils::Entity entity) noexcept
+    Entity(filament::Engine *engine, utils::Entity entity) noexcept
         : m_engine{engine},
           m_entity{entity}
     {
     }
 
-    EntityResource(EntityResource &&other) noexcept
+    Entity(Entity &&other) noexcept
         : m_engine{other.m_engine},
           m_entity{std::exchange(other.m_entity, utils::Entity{})}
     {
     }
 
-    EntityResource &operator=(EntityResource &&other) noexcept
+    Entity &operator=(Entity &&other) noexcept
 	{
 		if (!m_entity.isNull())
         {
@@ -44,10 +44,10 @@ public:
 		return *this;
 	}
 
-    EntityResource(const EntityResource &other) = delete;
-	EntityResource &operator=(const EntityResource &w) = delete;
+    Entity(const Entity &other) = delete;
+	Entity &operator=(const Entity &w) = delete;
 
-    ~EntityResource()
+    ~Entity()
     {
         if (!m_entity.isNull())
         {

@@ -20,7 +20,7 @@ private:
     render::Scene m_scene;
     render::Camera m_camera;
     render::Material m_material;
-    render::EntityResource m_entity;
+    render::Entity m_entity;
     render::Texture m_texture;
 
     std::vector<render::SharedVertexBuffer> m_vertexBuffers;
@@ -41,7 +41,7 @@ public:
     /**
      * \brief Should be called when applications runs
      */
-    void setup(const std::filesystem::path& fontPath);
+    void setup(const std::filesystem::path &fontPath);
 
     /**
      * \brief Should be called every frame start
@@ -62,4 +62,4 @@ public:
     //endregion
 };
 
-} // namespace spatial::render
+} // namespace spatial::ui

@@ -21,8 +21,9 @@ private:
     render::Material m_material;
     render::MaterialInstance m_instance;
     render::Texture m_texture;
-    render::EntityResource m_light;
-    render::MeshResource m_sphereMesh;
+    render::Entity m_light;
+    render::Mesh m_sphereMesh;
+    render::ImageBasedLight m_ibl;
 
 public:
     Sandbox(core::Application& app, render::RenderingSystem& rendering);

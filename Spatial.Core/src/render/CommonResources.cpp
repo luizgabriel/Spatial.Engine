@@ -30,7 +30,7 @@ Camera createCamera(fl::Engine *engine) noexcept
     return {engine, engine->createCamera()};
 }
 
-EntityResource createEntity(fl::Engine *engine) noexcept
+Entity createEntity(fl::Engine *engine) noexcept
 {
     return {engine, utils::EntityManager::get().create()};
 }

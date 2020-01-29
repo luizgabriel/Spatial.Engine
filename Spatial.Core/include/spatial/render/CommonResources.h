@@ -7,8 +7,8 @@
 #include <filament/Camera.h>
 #include <filament/Texture.h>
 
-#include <spatial/render/EngineResource.h>
-#include <spatial/render/EntityResource.h>
+#include <spatial/render/EngineRef.h>
+#include <spatial/render/Entity.h>
 
 #include <memory>
 
@@ -16,25 +16,30 @@ namespace spatial::render
 {
 
 //Scoped Pointers
-using SwapChain = EngineResource<filament::SwapChain>;
-using Renderer = EngineResource<filament::Renderer>;
-using Scene = EngineResource<filament::Scene>;
-using View = EngineResource<filament::View>;
-using Camera = EngineResource<filament::Camera>;
-using Material = EngineResource<filament::Material>;
-using MaterialInstance = EngineResource<filament::MaterialInstance>;
-using Texture = EngineResource<filament::Texture>;
-using VertexBuffer = EngineResource<filament::VertexBuffer>;
-using IndexBuffer = EngineResource<filament::IndexBuffer>;
+using SwapChain = EngineRef<filament::SwapChain>;
+using Renderer = EngineRef<filament::Renderer>;
+using Scene = EngineRef<filament::Scene>;
+using View = EngineRef<filament::View>;
+using Camera = EngineRef<filament::Camera>;
+using Material = EngineRef<filament::Material>;
+using MaterialInstance = EngineRef<filament::MaterialInstance>;
+using Texture = EngineRef<filament::Texture>;
+using VertexBuffer = EngineRef<filament::VertexBuffer>;
+using IndexBuffer = EngineRef<filament::IndexBuffer>;
+using Skybox = EngineRef<filament::Skybox>;
+using IndirectLight = EngineRef<filament::IndirectLight>;
 
 //Shared Pointers
-using SharedVertexBuffer = std::shared_ptr<filament::VertexBuffer>;
-using SharedIndexBuffer = std::shared_ptr<filament::IndexBuffer>;
-using SharedMaterial = std::shared_ptr<filament::Material>;
-using SharedMaterialInstance = std::shared_ptr<filament::MaterialInstance>;
-using SharedView = std::shared_ptr<filament::View>;
-using SharedTexture = std::shared_ptr<filament::Texture>;
-using SharedCamera = std::shared_ptr<filament::Camera>;
+template <typename T>
+using SharedEngineRef = std::shared_ptr<T>;
+
+using SharedVertexBuffer = SharedEngineRef<filament::VertexBuffer>;
+using SharedIndexBuffer = SharedEngineRef<filament::IndexBuffer>;
+using SharedMaterial = SharedEngineRef<filament::Material>;
+using SharedMaterialInstance = SharedEngineRef<filament::MaterialInstance>;
+using SharedView = SharedEngineRef<filament::View>;
+using SharedTexture = SharedEngineRef<filament::Texture>;
+using SharedCamera = SharedEngineRef<filament::Camera>;
 
 /**
  * \brief Creates a scoped pointer of the filament::SwapChain 
@@ -64,17 +69,15 @@ Camera createCamera(filament::Engine *engine) noexcept;
 /**
  * \brief Creates a scoped pointer of the utils::Entity
  */
-EntityResource createEntity(filament::Engine *engine) noexcept;
+Entity createEntity(filament::Engine *engine) noexcept;
 
 /**
  * \brief Creates a shared pointer of any T-type instance of filament 
  */
-template<typename T>
-std::shared_ptr<T> createSharedResource(filament::Engine *engine, T* instance) noexcept
+template <typename T>
+SharedEngineRef<T> createSharedResource(filament::Engine *engine, T *instance) noexcept
 {
-    return std::shared_ptr<T>{instance, [=](T* res){
-        engine->destroy(res);
-    }};
+    return {instance, [=](T *res) { engine->destroy(res); }};
 }
 
 } // namespace spatial::render

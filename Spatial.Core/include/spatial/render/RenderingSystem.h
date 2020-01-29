@@ -8,6 +8,8 @@
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
 
+#include <filament/Renderer.h>
+
 #include <vector>
 
 namespace spatial::render

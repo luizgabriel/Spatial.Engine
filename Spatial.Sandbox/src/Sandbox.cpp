@@ -20,7 +20,8 @@ Sandbox::Sandbox(Application &app, RenderingSystem &rendering)
       m_instance{m_engine, m_material->createInstance()},
       m_texture{createTexture(m_engine, "textures/debug_cube.png")},
       m_light{createEntity(m_engine)},
-      m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube.filamesh")}
+      m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube.filamesh")},
+      m_ibl{createIBLFromKtx(m_engine, "textures/pillars_2k", "pillars_2k")}
 {
     connect(app, this);
 }
@@ -33,6 +34,8 @@ void Sandbox::onStart()
     m_instance->setParameter("albedo", m_texture.get(), sampler);
     //m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
 
+    m_scene->setSkybox(m_ibl.getSkybox());
+    m_scene->setIndirectLight(m_ibl.getLight());
     m_scene->addEntity(m_light.get());
     m_scene->addEntity(m_sphereMesh.get());
 

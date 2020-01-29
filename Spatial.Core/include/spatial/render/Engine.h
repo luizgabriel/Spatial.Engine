@@ -1,11 +1,6 @@
 #pragma once
 
 #include <filament/Engine.h>
-#include <filament/View.h>
-#include <filament/Renderer.h>
-#include <filament/Material.h>
-#include <utils/EntityManager.h>
-#include <spatial/render/EngineResource.h>
 #include <memory>
 
 namespace spatial::render

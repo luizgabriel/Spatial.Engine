@@ -16,8 +16,8 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
-add_resources_library(Sandbox.Assets.Materials
-    MATERIAL
+add_material_resources(Sandbox.Assets.Materials
+    SOURCES
         assets/materials/default.mat
         assets/materials/plastic.mat
         assets/materials/ui_blit.mat
@@ -27,8 +27,8 @@ add_resources_library(Sandbox.Assets.Materials
         Spatial.Sandbox
 )
 
-add_resources_library(Sandbox.Assets.Models
-    MODEL
+add_mesh_resources(Sandbox.Assets.Models
+    SOURCES
         assets/models/sphere.fbx
         assets/models/debug_cube.fbx
     OUTPUT
@@ -37,8 +37,8 @@ add_resources_library(Sandbox.Assets.Models
         Spatial.Sandbox
 )
 
-add_resources_library(Sandbox.Assets.Fonts
-    COPY
+add_copy_resources(Sandbox.Assets.Fonts
+    SOURCES
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
     OUTPUT
@@ -47,8 +47,8 @@ add_resources_library(Sandbox.Assets.Fonts
         Spatial.Sandbox
 )
 
-add_resources_library(Sandbox.Assets.Textures
-    COPY
+add_copy_resources(Sandbox.Assets.Textures
+    SOURCES
         assets/textures/debug_cube.png
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
@@ -56,9 +56,11 @@ add_resources_library(Sandbox.Assets.Textures
         Spatial.Sandbox
 )
 
-add_resources_library(Sandbox.Assets.Skyboxes
-    SKYBOX
+add_skybox_resources(Sandbox.Assets.Skyboxes
+    SOURCES
         assets/textures/pillars_2k.hdr
+    FORMAT
+        ktx
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
     DEPENDEES
