@@ -15,7 +15,7 @@ function(add_skybox_resources TARGET_PREFIX)
 
         add_custom_command(
             OUTPUT ${OUTPUT_FILE}
-            COMMAND ${CMGEN_PROGRAM} -q -f ${ARG_FORMAT} -x ${ARG_OUTPUT} ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}
+            COMMAND ${CMGEN_PROGRAM} -q -f ${ARG_FORMAT} -x ${ARG_OUTPUT}/${FILE_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}
             COMMENT "Compiling skybox: ${SOURCE} => [${ARG_FORMAT}] ${ARG_OUTPUT}/${FILE_NAME}"
         )
 

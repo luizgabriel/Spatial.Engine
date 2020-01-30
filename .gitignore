@@ -8,3 +8,4 @@ imgui_log.txt
 __tmp/
 *.log
 *.ini
+CMakeSettings.json

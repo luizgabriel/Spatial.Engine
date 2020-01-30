@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake)
 include(SetupDependencies)
 
 option(BUILD_SPATIAL_SANDBOX "Build Spatial Sandbox target" ON)
-option(GENERATE_DEPENDENCY_GRAPH "Generates a depedency graph file. ('.dot' graphviz)" ON)
+option(GENERATE_DEPENDENCY_GRAPH "Generates a depedency graph file. ('.dot' graphviz)" OFF)
 
 
 add_subdirectory(Spatial.Core)
@@ -18,10 +18,16 @@ if (BUILD_SPATIAL_SANDBOX)
 endif()
 
 if (GENERATE_DEPENDENCY_GRAPH)
+    find_program(DOT_PROGRAM dot)
+
+    if (DOT_PROGRAM)
     add_custom_target(Spatial.GraphViz ALL
         COMMAND ${CMAKE_COMMAND} "--graphviz=spatial.dot" .
-        COMMAND dot -Tpng spatial.dot -o foo.png
+        COMMAND ${DOT_PROGRAM} -Tpng spatial.dot -o foo.png
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating graphviz file: ${CMAKE_BINARY_DIR}/spatial.dot"
     )
+    else()
+    message(WARNING "Could not find graphviz dot executable")
+    endif()
 endif()
