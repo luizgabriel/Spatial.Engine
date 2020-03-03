@@ -59,6 +59,8 @@ int Application::run()
         
         m_updateSignal.trigger(delta);
 
+        m_updateGuiSignal.trigger(delta);
+
         m_frameEndSignal.trigger(delta);
 
         //Forces the Frame Rate

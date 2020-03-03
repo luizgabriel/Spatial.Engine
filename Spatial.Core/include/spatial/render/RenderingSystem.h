@@ -10,7 +10,7 @@
 
 #include <filament/Renderer.h>
 
-#include <vector>
+#include <deque>
 
 namespace spatial::render
 {
@@ -26,7 +26,7 @@ private:
 	Camera m_mainCamera;
 	View m_mainView;
 
-	std::vector<filament::View*> m_views;
+	std::deque<filament::View*> m_views;
 
 	void setupViewport();
 
@@ -35,6 +35,10 @@ public:
 
 	RenderingSystem(core::Application &app, desktop::Window &&window, filament::backend::Backend backend);
 
+	RenderingSystem(const RenderingSystem& other) = delete;
+
+	RenderingSystem(RenderingSystem&& other) = default;
+
 	void onStart();
 
 	void onEndFrame(float delta);
@@ -42,9 +46,24 @@ public:
 	void onEvent(const desktop::WindowResizedEvent &event);
 
 	/**
-	 * \brief Register a view to the renderer
+	 * \brief Registers a view to the renderer
 	 */
-	void pushView(filament::View* view);
+	void pushFrontView(filament::View* view);
+
+	/**
+	 * \brief Deregisters a view to the renderer
+	 */
+	void popFrontView();
+
+	/**
+	 * \brief Registers a view to the renderer
+	 */
+	void pushBackView(filament::View* view);
+
+	/**
+	 * \brief Deregisters a view to the renderer
+	 */
+	void popBackView();
 
 	//region Getters
 	auto getEngine()

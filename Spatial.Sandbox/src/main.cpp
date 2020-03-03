@@ -1,8 +1,6 @@
 #include "SandboxInterface.h"
 #include "Sandbox.h"
 
-#include <filesystem>
-
 namespace fl = filament;
 using namespace spatial;
 using namespace std::filesystem;
@@ -21,8 +19,9 @@ int main(int arc, char *argv[])
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
     auto rendering = RenderingSystem{app, std::move(window)};
     auto input = InputSystem{app};
+    auto ui = UserInterfaceSystem{app, rendering, path{"fonts"} / "Roboto-Medium.ttf"};
+
     auto sandbox = Sandbox{app, rendering};
-    auto ui = UserInterfaceSystem{app, rendering};
 
     return app.run();
 }

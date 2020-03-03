@@ -1,8 +1,6 @@
 #include <spatial/ui/UserInterfaceSystem.h>
 #include <spatial/core/ApplicationEvents.h>
 
-#include <filesystem>
-
 using namespace spatial::core;
 using namespace spatial::common;
 using namespace spatial::desktop;
@@ -13,10 +11,11 @@ namespace fs = std::filesystem;
 namespace spatial::ui
 {
 
-UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rendering)
+UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rendering, const fs::path& fontPath)
 	: m_renderer{rendering.getEngine()},
 	  m_input{},
-	  m_window{&rendering.getWindow()}
+	  m_window{&rendering.getWindow()},
+	  m_fontPath{fontPath}
 {
 	connect(app, this);
 	connect<WindowResizedEvent>(app, this);
@@ -24,14 +23,14 @@ UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rend
 	connect<KeyEvent>(app, this);
 	connect<TextEvent>(app, this);
 
-	rendering.pushView(m_renderer.getView());
+	rendering.pushFrontView(m_renderer.getView());
 }
 
 void UserInterfaceSystem::onStart()
 {
 	setupViewport();
 
-	m_renderer.setup(fs::path{"fonts"} / "Roboto-Medium.ttf");
+	m_renderer.setup(m_fontPath);
 	m_input.setup();
 }
 
@@ -70,7 +69,7 @@ void UserInterfaceSystem::onStartFrame(float delta)
 	m_renderer.beforeRender(delta);
 }
 
-void UserInterfaceSystem::onUpdateFrame(float delta)
+void UserInterfaceSystem::onUpdateGuiFrame(float delta)
 {
 	m_renderer.dispatchCommands();
 }

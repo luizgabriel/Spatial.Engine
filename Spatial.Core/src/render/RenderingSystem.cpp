@@ -27,7 +27,7 @@ RenderingSystem::RenderingSystem(Application& app, Window &&window, fl::backend:
 	connect(app, this);
 	connect<desktop::WindowResizedEvent>(app, this);
 
-	pushView(m_mainView.get());
+	pushBackView(m_mainView.get());
 }
 
 void RenderingSystem::onStart()
@@ -68,9 +68,24 @@ void RenderingSystem::setupViewport()
 		fl::Camera::Fov::VERTICAL);
 }
 
-void RenderingSystem::pushView(filament::View* view)
+void RenderingSystem::pushFrontView(filament::View* view)
 {
-	m_views.push_back(view);
+	m_views.emplace_back(view);
+}
+
+void RenderingSystem::popFrontView()
+{
+	m_views.pop_back();
+}
+
+void RenderingSystem::pushBackView(filament::View* view)
+{
+	m_views.emplace_front(view);
+}
+
+void RenderingSystem::popBackView()
+{
+	m_views.pop_front();
 }
 
 } // namespace spatial::render

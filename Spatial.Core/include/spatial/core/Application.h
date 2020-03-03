@@ -24,11 +24,10 @@ private:
 
     //region Signals
     common::Signal<> m_startSignal;
-
     common::Signal<float> m_frameStartSignal;
     common::Signal<float> m_updateSignal;
+    common::Signal<float> m_updateGuiSignal;
     common::Signal<float> m_frameEndSignal;
-
     common::Signal<> m_finishSignal;
     //endregion
 
@@ -64,6 +63,11 @@ public:
      * \brief Called every update of frame
      */
     auto &getUpdateSignal() { return m_updateSignal; }
+
+    /**
+     * \brief Called every update of frame
+     */
+    auto &getUpdateGuiSignal() { return m_updateGuiSignal; }
 
     /**
      * \brief Called every end of frame

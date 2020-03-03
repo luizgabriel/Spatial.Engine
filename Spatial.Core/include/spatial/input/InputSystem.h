@@ -13,6 +13,10 @@ class InputSystem
 public:
     InputSystem(core::Application& app);
 
+    InputSystem(const InputSystem& other) = delete;
+
+	InputSystem(InputSystem&& other) = default;
+
     void onStartFrame(float delta);
 
     void onEvent(const desktop::MouseMovedEvent &event);

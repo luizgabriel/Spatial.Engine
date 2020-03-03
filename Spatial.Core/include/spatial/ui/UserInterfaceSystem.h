@@ -9,6 +9,8 @@
 #include <spatial/ui/UserInterfaceRenderer.h>
 #include <spatial/ui/UserInterfaceInput.h>
 
+#include <filesystem>
+
 namespace spatial::ui
 {
 
@@ -20,16 +22,18 @@ private:
 
     const desktop::Window *m_window;
 
+	std::filesystem::path m_fontPath;
+
     void setupViewport();
 
 public:
-    UserInterfaceSystem(core::Application& app, render::RenderingSystem& rendering);
+    UserInterfaceSystem(core::Application& app, render::RenderingSystem& rendering, const std::filesystem::path& fontPath);
 
     void onStart();
 
     void onStartFrame(float delta);
 
-    void onUpdateFrame(float delta);
+    void onUpdateGuiFrame(float delta);
 
     void onEvent(const desktop::WindowResizedEvent &event);
 
