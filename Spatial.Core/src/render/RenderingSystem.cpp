@@ -1,21 +1,19 @@
 #include <spatial/render/RenderingSystem.h>
-#include <spatial/core/ApplicationEvents.h>
-
-#include <utils/CString.h>
 
 using namespace spatial::desktop;
-using namespace spatial::core;
+using namespace spatial::common;
 namespace fl = filament;
+namespace bk = filament::backend;
 
 namespace spatial::render
 {
 
-RenderingSystem::RenderingSystem(Application& app, Window &&window)
-	: RenderingSystem(app, std::move(window), fl::backend::Backend::OPENGL)
+RenderingSystem::RenderingSystem(Window &&window)
+	: RenderingSystem(std::move(window), bk::Backend::OPENGL)
 {
 }
 
-RenderingSystem::RenderingSystem(Application& app, Window &&window, fl::backend::Backend backend)
+RenderingSystem::RenderingSystem(Window &&window, bk::Backend backend)
 	: m_window{std::move(window)},
 	  m_engine{backend},
 	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
@@ -24,10 +22,17 @@ RenderingSystem::RenderingSystem(Application& app, Window &&window, fl::backend:
 	  m_mainView{createView(m_engine.get())},
 	  m_views{5}
 {
-	connect(app, this);
-	connect<desktop::WindowResizedEvent>(app, this);
-
 	pushBackView(m_mainView.get());
+}
+
+void RenderingSystem::attach(EventQueue& queue)
+{
+    queue.connect<desktop::WindowResizedEvent>(this);
+}
+
+void RenderingSystem::detach(EventQueue& queue)
+{
+    queue.disconnect<desktop::WindowResizedEvent>(this);
 }
 
 void RenderingSystem::onStart()

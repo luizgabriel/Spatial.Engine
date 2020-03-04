@@ -1,17 +1,26 @@
 #pragma once
 
 #include <spatial/core/Application.h>
+#include <spatial/common/EventQueue.h>
 #include <boost/tti/has_member_function.hpp>
 
 namespace spatial::core
 {
 
+BOOST_TTI_HAS_MEMBER_FUNCTION(attach);
+BOOST_TTI_HAS_MEMBER_FUNCTION(detach);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onStart);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onStartFrame);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdateFrame);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdateGuiFrame);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onEndFrame);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onFinish);
+
+template <typename T>
+constexpr bool has_attach_v = has_member_function_attach<T, void, boost::mpl::vector<common::EventQueue&>>::value;
+
+template <typename T>
+constexpr bool has_detach_v = has_member_function_detach<T, void, boost::mpl::vector<common::EventQueue&>>::value;
 
 template <typename T>
 constexpr bool has_on_start_v = has_member_function_onStart<T, void>::value;
@@ -34,6 +43,9 @@ constexpr bool has_on_finish_v = has_member_function_onFinish<T, void>::value;
 template <typename Handler>
 void connect(Application& app, Handler *instance) noexcept
 {
+    if constexpr(has_attach_v<Handler>)
+        instance->attach(app.getEBus());
+
     if constexpr(has_on_start_v<Handler>)
         app.getStartSignal().connect<&Handler::onStart>(instance);
 
@@ -53,9 +65,18 @@ void connect(Application& app, Handler *instance) noexcept
         app.getFinishSignal().connect<&Handler::onFinish>(instance);
 }
 
+template <typename... Handlers>
+void connect(Application& app, Handlers*... instance) noexcept
+{
+    (connect(app, instance), ...);
+}
+
 template <typename Handler>
 void disconnect(Application& app, Handler *instance) noexcept
 {
+    if constexpr(has_detach_v<Handler>)
+        instance->detach(app.getEBus());
+
     if constexpr(has_on_start_v<Handler>)
         app.getStartSignal().disconnect<&Handler::onStart>(instance);
 
@@ -73,6 +94,12 @@ void disconnect(Application& app, Handler *instance) noexcept
 
     if constexpr(has_on_finish_v<Handler>)
         app.getFinishSignal().disconnect<&Handler::onFinish>(instance);
+}
+
+template <typename... Handlers>
+void disconnect(Application& app, Handlers&&... instance) noexcept
+{
+    (disconnect(app, std::forward<Handlers>(instance)), ...);
 }
 
 template <typename Event, auto Function>

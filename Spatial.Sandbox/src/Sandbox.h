@@ -1,7 +1,12 @@
 #pragma once
 
-#include <spatial/spatial.h>
 #include "SandboxInterface.h"
+
+#include <spatial/render/CommonResources.h>
+#include <spatial/render/Entity.h>
+#include <spatial/render/ImageBasedLight.h>
+#include <spatial/render/Mesh.h>
+#include <spatial/render/RenderingSystem.h>
 
 namespace fl = filament;
 
@@ -26,7 +31,7 @@ private:
     render::ImageBasedLight m_ibl;
 
 public:
-    Sandbox(core::Application& app, render::RenderingSystem& rendering);
+    Sandbox(render::RenderingSystem& rendering);
 
     void onStart();
 

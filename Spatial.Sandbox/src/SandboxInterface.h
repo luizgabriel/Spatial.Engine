@@ -1,6 +1,8 @@
 #pragma once
 
-#include <spatial/spatial.h>
+#include <math/vec3.h>
+#include <math/vec4.h>
+#include <imgui.h>
 
 namespace ImGui
 {
@@ -18,12 +20,12 @@ class SandboxInterface
 {
     struct CameraData
     {
-        math::float3 eye;
-        math::float3 center;
+        filament::math::float3 eye;
+        filament::math::float3 center;
     };
 
     struct ViewData {
-        math::float4 clearColor;
+        filament::math::float4 clearColor;
     };
 
     struct MaterialData {

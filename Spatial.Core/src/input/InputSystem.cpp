@@ -1,20 +1,28 @@
 #include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
-#include <spatial/core/ApplicationEvents.h>
 
-using namespace spatial::core;
 using namespace spatial::desktop;
 using namespace spatial::common;
 
 namespace spatial::input
 {
 
-InputSystem::InputSystem(Application& app)
+InputSystem::InputSystem()
 {
-    connect(app, this);
-    connect<MouseMovedEvent>(app, this);
-    connect<KeyEvent>(app, this);
-    connect<TextEvent>(app, this);
+}
+
+void InputSystem::attach(EventQueue& queue)
+{
+    queue.connect<MouseMovedEvent>(this);
+    queue.connect<KeyEvent>(this);
+    queue.connect<TextEvent>(this);
+}
+
+void InputSystem::detach(EventQueue& queue)
+{
+    queue.disconnect<MouseMovedEvent>(this);
+    queue.disconnect<KeyEvent>(this);
+    queue.disconnect<TextEvent>(this);
 }
 
 void InputSystem::onStartFrame(float delta)

@@ -1,7 +1,5 @@
 #include <spatial/ui/UserInterfaceSystem.h>
-#include <spatial/core/ApplicationEvents.h>
 
-using namespace spatial::core;
 using namespace spatial::common;
 using namespace spatial::desktop;
 using namespace spatial::render;
@@ -11,19 +9,29 @@ namespace fs = std::filesystem;
 namespace spatial::ui
 {
 
-UserInterfaceSystem::UserInterfaceSystem(Application& app, RenderingSystem& rendering, const fs::path& fontPath)
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const fs::path& fontPath)
 	: m_renderer{rendering.getEngine()},
 	  m_input{},
 	  m_window{&rendering.getWindow()},
 	  m_fontPath{fontPath}
 {
-	connect(app, this);
-	connect<WindowResizedEvent>(app, this);
-	connect<MouseMovedEvent>(app, this);
-	connect<KeyEvent>(app, this);
-	connect<TextEvent>(app, this);
-
 	rendering.pushFrontView(m_renderer.getView());
+}
+
+void UserInterfaceSystem::attach(EventQueue& queue)
+{
+    queue.connect<WindowResizedEvent>(this);
+	queue.connect<MouseMovedEvent>(this);
+	queue.connect<KeyEvent>(this);
+	queue.connect<TextEvent>(this);
+}
+
+void UserInterfaceSystem::detach(EventQueue& queue)
+{
+    queue.disconnect<WindowResizedEvent>(this);
+	queue.disconnect<MouseMovedEvent>(this);
+	queue.disconnect<KeyEvent>(this);
+	queue.disconnect<TextEvent>(this);
 }
 
 void UserInterfaceSystem::onStart()

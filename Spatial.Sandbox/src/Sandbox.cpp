@@ -1,14 +1,18 @@
 #include "Sandbox.h"
 
-using namespace spatial::core;
+#include <spatial/render/CommonResources.h>
+#include <spatial/render/ResourceLoaders.h>
+
+#include <filament/RenderableManager.h>
+#include <filament/LightManager.h>
+
 using namespace spatial::render;
-using namespace spatial::math;
 namespace fl = filament;
 
 namespace spatial::sandbox
 {
 
-Sandbox::Sandbox(Application &app, RenderingSystem &rendering)
+Sandbox::Sandbox(RenderingSystem &rendering)
     : m_interface{},
 
       m_engine{rendering.getEngine()},
@@ -23,7 +27,6 @@ Sandbox::Sandbox(Application &app, RenderingSystem &rendering)
       m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube.filamesh")},
       m_ibl{createIBLFromKtx(m_engine, "textures/pillars_2k", "pillars_2k")}
 {
-    connect(app, this);
 }
 
 void Sandbox::onStart()

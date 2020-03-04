@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/core/Application.h>
+#include <spatial/common/EventQueue.h>
 #include <spatial/desktop/PlatformEvent.h>
 
 #include <spatial/render/CommonResources.h>
@@ -22,12 +22,15 @@ private:
 
     const desktop::Window *m_window;
 
-	std::filesystem::path m_fontPath;
+    std::filesystem::path m_fontPath;
 
     void setupViewport();
 
 public:
-    UserInterfaceSystem(core::Application& app, render::RenderingSystem& rendering, const std::filesystem::path& fontPath);
+    UserInterfaceSystem(render::RenderingSystem &rendering, const std::filesystem::path &fontPath);
+
+    void attach(common::EventQueue &queue);
+    void detach(common::EventQueue &queue);
 
     void onStart();
 
@@ -44,4 +47,4 @@ public:
     void onEvent(const desktop::TextEvent &event);
 };
 
-} // namespace spatial::render
+} // namespace spatial::ui

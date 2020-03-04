@@ -1,9 +1,13 @@
 #include "SandboxInterface.h"
 
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <spatial/common/Key.h>
+#include <spatial/input/Input.h>
+
 namespace fl = filament;
 using namespace filament::math;
 using namespace spatial::common;
-using namespace spatial::core;
 using namespace spatial::input;
 
 namespace ImGui

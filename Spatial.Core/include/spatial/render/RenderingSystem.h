@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/core/Application.h>
+#include <spatial/common/EventQueue.h>
 
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
@@ -26,18 +26,21 @@ private:
 	Camera m_mainCamera;
 	View m_mainView;
 
-	std::deque<filament::View*> m_views;
+	std::deque<filament::View *> m_views;
 
 	void setupViewport();
 
 public:
-	RenderingSystem(core::Application &app, desktop::Window &&window);
+	RenderingSystem(desktop::Window &&window);
 
-	RenderingSystem(core::Application &app, desktop::Window &&window, filament::backend::Backend backend);
+	RenderingSystem(desktop::Window &&window, filament::backend::Backend backend);
 
-	RenderingSystem(const RenderingSystem& other) = delete;
+	RenderingSystem(const RenderingSystem &other) = delete;
 
-	RenderingSystem(RenderingSystem&& other) = default;
+	RenderingSystem(RenderingSystem &&other) = default;
+
+	void attach(common::EventQueue &queue);
+	void detach(common::EventQueue &queue);
 
 	void onStart();
 
@@ -48,7 +51,7 @@ public:
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushFrontView(filament::View* view);
+	void pushFrontView(filament::View *view);
 
 	/**
 	 * \brief Deregisters a view to the renderer
@@ -58,7 +61,7 @@ public:
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushBackView(filament::View* view);
+	void pushBackView(filament::View *view);
 
 	/**
 	 * \brief Deregisters a view to the renderer

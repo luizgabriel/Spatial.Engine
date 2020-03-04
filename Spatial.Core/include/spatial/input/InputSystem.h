@@ -1,9 +1,9 @@
 #pragma once
 
-#include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/KeyAction.h>
+#include <spatial/common/EventQueue.h>
 
 namespace spatial::input
 {
@@ -11,11 +11,13 @@ namespace spatial::input
 class InputSystem
 {
 public:
-    InputSystem(core::Application& app);
+    InputSystem();
 
-    InputSystem(const InputSystem& other) = delete;
+    InputSystem(const InputSystem &other) = delete;
+    InputSystem(InputSystem &&other) = default;
 
-	InputSystem(InputSystem&& other) = default;
+    void attach(common::EventQueue &queue);
+    void detach(common::EventQueue &queue);
 
     void onStartFrame(float delta);
 
@@ -24,4 +26,4 @@ public:
     void onEvent(const desktop::TextEvent &event);
 };
 
-} // namespace spatial
+} // namespace spatial::input
