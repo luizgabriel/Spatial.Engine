@@ -23,10 +23,10 @@ int main(int arc, char *argv[])
     auto binaryPath = path{argv[0]}.parent_path();
     Asset::init(binaryPath.parent_path() / "assets");
 
-    auto input = InputSystem{};
     auto app = Application{};
     auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
     auto rendering = RenderingSystem{std::move(window)};
+    auto input = InputSystem{};
     auto ui = UserInterfaceSystem{rendering, path{"fonts"} / "Roboto-Medium.ttf"};
     auto sandbox = Sandbox{rendering};
 
