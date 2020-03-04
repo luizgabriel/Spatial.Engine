@@ -41,7 +41,7 @@ template <typename T>
 constexpr bool has_on_finish_v = has_member_function_onFinish<T, void>::value;
 
 template <typename Handler>
-void connect(Application& app, Handler *instance) noexcept
+void connect(Application& app, Handler *instance)
 {
     if constexpr(has_attach_v<Handler>)
         instance->attach(app.getEBus());
@@ -66,13 +66,13 @@ void connect(Application& app, Handler *instance) noexcept
 }
 
 template <typename... Handlers>
-void connect(Application& app, Handlers*... instance) noexcept
+void connect(Application& app, Handlers*... instance)
 {
     (connect(app, instance), ...);
 }
 
 template <typename Handler>
-void disconnect(Application& app, Handler *instance) noexcept
+void disconnect(Application& app, Handler *instance)
 {
     if constexpr(has_detach_v<Handler>)
         instance->detach(app.getEBus());
@@ -97,7 +97,7 @@ void disconnect(Application& app, Handler *instance) noexcept
 }
 
 template <typename... Handlers>
-void disconnect(Application& app, Handlers&&... instance) noexcept
+void disconnect(Application& app, Handlers&&... instance)
 {
     (disconnect(app, std::forward<Handlers>(instance)), ...);
 }
