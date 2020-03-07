@@ -22,8 +22,9 @@ if (GENERATE_DEPENDENCY_GRAPH)
 
     if (DOT_PROGRAM)
     add_custom_target(Spatial.GraphViz ALL
-        COMMAND ${CMAKE_COMMAND} "--graphviz=spatial.dot" .
-        COMMAND ${DOT_PROGRAM} -Tpng spatial.dot -o foo.png
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/graphviz
+        COMMAND ${CMAKE_COMMAND} "--graphviz=graphviz/spatial.dot" .
+        COMMAND ${DOT_PROGRAM} -Tpng spatial.dot -o graphviz/dependency_graph.png
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating graphviz file: ${CMAKE_BINARY_DIR}/spatial.dot"
     )
