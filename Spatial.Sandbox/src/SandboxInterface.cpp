@@ -26,7 +26,7 @@ void SpatialDockLayout(ImGuiID dockspaceId)
     ImGui::DockBuilderFinish(dockspaceId);
 }
 
-bool BeginSpatialEngine(bool *openedPropertiesPtr)
+void BeginSpatialEngine(bool *openedPropertiesPtr)
 {
     static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_PassthruCentralNode;
     static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
@@ -69,8 +69,6 @@ bool BeginSpatialEngine(bool *openedPropertiesPtr)
 
         ImGui::EndMainMenuBar();
     }
-
-    return true;
 }
 
 } // namespace ImGui
@@ -100,8 +98,10 @@ void SandboxInterface::render()
     if (Input::released(Key::G))
         m_showEngineGui = !m_showEngineGui;
 
-    if (m_showEngineGui && ImGui::BeginSpatialEngine(&m_openedPropertiesWindow))
+    if (m_showEngineGui)
     {
+        ImGui::BeginSpatialEngine(&m_openedPropertiesWindow);
+
         if (m_openedPropertiesWindow)
         {
             if (ImGui::Begin("Properties", &m_openedPropertiesWindow))
