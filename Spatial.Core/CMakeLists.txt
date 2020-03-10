@@ -38,7 +38,8 @@ set_property(
 target_include_directories(
 	Spatial.Core
 	PUBLIC
-		include
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
 	PRIVATE
 		src		
 )
@@ -53,6 +54,9 @@ target_link_libraries(
 		CONAN_PKG::imgui
 		CONAN_PKG::boost_tti
 		CONAN_PKG::stb
+
+		SDL2::SDL2
+		SDL2::SDL2main
 )
 
 find_package(OpenGL REQUIRED)
@@ -78,3 +82,15 @@ endif()
 
 # ADD DEBUG/RELEASE FLAGS
 target_compile_definitions(Spatial.Core PUBLIC "$<$<CONFIG:DEBUG>:SPATIAL_DEBUG>")
+
+
+install(
+	TARGETS Spatial.Core
+	EXPORT SpatialEngine
+	LIBRARY DESTINATION lib
+)
+
+install(
+	DIRECTORY include/
+	DESTINATION include
+)

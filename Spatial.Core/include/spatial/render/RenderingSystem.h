@@ -9,6 +9,7 @@
 #include <spatial/render/CommonResources.h>
 
 #include <filament/Renderer.h>
+#include <filament/Viewport.h>
 
 #include <deque>
 

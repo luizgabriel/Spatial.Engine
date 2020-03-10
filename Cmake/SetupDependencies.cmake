@@ -11,3 +11,5 @@ else()
         BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     )    
 endif()
+
+find_package(SDL2 CONFIG REQUIRED)

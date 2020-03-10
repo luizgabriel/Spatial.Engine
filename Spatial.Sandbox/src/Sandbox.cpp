@@ -5,6 +5,7 @@
 
 #include <filament/RenderableManager.h>
 #include <filament/LightManager.h>
+#include <filament/TextureSampler.h>
 
 using namespace spatial::render;
 namespace fl = filament;
@@ -33,7 +34,7 @@ void Sandbox::onStart()
 {
     m_view->setScene(m_scene.get());
 
-    fl::TextureSampler sampler(fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR);
+    auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
     m_instance->setParameter("albedo", m_texture.get(), sampler);
     //m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
 

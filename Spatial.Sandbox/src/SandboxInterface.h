@@ -9,7 +9,7 @@ namespace ImGui
 
 void SpatialDockLayout(ImGuiID dockspaceId);
 
-bool BeginSpatialEngine(bool *openedPropertiesPtr);
+void BeginSpatialEngine(bool *openedPropertiesPtr);
 
 } // namespace ImGui
 

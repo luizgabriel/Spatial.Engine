@@ -6,6 +6,8 @@
 #include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
+#include <filament/TextureSampler.h>
+#include <filament/Viewport.h>
 
 #include <filesystem>
 
