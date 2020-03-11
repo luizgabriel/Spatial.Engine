@@ -86,11 +86,8 @@ target_compile_definitions(Spatial.Core PUBLIC "$<$<CONFIG:DEBUG>:SPATIAL_DEBUG>
 
 install(
 	TARGETS Spatial.Core
-	EXPORT SpatialEngine
+	EXPORT Spatial.Export
 	LIBRARY DESTINATION lib
 )
 
-install(
-	DIRECTORY include/
-	DESTINATION include
-)
+install(DIRECTORY include/ DESTINATION include)

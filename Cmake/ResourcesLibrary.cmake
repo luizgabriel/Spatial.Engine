@@ -1,4 +1,0 @@
-include(ResourceTypes/CopyResource)
-include(ResourceTypes/MaterialResource)
-include(ResourceTypes/MeshResource)
-include(ResourceTypes/SkyboxResource)

@@ -19,10 +19,9 @@ set_property(
 add_material_resources(Sandbox.Assets.Materials
     SOURCES
         assets/materials/default.mat
-        assets/materials/plastic.mat
         assets/materials/ui_blit.mat
     OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/assets/materials
+        assets/materials
     DEPENDEES
         Spatial.Sandbox
 )
@@ -32,7 +31,7 @@ add_mesh_resources(Sandbox.Assets.Models
         assets/models/sphere.fbx
         assets/models/debug_cube.fbx
     OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/assets/models
+        assets/models
     DEPENDEES
         Spatial.Sandbox
 )
@@ -42,7 +41,7 @@ add_copy_resources(Sandbox.Assets.Fonts
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
     OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/assets/fonts
+        assets/fonts
     DEPENDEES
         Spatial.Sandbox
 )
@@ -51,7 +50,7 @@ add_copy_resources(Sandbox.Assets.Textures
     SOURCES
         assets/textures/debug_cube.png
     OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
+        assets/textures
     DEPENDEES
         Spatial.Sandbox
 )
@@ -62,7 +61,31 @@ add_skybox_resources(Sandbox.Assets.Skyboxes
     FORMAT
         ktx
     OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/assets/textures
+        assets/textures
     DEPENDEES
         Spatial.Sandbox
+)
+
+install(
+    FILES
+        assets/fonts/Roboto-Medium.ttf
+        assets/fonts/Roboto-Regular.ttf
+    DESTINATION
+        assets/fonts
+)
+
+install(
+    FILES
+        assets/materials/default.mat
+        assets/materials/ui_blit.mat
+    DESTINATION
+        assets/materials
+)
+
+install(
+    FILES
+        assets/textures/uv_test.png
+        assets/textures/pillars_2k.hdr
+    DESTINATION
+        assets/textures
 )

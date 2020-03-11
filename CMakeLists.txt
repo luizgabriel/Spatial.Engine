@@ -5,6 +5,7 @@ project(SpatialEngine
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake/Modules)
 include(SetupDependencies)
 include(CMakePackageConfigHelpers)
 
@@ -33,36 +34,31 @@ if (SPATIAL_DEPENDENCY_GRAPH)
     endif()
 endif()
 
-install(DIRECTORY ${CMAKE_BINARY_DIR}/tools DESTINATION /)
-
-install(FILES CMake/ResourcesLibrary.cmake DESTINATION cmake)
+install(DIRECTORY ${CMAKE_BINARY_DIR}/tools DESTINATION bin)
 
 install(
-	FILES
-		CMake/ResourceTypes/CopyResource.cmake
-		CMake/ResourceTypes/MaterialResource.cmake
-		CMake/ResourceTypes/MeshResource.cmake
-		CMake/ResourceTypes/SkyboxResource.cmake
+	DIRECTORY
+		CMake/Modules/
 	DESTINATION
-		cmake/ResourceTypes
+		cmake/modules
 )
 
-install(EXPORT
-    SpatialEngine
+install(
+    EXPORT Spatial.Export
     NAMESPACE Spatial::
-    DESTINATION /
+    FILE SpatialEngineConfig.cmake
+    DESTINATION cmake
 )
 
 write_basic_package_version_file(
     SpatialEngineConfigVersion.cmake
-    VERSION ${CMAKE_PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
 )
 
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/SpatialEngineConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/SpatialEngineConfigVersion.cmake
     DESTINATION
-        ${CMAKE_INSTALL_PREFIX}/cmake
+        cmake
 )
