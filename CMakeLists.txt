@@ -40,14 +40,14 @@ install(
 	DIRECTORY
 		CMake/Modules/
 	DESTINATION
-		cmake/modules
+		lib/cmake
 )
 
 install(
     EXPORT Spatial.Export
     NAMESPACE Spatial::
     FILE SpatialEngineConfig.cmake
-    DESTINATION cmake
+    DESTINATION lib/cmake
 )
 
 write_basic_package_version_file(
@@ -60,5 +60,5 @@ install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/SpatialEngineConfigVersion.cmake
     DESTINATION
-        cmake
+        lib/cmake
 )
