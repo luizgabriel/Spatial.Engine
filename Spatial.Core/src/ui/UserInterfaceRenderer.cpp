@@ -20,7 +20,7 @@ namespace fl = filament;
 namespace spatial::ui
 {
 
-UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine *engine)
+UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	: m_engine{engine},
 	  m_view{createView(m_engine)},
 	  m_scene{createScene(m_engine)},
@@ -45,15 +45,14 @@ void UserInterfaceRenderer::setup(const fs::path& fontPath)
 {
 	m_texture = imguiCreateTextureAtlas(m_engine, fontPath);
 
-	m_material->setDefaultParameter(
-		"albedo", m_texture.get(),
-		{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+	m_material->setDefaultParameter("albedo", m_texture.get(),
+									{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
-	auto &io = ImGui::GetIO();
+	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	auto &style = ImGui::GetStyle();
+	auto& style = ImGui::GetStyle();
 
 	ImGui::StyleColorsDark();
 	auto colors = style.Colors;
@@ -110,10 +109,7 @@ UserInterfaceRenderer::~UserInterfaceRenderer()
 void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float dpiY)
 {
 	m_view->setViewport({0, 0, static_cast<uint32_t>(width), static_cast<uint32_t>(height)});
-	m_camera->setProjection(
-		fl::Camera::Projection::ORTHO,
-		0.0, width / dpiX, height / dpiY,
-		0.0, 0.0, 1.0);
+	m_camera->setProjection(fl::Camera::Projection::ORTHO, 0.0, width / dpiX, height / dpiY, 0.0, 0.0, 1.0);
 
 	imguiRefreshViewport(width, height, dpiX, dpiY);
 }
@@ -138,8 +134,8 @@ void UserInterfaceRenderer::dispatchCommands()
 void UserInterfaceRenderer::renderDrawData()
 {
 	auto imguiData = ImGui::GetDrawData();
-	auto &rcm = m_engine->getRenderableManager();
-	auto &io = ImGui::GetIO();
+	auto& rcm = m_engine->getRenderableManager();
+	auto& io = ImGui::GetIO();
 	auto [fbwidth, fbheight] = imguiGetFrameSize();
 
 	imguiData->ScaleClipRects(io.DisplayFramebufferScale);
@@ -150,12 +146,12 @@ void UserInterfaceRenderer::renderDrawData()
 	// Count how many primitives we'll need, then create a Renderable builder.
 	// Also count how many unique scissor rectangles are required.
 	size_t nPrims = 0;
-	std::unordered_map<uint64_t, fl::MaterialInstance *> scissorRects;
+	std::unordered_map<uint64_t, fl::MaterialInstance*> scissorRects;
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
 	{
-		const ImDrawList *cmds = imguiData->CmdLists[cmdListIndex];
+		const ImDrawList* cmds = imguiData->CmdLists[cmdListIndex];
 		nPrims += cmds->CmdBuffer.size();
-		for (const auto &pcmd : cmds->CmdBuffer)
+		for (const auto& pcmd : cmds->CmdBuffer)
 		{
 			scissorRects[imguiMakeScissorKey(fbheight, pcmd.ClipRect)] = nullptr;
 		}
@@ -168,7 +164,7 @@ void UserInterfaceRenderer::renderDrawData()
 
 	// Push each unique scissor rectangle to a MaterialInstance.
 	size_t matIndex = 0;
-	for (auto &pair : scissorRects)
+	for (auto& pair : scissorRects)
 	{
 		pair.second = m_materialInstances[matIndex++].get();
 		uint32_t left = (pair.first >> 0ull) & 0xffffull;
@@ -184,11 +180,11 @@ void UserInterfaceRenderer::renderDrawData()
 	int primIndex = 0;
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
 	{
-		const ImDrawList *cmds = imguiData->CmdLists[cmdListIndex];
+		const ImDrawList* cmds = imguiData->CmdLists[cmdListIndex];
 		size_t indexOffset = 0;
 		populateVertexData(bufferIndex, cmds->VtxBuffer, cmds->IdxBuffer);
 
-		for (const auto &pcmd : cmds->CmdBuffer)
+		for (const auto& pcmd : cmds->CmdBuffer)
 		{
 			if (pcmd.UserCallback)
 			{
@@ -199,9 +195,9 @@ void UserInterfaceRenderer::renderDrawData()
 				uint64_t skey = imguiMakeScissorKey(fbheight, pcmd.ClipRect);
 				auto miter = scissorRects.find(skey);
 				assert(miter != scissorRects.end());
-				rbuilder.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
-								  m_vertexBuffers[bufferIndex].get(), m_indexBuffers[bufferIndex].get(),
-								  indexOffset, pcmd.ElemCount)
+				rbuilder
+					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES, m_vertexBuffers[bufferIndex].get(),
+							  m_indexBuffers[bufferIndex].get(), indexOffset, pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, miter->second);
 				primIndex++;
@@ -256,7 +252,8 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 	}
 }
 
-void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert> &vb, const ImVector<ImDrawIdx> &ib)
+void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
+											   const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
@@ -281,4 +278,4 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	}
 }
 
-} // namespace spatial::render
+} // namespace spatial::ui

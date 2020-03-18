@@ -5,11 +5,10 @@ namespace spatial::common
 
 std::string nameOf(Key key)
 {
-    switch (key)
-    {
-    default:
-        return "TODO";
-    }
+	switch (key)
+	{
+	default: return "TODO";
+	}
 }
 
-}
+} // namespace spatial::common

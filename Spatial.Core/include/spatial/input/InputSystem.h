@@ -11,19 +11,19 @@ namespace spatial::input
 class InputSystem
 {
 public:
-    InputSystem();
+	InputSystem();
 
-    InputSystem(const InputSystem &other) = delete;
-    InputSystem(InputSystem &&other) = default;
+	InputSystem(const InputSystem& other) = delete;
+	InputSystem(InputSystem&& other) = default;
 
-    void attach(common::EventQueue &queue);
-    void detach(common::EventQueue &queue);
+	void attach(common::EventQueue& queue);
+	void detach(common::EventQueue& queue);
 
-    void onStartFrame(float delta);
+	void onStartFrame(float delta);
 
-    void onEvent(const desktop::MouseMovedEvent &event);
-    void onEvent(const desktop::KeyEvent &event);
-    void onEvent(const desktop::TextEvent &event);
+	void onEvent(const desktop::MouseMovedEvent& event);
+	void onEvent(const desktop::KeyEvent& event);
+	void onEvent(const desktop::TextEvent& event);
 };
 
 } // namespace spatial::input

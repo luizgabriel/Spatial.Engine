@@ -17,34 +17,34 @@ namespace spatial::ui
 class UserInterfaceSystem
 {
 private:
-    UserInterfaceRenderer m_renderer;
-    UserInterfaceInput m_input;
+	UserInterfaceRenderer m_renderer;
+	UserInterfaceInput m_input;
 
-    const desktop::Window *m_window;
+	const desktop::Window* m_window;
 
-    std::filesystem::path m_fontPath;
+	std::filesystem::path m_fontPath;
 
-    void setupViewport();
+	void setupViewport();
 
 public:
-    UserInterfaceSystem(render::RenderingSystem &rendering, const std::filesystem::path &fontPath);
+	UserInterfaceSystem(render::RenderingSystem& rendering, const std::filesystem::path& fontPath);
 
-    void attach(common::EventQueue &queue);
-    void detach(common::EventQueue &queue);
+	void attach(common::EventQueue& queue);
+	void detach(common::EventQueue& queue);
 
-    void onStart();
+	void onStart();
 
-    void onStartFrame(float delta);
+	void onStartFrame(float delta);
 
-    void onUpdateGuiFrame(float delta);
+	void onUpdateGuiFrame(float delta);
 
-    void onEvent(const desktop::WindowResizedEvent &event);
+	void onEvent(const desktop::WindowResizedEvent& event);
 
-    void onEvent(const desktop::MouseMovedEvent &event);
+	void onEvent(const desktop::MouseMovedEvent& event);
 
-    void onEvent(const desktop::KeyEvent &event);
+	void onEvent(const desktop::KeyEvent& event);
 
-    void onEvent(const desktop::TextEvent &event);
+	void onEvent(const desktop::TextEvent& event);
 };
 
 } // namespace spatial::ui

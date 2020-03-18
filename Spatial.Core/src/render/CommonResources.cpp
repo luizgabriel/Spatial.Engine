@@ -5,34 +5,34 @@ namespace fl = filament;
 namespace spatial::render
 {
 
-SwapChain createSwapChain(fl::Engine *engine, void *nativeWindowHandle) noexcept
+SwapChain createSwapChain(fl::Engine* engine, void* nativeWindowHandle) noexcept
 {
-    return {engine, engine->createSwapChain(nativeWindowHandle)};
+	return {engine, engine->createSwapChain(nativeWindowHandle)};
 }
 
-Renderer createRenderer(fl::Engine *engine) noexcept
+Renderer createRenderer(fl::Engine* engine) noexcept
 {
-    return {engine, engine->createRenderer()};
+	return {engine, engine->createRenderer()};
 }
 
-Scene createScene(fl::Engine *engine) noexcept
+Scene createScene(fl::Engine* engine) noexcept
 {
-    return {engine, engine->createScene()};
+	return {engine, engine->createScene()};
 }
 
-View createView(fl::Engine *engine) noexcept
+View createView(fl::Engine* engine) noexcept
 {
-    return {engine, engine->createView()};
+	return {engine, engine->createView()};
 }
 
-Camera createCamera(fl::Engine *engine) noexcept
+Camera createCamera(fl::Engine* engine) noexcept
 {
-    return {engine, engine->createCamera()};
+	return {engine, engine->createCamera()};
 }
 
-Entity createEntity(fl::Engine *engine) noexcept
+Entity createEntity(fl::Engine* engine) noexcept
 {
-    return {engine, utils::EntityManager::get().create()};
+	return {engine, utils::EntityManager::get().create()};
 }
 
-}
+} // namespace spatial::render

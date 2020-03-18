@@ -27,32 +27,32 @@ private:
 	Camera m_mainCamera;
 	View m_mainView;
 
-	std::deque<filament::View *> m_views;
+	std::deque<filament::View*> m_views;
 
 	void setupViewport();
 
 public:
-	RenderingSystem(desktop::Window &&window);
+	RenderingSystem(desktop::Window&& window);
 
-	RenderingSystem(desktop::Window &&window, filament::backend::Backend backend);
+	RenderingSystem(desktop::Window&& window, filament::backend::Backend backend);
 
-	RenderingSystem(const RenderingSystem &other) = delete;
+	RenderingSystem(const RenderingSystem& other) = delete;
 
-	RenderingSystem(RenderingSystem &&other) = default;
+	RenderingSystem(RenderingSystem&& other) = default;
 
-	void attach(common::EventQueue &queue);
-	void detach(common::EventQueue &queue);
+	void attach(common::EventQueue& queue);
+	void detach(common::EventQueue& queue);
 
 	void onStart();
 
 	void onEndFrame(float delta);
 
-	void onEvent(const desktop::WindowResizedEvent &event);
+	void onEvent(const desktop::WindowResizedEvent& event);
 
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushFrontView(filament::View *view);
+	void pushFrontView(filament::View* view);
 
 	/**
 	 * \brief Deregisters a view to the renderer
@@ -62,34 +62,22 @@ public:
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushBackView(filament::View *view);
+	void pushBackView(filament::View* view);
 
 	/**
 	 * \brief Deregisters a view to the renderer
 	 */
 	void popBackView();
 
-	//region Getters
-	auto getEngine()
-	{
-		return m_engine.get();
-	}
+	// region Getters
+	auto getEngine() { return m_engine.get(); }
 
-	const auto &getWindow()
-	{
-		return m_window;
-	}
+	const auto& getWindow() { return m_window; }
 
-	const auto getMainView()
-	{
-		return m_mainView.get();
-	}
+	const auto getMainView() { return m_mainView.get(); }
 
-	auto getMainCamera()
-	{
-		return m_mainCamera.get();
-	}
-	//endregion
+	auto getMainCamera() { return m_mainCamera.get(); }
+	// endregion
 };
 
 } // namespace spatial::render

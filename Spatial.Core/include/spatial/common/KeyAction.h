@@ -7,9 +7,9 @@ namespace spatial::common
 
 enum class KeyAction
 {
-    None,
-    Pressed,
-    Released,
+	None,
+	Pressed,
+	Released,
 };
 
 std::string nameOf(KeyAction action);

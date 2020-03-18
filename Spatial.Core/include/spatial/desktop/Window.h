@@ -18,7 +18,7 @@ class WindowContext;
 class Window
 {
 private:
-	SDL_Window *m_windowHandle;
+	SDL_Window* m_windowHandle;
 
 	Window(int width, int height, std::string_view title);
 
@@ -27,17 +27,17 @@ private:
 public:
 	~Window();
 
-	void *getNativeHandle();
+	void* getNativeHandle();
 
 	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;
 	bool hasFocus() const;
 
-	Window(Window &&other) noexcept;
-	Window(const Window &w) = delete;
+	Window(Window&& other) noexcept;
+	Window(const Window& w) = delete;
 
-	Window &operator=(Window &&other) noexcept;
-	Window &operator=(const Window &w) = delete;
+	Window& operator=(Window&& other) noexcept;
+	Window& operator=(const Window& w) = delete;
 };
 
 class WindowContext
@@ -50,11 +50,11 @@ public:
 
 	Window createWindow(int width, int height, std::string_view title) const noexcept;
 
-	WindowContext(const WindowContext &c) = delete;
-	WindowContext(const WindowContext &&c) = delete;
+	WindowContext(const WindowContext& c) = delete;
+	WindowContext(const WindowContext&& c) = delete;
 
-	WindowContext &operator=(WindowContext &&other) = delete;
-	WindowContext &operator=(const WindowContext &w) = delete;
+	WindowContext& operator=(WindowContext&& other) = delete;
+	WindowContext& operator=(const WindowContext& w) = delete;
 };
 
 } // namespace spatial::desktop

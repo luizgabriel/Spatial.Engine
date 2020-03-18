@@ -10,31 +10,22 @@ class InputSystem;
 class Input
 {
 private:
-    static InputState s_inputState;
+	static InputState s_inputState;
 
 public:
-    static bool pressed(common::Key key)
-    {
-        return s_inputState.pressed(key);
-    }
+	static bool pressed(common::Key key) { return s_inputState.pressed(key); }
 
-    template <typename... Args>
-    static bool combined(Args... keys)
-    {
-        return s_inputState.combined(keys...);
-    }
+	template <typename... Args>
+	static bool combined(Args... keys)
+	{
+		return s_inputState.combined(keys...);
+	}
 
-    static bool released(common::Key key)
-    {
-        return s_inputState.released(key);
-    }
+	static bool released(common::Key key) { return s_inputState.released(key); }
 
-    static filament::math::float2 mouse()
-    {
-        return s_inputState.getMousePosition();
-    }
+	static filament::math::float2 mouse() { return s_inputState.getMousePosition(); }
 
-    friend class InputSystem;
+	friend class InputSystem;
 };
 
 } // namespace spatial::input

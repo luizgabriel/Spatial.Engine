@@ -15,16 +15,16 @@ std::pair<int, int> imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-render::SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine *engine, size_t capacity);
+render::SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine* engine, size_t capacity);
 
-render::SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine *engine, size_t capacity);
+render::SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine* engine, size_t capacity);
 
-uint64_t imguiMakeScissorKey(int fbheight, const ImVec4 &clipRect);
+uint64_t imguiMakeScissorKey(int fbheight, const ImVec4& clipRect);
 
-render::Texture imguiCreateTextureAtlas(filament::Engine *engine, const std::filesystem::path& font);
+render::Texture imguiCreateTextureAtlas(filament::Engine* engine, const std::filesystem::path& font);
 
 template <typename FilamentType, typename ImGuiType>
-filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType> &imVector)
+filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)
 {
 	auto nVec = imVector.Size;
 	auto alloc = std::allocator<ImGuiType>();
@@ -32,14 +32,14 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 
 	std::copy(imVector.begin(), imVector.end(), data);
 
-	auto callback = [](void *buffer, size_t size, void *user) {
+	auto callback = [](void* buffer, size_t size, void* user) {
 		auto alloc = std::allocator<ImGuiType>();
 		auto nVec = size / sizeof(ImGuiType);
-		alloc.deallocate(reinterpret_cast<ImGuiType *>(buffer), nVec);
+		alloc.deallocate(reinterpret_cast<ImGuiType*>(buffer), nVec);
 	};
 
 	auto nVecBytes = nVec * sizeof(ImGuiType);
 	return {data, nVecBytes, callback, nullptr};
 }
 
-} // namespace spatial::render
+} // namespace spatial::ui

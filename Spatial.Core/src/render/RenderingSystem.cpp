@@ -8,12 +8,11 @@ namespace bk = filament::backend;
 namespace spatial::render
 {
 
-RenderingSystem::RenderingSystem(Window &&window)
-	: RenderingSystem(std::move(window), bk::Backend::OPENGL)
+RenderingSystem::RenderingSystem(Window&& window) : RenderingSystem(std::move(window), bk::Backend::OPENGL)
 {
 }
 
-RenderingSystem::RenderingSystem(Window &&window, bk::Backend backend)
+RenderingSystem::RenderingSystem(Window&& window, bk::Backend backend)
 	: m_window{std::move(window)},
 	  m_engine{backend},
 	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
@@ -27,12 +26,12 @@ RenderingSystem::RenderingSystem(Window &&window, bk::Backend backend)
 
 void RenderingSystem::attach(EventQueue& queue)
 {
-    queue.connect<desktop::WindowResizedEvent>(this);
+	queue.connect<desktop::WindowResizedEvent>(this);
 }
 
 void RenderingSystem::detach(EventQueue& queue)
 {
-    queue.disconnect<desktop::WindowResizedEvent>(this);
+	queue.disconnect<desktop::WindowResizedEvent>(this);
 }
 
 void RenderingSystem::onStart()
@@ -40,7 +39,7 @@ void RenderingSystem::onStart()
 	m_mainView->setClearTargets(true, true, true);
 	m_mainView->setClearColor({.0f, .0f, .0f, 1.0f});
 	m_mainView->setCamera(m_mainCamera.get());
-	//m_mainView->setVisibleLayers(0x04, 0x04);
+	// m_mainView->setVisibleLayers(0x04, 0x04);
 
 	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
 
@@ -58,7 +57,7 @@ void RenderingSystem::onEndFrame(float delta)
 	}
 }
 
-void RenderingSystem::onEvent(const WindowResizedEvent &event)
+void RenderingSystem::onEvent(const WindowResizedEvent& event)
 {
 	setupViewport();
 }
@@ -68,9 +67,7 @@ void RenderingSystem::setupViewport()
 	auto [dw, dh] = m_window.getFrameBufferSize();
 
 	m_mainView->setViewport({0, 0, dw, dh});
-	m_mainCamera->setProjection(
-		45.0, double(dw) / dh, 0.1, 1000000.0f,
-		fl::Camera::Fov::VERTICAL);
+	m_mainCamera->setProjection(45.0, double(dw) / dh, 0.1, 1000000.0f, fl::Camera::Fov::VERTICAL);
 }
 
 void RenderingSystem::pushFrontView(filament::View* view)
