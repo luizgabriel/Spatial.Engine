@@ -18,19 +18,19 @@ using namespace spatial::input;
 using namespace spatial::ui;
 using namespace spatial::sandbox;
 
-int main(int arc, char *argv[])
+int main(int arc, char* argv[])
 {
-    auto binaryPath = path{argv[0]}.parent_path();
-    Asset::init(binaryPath.parent_path() / "assets");
+	auto binaryPath = path{argv[0]}.parent_path();
+	Asset::init(binaryPath.parent_path() / "assets");
 
-    auto app = Application{};
-    auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
-    auto rendering = RenderingSystem{std::move(window)};
-    auto input = InputSystem{};
-    auto ui = UserInterfaceSystem{rendering, path{"fonts"} / "Roboto-Medium.ttf"};
-    auto sandbox = Sandbox{rendering};
+	auto app = Application{};
+	auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
+	auto rendering = RenderingSystem{std::move(window)};
+	auto input = InputSystem{};
+	auto ui = UserInterfaceSystem{rendering, path{"fonts"} / "Roboto-Medium.ttf"};
+	auto sandbox = Sandbox{rendering};
 
-    connect(app, &rendering, &input, &ui, &sandbox);
+	connect(app, &rendering, &input, &ui, &sandbox);
 
-    return app.run();
+	return app.run();
 }
