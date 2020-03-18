@@ -11,4 +11,5 @@ Spatial is a cross-platform c++ game engine created on top off google's [filamen
 - [Introduction](https://github.com/luizgabriel/Spatial.Engine/wiki)
 - [External Dependencies](https://github.com/luizgabriel/Spatial.Engine/wiki/External-Dependencies)
 - [Building on Windows](https://github.com/luizgabriel/Spatial.Engine/wiki/Building-on-Windows)
+- [Building on Linux](https://github.com/luizgabriel/Spatial.Engine/wiki/Building-on-Linux)
 - [Getting Started](https://github.com/luizgabriel/Spatial.Engine/wiki/Getting-Started)
