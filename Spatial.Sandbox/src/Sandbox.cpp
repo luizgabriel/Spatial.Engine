@@ -21,12 +21,12 @@ Sandbox::Sandbox(RenderingSystem& rendering)
 	  m_view{rendering.getMainView()},
 
 	  m_scene{createScene(m_engine)},
-	  m_material{createMaterial(m_engine, "materials/default.filamat")},
+	  m_material{createMaterial(m_engine, "materials/default")},
 	  m_instance{m_engine, m_material->createInstance()},
 	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
-	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube.filamesh")},
-	  m_ibl{createIBLFromKtx(m_engine, "textures/pillars_2k", "pillars_2k")}
+	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
+	  m_ibl{createIBLFromKtx(m_engine, "textures/pillars_2k")}
 {
 }
 

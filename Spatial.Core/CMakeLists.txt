@@ -54,9 +54,7 @@ target_link_libraries(
 		CONAN_PKG::imgui
 		CONAN_PKG::boost_tti
 		CONAN_PKG::stb
-
-		SDL2::SDL2
-		SDL2::SDL2main
+		CONAN_PKG::sdl2
 )
 
 find_package(OpenGL REQUIRED)

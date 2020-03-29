@@ -58,8 +58,11 @@ add_copy_resources(Sandbox.Assets.Textures
 add_skybox_resources(Sandbox.Assets.Skyboxes
     SOURCES
         assets/textures/pillars_2k.hdr
+        assets/textures/railway_bridge_2k.hdr
     FORMAT
         ktx
+    RESOLUTION
+        4K
     OUTPUT
         assets/textures
     DEPENDEES

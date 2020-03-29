@@ -26,9 +26,14 @@ namespace fm = filamesh;
 namespace spatial::render
 {
 
+fs::path appendExtension(const fs::path& path, const std::string& extension)
+{
+	return path.parent_path() / (path.filename().generic_string() + "." + extension);
+}
+
 Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 {
-	auto absolutePath = Asset::absolute(filePath);
+	auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
 	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
 
 	if (!stream)
@@ -44,7 +49,7 @@ Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 
 Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::path& filePath)
 {
-	auto absolute = Asset::absolute(filePath);
+	auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
 	if (!fs::exists(absolute))
 		throw std::runtime_error("could not open file.");
 
@@ -130,8 +135,10 @@ bands_t parseShFile(const fs::path& file)
 	return bands;
 }
 
-ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem::path& folder, const std::string& name)
+ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem::path& folder)
 {
+	auto name = folder.filename().generic_string();
+
 	auto iblPath = folder / (name + "_ibl.ktx");
 	auto texture = createKtxTexture(engine, iblPath);
 

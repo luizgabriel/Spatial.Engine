@@ -1,15 +1,14 @@
-if(CONAN_EXPORTED)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(TARGETS)
-else()
-    include(Conan)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+endif ()
 
-    conan_cmake_run(
-        CONANFILE conanfile.txt
-        PROFILE clang
-        BUILD missing
-        BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-    )    
-endif()
-
-find_package(SDL2 CONFIG REQUIRED)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.conan/bin)
+    file(GLOB_RECURSE PROGRAMS_TOOLS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/.conan/bin/*")
+    install(
+        PROGRAMS
+            ${PROGRAMS_TOOLS_FILES}
+        DESTINATION
+            bin
+    )
+endif ()

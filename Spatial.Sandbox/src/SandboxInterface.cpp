@@ -107,8 +107,8 @@ void SandboxInterface::render()
 		{
 			if (ImGui::Begin("Properties", &m_openedPropertiesWindow))
 			{
-				ImGui::Text("View Controls");
-				ImGui::ColorPicker4("Clear color", &viewData.clearColor[0]);
+				//ImGui::Text("View Controls");
+				//ImGui::ColorPicker4("Clear color", &viewData.clearColor[0]);
 
 				ImGui::Separator();
 				ImGui::Text("Camera Controls");

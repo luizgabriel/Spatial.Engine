@@ -34,8 +34,6 @@ if (SPATIAL_DEPENDENCY_GRAPH)
     endif()
 endif()
 
-install(DIRECTORY ${CMAKE_BINARY_DIR}/tools DESTINATION bin)
-
 install(
 	DIRECTORY
 		CMake/Modules/

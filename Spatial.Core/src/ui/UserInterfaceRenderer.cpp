@@ -25,7 +25,7 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	  m_view{createView(m_engine)},
 	  m_scene{createScene(m_engine)},
 	  m_camera{createCamera(m_engine)},
-	  m_material{createMaterial(m_engine, "materials/ui_blit.filamat")},
+	  m_material{createMaterial(m_engine, "materials/ui_blit")},
 	  m_entity{createEntity(m_engine)},
 	  m_texture{m_engine}
 {
