@@ -23,7 +23,7 @@ function(add_material_resources TARGET)
             COMMENT "Compiling material: ${SOURCE} => ${OUTPUT_FILE}"
         )
 
-        list(APPEND OUTPUT_FILES "${OUTPUT_FILE}" PARENT_SCOPE)
+        list(APPEND OUTPUT_FILES "${OUTPUT_FILE}")
     endforeach()
 
     add_custom_target(${TARGET}

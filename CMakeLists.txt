@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 project(SpatialEngine
     LANGUAGES CXX
     VERSION 1.0.0

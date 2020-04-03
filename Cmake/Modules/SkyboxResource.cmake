@@ -3,7 +3,7 @@ include(CMakeParseArguments)
 
 find_program(CMGEN_PROGRAM cmgen HINTS ${CMAKE_BINARY_DIR})
 
-function(add_skybox_resources TARGET_PREFIX)
+function(add_skybox_resources TARGET)
     set(oneValueArgs OUTPUT FORMAT)
     set(multiValueArgs SOURCES DEPENDEES)
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -23,14 +23,15 @@ function(add_skybox_resources TARGET_PREFIX)
             COMMENT "Compiling skybox: ${SOURCE} => [${ARG_FORMAT}] ${ARG_OUTPUT}/${FILE_NAME}"
         )
 
-        set(TARGET "${TARGET_PREFIX}_${FILE_NAME}")
-        add_custom_target(${TARGET}
-            DEPENDS
-                ${OUTPUT_FILE}
-        )
+        list(APPEND OUTPUT_FILES "${OUTPUT_FILE}")
+    endforeach()
 
-        foreach(DEPENDEE ${ARG_DEPENDEES})
-            add_dependencies(${DEPENDEE} ${TARGET})
-        endforeach()
+    add_custom_target(${TARGET}
+        DEPENDS
+            ${OUTPUT_FILES}
+    )
+
+    foreach(DEPENDEE ${ARG_DEPENDEES})
+        add_dependencies(${DEPENDEE} ${TARGET})
     endforeach()
 endfunction()

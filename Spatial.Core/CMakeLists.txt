@@ -24,7 +24,7 @@ add_library(Spatial.Core
 	src/ui/UserInterfaceRenderer.cpp
 	src/ui/UserInterfaceInput.cpp
 )
-set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
+set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 20)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
 
 cmake_policy(SET CMP0091 NEW)
