@@ -5,7 +5,7 @@ spdlog/1.4.2@bincrafters/stable
 stb/20190512@conan/stable
 boost_tti/1.67.0@bincrafters/stable
 sdl2/2.0.12@bincrafters/stable
-filament/1.4.5@google/stable
+filament/1.5.2@google/stable
 imgui/docking@ocornut/testing
 
 [options]

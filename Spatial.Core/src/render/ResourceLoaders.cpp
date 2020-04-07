@@ -33,23 +33,25 @@ fs::path appendExtension(const fs::path& path, const std::string& extension)
 
 Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 {
-	auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
+	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
+	
 	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
 
 	if (!stream)
 		throw std::runtime_error("could not open file.");
 
-	auto iterator = std::istreambuf_iterator<char>{stream};
+	const auto iterator = std::istreambuf_iterator<char>{stream};
 	auto data = std::vector<char>{iterator, {}};
 
-	auto material = fl::Material::Builder().package(&data[0], data.size()).build(*engine);
+	const auto material = fl::Material::Builder().package(&data[0], data.size()).build(*engine);
 
 	return {engine, material};
 }
 
 Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::path& filePath)
 {
-	auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
+	const auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
+	
 	if (!fs::exists(absolute))
 		throw std::runtime_error("could not open file.");
 
@@ -65,7 +67,7 @@ Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::pa
 
 Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 {
-	auto path = Asset::absolute(filePath);
+	const auto path = Asset::absolute(filePath);
 
 	if (!fs::exists(path))
 		throw std::runtime_error("could not open file:"s + path.generic_string());
@@ -73,17 +75,17 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 	int width, height, n;
 	unsigned char* data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
 
-	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(width * height * 4), fl::Texture::Format::RGBA,
+	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(height * width * 4), fl::Texture::Format::RGBA,
 													 fl::Texture::Type::UBYTE,
-													 (fl::Texture::PixelBufferDescriptor::Callback)&stbi_image_free};
+													 reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
-	auto texture = fl::Texture::Builder()
-					   .width(uint32_t(width))
-					   .height(uint32_t(height))
-					   .levels(1)
-					   .sampler(fl::Texture::Sampler::SAMPLER_2D)
-					   .format(fl::Texture::InternalFormat::RGBA8)
-					   .build(*engine);
+	const auto texture = fl::Texture::Builder()
+	                     .width(uint32_t(width))
+	                     .height(uint32_t(height))
+	                     .levels(1)
+	                     .sampler(fl::Texture::Sampler::SAMPLER_2D)
+	                     .format(fl::Texture::InternalFormat::RGBA8)
+	                     .build(*engine);
 
 	texture->setImage(*engine, 0, std::move(buffer));
 
@@ -94,7 +96,7 @@ Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
 {
 	using namespace std;
 
-	auto absolutePath = Asset::absolute(filePath);
+	const auto absolutePath = Asset::absolute(filePath);
 	auto stream = ifstream{absolutePath, std::ios_base::in | ios::binary};
 
 	if (!stream)
@@ -104,7 +106,7 @@ Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
 
 	// we are using "new" here because of this legacy api
 	// but this pointer is released with the texture holding it
-	auto ktxBundle = new image::KtxBundle(contents.data(), contents.size());
+	const auto ktxBundle = new image::KtxBundle(contents.data(), contents.size());
 	return {engine, image::ktx::createTexture(engine, ktxBundle, false)};
 }
 
@@ -112,7 +114,7 @@ using bands_t = std::array<float3, 9>;
 bands_t parseShFile(const fs::path& file)
 {
 	auto bands = bands_t{};
-	auto absolutePath = Asset::absolute(file);
+	const auto absolutePath = Asset::absolute(file);
 	auto stream = std::ifstream{absolutePath, std::ios_base::in};
 
 	if (!stream)
@@ -137,15 +139,15 @@ bands_t parseShFile(const fs::path& file)
 
 ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem::path& folder)
 {
-	auto name = folder.filename().generic_string();
+	const auto name = folder.filename().generic_string();
 
-	auto iblPath = folder / (name + "_ibl.ktx");
+	const auto iblPath = folder / (name + "_ibl.ktx");
 	auto texture = createKtxTexture(engine, iblPath);
 
-	auto skyPath = folder / (name + "_skybox.ktx");
+	const auto skyPath = folder / (name + "_skybox.ktx");
 	auto skyboxTexture = createKtxTexture(engine, skyPath);
 
-	auto shPath = folder / "sh.txt";
+	const auto shPath = folder / "sh.txt";
 	auto bands = parseShFile(shPath);
 
 	auto light = IndirectLight{

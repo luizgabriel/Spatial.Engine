@@ -1,6 +1,5 @@
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
     include(${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
-    set(CONAN_DISABLE_CHECK_COMPILER ON)
     conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 endif ()
 

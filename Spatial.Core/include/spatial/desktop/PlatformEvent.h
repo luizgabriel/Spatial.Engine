@@ -13,7 +13,7 @@ struct WindowResizedEvent
 
 	WindowResizedEvent(std::uint32_t width, std::uint32_t height) : width{width}, height{height} {}
 
-	float getRatio() const { return float(width) / height; }
+	[[nodiscard]] float getRatio() const { return float(width) / height; }
 };
 
 struct WindowClosedEvent
@@ -26,7 +26,7 @@ struct KeyEvent
 	common::KeyAction action;
 	int repeat;
 
-	explicit KeyEvent(common::Key key, common::KeyAction action = common::KeyAction::None, int repeat = 0)
+	explicit KeyEvent(const common::Key key, const common::KeyAction action = common::KeyAction::None, int repeat = 0)
 		: key{key},
 		  action{action},
 		  repeat{repeat}

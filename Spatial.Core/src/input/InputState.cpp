@@ -10,7 +10,7 @@ InputState::InputState() : m_mousePosition{.0f, .0f}, m_keyPressed{}, m_keyRelea
 {
 }
 
-void InputState::set(Key key, KeyAction action)
+void InputState::set(const Key key, const KeyAction action)
 {
 	switch (action)
 	{
@@ -24,14 +24,14 @@ void InputState::set(Key key, KeyAction action)
 
 void InputState::setPressed(Key key)
 {
-	auto flag = static_cast<size_t>(key);
+	const auto flag = static_cast<size_t>(key);
 	m_keyPressed.set(flag);
 	m_keyReleased.reset(flag);
 }
 
 void InputState::setReleased(Key key)
 {
-	auto flag = static_cast<size_t>(key);
+	const auto flag = static_cast<size_t>(key);
 	m_keyPressed.reset(flag);
 	m_keyReleased.set(flag);
 }

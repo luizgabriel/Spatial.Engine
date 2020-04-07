@@ -12,6 +12,6 @@ enum class KeyAction
 	Released,
 };
 
-std::string nameOf(KeyAction action);
+std::string nameOf(const KeyAction action);
 
 } // namespace spatial::common

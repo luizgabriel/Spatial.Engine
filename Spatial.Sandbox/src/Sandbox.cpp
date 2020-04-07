@@ -14,9 +14,7 @@ namespace spatial::sandbox
 {
 
 Sandbox::Sandbox(RenderingSystem& rendering)
-	: m_interface{},
-
-	  m_engine{rendering.getEngine()},
+	: m_engine{rendering.getEngine()},
 	  m_camera{rendering.getMainCamera()},
 	  m_view{rendering.getMainView()},
 
@@ -34,7 +32,7 @@ void Sandbox::onStart()
 {
 	m_view->setScene(m_scene.get());
 
-	auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
+	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
 	m_instance->setParameter("albedo", m_texture.get(), sampler);
 	// m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
 
@@ -44,7 +42,7 @@ void Sandbox::onStart()
 	m_scene->addEntity(m_sphereMesh.get());
 
 	auto& rcm = m_engine->getRenderableManager();
-	auto ri = rcm.getInstance(m_sphereMesh.get());
+	const auto ri = rcm.getInstance(m_sphereMesh.get());
 	rcm.setCastShadows(ri, false);
 }
 

@@ -81,16 +81,7 @@ namespace spatial::sandbox
 
 SandboxInterface::SandboxInterface()
 	: m_showEngineGui{true},
-	  m_openedPropertiesWindow{true},
-
-	  cameraData{.eye = {436.0f, 158.0f, -436.0f}, .center = {-500.0f, 50.0f, 100.0f}},
-	  viewData{},
-	  materialData{
-		  .metallic = 0.5f,
-		  .roughness = 0.4f,
-		  .clearCoat = 0.7f,
-		  .clearCoatRoughness = 0.0f,
-	  }
+	  m_openedPropertiesWindow{true}
 {
 }
 

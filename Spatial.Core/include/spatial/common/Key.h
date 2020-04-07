@@ -120,6 +120,6 @@ enum class Key
 	Count ///< Keep last -- the total number of keyboard keys
 };
 
-std::string nameOf(Key key);
+std::string nameOf(const Key key);
 
 } // namespace spatial::common

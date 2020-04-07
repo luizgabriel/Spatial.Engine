@@ -9,7 +9,7 @@
 namespace spatial::desktop
 {
 
-common::Key mapKeyFromScancode(SDL_Scancode scanCode) noexcept;
+common::Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept;
 
 common::Key mapKeyFromMouseButton(int mouseButton) noexcept;
 
@@ -27,8 +27,7 @@ private:
 public:
 	~Window();
 
-	void* getNativeHandle();
-
+	void* getNativeHandle() const;
 	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;
 	bool hasFocus() const;
@@ -48,7 +47,7 @@ public:
 
 	void pollEvents(common::EventQueue& queue);
 
-	Window createWindow(int width, int height, std::string_view title) const noexcept;
+	[[nodiscard]] Window createWindow(int width, int height, std::string_view title) const noexcept;
 
 	WindowContext(const WindowContext& c) = delete;
 	WindowContext(const WindowContext&& c) = delete;

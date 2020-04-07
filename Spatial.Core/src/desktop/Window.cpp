@@ -17,7 +17,7 @@ namespace spatial::desktop
 
 Window::Window(int width, int height, std::string_view title)
 	: m_windowHandle{SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-									  SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
+									  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
 	assert(m_windowHandle != nullptr);
 	SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
@@ -70,11 +70,12 @@ bool Window::hasFocus() const
 	return (SDL_GetWindowFlags(m_windowHandle) & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
-void* Window::getNativeHandle()
+void* Window::getNativeHandle() const
 {
 	assert(m_windowHandle != nullptr);
 
 	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
 	return wmInfo.info.win.window;
 }

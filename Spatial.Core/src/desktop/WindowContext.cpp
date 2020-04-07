@@ -1,3 +1,4 @@
+// ReSharper disable CppMemberFunctionMayBeStatic
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/Key.h>
@@ -9,7 +10,7 @@ namespace spatial::desktop
 
 WindowContext::WindowContext()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		throw std::runtime_error("Could not initialize SDL");
 }
 
@@ -82,7 +83,7 @@ Window WindowContext::createWindow(int width, int height, std::string_view title
 	return Window{width, height, title};
 }
 
-Key mapKeyFromScancode(SDL_Scancode scanCode) noexcept
+Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept
 {
 	switch (scanCode)
 	{

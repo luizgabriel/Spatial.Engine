@@ -16,7 +16,7 @@ namespace spatial::sandbox
 class Sandbox
 {
 private:
-	SandboxInterface m_interface;
+	SandboxInterface m_interface{};
 
 	fl::Engine* m_engine;
 	fl::Camera* m_camera;

@@ -7,7 +7,7 @@ from platform import system
 
 CONAN_DIR = ".conan"
 TMP_DIR = "%s/tmp" % CONAN_DIR
-DEFAULT_PROFILE = "clang"
+DEFAULT_PROFILE = "default"
 
 
 def run(command):

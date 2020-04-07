@@ -42,9 +42,25 @@ private:
 	bool m_openedPropertiesWindow;
 
 public:
-	CameraData cameraData;
-	ViewData viewData;
-	MaterialData materialData;
+	CameraData cameraData{
+		{
+			436.0f,
+			158.0f,
+			-436.0f
+		},
+		{
+			-500.0f,
+			50.0f,
+			100.0f
+		}
+	};
+	ViewData viewData{};
+	MaterialData materialData{
+		0.5f,
+		0.4f,
+		0.7f,
+		0.0f,
+	};
 
 	SandboxInterface();
 

@@ -3,7 +3,7 @@
 namespace spatial::common
 {
 
-std::string nameOf(Key key)
+std::string nameOf(const Key key)
 {
 	switch (key)
 	{

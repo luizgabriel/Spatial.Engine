@@ -4,13 +4,14 @@
 namespace spatial::common
 {
 
-std::string nameOf(KeyAction action)
+std::string nameOf(const KeyAction action)
 {
 	switch (action)
 	{
-	case KeyAction::None: return "TYPED";
-	case KeyAction::Pressed: return "PRESSED"; break;
-	case KeyAction::Released: return "RELEASED";
+		default:
+		case KeyAction::None: return "TYPED";
+		case KeyAction::Pressed: return "PRESSED";
+		case KeyAction::Released: return "RELEASED";
 	}
 }
 
