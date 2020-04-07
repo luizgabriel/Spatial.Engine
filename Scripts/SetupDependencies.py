@@ -24,6 +24,11 @@ def conan_install():
 
 
 if __name__ == "__main__":
+    try:
+        os.makedirs(CONAN_DIR)
+    except:
+        pass
+
     conan_repo("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
     conan_repo("luizgabriel", "https://api.bintray.com/conan/luizgabriel/conan-repo")
 
