@@ -13,7 +13,7 @@ void BeginSpatialEngine(bool* openedPropertiesPtr);
 
 } // namespace ImGui
 
-namespace spatial::sandbox
+namespace spatial
 {
 
 class SandboxInterface

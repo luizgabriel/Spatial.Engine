@@ -1,20 +1,17 @@
-#include <iostream>
 #include <spatial/core/Application.h>
 #include <spatial/desktop/PlatformEvent.h>
 
 #include <chrono>
 #include <thread>
 
-using namespace spatial::common;
-using namespace spatial::desktop;
 using namespace std::chrono_literals;
 
 namespace chr = std::chrono;
 
-namespace spatial::core
+namespace spatial
 {
 
-Application::Application() : m_running{false}, m_desiredDelta{1.0f / 60.0f}, m_ebus{}, m_clock{}, m_windowContext{}
+Application::Application()
 {
 	m_ebus.connect<WindowClosedEvent>(this);
 }
@@ -42,7 +39,7 @@ int Application::run()
 
 	while (m_running)
 	{
-		auto delta = m_clock.getDeltaTime().count();
+		const auto delta = m_clock.getDeltaTime().count();
 
 		m_windowContext.pollEvents(m_ebus);
 
@@ -69,7 +66,7 @@ int Application::run()
 	return 0;
 }
 
-void Application::setMaxFPS(std::uint16_t fps)
+void Application::setMaxFps(float fps)
 {
 	m_desiredDelta = chr::duration<float>{1.0f / fps};
 }

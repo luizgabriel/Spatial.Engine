@@ -1,6 +1,6 @@
 #include <spatial/input/Input.h>
 
-namespace spatial::input
+namespace spatial
 {
 
 InputState Input::s_inputState{};

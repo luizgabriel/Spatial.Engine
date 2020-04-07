@@ -1,17 +1,12 @@
 #include <spatial/ui/UserInterfaceSystem.h>
 
-using namespace spatial::common;
-using namespace spatial::desktop;
-using namespace spatial::render;
-namespace fl = filament;
 namespace fs = std::filesystem;
 
-namespace spatial::ui
+namespace spatial
 {
 
 UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const fs::path& fontPath)
 	: m_renderer{rendering.getEngine()},
-	  m_input{},
 	  m_window{&rendering.getWindow()},
 	  m_fontPath{fontPath}
 {
@@ -66,8 +61,8 @@ void UserInterfaceSystem::setupViewport()
 {
 	auto [w, h] = m_window->getWindowSize();
 	auto [fw, fh] = m_window->getFrameBufferSize();
-	auto dpiX = w / fw;
-	auto dpiY = h / fh;
+	const auto dpiX = w / fw;
+	const auto dpiY = h / fh;
 
 	m_renderer.setViewport(w, h, dpiX, dpiY);
 }

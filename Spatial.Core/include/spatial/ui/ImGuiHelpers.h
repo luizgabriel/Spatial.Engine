@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <imgui.h>
 
-namespace spatial::ui
+namespace spatial
 {
 
 void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scaleX, float scaleY);
@@ -15,13 +15,13 @@ std::pair<int, int> imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-render::SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine* engine, size_t capacity);
+SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine* engine, size_t capacity);
 
-render::SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine* engine, size_t capacity);
+SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine* engine, size_t capacity);
 
 uint64_t imguiMakeScissorKey(int fbheight, const ImVec4& clipRect);
 
-render::Texture imguiCreateTextureAtlas(filament::Engine* engine, const std::filesystem::path& font);
+Texture imguiCreateTextureAtlas(filament::Engine* engine, const std::filesystem::path& font);
 
 template <typename FilamentType, typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)
@@ -42,4 +42,4 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 	return {data, nVecBytes, callback, nullptr};
 }
 
-} // namespace spatial::ui
+} // namespace spatial

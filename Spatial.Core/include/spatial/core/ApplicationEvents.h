@@ -4,7 +4,7 @@
 #include <spatial/common/EventQueue.h>
 #include <boost/tti/has_member_function.hpp>
 
-namespace spatial::core
+namespace spatial
 {
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(attach);
@@ -17,10 +17,10 @@ BOOST_TTI_HAS_MEMBER_FUNCTION(onEndFrame);
 BOOST_TTI_HAS_MEMBER_FUNCTION(onFinish);
 
 template <typename T>
-constexpr bool has_attach_v = has_member_function_attach<T, void, boost::mpl::vector<common::EventQueue&>>::value;
+constexpr bool has_attach_v = has_member_function_attach<T, void, boost::mpl::vector<EventQueue&>>::value;
 
 template <typename T>
-constexpr bool has_detach_v = has_member_function_detach<T, void, boost::mpl::vector<common::EventQueue&>>::value;
+constexpr bool has_detach_v = has_member_function_detach<T, void, boost::mpl::vector<EventQueue&>>::value;
 
 template <typename T>
 constexpr bool has_on_start_v = has_member_function_onStart<T, void>::value;

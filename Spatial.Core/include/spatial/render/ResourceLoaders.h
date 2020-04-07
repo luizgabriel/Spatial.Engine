@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-namespace spatial::render
+namespace spatial
 {
 
 Material createMaterial(filament::Engine* engine, const std::filesystem::path& filePath);
@@ -17,6 +17,6 @@ Texture createTexture(filament::Engine* engine, const std::filesystem::path& fil
 
 Texture createKtxTexture(filament::Engine* engine, const std::filesystem::path& filePath);
 
-ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem::path& folder);
+ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem::path& folder);
 
 } // namespace spatial::render

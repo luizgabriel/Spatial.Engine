@@ -1,10 +1,9 @@
 #pragma once
 
 #include <spatial/common/Key.h>
-#include <spatial/common/KeyAction.h>
 #include <math/vec2.h>
 
-namespace spatial::desktop
+namespace spatial
 {
 
 struct WindowResizedEvent
@@ -22,11 +21,11 @@ struct WindowClosedEvent
 
 struct KeyEvent
 {
-	common::Key key;
-	common::KeyAction action;
+	Key key;
+	KeyAction action;
 	int repeat;
 
-	explicit KeyEvent(const common::Key key, const common::KeyAction action = common::KeyAction::None, int repeat = 0)
+	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::None, int repeat = 0)
 		: key{key},
 		  action{action},
 		  repeat{repeat}

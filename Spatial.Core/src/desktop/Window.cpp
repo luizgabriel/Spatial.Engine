@@ -10,9 +10,8 @@
 #include <utils/unwindows.h>
 #endif
 
-using namespace spatial::common;
 
-namespace spatial::desktop
+namespace spatial
 {
 
 Window::Window(int width, int height, std::string_view title)
@@ -80,4 +79,4 @@ void* Window::getNativeHandle() const
 	return wmInfo.info.win.window;
 }
 
-} // namespace spatial::desktop
+} // namespace spatial

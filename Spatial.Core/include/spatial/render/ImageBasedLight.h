@@ -3,9 +3,8 @@
 #include <spatial/render/CommonResources.h>
 
 #include <filament/Texture.h>
-#include <math/vec3.h>
 
-namespace spatial::render
+namespace spatial
 {
 
 class ImageBasedLight
@@ -35,9 +34,9 @@ public:
 	{
 	}
 
-	const auto getSkybox() const { return m_skybox.get(); }
+	auto getSkybox() const { return m_skybox.get(); }
 
-	const auto getLight() const { return m_light.get(); }
+	auto getLight() const { return m_light.get(); }
 };
 
 } // namespace spatial::render

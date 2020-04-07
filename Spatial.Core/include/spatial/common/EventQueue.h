@@ -2,7 +2,7 @@
 
 #include <entt/signal/dispatcher.hpp>
 
-namespace spatial::common
+namespace spatial
 {
 
 class EventQueue
@@ -14,10 +14,10 @@ public:
 	template <typename Event>
 	void update()
 	{
-		m_dispatcher.template update<Event>();
+		m_dispatcher.update<Event>();
 	}
 
-	void update() { m_dispatcher.update(); }
+	void update() const { m_dispatcher.update(); }
 
 	template <typename Event, auto Function>
 	void connect()
@@ -64,14 +64,14 @@ public:
 	template <typename Event, typename... Args>
 	void enqueue(Args&&... args)
 	{
-		m_dispatcher.template enqueue<Event, Args...>(std::template forward<Args>(args)...);
+		m_dispatcher.enqueue<Event, Args...>(std::forward<Args>(args)...);
 	}
 
 	template <typename Event>
 	void enqueue(Event&& event)
 	{
-		m_dispatcher.template enqueue<Event>(std::template forward<Event>(event));
+		m_dispatcher.enqueue<Event>(std::forward<Event>(event));
 	}
 };
 
-} // namespace spatial::common
+} // namespace spatial

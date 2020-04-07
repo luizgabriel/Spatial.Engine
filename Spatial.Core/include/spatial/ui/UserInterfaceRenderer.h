@@ -1,14 +1,12 @@
 #pragma once
 
 #include <spatial/render/CommonResources.h>
-#include <spatial/desktop/Window.h>
 #include <vector>
 #include <imgui.h>
-#include <imgui_internal.h>
 
 #include <filesystem>
 
-namespace spatial::ui
+namespace spatial
 {
 
 class UserInterfaceRenderer
@@ -16,16 +14,16 @@ class UserInterfaceRenderer
 private:
 	filament::Engine* m_engine;
 
-	render::View m_view;
-	render::Scene m_scene;
-	render::Camera m_camera;
-	render::Material m_material;
-	render::Entity m_entity;
-	render::Texture m_texture;
+	View m_view;
+	Scene m_scene;
+	Camera m_camera;
+	Material m_material;
+	Entity m_entity;
+	Texture m_texture;
 
-	std::vector<render::SharedVertexBuffer> m_vertexBuffers;
-	std::vector<render::SharedIndexBuffer> m_indexBuffers;
-	std::vector<render::SharedMaterialInstance> m_materialInstances;
+	std::vector<SharedVertexBuffer> m_vertexBuffers;
+	std::vector<SharedIndexBuffer> m_indexBuffers;
+	std::vector<SharedMaterialInstance> m_materialInstances;
 
 	void renderDrawData();
 	void createBuffers(size_t numRequiredBuffers);
@@ -33,7 +31,7 @@ private:
 	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
 
 public:
-	UserInterfaceRenderer(filament::Engine* engine);
+	explicit UserInterfaceRenderer(filament::Engine* engine);
 	~UserInterfaceRenderer();
 
 	void setViewport(int width, int height, float dpiX, float dpiY);
@@ -55,7 +53,7 @@ public:
 	void dispatchCommands();
 
 	// region Getters
-	const auto getView() { return m_view.get(); }
+	auto getView() { return m_view.get(); }
 	// endregion
 };
 

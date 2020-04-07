@@ -1,9 +1,8 @@
 #pragma once
 
 #include <filesystem>
-#include <vector>
 
-namespace spatial::core
+namespace spatial
 {
 
 class Asset

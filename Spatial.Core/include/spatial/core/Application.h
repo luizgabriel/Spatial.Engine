@@ -7,28 +7,28 @@
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
 
-namespace spatial::core
+namespace spatial
 {
 
 class Application final
 {
 private:
-	bool m_running;
+	bool m_running = false;
 
-	std::chrono::duration<float> m_desiredDelta;
+	std::chrono::duration<float> m_desiredDelta{1.0f / 60.0f};
 
-	common::EventQueue m_ebus;
-	Clock m_clock;
+	EventQueue m_ebus{};
+	Clock m_clock{};
 
-	desktop::WindowContext m_windowContext;
+	WindowContext m_windowContext{};
 
 	// region Signals
-	common::Signal<> m_startSignal;
-	common::Signal<float> m_frameStartSignal;
-	common::Signal<float> m_updateSignal;
-	common::Signal<float> m_updateGuiSignal;
-	common::Signal<float> m_frameEndSignal;
-	common::Signal<> m_finishSignal;
+	Signal<> m_startSignal;
+	Signal<float> m_frameStartSignal;
+	Signal<float> m_updateSignal;
+	Signal<float> m_updateGuiSignal;
+	Signal<float> m_frameEndSignal;
+	Signal<> m_finishSignal;
 	// endregion
 
 public:
@@ -44,9 +44,9 @@ public:
 
 	bool isRunning() const { return m_running; }
 
-	void onEvent(const desktop::WindowClosedEvent& event);
+	void onEvent(const WindowClosedEvent& event);
 
-	void setMaxFPS(std::uint16_t fps);
+	void setMaxFps(float fps);
 
 	// region Getters
 	/**
@@ -82,14 +82,14 @@ public:
 	/**
 	 * \brief Gets the main application event bus channel
 	 */
-	auto& getEBus() { return m_ebus; }
+	auto& getEBus()  { return m_ebus; }
 
 	/**
 	 * \brief Gets the window context
 	 * The window context is responsible for creating windows.
 	 * Its lifetime should last longer than all windows
 	 */
-	const auto& getWindowContext() { return m_windowContext; }
+	const auto& getWindowContext() const { return m_windowContext; }
 	// endregion Getters
 };
 

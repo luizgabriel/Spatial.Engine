@@ -2,7 +2,7 @@
 
 #include <entt/signal/sigh.hpp>
 
-namespace spatial::common
+namespace spatial
 {
 
 template <typename... Args>
@@ -46,4 +46,4 @@ public:
 	}
 };
 
-} // namespace spatial::common
+} // namespace spatial

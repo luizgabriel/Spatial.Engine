@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filament/Engine.h>
+#include <filament/Renderer.h>
 #include <filament/Material.h>
 #include <filament/Scene.h>
 #include <filament/View.h>
@@ -12,7 +13,7 @@
 
 #include <memory>
 
-namespace spatial::render
+namespace spatial
 {
 
 // Scoped Pointers

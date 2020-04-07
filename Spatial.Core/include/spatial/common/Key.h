@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace spatial::common
+namespace spatial
 {
 
 enum class Key
@@ -122,4 +122,13 @@ enum class Key
 
 std::string nameOf(const Key key);
 
-} // namespace spatial::common
+enum class KeyAction
+{
+	None,
+	Pressed,
+	Released,
+};
+
+std::string nameOf(const KeyAction action);
+
+} // namespace spatial

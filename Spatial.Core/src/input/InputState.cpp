@@ -1,9 +1,8 @@
 #include <spatial/input/Input.h>
 
-namespace spatial::input
+namespace spatial
 {
 
-using namespace common;
 using namespace filament::math;
 
 InputState::InputState() : m_mousePosition{.0f, .0f}, m_keyPressed{}, m_keyReleased{}
@@ -51,4 +50,4 @@ void InputState::setMousePosition(float2 position)
 	m_mousePosition = position;
 }
 
-} // namespace spatial::input
+} // namespace spatial

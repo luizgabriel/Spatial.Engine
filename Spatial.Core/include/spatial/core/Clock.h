@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace spatial::core
+namespace spatial
 {
 
 using delta_t = std::chrono::duration<float>;
@@ -15,7 +15,7 @@ public:
 	void tick();
 	delta_t getDeltaTime() const;
 
-	std::chrono::steady_clock::time_point getLastTime() const { return m_LastTime; }
+	auto getLastTime() const { return m_LastTime; }
 
 private:
 	std::chrono::steady_clock::duration m_TimeStep;

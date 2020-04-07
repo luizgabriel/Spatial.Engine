@@ -3,31 +3,30 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/Key.h>
 
-using namespace spatial::common;
 
-namespace spatial::desktop
+namespace spatial
 {
-
 WindowContext::WindowContext()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-		throw std::runtime_error("Could not initialize SDL");
+		m_valid = false;
 }
 
 WindowContext::~WindowContext()
 {
-	SDL_Quit();
+	if (m_valid)
+		SDL_Quit();
 }
 
-void WindowContext::pollEvents(common::EventQueue& queue)
+void WindowContext::pollEvents(EventQueue& queue)
 {
 	SDL_Event e;
 	while (SDL_PollEvent(&e) != 0)
 	{
 		switch (e.type)
 		{
-
-		case SDL_QUIT: queue.enqueue<WindowClosedEvent>(); break;
+		case SDL_QUIT: queue.enqueue<WindowClosedEvent>();
+			break;
 
 		case SDL_TEXTINPUT: queue.enqueue<TextEvent>(std::string{e.text.text});
 
@@ -50,30 +49,35 @@ void WindowContext::pollEvents(common::EventQueue& queue)
 			break;
 		}
 
-		case SDL_MOUSEWHEEL: queue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y); break;
-
-		case SDL_MOUSEBUTTONDOWN:
-			queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
+		case SDL_MOUSEWHEEL: queue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
 			break;
 
-		case SDL_MOUSEBUTTONUP:
-			queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
+		case SDL_MOUSEBUTTONDOWN: queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed,
+		                                                  e.button.clicks);
 			break;
 
-		case SDL_MOUSEMOTION: queue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y); break;
+		case SDL_MOUSEBUTTONUP: queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released,
+		                                                e.button.clicks);
+			break;
 
-		case SDL_DROPFILE: SDL_free(e.drop.file); break;
+		case SDL_MOUSEMOTION: queue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
+			break;
+
+		case SDL_DROPFILE: SDL_free(e.drop.file);
+			break;
 
 		case SDL_WINDOWEVENT:
 		{
 			switch (e.window.event)
 			{
-			case SDL_WINDOWEVENT_RESIZED: queue.enqueue<WindowResizedEvent>(e.window.data1, e.window.data2); break;
+			case SDL_WINDOWEVENT_RESIZED: queue.enqueue<WindowResizedEvent>(e.window.data1, e.window.data2);
+				break;
 			default: break;
 			}
 
 			break;
 		}
+		default: ;
 		}
 	}
 }
@@ -81,6 +85,19 @@ void WindowContext::pollEvents(common::EventQueue& queue)
 Window WindowContext::createWindow(int width, int height, std::string_view title) const noexcept
 {
 	return Window{width, height, title};
+}
+
+WindowContext::WindowContext(WindowContext&& c) noexcept
+{
+	if (c.m_valid)
+	{
+		c.m_valid = false;
+	}
+	else
+	{
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+			m_valid = false;
+	}
 }
 
 Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept
@@ -201,5 +218,4 @@ Key mapKeyFromMouseButton(int mouseButton) noexcept
 	default: return Key::UnknownKey;
 	}
 }
-
-} // namespace spatial::desktop
+} // namespace spatial

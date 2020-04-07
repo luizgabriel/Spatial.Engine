@@ -1,6 +1,6 @@
 #include <spatial/core/Clock.h>
 
-namespace spatial::core
+namespace spatial
 {
 
 using namespace std::chrono;
@@ -20,4 +20,4 @@ delta_t Clock::getDeltaTime() const
 	return duration_cast<duration<float>>(m_TimeStep);
 }
 
-} // namespace spatial::core
+} // namespace spatial

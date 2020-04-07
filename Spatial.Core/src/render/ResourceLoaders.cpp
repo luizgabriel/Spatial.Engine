@@ -16,14 +16,13 @@
 #include <array>
 #include <string>
 
-using namespace spatial::core;
 using namespace filament::math;
 using namespace std::string_literals;
 namespace fs = std::filesystem;
 namespace fl = filament;
 namespace fm = filamesh;
 
-namespace spatial::render
+namespace spatial
 {
 
 fs::path appendExtension(const fs::path& path, const std::string& extension)
@@ -55,12 +54,11 @@ Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::pa
 	if (!fs::exists(absolute))
 		throw std::runtime_error("could not open file.");
 
-	auto registry = filamesh::MeshReader::MaterialRegistry{};
+	auto registry = fm::MeshReader::MaterialRegistry{};
 	registry.registerMaterialInstance(utils::CString("DefaultMaterial"), material);
 
-	auto reader = fm::MeshReader{};
-	auto path = utils::Path{absolute.generic_string()};
-	auto mesh = reader.loadMeshFromFile(engine, path, registry);
+	const auto path = utils::Path{absolute.generic_string()};
+	const auto mesh = fm::MeshReader::loadMeshFromFile(engine, path, registry);
 
 	return {engine, mesh};
 }
@@ -73,9 +71,9 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 		throw std::runtime_error("could not open file:"s + path.generic_string());
 
 	int width, height, n;
-	unsigned char* data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
+	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
 
-	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(height * width * 4), fl::Texture::Format::RGBA,
+	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(width) * height * 4, fl::Texture::Format::RGBA,
 													 fl::Texture::Type::UBYTE,
 													 reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
@@ -123,7 +121,7 @@ bands_t parseShFile(const fs::path& file)
 	stream >> std::skipws;
 
 	char c;
-	for (float3& band : bands)
+	for (auto& band : bands)
 	{
 		while (stream >> c && c != '(')
 			;
@@ -137,7 +135,7 @@ bands_t parseShFile(const fs::path& file)
 	return bands;
 }
 
-ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem::path& folder)
+ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem::path& folder)
 {
 	const auto name = folder.filename().generic_string();
 
@@ -159,4 +157,4 @@ ImageBasedLight createIBLFromKtx(filament::Engine* engine, const std::filesystem
 	return {std::move(light), std::move(texture), std::move(skybox), std::move(skyboxTexture)};
 }
 
-} // namespace spatial::render
+} // namespace spatial

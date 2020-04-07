@@ -1,6 +1,5 @@
 add_library(Spatial.Core
 	src/common/Key.cpp
-	src/common/KeyAction.cpp
 
 	src/core/Application.cpp
 	src/core/Asset.cpp

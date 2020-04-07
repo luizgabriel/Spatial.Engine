@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace spatial::core
+namespace spatial
 {
 
 Logger createDefaultLogger(const std::string& output)
@@ -22,4 +22,4 @@ Logger createDefaultLogger(const std::string& output)
 	return logger;
 }
 
-} // namespace spatial::core
+} // namespace spatial

@@ -1,10 +1,8 @@
 #include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
 
-using namespace spatial::desktop;
-using namespace spatial::common;
 
-namespace spatial::input
+namespace spatial
 {
 
 InputSystem::InputSystem()
@@ -45,4 +43,4 @@ void InputSystem::onEvent(const TextEvent& event)
 {
 }
 
-} // namespace spatial::input
+} // namespace spatial

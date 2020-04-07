@@ -11,13 +11,10 @@
 
 #include <filesystem>
 
-using namespace spatial::common;
-using namespace spatial::desktop;
-using namespace spatial::render;
 namespace fs = std::filesystem;
 namespace fl = filament;
 
-namespace spatial::ui
+namespace spatial
 {
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)

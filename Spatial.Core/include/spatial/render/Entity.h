@@ -3,7 +3,7 @@
 #include <filament/Engine.h>
 #include <utils/EntityManager.h>
 
-namespace spatial::render
+namespace spatial
 {
 
 class Entity

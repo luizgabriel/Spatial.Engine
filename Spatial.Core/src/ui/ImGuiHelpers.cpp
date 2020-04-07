@@ -7,10 +7,8 @@
 namespace fs = std::filesystem;
 namespace fl = filament;
 
-using namespace spatial::core;
-using namespace spatial::render;
 
-namespace spatial::ui
+namespace spatial
 {
 
 void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scaleX, float scaleY)
@@ -67,18 +65,21 @@ SharedIndexBuffer imguiCreateIndexBuffer(fl::Engine* engine, size_t capacity)
 
 uint64_t imguiMakeScissorKey(int fbheight, const ImVec4& clipRect)
 {
-	uint16_t left = (uint16_t)clipRect.x;
-	uint16_t bottom = (uint16_t)(fbheight - clipRect.w);
-	uint16_t width = (uint16_t)(clipRect.z - clipRect.x);
-	uint16_t height = (uint16_t)(clipRect.w - clipRect.y);
-	return ((uint64_t)left << 0ull) | ((uint64_t)bottom << 16ull) | ((uint64_t)width << 32ull) | ((uint64_t)height << 48ull);
+	auto left = (uint16_t)clipRect.x;
+	auto bottom = (uint16_t)(fbheight - clipRect.w);
+	auto width = (uint16_t)(clipRect.z - clipRect.x);
+	auto height = (uint16_t)(clipRect.w - clipRect.y);
+	return (static_cast<uint64_t>(left) << 0ull)
+		 | (static_cast<uint64_t>(bottom) << 16ull)
+		 | (static_cast<uint64_t>(width) << 32ull)
+		 | (static_cast<uint64_t>(height) << 48ull);
 }
 
 Texture imguiCreateTextureAtlas(fl::Engine* engine, const fs::path& font)
 {
 	auto& io = ImGui::GetIO();
 
-	auto fontPath = Asset::absolute(font);
+	const auto fontPath = Asset::absolute(font);
 	if (fs::exists(fontPath))
 	{
 		const auto& filePath = fontPath.generic_string();
@@ -90,15 +91,15 @@ Texture imguiCreateTextureAtlas(fl::Engine* engine, const fs::path& font)
 
 	io.Fonts->GetTexDataAsAlpha8(&data, &width, &height, &bpp);
 
-	auto size = size_t(width * height * bpp);
+	const auto size = size_t(height * width * bpp);
 	auto pb = fl::Texture::PixelBufferDescriptor{data, size, fl::Texture::Format::R, fl::Texture::Type::UBYTE};
-	auto texture = fl::Texture::Builder()
-					   .width((uint32_t)width)
-					   .height((uint32_t)height)
-					   .levels((uint8_t)1)
-					   .format(fl::Texture::InternalFormat::R8)
-					   .sampler(fl::Texture::Sampler::SAMPLER_2D)
-					   .build(*engine);
+	const auto texture = fl::Texture::Builder()
+	                     .width(static_cast<uint32_t>(width))
+	                     .height(static_cast<uint32_t>(height))
+	                     .levels(static_cast<uint8_t>(1))
+	                     .format(fl::Texture::InternalFormat::R8)
+	                     .sampler(fl::Texture::Sampler::SAMPLER_2D)
+	                     .build(*engine);
 
 	texture->setImage(*engine, 0, std::move(pb));
 

@@ -1,9 +1,8 @@
 #pragma once
 
 #include <filament/Engine.h>
-#include <memory>
 
-namespace spatial::render
+namespace spatial
 {
 
 class RenderEngine
@@ -12,7 +11,7 @@ private:
 	filament::Engine* m_engine;
 
 public:
-	RenderEngine(filament::backend::Backend backend);
+	RenderEngine(const filament::backend::Backend backend);
 	~RenderEngine();
 
 	filament::Engine* get() { return m_engine; }

@@ -8,18 +8,17 @@
 #include <spatial/render/Engine.h>
 #include <spatial/render/CommonResources.h>
 
-#include <filament/Renderer.h>
 #include <filament/Viewport.h>
 
 #include <deque>
 
-namespace spatial::render
+namespace spatial
 {
 
 class RenderingSystem
 {
 private:
-	desktop::Window m_window;
+	Window m_window;
 	RenderEngine m_engine;
 	SwapChain m_swapChain;
 	Renderer m_renderer;
@@ -32,22 +31,22 @@ private:
 	void setupViewport();
 
 public:
-	RenderingSystem(desktop::Window&& window);
+	RenderingSystem(Window&& window);
 
-	RenderingSystem(desktop::Window&& window, filament::backend::Backend backend);
+	RenderingSystem(Window&& window, const filament::backend::Backend backend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 
 	RenderingSystem(RenderingSystem&& other) = default;
 
-	void attach(common::EventQueue& queue);
-	void detach(common::EventQueue& queue);
+	void attach(EventQueue& queue);
+	void detach(EventQueue& queue);
 
 	void onStart();
 
 	void onEndFrame(float delta);
 
-	void onEvent(const desktop::WindowResizedEvent& event);
+	void onEvent(const WindowResizedEvent& event);
 
 	/**
 	 * \brief Registers a view to the renderer
@@ -72,9 +71,9 @@ public:
 	// region Getters
 	auto getEngine() { return m_engine.get(); }
 
-	const auto& getWindow() { return m_window; }
+	auto& getWindow()  { return m_window; }
 
-	const auto getMainView() { return m_mainView.get(); }
+	auto getMainView() { return m_mainView.get(); }
 
 	auto getMainCamera() { return m_mainCamera.get(); }
 	// endregion

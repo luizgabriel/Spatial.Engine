@@ -2,7 +2,7 @@
 
 #include <filament/Engine.h>
 
-namespace spatial::render
+namespace spatial
 {
 
 template <typename T>

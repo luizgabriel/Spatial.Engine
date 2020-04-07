@@ -1,9 +1,8 @@
 #include <spatial/core/Asset.h>
-#include <fstream>
 
-namespace spatial::core
+namespace spatial
 {
 
 std::filesystem::path Asset::s_basePath{};
 
-} // namespace spatial::core
+} // namespace spatial

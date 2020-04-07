@@ -2,7 +2,7 @@
 
 namespace fl = filament;
 
-namespace spatial::render
+namespace spatial
 {
 
 SwapChain createSwapChain(fl::Engine* engine, void* nativeWindowHandle) noexcept
@@ -35,4 +35,4 @@ Entity createEntity(fl::Engine* engine) noexcept
 	return {engine, utils::EntityManager::get().create()};
 }
 
-} // namespace spatial::render
+} // namespace spatial

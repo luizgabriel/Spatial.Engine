@@ -1,18 +1,17 @@
 #include <spatial/render/RenderingSystem.h>
 
-using namespace spatial::desktop;
-using namespace spatial::common;
+using namespace spatial;
 namespace fl = filament;
 namespace bk = filament::backend;
 
-namespace spatial::render
+namespace spatial
 {
 
 RenderingSystem::RenderingSystem(Window&& window) : RenderingSystem(std::move(window), bk::Backend::OPENGL)
 {
 }
 
-RenderingSystem::RenderingSystem(Window&& window, bk::Backend backend)
+RenderingSystem::RenderingSystem(Window&& window, const bk::Backend backend)
 	: m_window{std::move(window)},
 	  m_engine{backend},
 	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
@@ -26,12 +25,12 @@ RenderingSystem::RenderingSystem(Window&& window, bk::Backend backend)
 
 void RenderingSystem::attach(EventQueue& queue)
 {
-	queue.connect<desktop::WindowResizedEvent>(this);
+	queue.connect<WindowResizedEvent>(this);
 }
 
 void RenderingSystem::detach(EventQueue& queue)
 {
-	queue.disconnect<desktop::WindowResizedEvent>(this);
+	queue.disconnect<WindowResizedEvent>(this);
 }
 
 void RenderingSystem::onStart()
@@ -90,4 +89,4 @@ void RenderingSystem::popBackView()
 	m_views.pop_front();
 }
 
-} // namespace spatial::render
+} // namespace spatial

@@ -2,9 +2,8 @@
 
 #include <math/vec2.h>
 #include <spatial/common/Key.h>
-#include <spatial/common/KeyAction.h>
 
-namespace spatial::ui
+namespace spatial
 {
 
 class UserInterfaceInput
@@ -15,8 +14,8 @@ public:
 	void setup();
 
 	void setMousePosition(filament::math::float2 position);
-	void setKey(common::Key key, common::KeyAction action);
+	void setKey(Key key, KeyAction action);
 	void setText(const std::string& text);
 };
 
-} // namespace spatial::ui
+} // namespace spatial

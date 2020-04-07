@@ -7,10 +7,9 @@
 #include <filament/LightManager.h>
 #include <filament/TextureSampler.h>
 
-using namespace spatial::render;
 namespace fl = filament;
 
-namespace spatial::sandbox
+namespace spatial
 {
 
 Sandbox::Sandbox(RenderingSystem& rendering)
@@ -24,7 +23,7 @@ Sandbox::Sandbox(RenderingSystem& rendering)
 	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
-	  m_ibl{createIBLFromKtx(m_engine, "textures/pillars_2k")}
+	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")}
 {
 }
 

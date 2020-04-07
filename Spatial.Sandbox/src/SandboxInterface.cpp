@@ -5,78 +5,75 @@
 #include <spatial/common/Key.h>
 #include <spatial/input/Input.h>
 
-namespace fl = filament;
 using namespace filament::math;
-using namespace spatial::common;
-using namespace spatial::input;
 
 namespace ImGui
 {
 
 void SpatialDockLayout(ImGuiID dockspaceId)
 {
-	ImGui::DockBuilderRemoveNode(dockspaceId); // Clear out existing layout
-	ImGui::DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace);
+	DockBuilderRemoveNode(dockspaceId); // Clear out existing layout
+	DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace);
 
 	auto dockId = dockspaceId;
-	auto dockRight = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Right, 0.20f, NULL, &dockId);
+	const auto dockRight = DockBuilderSplitNode(dockId, ImGuiDir_Right, 0.20f, nullptr, &dockId);
 	// auto dockBottom = ImGui::DockBuilderSplitNode(dockId, ImGuiDir_Down, 0.20f, NULL, &dockId);
 
-	ImGui::DockBuilderDockWindow("Properties", dockRight);
-	ImGui::DockBuilderFinish(dockspaceId);
+	DockBuilderDockWindow("Properties", dockRight);
+	DockBuilderFinish(dockspaceId);
 }
 
 void BeginSpatialEngine(bool* openedPropertiesPtr)
 {
-	static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_PassthruCentralNode;
-	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
-										  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-										  ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
-										  ImGuiWindowFlags_NoBackground;
+	static auto dockFlags = ImGuiDockNodeFlags_PassthruCentralNode;
+	static auto windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+	                          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+	                          ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+	                          ImGuiWindowFlags_NoBackground;
 
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGuiViewport* viewport = GetMainViewport();
 
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
-	ImGui::SetNextWindowViewport(viewport->ID);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	SetNextWindowPos(viewport->Pos);
+	SetNextWindowSize(viewport->Size);
+	SetNextWindowViewport(viewport->ID);
+	PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace", nullptr, windowFlags);
-	ImGui::PopStyleVar();
+	PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	Begin("DockSpace", nullptr, windowFlags);
+	PopStyleVar();
 
-	ImGui::PopStyleVar(2);
+	PopStyleVar(2);
 
 	// DockSpace
-	ImGuiID dockspaceId = ImGui::GetID("SpatialDockSpace");
+	const ImGuiID dockspaceId = GetID("SpatialDockSpace");
 
-	if (ImGui::DockBuilderGetNode(dockspaceId) == NULL)
+	if (DockBuilderGetNode(dockspaceId) == nullptr)
 	{
-		ImGui::SpatialDockLayout(dockspaceId);
+		SpatialDockLayout(dockspaceId);
 	}
 
-	ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockFlags);
+	DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockFlags);
 
-	if (ImGui::BeginMainMenuBar())
+	if (BeginMainMenuBar())
 	{
-		ImGui::Text("Spatial Engine");
-		ImGui::Separator();
+		Text("Spatial Engine");
+		Separator();
 
-		if (ImGui::BeginMenu("Options"))
+		if (BeginMenu("Options"))
 		{
-			ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
+			MenuItem("Properties", NULL, openedPropertiesPtr);
 			// ImGui::MenuItem("Console", NULL, &gOpenedLogging);
-			ImGui::EndMenu();
+			EndMenu();
 		}
 
-		ImGui::EndMainMenuBar();
+		EndMainMenuBar();
 	}
 }
 
 } // namespace ImGui
 
-namespace spatial::sandbox
+namespace spatial
 {
 
 SandboxInterface::SandboxInterface()
@@ -122,4 +119,4 @@ void SandboxInterface::render()
 	}
 }
 
-} // namespace spatial::sandbox
+} // namespace spatial

@@ -4,7 +4,7 @@
 #include <spatial/render/Entity.h>
 #include <filameshio/MeshReader.h>
 
-namespace spatial::render
+namespace spatial
 {
 
 class Mesh

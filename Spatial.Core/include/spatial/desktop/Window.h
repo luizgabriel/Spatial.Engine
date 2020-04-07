@@ -6,12 +6,12 @@
 #include <spatial/common/Key.h>
 #include <spatial/common/EventQueue.h>
 
-namespace spatial::desktop
+namespace spatial
 {
 
-common::Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept;
+Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept;
 
-common::Key mapKeyFromMouseButton(int mouseButton) noexcept;
+Key mapKeyFromMouseButton(int mouseButton) noexcept;
 
 class WindowContext;
 
@@ -41,19 +41,22 @@ public:
 
 class WindowContext
 {
+private:
+	bool m_valid{true};
+	
 public:
 	WindowContext();
 	~WindowContext();
 
-	void pollEvents(common::EventQueue& queue);
+	void pollEvents(EventQueue& queue);
 
 	[[nodiscard]] Window createWindow(int width, int height, std::string_view title) const noexcept;
 
 	WindowContext(const WindowContext& c) = delete;
-	WindowContext(const WindowContext&& c) = delete;
-
-	WindowContext& operator=(WindowContext&& other) = delete;
 	WindowContext& operator=(const WindowContext& w) = delete;
+	
+	WindowContext(WindowContext&& c) noexcept;
+	WindowContext& operator=(WindowContext&& other) noexcept = delete;
 };
 
 } // namespace spatial::desktop

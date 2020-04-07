@@ -2,11 +2,11 @@
 
 #include <spdlog/spdlog.h>
 
-namespace spatial::core
+namespace spatial
 {
 
 using Logger = spdlog::logger;
 
 Logger createDefaultLogger(const std::string& output);
 
-} // namespace spatial::core
+} // namespace spatial
