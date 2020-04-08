@@ -6,16 +6,13 @@
 
 namespace ImGui
 {
-
 void SpatialDockLayout(ImGuiID dockspaceId);
 
 void BeginSpatialEngine(bool* openedPropertiesPtr);
-
 } // namespace ImGui
 
 namespace spatial
 {
-
 class SandboxInterface
 {
 	struct CameraData
@@ -43,16 +40,8 @@ private:
 
 public:
 	CameraData cameraData{
-		{
-			436.0f,
-			158.0f,
-			-436.0f
-		},
-		{
-			-500.0f,
-			50.0f,
-			100.0f
-		}
+		{300, 200, 300},
+		{100, 100, 0}
 	};
 	ViewData viewData{};
 	MaterialData materialData{
@@ -66,5 +55,4 @@ public:
 
 	void render();
 };
-
 } // namespace spatial::sandbox

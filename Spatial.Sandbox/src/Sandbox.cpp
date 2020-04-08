@@ -53,7 +53,7 @@ void Sandbox::onUpdateFrame(float delta)
 	auto& viewData = m_interface.viewData;
 	auto& materialData = m_interface.materialData;
 
-	m_camera->lookAt(cameraData.eye, cameraData.center, {0, 1.0f, .0f});
+	m_camera->lookAt(cameraData.eye, cameraData.center, {0, 1.0f, 0});
 	m_view->setClearColor(viewData.clearColor);
 
 	m_instance->setParameter("metallic", materialData.metallic);

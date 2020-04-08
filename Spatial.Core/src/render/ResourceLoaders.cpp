@@ -25,6 +25,8 @@ namespace fm = filamesh;
 namespace spatial
 {
 
+constexpr const char* errorMessage = "could not open file: ";
+
 fs::path appendExtension(const fs::path& path, const std::string& extension)
 {
 	return path.parent_path() / (path.filename().generic_string() + "." + extension);
@@ -33,11 +35,11 @@ fs::path appendExtension(const fs::path& path, const std::string& extension)
 Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 {
 	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
-	
+
 	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
 
 	if (!stream)
-		throw std::runtime_error("could not open file.");
+		throw std::runtime_error(errorMessage + absolutePath.generic_string());
 
 	const auto iterator = std::istreambuf_iterator<char>{stream};
 	auto data = std::vector<char>{iterator, {}};
@@ -50,9 +52,9 @@ Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::path& filePath)
 {
 	const auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
-	
+
 	if (!fs::exists(absolute))
-		throw std::runtime_error("could not open file.");
+		throw std::runtime_error(errorMessage + absolute.generic_string());
 
 	auto registry = fm::MeshReader::MaterialRegistry{};
 	registry.registerMaterialInstance(utils::CString("DefaultMaterial"), material);
@@ -68,14 +70,15 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 	const auto path = Asset::absolute(filePath);
 
 	if (!fs::exists(path))
-		throw std::runtime_error("could not open file:"s + path.generic_string());
+		throw std::runtime_error(errorMessage + path.generic_string());
 
 	int width, height, n;
 	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
 
 	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(width) * height * 4, fl::Texture::Format::RGBA,
-													 fl::Texture::Type::UBYTE,
-													 reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
+	                                                 fl::Texture::Type::UBYTE,
+	                                                 reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&
+		                                                 stbi_image_free)};
 
 	const auto texture = fl::Texture::Builder()
 	                     .width(uint32_t(width))
@@ -98,7 +101,7 @@ Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
 	auto stream = ifstream{absolutePath, std::ios_base::in | ios::binary};
 
 	if (!stream)
-		throw std::runtime_error("Could not open file: "s + filePath.generic_string());
+		throw std::runtime_error(errorMessage + filePath.generic_string());
 
 	auto contents = vector<uint8_t>{istreambuf_iterator<char>(stream), {}};
 
@@ -109,6 +112,7 @@ Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
 }
 
 using bands_t = std::array<float3, 9>;
+
 bands_t parseShFile(const fs::path& file)
 {
 	auto bands = bands_t{};
@@ -116,7 +120,7 @@ bands_t parseShFile(const fs::path& file)
 	auto stream = std::ifstream{absolutePath, std::ios_base::in};
 
 	if (!stream)
-		throw std::runtime_error("Could not open file: "s + absolutePath.generic_string());
+		throw std::runtime_error(errorMessage + absolutePath.generic_string());
 
 	stream >> std::skipws;
 
@@ -124,7 +128,9 @@ bands_t parseShFile(const fs::path& file)
 	for (auto& band : bands)
 	{
 		while (stream >> c && c != '(')
-			;
+		{
+		}
+
 		stream >> band.r;
 		stream >> c;
 		stream >> band.g;
@@ -156,5 +162,4 @@ ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem
 
 	return {std::move(light), std::move(texture), std::move(skybox), std::move(skyboxTexture)};
 }
-
 } // namespace spatial

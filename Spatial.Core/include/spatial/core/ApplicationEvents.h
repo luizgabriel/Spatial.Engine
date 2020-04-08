@@ -97,9 +97,9 @@ void disconnect(Application& app, Handler* instance)
 }
 
 template <typename... Handlers>
-void disconnect(Application& app, Handlers&&... instance)
+void disconnect(Application& app, Handlers*... instance)
 {
-	(disconnect(app, std::forward<Handlers>(instance)), ...);
+	(disconnect(app, instance), ...);
 }
 
 template <typename Event, auto Function>
@@ -126,4 +126,4 @@ void disconnect(Application& app, Handler* instance)
 	app.getEBus().template disconnect<Event, Function>(instance);
 }
 
-} // namespace spatial::core
+} // namespace spatial

@@ -1,8 +1,6 @@
 #!python
 
 import os
-import shutil
-from platform import system
 
 
 CONAN_DIR = ".conan"

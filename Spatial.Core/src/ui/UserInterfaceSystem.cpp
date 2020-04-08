@@ -1,14 +1,16 @@
 #include <spatial/ui/UserInterfaceSystem.h>
 
+#include <utility>
+
 namespace fs = std::filesystem;
 
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const fs::path& fontPath)
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, fs::path fontPath)
 	: m_renderer{rendering.getEngine()},
 	  m_window{&rendering.getWindow()},
-	  m_fontPath{fontPath}
+	  m_fontPath{std::move(fontPath)}
 {
 	rendering.pushFrontView(m_renderer.getView());
 }

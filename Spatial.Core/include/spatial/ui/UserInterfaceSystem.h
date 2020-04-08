@@ -25,7 +25,7 @@ private:
 	void setupViewport();
 
 public:
-	UserInterfaceSystem(RenderingSystem& rendering, const std::filesystem::path& fontPath);
+	UserInterfaceSystem(RenderingSystem& rendering, std::filesystem::path fontPath);
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);

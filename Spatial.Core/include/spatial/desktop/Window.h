@@ -28,6 +28,8 @@ public:
 	~Window();
 
 	void* getNativeHandle() const;
+	SDL_Window* getHandle() const { return m_windowHandle; }
+	
 	std::pair<uint32_t, uint32_t> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;
 	bool hasFocus() const;

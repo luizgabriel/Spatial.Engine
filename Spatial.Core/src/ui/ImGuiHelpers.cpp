@@ -91,7 +91,7 @@ Texture imguiCreateTextureAtlas(fl::Engine* engine, const fs::path& font)
 
 	io.Fonts->GetTexDataAsAlpha8(&data, &width, &height, &bpp);
 
-	const auto size = size_t(height * width * bpp);
+	const auto size = size_t(width) * height * bpp;
 	auto pb = fl::Texture::PixelBufferDescriptor{data, size, fl::Texture::Format::R, fl::Texture::Type::UBYTE};
 	const auto texture = fl::Texture::Builder()
 	                     .width(static_cast<uint32_t>(width))
