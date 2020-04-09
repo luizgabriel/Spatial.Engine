@@ -21,11 +21,6 @@ class SandboxInterface
 		filament::math::float3 center;
 	};
 
-	struct ViewData
-	{
-		filament::math::float4 clearColor;
-	};
-
 	struct MaterialData
 	{
 		float metallic;
@@ -43,7 +38,6 @@ public:
 		{300, 200, 300},
 		{100, 100, 0}
 	};
-	ViewData viewData{};
 	MaterialData materialData{
 		0.5f,
 		0.4f,

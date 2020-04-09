@@ -70,8 +70,15 @@ void WindowContext::pollEvents(EventQueue& queue)
 		{
 			switch (e.window.event)
 			{
-			case SDL_WINDOWEVENT_RESIZED: queue.enqueue<WindowResizedEvent>(e.window.data1, e.window.data2);
+			case SDL_WINDOWEVENT_RESIZED:
+			{
+				std::pair<int, int> windowSize, frameBufferSize;
+				auto* sdlWindow = SDL_GetWindowFromID(e.window.windowID);
+				SDL_GetWindowSize(sdlWindow, &windowSize.first, &windowSize.second);
+				SDL_GL_GetDrawableSize(sdlWindow, &frameBufferSize.first, &frameBufferSize.second);
+				queue.enqueue<WindowResizedEvent>(windowSize, frameBufferSize);
 				break;
+			}
 			default: break;
 			}
 

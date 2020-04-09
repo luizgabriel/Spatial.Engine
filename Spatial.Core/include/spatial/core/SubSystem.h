@@ -53,15 +53,13 @@ public:
 	}
 
 	auto& get() { return m_system;  }
-	auto& getSystem() { return m_system; }
-	auto getApplication() const { return m_app; }
 };
 
 template <typename S>
 using SystemRef = std::shared_ptr<SubSystem<S>>;
 
 template <typename S, typename... Args>
-SystemRef<S> makeSystem(Application& app, Args&&... args)
+SystemRef<S> createSharedSystem(Application& app, Args&&... args)
 {
 	return std::make_shared<SubSystem<S>>(&app, std::forward<Args>(args)...);
 }

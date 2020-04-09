@@ -2,7 +2,6 @@
 
 #include <spatial/common/EventQueue.h>
 
-#include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 
 #include <spatial/render/Engine.h>
@@ -14,11 +13,9 @@
 
 namespace spatial
 {
-
 class RenderingSystem
 {
 private:
-	Window m_window;
 	RenderEngine m_engine;
 	SwapChain m_swapChain;
 	Renderer m_renderer;
@@ -28,16 +25,18 @@ private:
 
 	std::deque<filament::View*> m_views;
 
-	void setupViewport();
-
 public:
-	RenderingSystem(Window&& window);
+	RenderingSystem(void* nativeWindowHandle);
 
-	RenderingSystem(Window&& window, const filament::backend::Backend backend);
+	RenderingSystem(void* nativeWindowHandle, const filament::backend::Backend backend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
+	
+	RenderingSystem(RenderingSystem&& other) noexcept;
 
-	RenderingSystem(RenderingSystem&& other) = default;
+	RenderingSystem& operator=(RenderingSystem&& other) noexcept;
+	
+	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);
@@ -64,19 +63,18 @@ public:
 	void pushBackView(filament::View* view);
 
 	/**
-	 * \brief Deregisters a view to the renderer
+	 * \brief Pops a view to the renderer
 	 */
 	void popBackView();
 
 	// region Getters
 	auto getEngine() { return m_engine.get(); }
 
-	auto& getWindow()  { return m_window; }
-
 	auto getMainView() { return m_mainView.get(); }
 
 	auto getMainCamera() { return m_mainCamera.get(); }
+
+	void setupViewport(const std::pair<int, int>& frameBufferSize);
 	// endregion
 };
-
-} // namespace spatial::render
+} // namespace spatial

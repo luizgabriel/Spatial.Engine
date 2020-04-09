@@ -19,7 +19,7 @@ Window::Window(int width, int height, std::string_view title)
 									  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
 	assert(m_windowHandle != nullptr);
-	SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
+	//SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
 }
 
 Window::Window(Window&& other) noexcept : m_windowHandle(std::exchange(other.m_windowHandle, nullptr))
@@ -42,7 +42,7 @@ Window::~Window()
 		SDL_DestroyWindow(m_windowHandle);
 }
 
-std::pair<uint32_t, uint32_t> Window::getFrameBufferSize() const
+std::pair<int, int> Window::getFrameBufferSize() const
 {
 	assert(m_windowHandle != nullptr);
 

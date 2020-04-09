@@ -1,18 +1,22 @@
 #pragma once
 
 #include <spatial/common/Key.h>
-#include <math/vec2.h>
+
+#include <utility>
 
 namespace spatial
 {
 
 struct WindowResizedEvent
 {
-	std::uint32_t width, height;
+	std::pair<int, int> windowSize;
+	std::pair<int, int> frameBufferSize;
 
-	WindowResizedEvent(std::uint32_t width, std::uint32_t height) : width{width}, height{height} {}
-
-	[[nodiscard]] float getRatio() const { return float(width) / height; }
+	WindowResizedEvent(std::pair<int, int> windowSize, std::pair<int, int> frameBufferSize)
+		: windowSize{std::move(windowSize)},
+		  frameBufferSize{std::move(frameBufferSize)}
+	{
+	}
 };
 
 struct WindowClosedEvent

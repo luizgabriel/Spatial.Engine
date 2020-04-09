@@ -9,7 +9,6 @@ namespace spatial
 
 UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, fs::path fontPath)
 	: m_renderer{rendering.getEngine()},
-	  m_window{&rendering.getWindow()},
 	  m_fontPath{std::move(fontPath)}
 {
 	rendering.pushFrontView(m_renderer.getView());
@@ -33,15 +32,13 @@ void UserInterfaceSystem::detach(EventQueue& queue)
 
 void UserInterfaceSystem::onStart()
 {
-	setupViewport();
-
 	m_renderer.setup(m_fontPath);
 	m_input.setup();
 }
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 {
-	setupViewport();
+	setupViewport(event.windowSize, event.frameBufferSize);
 }
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
@@ -59,10 +56,10 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 	m_input.setText(event.text);
 }
 
-void UserInterfaceSystem::setupViewport()
+void UserInterfaceSystem::setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
 {
-	auto [w, h] = m_window->getWindowSize();
-	auto [fw, fh] = m_window->getFrameBufferSize();
+	auto [w, h] = windowSize;
+	auto [fw, fh] = frameBufferSize;
 	const auto dpiX = w / fw;
 	const auto dpiY = h / fh;
 

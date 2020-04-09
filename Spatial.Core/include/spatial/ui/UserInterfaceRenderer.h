@@ -24,6 +24,8 @@ private:
 	std::vector<SharedVertexBuffer> m_vertexBuffers;
 	std::vector<SharedIndexBuffer> m_indexBuffers;
 	std::vector<SharedMaterialInstance> m_materialInstances;
+	
+	ImGuiContext* m_imguiContext;
 
 	void renderDrawData();
 	void createBuffers(size_t numRequiredBuffers);

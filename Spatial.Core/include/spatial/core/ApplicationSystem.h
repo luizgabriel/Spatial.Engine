@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <utility>
+#include <spatial/core/Application.h>
 #include <spatial/core/ApplicationEvents.h>
 
 namespace spatial
@@ -52,7 +53,7 @@ template <typename S>
 using SystemRef = std::shared_ptr<SubSystem<S>>;
 
 template <typename S, typename... Args>
-SystemRef<S> makeSystem(Application& app, Args&&... args)
+SystemRef<S> makeSharedSystem(Application& app, Args&&... args)
 {
 	return std::make_shared<SubSystem<S>>(&app, std::forward<Args>(args)...);
 }

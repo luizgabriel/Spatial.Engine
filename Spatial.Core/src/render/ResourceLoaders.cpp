@@ -127,9 +127,8 @@ bands_t parseShFile(const fs::path& file)
 	char c;
 	for (auto& band : bands)
 	{
-		while (stream >> c && c != '(')
-		{
-		}
+		// ReSharper disable once CppPossiblyErroneousEmptyStatements
+		while (!stream.eof() && stream >> c && c != '(');
 
 		stream >> band.r;
 		stream >> c;

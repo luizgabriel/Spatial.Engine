@@ -13,23 +13,29 @@
 using namespace spatial;
 using namespace std::filesystem;
 
-int main(int argc, char* argv[]) 
-try {
+int main(int argc, char* argv[])
+{
 	const auto binaryPath = path{argv[0]}.parent_path();
 	Asset::init(binaryPath / "assets");
 
 	auto app = Application{};
 	auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
-	auto rendering = SubSystem<RenderingSystem>{app, std::move(window)};
 	auto input = SubSystem<InputSystem>{app};
-	auto ui = SubSystem<UserInterfaceSystem>{app, rendering.get(), path{"fonts"} / "Roboto-Medium.ttf"};
-	auto sandbox = SubSystem<Sandbox>{app, rendering.get()};
+	auto rendering = SubSystem<RenderingSystem>{app, window.getNativeHandle()};
+	rendering.get().setupViewport(window.getFrameBufferSize());
 	
-	return app.run();
-}
-catch (const std::runtime_error& e)
-{
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "[Spatial Engine] Something went wrong", e.what(), nullptr);
+	try
+	{
+		auto ui = SubSystem<UserInterfaceSystem>{app, rendering.get(), path{"fonts"} / "Roboto-Medium.ttf"};
+		ui.get().setupViewport(window.getWindowSize(), window.getFrameBufferSize());
+		auto sandbox = SubSystem<Sandbox>{app, rendering.get()};
 
-	return -1;
+		return app.run();
+	}
+	catch (const std::runtime_error& e)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "[Spatial Engine] Something went wrong", e.what(), nullptr);
+
+		return -1;
+	}
 }

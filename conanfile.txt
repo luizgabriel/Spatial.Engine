@@ -15,7 +15,7 @@ sdl2:iconv=False
 cmake
 
 [imports]
-bin, * -> ./bin
+filament:bin, * -> ./bin
 
 [build_requires]
 cmake_installer/3.16.3@conan/stable

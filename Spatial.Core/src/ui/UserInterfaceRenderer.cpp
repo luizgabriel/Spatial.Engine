@@ -35,7 +35,7 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	m_view->setPostProcessingEnabled(false);
 	m_view->setShadowsEnabled(false);
 
-	ImGui::CreateContext();
+	m_imguiContext = ImGui::CreateContext();
 }
 
 void UserInterfaceRenderer::setup(const fs::path& fontPath)
@@ -100,7 +100,7 @@ void UserInterfaceRenderer::setup(const fs::path& fontPath)
 
 UserInterfaceRenderer::~UserInterfaceRenderer()
 {
-	ImGui::DestroyContext();
+	ImGui::DestroyContext(m_imguiContext);
 }
 
 void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float dpiY)
@@ -113,6 +113,7 @@ void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float
 
 void UserInterfaceRenderer::beforeRender(float delta)
 {
+	ImGui::SetCurrentContext(m_imguiContext);
 	imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();
 }
@@ -133,7 +134,7 @@ void UserInterfaceRenderer::renderDrawData()
 	auto imguiData = ImGui::GetDrawData();
 	auto& rcm = m_engine->getRenderableManager();
 	auto& io = ImGui::GetIO();
-	auto [fbwidth, fbheight] = imguiGetFrameSize();
+	auto [fbWidth, fbHeight] = imguiGetFrameSize();
 
 	imguiData->ScaleClipRects(io.DisplayFramebufferScale);
 
@@ -150,11 +151,11 @@ void UserInterfaceRenderer::renderDrawData()
 		nPrims += cmds->CmdBuffer.size();
 		for (const auto& pcmd : cmds->CmdBuffer)
 		{
-			scissorRects[imguiMakeScissorKey(fbheight, pcmd.ClipRect)] = nullptr;
+			scissorRects[imguiMakeScissorKey(fbHeight, pcmd.ClipRect)] = nullptr;
 		}
 	}
-	auto rbuilder = fl::RenderableManager::Builder(nPrims);
-	rbuilder.boundingBox({{0, 0, 0}, {10000, 10000, 10000}}).culling(false);
+	auto rBuilder = fl::RenderableManager::Builder(nPrims);
+	rBuilder.boundingBox({{0, 0, 0}, {10000, 10000, 10000}}).culling(false);
 
 	// Ensure that we have a material instance for each scissor rectangle.
 	createMaterialInstances(scissorRects.size());
@@ -189,14 +190,14 @@ void UserInterfaceRenderer::renderDrawData()
 			}
 			else
 			{
-				uint64_t skey = imguiMakeScissorKey(fbheight, pcmd.ClipRect);
-				auto miter = scissorRects.find(skey);
-				assert(miter != scissorRects.end());
-				rbuilder
+				auto sKey = imguiMakeScissorKey(fbHeight, pcmd.ClipRect);
+				auto mIter = scissorRects.find(sKey);
+				assert(mIter != scissorRects.end());
+				rBuilder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES, m_vertexBuffers[bufferIndex].get(),
 							  m_indexBuffers[bufferIndex].get(), indexOffset, pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
-					.material(primIndex, miter->second);
+					.material(primIndex, mIter->second);
 				primIndex++;
 			}
 			indexOffset += pcmd.ElemCount;
@@ -207,7 +208,7 @@ void UserInterfaceRenderer::renderDrawData()
 
 	if (imguiData->CmdListsCount > 0)
 	{
-		rbuilder.build(*m_engine, m_entity.get());
+		rBuilder.build(*m_engine, m_entity.get());
 	}
 }
 
@@ -215,7 +216,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 {
 	if (numRequiredBuffers > m_vertexBuffers.size())
 	{
-		size_t previousSize = m_vertexBuffers.size();
+		const size_t previousSize = m_vertexBuffers.size();
 		m_vertexBuffers.resize(numRequiredBuffers, nullptr);
 		for (size_t i = previousSize; i < m_vertexBuffers.size(); i++)
 		{
@@ -226,7 +227,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 
 	if (numRequiredBuffers > m_indexBuffers.size())
 	{
-		size_t previousSize = m_indexBuffers.size();
+		const size_t previousSize = m_indexBuffers.size();
 		m_indexBuffers.resize(numRequiredBuffers, nullptr);
 		for (size_t i = previousSize; i < m_indexBuffers.size(); i++)
 		{
@@ -238,7 +239,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 
 void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 {
-	size_t previousSize = m_materialInstances.size();
+	const size_t previousSize = m_materialInstances.size();
 	if (numRequiredInstances > m_materialInstances.size())
 	{
 		m_materialInstances.resize(numRequiredInstances);
@@ -255,8 +256,8 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
 	{
-		size_t capacityVertCount = m_vertexBuffers[bufferIndex]->getVertexCount();
-		if (vb.Size > capacityVertCount)
+		const size_t capacityVertCount = m_vertexBuffers[bufferIndex]->getVertexCount();
+		if (static_cast<size_t>(vb.Size) > capacityVertCount)
 			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(m_engine, vb.Size);
 
 		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
@@ -266,8 +267,8 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	// Create a new index buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
 	{
-		size_t capacityIndexCount = m_indexBuffers[bufferIndex]->getIndexCount();
-		if (ib.Size > capacityIndexCount)
+		const size_t capacityIndexCount = m_indexBuffers[bufferIndex]->getIndexCount();
+		if (static_cast<size_t>(ib.Size) > capacityIndexCount)
 			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(m_engine, ib.Size);
 
 		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);

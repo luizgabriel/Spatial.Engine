@@ -11,24 +11,21 @@
 
 namespace spatial
 {
-
 class UserInterfaceSystem
 {
 private:
 	UserInterfaceRenderer m_renderer;
 	UserInterfaceInput m_input{};
 
-	const Window* m_window;
-
 	std::filesystem::path m_fontPath;
-
-	void setupViewport();
 
 public:
 	UserInterfaceSystem(RenderingSystem& rendering, std::filesystem::path fontPath);
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);
+
+	void setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
 	void onStart();
 
@@ -44,5 +41,4 @@ public:
 
 	void onEvent(const TextEvent& event);
 };
-
-} // namespace spatial::ui
+} // namespace spatial

@@ -30,6 +30,7 @@ Sandbox::Sandbox(RenderingSystem& rendering)
 void Sandbox::onStart()
 {
 	m_view->setScene(m_scene.get());
+	m_view->setClearColor({0, 0, 0, 0});
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
 	m_instance->setParameter("albedo", m_texture.get(), sampler);
@@ -43,6 +44,7 @@ void Sandbox::onStart()
 	auto& rcm = m_engine->getRenderableManager();
 	const auto ri = rcm.getInstance(m_sphereMesh.get());
 	rcm.setCastShadows(ri, false);
+
 }
 
 void Sandbox::onUpdateFrame(float delta)
@@ -50,11 +52,9 @@ void Sandbox::onUpdateFrame(float delta)
 	m_interface.render();
 
 	auto& cameraData = m_interface.cameraData;
-	auto& viewData = m_interface.viewData;
 	auto& materialData = m_interface.materialData;
 
 	m_camera->lookAt(cameraData.eye, cameraData.center, {0, 1.0f, 0});
-	m_view->setClearColor(viewData.clearColor);
 
 	m_instance->setParameter("metallic", materialData.metallic);
 	m_instance->setParameter("roughness", materialData.roughness);

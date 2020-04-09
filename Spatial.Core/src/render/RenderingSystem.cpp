@@ -6,21 +6,42 @@ namespace bk = filament::backend;
 
 namespace spatial
 {
-
-RenderingSystem::RenderingSystem(Window&& window) : RenderingSystem(std::move(window), bk::Backend::OPENGL)
+RenderingSystem::RenderingSystem(void* nativeWindowHandle)
+	: RenderingSystem(nativeWindowHandle, bk::Backend::OPENGL)
 {
 }
 
-RenderingSystem::RenderingSystem(Window&& window, const bk::Backend backend)
-	: m_window{std::move(window)},
-	  m_engine{backend},
-	  m_swapChain{createSwapChain(m_engine.get(), m_window.getNativeHandle())},
+RenderingSystem::RenderingSystem(void* nativeWindowHandle, const bk::Backend backend)
+	: m_engine{backend},
+	  m_swapChain{createSwapChain(m_engine.get(), nativeWindowHandle)},
 	  m_renderer{createRenderer(m_engine.get())},
 	  m_mainCamera{createCamera(m_engine.get())},
 	  m_mainView{createView(m_engine.get())},
 	  m_views{5}
 {
 	pushBackView(m_mainView.get());
+}
+
+RenderingSystem::RenderingSystem(RenderingSystem&& other) noexcept
+	: m_engine{other.m_engine},
+	  m_swapChain{std::move(other.m_swapChain)},
+	  m_renderer{std::move(other.m_renderer)},
+	  m_mainCamera{std::move(other.m_mainCamera)},
+	  m_mainView{std::move(other.m_mainView)},
+	  m_views{std::move(other.m_views)}
+{
+}
+
+RenderingSystem& RenderingSystem::operator=(RenderingSystem&& other) noexcept
+{
+	m_engine = other.m_engine;
+	m_swapChain = std::move(other.m_swapChain);
+	m_renderer = std::move(other.m_renderer);
+	m_mainCamera = std::move(other.m_mainCamera);
+	m_mainView = std::move(other.m_mainView);
+	m_views = std::move(other.m_views);
+
+	return *this;
 }
 
 void RenderingSystem::attach(EventQueue& queue)
@@ -41,8 +62,6 @@ void RenderingSystem::onStart()
 	// m_mainView->setVisibleLayers(0x04, 0x04);
 
 	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
-
-	setupViewport();
 }
 
 void RenderingSystem::onEndFrame(float delta)
@@ -58,15 +77,7 @@ void RenderingSystem::onEndFrame(float delta)
 
 void RenderingSystem::onEvent(const WindowResizedEvent& event)
 {
-	setupViewport();
-}
-
-void RenderingSystem::setupViewport()
-{
-	auto [dw, dh] = m_window.getFrameBufferSize();
-
-	m_mainView->setViewport({0, 0, dw, dh});
-	m_mainCamera->setProjection(45.0, double(dw) / dh, 0.1, 1000000.0f, fl::Camera::Fov::VERTICAL);
+	this->setupViewport(event.frameBufferSize);
 }
 
 void RenderingSystem::pushFrontView(filament::View* view)
@@ -89,4 +100,10 @@ void RenderingSystem::popBackView()
 	m_views.pop_front();
 }
 
+void RenderingSystem::setupViewport(const std::pair<int, int>& frameBufferSize)
+{
+	auto [dw, dh] = frameBufferSize;
+	m_mainView->setViewport({0, 0, static_cast<uint32_t>(dw), static_cast<uint32_t>(dh)});
+	m_mainCamera->setProjection(45.0, double(dw) / dh, 0.1, 1000000.0f, fl::Camera::Fov::VERTICAL);
+}
 } // namespace spatial
