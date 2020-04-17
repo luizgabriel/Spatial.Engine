@@ -36,6 +36,15 @@ add_mesh_resources(Sandbox.Assets.Models
         Spatial.Sandbox
 )
 
+add_copy_resources(Sandbox.Assets.Config
+    SOURCES
+        assets/config/application.toml
+    OUTPUT
+        assets/config
+    DEPENDEES
+        Spatial.Sandbox
+)
+
 add_copy_resources(Sandbox.Assets.Fonts
     SOURCES
         assets/fonts/Roboto-Regular.ttf

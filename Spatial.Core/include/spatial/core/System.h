@@ -7,14 +7,14 @@
 namespace spatial
 {
 template <typename S>
-class SubSystem
+class System
 {
 private:
 	Application* m_app;
 	S m_system;
 
 public:
-	SubSystem(Application& application)
+	System(Application& application)
 		: m_app{&application},
 		  m_system{}
 	{
@@ -22,29 +22,29 @@ public:
 	}
 
 	template <typename... Args>
-	SubSystem(Application& application, Args&&... args)
+	System(Application& application, Args&&... args)
 		: m_app{&application},
 		  m_system{std::forward<Args>(args)...}
 	{
 		connect(*m_app, &m_system);
 	}
 
-	~SubSystem()
+	~System()
 	{
 		disconnect(*m_app, &m_system);
 	}
 
-	SubSystem(const SubSystem& other) = delete;
+	System(const System& other) = delete;
 
-	SubSystem(SubSystem&& other) noexcept
+	System(System&& other) noexcept
 		: m_app(other.m_app),
 		  m_system(std::move(other.m_system))
 	{
 	}
 
-	SubSystem& operator=(const SubSystem& other) = delete;
+	System& operator=(const System& other) = delete;
 
-	SubSystem& operator=(SubSystem&& other) noexcept
+	System& operator=(System&& other) noexcept
 	{
 		m_app = other.m_app;
 		m_system = std::move(other.m_system);
@@ -56,11 +56,11 @@ public:
 };
 
 template <typename S>
-using SystemRef = std::shared_ptr<SubSystem<S>>;
+using SystemRef = std::shared_ptr<System<S>>;
 
 template <typename S, typename... Args>
 SystemRef<S> createSharedSystem(Application& app, Args&&... args)
 {
-	return std::make_shared<SubSystem<S>>(&app, std::forward<Args>(args)...);
+	return std::make_shared<System<S>>(&app, std::forward<Args>(args)...);
 }
 }

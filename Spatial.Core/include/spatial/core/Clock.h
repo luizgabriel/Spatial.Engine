@@ -13,13 +13,17 @@ public:
 	Clock();
 
 	void tick();
-	delta_t getDeltaTime() const;
 
-	auto getLastTime() const { return m_LastTime; }
+	auto getLastTime() const { return m_lastTime; }
+
+	auto getDeltaTime() const
+	{
+		return std::chrono::duration_cast<delta_t>(m_timeStep);
+	}
 
 private:
-	std::chrono::steady_clock::duration m_TimeStep;
-	std::chrono::steady_clock::time_point m_LastTime;
+	std::chrono::steady_clock::duration m_timeStep;
+	std::chrono::steady_clock::time_point m_lastTime;
 };
 
 } // namespace spatial::core

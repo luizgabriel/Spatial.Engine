@@ -1,41 +1,35 @@
 #include "SandboxInterface.h"
 #include "Sandbox.h"
 
-#include <spatial/core/Application.h>
-#include <spatial/core/ApplicationEvents.h>
+#include <spatial/core/Initializer.h>
 #include <spatial/core/Asset.h>
-#include <spatial/core/SubSystem.h>
-
-#include <spatial/render/RenderingSystem.h>
-#include <spatial/input/InputSystem.h>
+#include <spatial/core/System.h>
+#include <spatial/core/CoreSystemBundle.h>
 #include <spatial/ui/UserInterfaceSystem.h>
+
+#include <fstream> // Required for parse_file
 
 using namespace spatial;
 using namespace std::filesystem;
 
+auto getConfig(const path& filePath)
+{
+	const auto configPath = Asset::absolute(filePath).generic_u8string();
+	return toml::parse_file(configPath);
+}
+
 int main(int argc, char* argv[])
 {
-	const auto binaryPath = path{argv[0]}.parent_path();
-	Asset::init(binaryPath / "assets");
+	Asset::init(path{argv[0]}.parent_path() / "assets");
 
 	auto app = Application{};
-	auto window = app.getWindowContext().createWindow(1280, 720, "Spatial Engine");
-	auto input = SubSystem<InputSystem>{app};
-	auto rendering = SubSystem<RenderingSystem>{app, window.getNativeHandle()};
-	rendering.get().setupViewport(window.getFrameBufferSize());
-	
-	try
-	{
-		auto ui = SubSystem<UserInterfaceSystem>{app, rendering.get(), path{"fonts"} / "Roboto-Medium.ttf"};
-		ui.get().setupViewport(window.getWindowSize(), window.getFrameBufferSize());
-		auto sandbox = SubSystem<Sandbox>{app, rendering.get()};
 
+	return tryRun([&app]()
+	{
+		auto config = getConfig("config/application.toml");
+		
+		auto core = CoreSystemBundle{app, config};
+		auto sandbox = System<Sandbox>{app, core.getRenderingSystem()};
 		return app.run();
-	}
-	catch (const std::runtime_error& e)
-	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "[Spatial Engine] Something went wrong", e.what(), nullptr);
-
-		return -1;
-	}
+	});
 }

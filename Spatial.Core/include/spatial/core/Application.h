@@ -15,7 +15,7 @@ class Application final
 private:
 	bool m_running = false;
 
-	std::chrono::duration<float> m_desiredDelta{1.0f / 60.0f};
+	float m_desiredDelta{1.0f / 60.0f};
 
 	EventQueue m_ebus{};
 	Clock m_clock{};
@@ -24,10 +24,10 @@ private:
 
 	// region Signals
 	Signal<> m_startSignal;
-	Signal<float> m_frameStartSignal;
-	Signal<float> m_updateSignal;
-	Signal<float> m_updateGuiSignal;
-	Signal<float> m_frameEndSignal;
+	Signal<float> m_startFrameSignal;
+	Signal<float> m_updateFrameSignal;
+	Signal<> m_endGuiFrameSignal;
+	Signal<> m_endFrameSignal;
 	Signal<> m_finishSignal;
 	// endregion
 
@@ -57,22 +57,22 @@ public:
 	/**
 	 * \brief Called every start of frame
 	 */
-	auto& getFrameStartSignal() { return m_frameStartSignal; }
+	auto& getStartFrameSignal() { return m_startFrameSignal; }
 
 	/**
 	 * \brief Called every update of frame
 	 */
-	auto& getUpdateSignal() { return m_updateSignal; }
+	auto& getUpdateFrameSignal() { return m_updateFrameSignal; }
 
 	/**
 	 * \brief Called every update of frame
 	 */
-	auto& getUpdateGuiSignal() { return m_updateGuiSignal; }
+	auto& getEndGuiFrameSignal() { return m_endGuiFrameSignal; }
 
 	/**
 	 * \brief Called every end of frame
 	 */
-	auto& getFrameEndSignal() { return m_frameEndSignal; }
+	auto& getEndFrameSignal() { return m_endFrameSignal; }
 
 	/**
 	 * \brief Called when the application is closed

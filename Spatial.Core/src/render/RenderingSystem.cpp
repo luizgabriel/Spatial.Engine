@@ -64,7 +64,7 @@ void RenderingSystem::onStart()
 	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
 }
 
-void RenderingSystem::onEndFrame(float delta)
+void RenderingSystem::onEndFrame()
 {
 	if (m_renderer->beginFrame(m_swapChain.get()))
 	{

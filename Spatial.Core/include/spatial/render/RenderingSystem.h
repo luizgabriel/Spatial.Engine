@@ -43,7 +43,7 @@ public:
 
 	void onStart();
 
-	void onEndFrame(float delta);
+	void onEndFrame();
 
 	void onEvent(const WindowResizedEvent& event);
 

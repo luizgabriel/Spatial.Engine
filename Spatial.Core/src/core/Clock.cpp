@@ -1,23 +1,21 @@
 #include <spatial/core/Clock.h>
 
+using namespace std::chrono;
+
+
 namespace spatial
 {
 
-using namespace std::chrono;
-
-Clock::Clock() : m_TimeStep(steady_clock::duration::zero()), m_LastTime(steady_clock::now())
+Clock::Clock() 
+	: m_timeStep(steady_clock::duration::zero()),
+	  m_lastTime(steady_clock::now())
 {
 }
 
 void Clock::tick()
 {
-	m_TimeStep = steady_clock::now() - m_LastTime;
-	m_LastTime = steady_clock::now();
-}
-
-delta_t Clock::getDeltaTime() const
-{
-	return duration_cast<duration<float>>(m_TimeStep);
+	m_timeStep = steady_clock::now() - m_lastTime;
+	m_lastTime = steady_clock::now();
 }
 
 } // namespace spatial

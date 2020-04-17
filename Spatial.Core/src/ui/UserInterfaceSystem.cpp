@@ -71,9 +71,9 @@ void UserInterfaceSystem::onStartFrame(float delta)
 	m_renderer.beforeRender(delta);
 }
 
-void UserInterfaceSystem::onUpdateGuiFrame(float delta)
+void UserInterfaceSystem::onEndGuiFrame()
 {
 	m_renderer.dispatchCommands();
 }
 
-} // namespace spatial::ui
+} // namespace spatial

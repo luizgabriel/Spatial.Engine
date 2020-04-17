@@ -31,7 +31,7 @@ public:
 
 	void onStartFrame(float delta);
 
-	void onUpdateGuiFrame(float delta);
+	void onEndGuiFrame();
 
 	void onEvent(const WindowResizedEvent& event);
 

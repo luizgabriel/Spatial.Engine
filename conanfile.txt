@@ -7,6 +7,7 @@ boost_tti/1.67.0@bincrafters/stable
 sdl2/2.0.12@bincrafters/stable
 filament/1.5.2@google/stable
 imgui/docking@ocornut/testing
+toml++/1.2.0@marzer/stable
 
 [options]
 sdl2:iconv=False

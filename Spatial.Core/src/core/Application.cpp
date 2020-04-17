@@ -6,8 +6,6 @@
 
 using namespace std::chrono_literals;
 
-namespace chr = std::chrono;
-
 namespace spatial
 {
 
@@ -35,7 +33,7 @@ int Application::run()
 {
 	m_running = true;
 
-	m_startSignal.trigger();
+	m_startSignal();
 
 	while (m_running)
 	{
@@ -43,32 +41,31 @@ int Application::run()
 
 		m_windowContext.pollEvents(m_ebus);
 
-		m_frameStartSignal.trigger(delta);
+		m_startFrameSignal(delta);
 
 		// Triggers all queued events
 		m_ebus.update<WindowResizedEvent>();
 		m_ebus.update();
 
-		m_updateSignal.trigger(delta);
+		m_updateFrameSignal(delta);
 
-		m_updateGuiSignal.trigger(delta);
+		m_endGuiFrameSignal();
+		m_endFrameSignal();
 
-		m_frameEndSignal.trigger(delta);
-
-		// Forces the Frame Rate
+		//std::this_thread::sleep_until(m_clock.getLastTime() + delta_t{m_desiredDelta});
 		std::this_thread::sleep_for(10ms);
-
+		
 		m_clock.tick();
 	}
 
-	m_finishSignal.trigger();
+	m_finishSignal();
 
 	return 0;
 }
 
 void Application::setMaxFps(float fps)
 {
-	m_desiredDelta = chr::duration<float>{1.0f / fps};
+	m_desiredDelta = 1.0f / fps;
 }
 
 } // namespace spatial::core
