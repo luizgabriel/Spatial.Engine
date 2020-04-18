@@ -4,19 +4,47 @@
 #include <chrono>
 #include <thread>
 
+
 using namespace std::chrono_literals;
 
 namespace spatial
 {
 
-Application::Application()
+Application::Application(const toml::table& config)
+	: m_window{[this, &config]()
+	  {
+		  const auto windowTitle = config["window"]["title"].as_string()->get();
+		  const auto windowWidth = config["window"]["width"].as_integer()->get();
+		  const auto windowHeight = config["window"]["height"].as_integer()->get();
+
+		  return this->m_windowContext.createWindow(windowWidth, windowHeight, windowTitle);
+	  }()},
+	  m_rendering{m_window.getNativeHandle()},
+	  m_ui{[this, &config]()
+	  {
+		  const auto fontPath = config["ui"]["font-path"].as_string()->get();
+		  return UserInterfaceSystem{this->m_rendering.getEngine(), fontPath};
+	  }()}
 {
 	m_ebus.connect<WindowClosedEvent>(this);
+	
+	m_input.attach(m_ebus);
+	m_rendering.attach(m_ebus);
+	m_ui.attach(m_ebus);
+
+	m_rendering.setupViewport(m_window.getFrameBufferSize());
+	m_ui.setupViewport(m_window.getWindowSize(), m_window.getFrameBufferSize());
+
+	m_rendering.pushFrontView(m_ui.getView());
 }
 
 Application::~Application()
 {
 	m_ebus.disconnect<WindowClosedEvent>(this);
+	
+	m_input.detach(m_ebus);
+	m_rendering.detach(m_ebus);
+	m_ui.detach(m_ebus);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)
@@ -33,15 +61,19 @@ int Application::run()
 {
 	m_running = true;
 
-	m_startSignal();
+	m_rendering.onStart();
+	m_ui.onStart();
 
+	m_startSignal();
+	
 	while (m_running)
 	{
 		const auto delta = m_clock.getDeltaTime().count();
 
-		m_windowContext.pollEvents(m_ebus);
+		m_input.onStartFrame(delta);
+		m_ui.onStartFrame(delta);
 
-		m_startFrameSignal(delta);
+		m_windowContext.pollEvents(m_ebus);
 
 		// Triggers all queued events
 		m_ebus.update<WindowResizedEvent>();
@@ -49,12 +81,13 @@ int Application::run()
 
 		m_updateFrameSignal(delta);
 
-		m_endGuiFrameSignal();
-		m_endFrameSignal();
+		m_drawGuiSignal();
 
-		//std::this_thread::sleep_until(m_clock.getLastTime() + delta_t{m_desiredDelta});
-		std::this_thread::sleep_for(10ms);
-		
+		m_ui.onEndGuiFrame();
+		m_rendering.onEndFrame();
+
+		std::this_thread::sleep_until(m_clock.getLastTime() + m_desiredDelta);
+
 		m_clock.tick();
 	}
 
@@ -65,7 +98,6 @@ int Application::run()
 
 void Application::setMaxFps(float fps)
 {
-	m_desiredDelta = 1.0f / fps;
+	m_desiredDelta = delta_t{1.0f / fps};
 }
-
 } // namespace spatial::core

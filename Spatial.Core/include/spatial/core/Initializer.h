@@ -1,8 +1,6 @@
 #pragma once
 
 #include <spatial/core/Application.h>
-#include <functional>
-
 namespace spatial
 {
 

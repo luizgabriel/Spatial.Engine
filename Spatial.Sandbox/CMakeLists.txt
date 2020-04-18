@@ -3,7 +3,7 @@ include(ResourcesLibrary)
 add_executable(Spatial.Sandbox
     src/main.cpp
     src/Sandbox.cpp
-    src/SandboxInterface.cpp
+    
 )
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)

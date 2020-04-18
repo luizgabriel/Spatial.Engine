@@ -38,12 +38,44 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	m_imguiContext = ImGui::CreateContext();
 }
 
+UserInterfaceRenderer::UserInterfaceRenderer(UserInterfaceRenderer&& other) noexcept
+	: m_engine{other.m_engine},
+	  m_view{std::move(other.m_view)},
+	  m_scene{std::move(other.m_scene)},
+	  m_camera{std::move(other.m_camera)},
+	  m_material{std::move(other.m_material)},
+	  m_entity{std::move(other.m_entity)},
+	  m_texture{std::move(other.m_texture)},
+	  m_vertexBuffers{std::move(other.m_vertexBuffers)},
+	  m_indexBuffers{std::move(other.m_indexBuffers)},
+	  m_materialInstances{std::move(other.m_materialInstances)},
+	  m_imguiContext{other.m_imguiContext}
+{
+}
+
+UserInterfaceRenderer& UserInterfaceRenderer::operator =(UserInterfaceRenderer&& other) noexcept
+{
+	m_engine = other.m_engine;
+	m_view = std::move(other.m_view);
+	m_scene = std::move(other.m_scene);
+	m_camera = std::move(other.m_camera);
+	m_material = std::move(other.m_material);
+	m_entity = std::move(other.m_entity);
+	m_texture = std::move(other.m_texture);
+	m_vertexBuffers = std::move(other.m_vertexBuffers);
+	m_indexBuffers = std::move(other.m_indexBuffers);
+	m_materialInstances = std::move(other.m_materialInstances);
+	m_imguiContext = other.m_imguiContext;
+
+	return *this;
+}
+
 void UserInterfaceRenderer::setup(const fs::path& fontPath)
 {
 	m_texture = imguiCreateTextureAtlas(m_engine, fontPath);
 
 	m_material->setDefaultParameter("albedo", m_texture.get(),
-									{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+	                                {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
@@ -111,7 +143,7 @@ void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float
 	imguiRefreshViewport(width, height, dpiX, dpiY);
 }
 
-void UserInterfaceRenderer::beforeRender(float delta)
+void UserInterfaceRenderer::beforeRender(float delta) const
 {
 	ImGui::SetCurrentContext(m_imguiContext);
 	imguiRefreshDeltaTime(delta);
@@ -195,7 +227,7 @@ void UserInterfaceRenderer::renderDrawData()
 				assert(mIter != scissorRects.end());
 				rBuilder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES, m_vertexBuffers[bufferIndex].get(),
-							  m_indexBuffers[bufferIndex].get(), indexOffset, pcmd.ElemCount)
+					          m_indexBuffers[bufferIndex].get(), indexOffset, pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, mIter->second);
 				primIndex++;
@@ -251,7 +283,7 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 }
 
 void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
-											   const ImVector<ImDrawIdx>& ib)
+                                               const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
@@ -275,5 +307,4 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 		m_indexBuffers[bufferIndex]->setBuffer(*m_engine, std::move(ibDescriptor));
 	}
 }
-
 } // namespace spatial::ui

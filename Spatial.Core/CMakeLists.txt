@@ -5,7 +5,6 @@ add_library(Spatial.Core
 	src/core/Asset.cpp
 	src/core/Logger.cpp
 	src/core/Clock.cpp
-	src/core/CoreSystemBundle.cpp
 
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
@@ -23,7 +22,7 @@ add_library(Spatial.Core
 	src/ui/UserInterfaceSystem.cpp
 	src/ui/UserInterfaceRenderer.cpp
 	src/ui/UserInterfaceInput.cpp
- "src/core/CoreSystemBundle.cpp")
+)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 17)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
 

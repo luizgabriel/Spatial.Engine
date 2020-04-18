@@ -36,6 +36,15 @@ public:
 	explicit UserInterfaceRenderer(filament::Engine* engine);
 	~UserInterfaceRenderer();
 
+
+	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
+
+	UserInterfaceRenderer(UserInterfaceRenderer&& other) noexcept;
+
+	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
+
+	UserInterfaceRenderer& operator=(UserInterfaceRenderer&& other) noexcept;
+
 	void setViewport(int width, int height, float dpiX, float dpiY);
 
 	/**
@@ -47,7 +56,7 @@ public:
 	 * \brief Should be called every frame start
 	 * @param delta The delta time in seconds
 	 */
-	void beforeRender(float delta);
+	void beforeRender(float delta) const;
 
 	/**
 	 * \brief Dispatches render commands. Should be called every frame, before the render

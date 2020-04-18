@@ -20,7 +20,7 @@ private:
 	std::filesystem::path m_fontPath;
 
 public:
-	UserInterfaceSystem(RenderingSystem& rendering, std::filesystem::path fontPath);
+	UserInterfaceSystem(filament::Engine* engine, std::filesystem::path fontPath);
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);
@@ -40,5 +40,7 @@ public:
 	void onEvent(const KeyEvent& event);
 
 	void onEvent(const TextEvent& event);
+
+	auto getView() { return m_renderer.getView(); }
 };
 } // namespace spatial

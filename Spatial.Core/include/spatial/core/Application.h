@@ -3,9 +3,11 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/common/Signal.h>
 #include <spatial/common/EventQueue.h>
-#include <spatial/core/Logger.h>
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
+#include <spatial/input/InputSystem.h>
+#include <spatial/ui/UserInterfaceSystem.h>
+#include <toml++/toml.h>
 
 namespace spatial
 {
@@ -14,25 +16,26 @@ class Application final
 {
 private:
 	bool m_running = false;
-
-	float m_desiredDelta{1.0f / 60.0f};
+	delta_t m_desiredDelta{1.0f / 60.0f};
 
 	EventQueue m_ebus{};
 	Clock m_clock{};
 
-	WindowContext m_windowContext{};
+	WindowContext m_windowContext;
+	Window m_window;
+	InputSystem m_input;
+	RenderingSystem m_rendering;
+	UserInterfaceSystem m_ui;
 
 	// region Signals
 	Signal<> m_startSignal;
-	Signal<float> m_startFrameSignal;
 	Signal<float> m_updateFrameSignal;
-	Signal<> m_endGuiFrameSignal;
-	Signal<> m_endFrameSignal;
+	Signal<> m_drawGuiSignal;
 	Signal<> m_finishSignal;
 	// endregion
 
 public:
-	Application();
+	Application(const toml::table& config);
 	~Application();
 
 	Application(const Application& other) = delete;
@@ -55,11 +58,6 @@ public:
 	auto& getStartSignal() { return m_startSignal; }
 
 	/**
-	 * \brief Called every start of frame
-	 */
-	auto& getStartFrameSignal() { return m_startFrameSignal; }
-
-	/**
 	 * \brief Called every update of frame
 	 */
 	auto& getUpdateFrameSignal() { return m_updateFrameSignal; }
@@ -67,12 +65,7 @@ public:
 	/**
 	 * \brief Called every update of frame
 	 */
-	auto& getEndGuiFrameSignal() { return m_endGuiFrameSignal; }
-
-	/**
-	 * \brief Called every end of frame
-	 */
-	auto& getEndFrameSignal() { return m_endFrameSignal; }
+	auto& getDrawGuiSignal() { return m_drawGuiSignal; }
 
 	/**
 	 * \brief Called when the application is closed
@@ -84,12 +77,26 @@ public:
 	 */
 	auto& getEBus()  { return m_ebus; }
 
-	/**
-	 * \brief Gets the window context
-	 * The window context is responsible for creating windows.
-	 * Its lifetime should last longer than all windows
+	/*
+	 * \brief Gets the main window
 	 */
-	const auto& getWindowContext() const { return m_windowContext; }
+	auto& getWindow() { return m_window; }
+
+	/*
+	 * \brief Gets the main window
+	 */
+	auto& getInputSystem() { return m_input; }
+
+	/*
+	 * \brief Gets the main window
+	 */
+	auto& getRenderingSystem() { return m_rendering; }
+
+	/*
+	 * \brief Get user interface
+	 */
+	auto& getUserInterfaceSystem() { return m_input; }
+	
 	// endregion Getters
 };
 
