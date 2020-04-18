@@ -7,7 +7,7 @@ add_executable(Spatial.Sandbox
 )
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
-set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD 17)
+set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD 20)
 set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD_REQUIRED ON)
 
 cmake_policy(SET CMP0091 NEW)

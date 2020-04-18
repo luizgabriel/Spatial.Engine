@@ -7,7 +7,7 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/input/InputSystem.h>
 #include <spatial/ui/UserInterfaceSystem.h>
-#include <toml++/toml.h>
+#include <spatial/core/Configuration.h>
 
 namespace spatial
 {
@@ -35,7 +35,7 @@ private:
 	// endregion
 
 public:
-	Application(const toml::table& config);
+	Application(const Configuration& config);
 	~Application();
 
 	Application(const Application& other) = delete;

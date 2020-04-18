@@ -10,19 +10,19 @@ using namespace std::chrono_literals;
 namespace spatial
 {
 
-Application::Application(const toml::table& config)
+Application::Application(const Configuration& config)
 	: m_window{[this, &config]()
 	  {
-		  const auto windowTitle = config["window"]["title"].as_string()->get();
-		  const auto windowWidth = config["window"]["width"].as_integer()->get();
-		  const auto windowHeight = config["window"]["height"].as_integer()->get();
+		  const auto windowTitle = config.get<std::string, 2>("window.title");
+		  const auto windowWidth = config.get<std::uint16_t, 2>("window.width");
+		  const auto windowHeight = config.get<std::uint16_t, 2>("window.height");
 
 		  return this->m_windowContext.createWindow(windowWidth, windowHeight, windowTitle);
 	  }()},
 	  m_rendering{m_window.getNativeHandle()},
 	  m_ui{[this, &config]()
 	  {
-		  const auto fontPath = config["ui"]["font-path"].as_string()->get();
+		  const auto fontPath = config.get<std::string, 2>("ui.font-path");
 		  return UserInterfaceSystem{this->m_rendering.getEngine(), fontPath};
 	  }()}
 {
