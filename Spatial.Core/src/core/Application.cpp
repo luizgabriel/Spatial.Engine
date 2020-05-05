@@ -1,9 +1,6 @@
 #include <spatial/core/Application.h>
-#include <spatial/desktop/PlatformEvent.h>
-
 #include <chrono>
 #include <thread>
-
 
 using namespace std::chrono_literals;
 
@@ -11,23 +8,22 @@ namespace spatial
 {
 
 Application::Application(const Configuration& config)
-	: m_window{[this, &config]()
-	  {
-		  const auto windowTitle = config.get<std::string, 2>("window.title");
-		  const auto windowWidth = config.get<std::uint16_t, 2>("window.width");
-		  const auto windowHeight = config.get<std::uint16_t, 2>("window.height");
+	: m_window{[this, &config]() {
+		  const auto windowTitle = config.get<std::string>("window.title");
+		  const auto windowWidth = config.get<int>("window.width");
+		  const auto windowHeight = config.get<int>("window.height");
 
 		  return this->m_windowContext.createWindow(windowWidth, windowHeight, windowTitle);
 	  }()},
+	  m_input{&m_window},
 	  m_rendering{m_window.getNativeHandle()},
-	  m_ui{[this, &config]()
-	  {
-		  const auto fontPath = config.get<std::string, 2>("ui.font-path");
+	  m_ui{[this, &config]() {
+		  const auto fontPath = config.get<std::string>("ui.font-path");
 		  return UserInterfaceSystem{this->m_rendering.getEngine(), fontPath};
 	  }()}
 {
 	m_ebus.connect<WindowClosedEvent>(this);
-	
+
 	m_input.attach(m_ebus);
 	m_rendering.attach(m_ebus);
 	m_ui.attach(m_ebus);
@@ -41,7 +37,7 @@ Application::Application(const Configuration& config)
 Application::~Application()
 {
 	m_ebus.disconnect<WindowClosedEvent>(this);
-	
+
 	m_input.detach(m_ebus);
 	m_rendering.detach(m_ebus);
 	m_ui.detach(m_ebus);
@@ -65,7 +61,7 @@ int Application::run()
 	m_ui.onStart();
 
 	m_startSignal();
-	
+
 	while (m_running)
 	{
 		const auto delta = m_clock.getDeltaTime().count();
@@ -100,4 +96,4 @@ void Application::setMaxFps(float fps)
 {
 	m_desiredDelta = delta_t{1.0f / fps};
 }
-} // namespace spatial::core
+} // namespace spatial

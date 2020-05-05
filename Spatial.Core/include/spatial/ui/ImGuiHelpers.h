@@ -19,7 +19,7 @@ SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine* engine, size_t capa
 
 SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine* engine, size_t capacity);
 
-uint64_t imguiMakeScissorKey(int fbheight, const ImVec4& clipRect);
+uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect);
 
 Texture imguiCreateTextureAtlas(filament::Engine* engine, const std::filesystem::path& font);
 

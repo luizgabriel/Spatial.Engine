@@ -47,4 +47,4 @@ public:
 	utils::Entity get() { return m_entity; }
 };
 
-} // namespace spatial::render
+} // namespace spatial

@@ -39,4 +39,4 @@ public:
 	auto getLight() const { return m_light.get(); }
 };
 
-} // namespace spatial::render
+} // namespace spatial

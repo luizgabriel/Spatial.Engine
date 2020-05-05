@@ -19,4 +19,4 @@ Texture createKtxTexture(filament::Engine* engine, const std::filesystem::path& 
 
 ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem::path& folder);
 
-} // namespace spatial::render
+} // namespace spatial

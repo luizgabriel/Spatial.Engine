@@ -3,7 +3,6 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/Key.h>
 
-
 namespace spatial
 {
 WindowContext::WindowContext()
@@ -25,8 +24,7 @@ void WindowContext::pollEvents(EventQueue& queue)
 	{
 		switch (e.type)
 		{
-		case SDL_QUIT: queue.enqueue<WindowClosedEvent>();
-			break;
+		case SDL_QUIT: queue.enqueue<WindowClosedEvent>(); break;
 
 		case SDL_TEXTINPUT: queue.enqueue<TextEvent>(std::string{e.text.text});
 
@@ -49,22 +47,19 @@ void WindowContext::pollEvents(EventQueue& queue)
 			break;
 		}
 
-		case SDL_MOUSEWHEEL: queue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
+		case SDL_MOUSEWHEEL: queue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y); break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
 			break;
 
-		case SDL_MOUSEBUTTONDOWN: queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed,
-		                                                  e.button.clicks);
+		case SDL_MOUSEBUTTONUP:
+			queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
 			break;
 
-		case SDL_MOUSEBUTTONUP: queue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released,
-		                                                e.button.clicks);
-			break;
+		case SDL_MOUSEMOTION: queue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y); break;
 
-		case SDL_MOUSEMOTION: queue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
-			break;
-
-		case SDL_DROPFILE: SDL_free(e.drop.file);
-			break;
+		case SDL_DROPFILE: SDL_free(e.drop.file); break;
 
 		case SDL_WINDOWEVENT:
 		{
@@ -84,12 +79,12 @@ void WindowContext::pollEvents(EventQueue& queue)
 
 			break;
 		}
-		default: ;
+		default:;
 		}
 	}
 }
 
-Window WindowContext::createWindow(int width, int height, std::string_view title) const noexcept
+Window WindowContext::createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept
 {
 	return Window{width, height, title};
 }

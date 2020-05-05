@@ -75,18 +75,17 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 	int width, height, n;
 	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
 
-	auto buffer = fl::Texture::PixelBufferDescriptor{data, size_t(width) * height * 4, fl::Texture::Format::RGBA,
-	                                                 fl::Texture::Type::UBYTE,
-	                                                 reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&
-		                                                 stbi_image_free)};
+	auto buffer = fl::Texture::PixelBufferDescriptor{
+		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
+		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	const auto texture = fl::Texture::Builder()
-	                     .width(uint32_t(width))
-	                     .height(uint32_t(height))
-	                     .levels(1)
-	                     .sampler(fl::Texture::Sampler::SAMPLER_2D)
-	                     .format(fl::Texture::InternalFormat::RGBA8)
-	                     .build(*engine);
+							 .width(uint32_t(width))
+							 .height(uint32_t(height))
+							 .levels(1)
+							 .sampler(fl::Texture::Sampler::SAMPLER_2D)
+							 .format(fl::Texture::InternalFormat::RGBA8)
+							 .build(*engine);
 
 	texture->setImage(*engine, 0, std::move(buffer));
 
@@ -127,7 +126,6 @@ bands_t parseShFile(const fs::path& file)
 	char c;
 	for (auto& band : bands)
 	{
-		// ReSharper disable once CppPossiblyErroneousEmptyStatements
 		while (!stream.eof() && stream >> c && c != '(');
 
 		stream >> band.r;

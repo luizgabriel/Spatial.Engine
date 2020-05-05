@@ -1,10 +1,12 @@
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/.conan/conanbuildinfo.cmake)
+set(CONAN_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.conan)
+
+if (EXISTS ${CONAN_CONFIG_DIR}/conanbuildinfo.cmake)
+    include(${CONAN_CONFIG_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 endif ()
 
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.conan/bin)
-    file(GLOB_RECURSE PROGRAMS_TOOLS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/.conan/bin/*")
+if (EXISTS ${CONAN_CONFIG_DIR}/bin)
+    file(GLOB_RECURSE PROGRAMS_TOOLS_FILES "${CONAN_CONFIG_DIR}/bin/*")
     install(
         PROGRAMS
             ${PROGRAMS_TOOLS_FILES}

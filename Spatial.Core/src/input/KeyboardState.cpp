@@ -1,15 +1,13 @@
-#include <spatial/input/Input.h>
+#include <spatial/input/Keyboard.h>
 
 namespace spatial
 {
 
-using namespace filament::math;
-
-InputState::InputState() : m_mousePosition{.0f, .0f}, m_keyPressed{}, m_keyReleased{}
+KeyboardState::KeyboardState() : m_keyPressed{}, m_keyReleased{}
 {
 }
 
-void InputState::set(const Key key, const KeyAction action)
+void KeyboardState::set(const Key key, const KeyAction action)
 {
 	switch (action)
 	{
@@ -21,33 +19,28 @@ void InputState::set(const Key key, const KeyAction action)
 	}
 }
 
-void InputState::setPressed(Key key)
+void KeyboardState::setPressed(Key key)
 {
 	const auto flag = static_cast<size_t>(key);
 	m_keyPressed.set(flag);
 	m_keyReleased.reset(flag);
 }
 
-void InputState::setReleased(Key key)
+void KeyboardState::setReleased(Key key)
 {
 	const auto flag = static_cast<size_t>(key);
 	m_keyPressed.reset(flag);
 	m_keyReleased.set(flag);
 }
 
-void InputState::reset(Key key)
+void KeyboardState::reset(Key key)
 {
 	m_keyReleased.reset(static_cast<size_t>(key));
 }
 
-void InputState::reset()
+void KeyboardState::reset()
 {
 	m_keyReleased.reset();
-}
-
-void InputState::setMousePosition(float2 position)
-{
-	m_mousePosition = position;
 }
 
 } // namespace spatial

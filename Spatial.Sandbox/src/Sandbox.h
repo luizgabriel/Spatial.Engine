@@ -1,15 +1,17 @@
 #pragma once
 
+#include <spatial/common/EventQueue.h>
+#include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/CommonResources.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/ImageBasedLight.h>
 #include <spatial/render/Mesh.h>
-#include <spatial/render/RenderingSystem.h>
 
 namespace fl = filament;
 
 namespace spatial
 {
+
 struct CameraData
 {
 	filament::math::float3 front{};
@@ -17,8 +19,8 @@ struct CameraData
 	filament::math::float3 up{};
 
 	float speed{1.0f};
-	float yaw{.0f};
-	float pitch{.0f};
+	float yaw{-131.0f};
+	float pitch{-12.0f};
 	float sensitivity{0.1f};
 };
 
@@ -59,13 +61,11 @@ private:
 		0.0f,
 	};
 
-	filament::math::float2 lastMouse{.0f, .0f};
-
 	bool showEngineGui{true};
 	bool enabledCameraController{true};
 
 public:
-	Sandbox(RenderingSystem& rendering);
+	Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filament::View* mainView);
 
 	void attach(EventQueue& queue);
 

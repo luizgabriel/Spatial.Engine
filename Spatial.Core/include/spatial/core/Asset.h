@@ -16,4 +16,4 @@ public:
 	static std::filesystem::path absolute(const std::filesystem::path& relative) { return s_basePath / relative; }
 };
 
-} // namespace spatial::core
+} // namespace spatial

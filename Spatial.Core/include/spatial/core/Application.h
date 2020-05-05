@@ -3,11 +3,11 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/common/Signal.h>
 #include <spatial/common/EventQueue.h>
+#include <spatial/common/Configuration.h>
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/input/InputSystem.h>
 #include <spatial/ui/UserInterfaceSystem.h>
-#include <spatial/core/Configuration.h>
 
 namespace spatial
 {
@@ -75,7 +75,7 @@ public:
 	/**
 	 * \brief Gets the main application event bus channel
 	 */
-	auto& getEBus()  { return m_ebus; }
+	auto& getEBus() { return m_ebus; }
 
 	/*
 	 * \brief Gets the main window
@@ -96,8 +96,8 @@ public:
 	 * \brief Get user interface
 	 */
 	auto& getUserInterfaceSystem() { return m_input; }
-	
+
 	// endregion Getters
 };
 
-} // namespace spatial::core
+} // namespace spatial

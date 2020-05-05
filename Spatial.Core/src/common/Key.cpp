@@ -7,7 +7,7 @@ std::string nameOf(const Key key)
 {
 	switch (key)
 	{
-		default: return "TODO";
+	default: return "TODO";
 	}
 }
 
@@ -15,10 +15,10 @@ std::string nameOf(const KeyAction action)
 {
 	switch (action)
 	{
-		default:
-		case KeyAction::None: return "TYPED";
-		case KeyAction::Pressed: return "PRESSED";
-		case KeyAction::Released: return "RELEASED";
+	default:
+	case KeyAction::None: return "TYPED";
+	case KeyAction::Pressed: return "PRESSED";
+	case KeyAction::Released: return "RELEASED";
 	}
 }
 

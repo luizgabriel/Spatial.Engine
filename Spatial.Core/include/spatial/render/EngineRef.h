@@ -12,18 +12,12 @@ private:
 	T* m_resource;
 
 public:
-	EngineRef(filament::Engine* engine, T* resource = nullptr)
-		: m_engine{engine},
-		  m_resource{resource}
+	EngineRef(filament::Engine* engine, T* resource = nullptr) : m_engine{engine}, m_resource{resource}
 	{
 		assert(m_engine != nullptr);
 	}
 
-	EngineRef(EngineRef&& other) noexcept
-		: m_engine{other.m_engine},
-		  m_resource{other.release()}
-	{
-	}
+	EngineRef(EngineRef&& other) noexcept : m_engine{other.m_engine}, m_resource{other.release()} {}
 
 	EngineRef(const EngineRef& w) = delete;
 
@@ -58,4 +52,4 @@ public:
 			m_engine->destroy(m_resource);
 	}
 };
-} // namespace spatial::render
+} // namespace spatial

@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/EventQueue.h>
+#include <math/vec2.h>
 
 namespace spatial
 {
@@ -39,26 +40,27 @@ public:
 
 	Window& operator=(Window&& other) noexcept;
 	Window& operator=(const Window& w) = delete;
+	void warpMouse(filament::math::float2 position);
 };
 
 class WindowContext
 {
 private:
 	bool m_valid{true};
-	
+
 public:
 	WindowContext();
 	~WindowContext();
 
 	void pollEvents(EventQueue& queue);
 
-	[[nodiscard]] Window createWindow(int width, int height, std::string_view title) const noexcept;
+	[[nodiscard]] Window createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept;
 
 	WindowContext(const WindowContext& c) = delete;
 	WindowContext& operator=(const WindowContext& w) = delete;
-	
+
 	WindowContext(WindowContext&& c) noexcept;
 	WindowContext& operator=(WindowContext&& other) noexcept = delete;
 };
 
-} // namespace spatial::desktop
+} // namespace spatial

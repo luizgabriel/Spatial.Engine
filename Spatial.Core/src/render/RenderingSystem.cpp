@@ -6,8 +6,7 @@ namespace bk = filament::backend;
 
 namespace spatial
 {
-RenderingSystem::RenderingSystem(void* nativeWindowHandle)
-	: RenderingSystem(nativeWindowHandle, bk::Backend::OPENGL)
+RenderingSystem::RenderingSystem(void* nativeWindowHandle) : RenderingSystem(nativeWindowHandle, bk::Backend::OPENGL)
 {
 }
 
@@ -20,28 +19,6 @@ RenderingSystem::RenderingSystem(void* nativeWindowHandle, const bk::Backend bac
 	  m_views{5}
 {
 	pushBackView(m_mainView.get());
-}
-
-RenderingSystem::RenderingSystem(RenderingSystem&& other) noexcept
-	: m_engine{other.m_engine},
-	  m_swapChain{std::move(other.m_swapChain)},
-	  m_renderer{std::move(other.m_renderer)},
-	  m_mainCamera{std::move(other.m_mainCamera)},
-	  m_mainView{std::move(other.m_mainView)},
-	  m_views{std::move(other.m_views)}
-{
-}
-
-RenderingSystem& RenderingSystem::operator=(RenderingSystem&& other) noexcept
-{
-	m_engine = other.m_engine;
-	m_swapChain = std::move(other.m_swapChain);
-	m_renderer = std::move(other.m_renderer);
-	m_mainCamera = std::move(other.m_mainCamera);
-	m_mainView = std::move(other.m_mainView);
-	m_views = std::move(other.m_views);
-
-	return *this;
 }
 
 void RenderingSystem::attach(EventQueue& queue)

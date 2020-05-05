@@ -81,4 +81,4 @@ SharedEngineRef<T> createSharedResource(filament::Engine* engine, T* instance) n
 	return {instance, [=](T* res) { engine->destroy(res); }};
 }
 
-} // namespace spatial::render
+} // namespace spatial

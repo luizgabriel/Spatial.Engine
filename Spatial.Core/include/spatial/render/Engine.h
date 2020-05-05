@@ -23,4 +23,4 @@ public:
 	const filament::Engine& ref() const { return *m_engine; }
 };
 
-} // namespace spatial::render
+} // namespace spatial

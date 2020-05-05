@@ -26,16 +26,10 @@ private:
 	std::deque<filament::View*> m_views;
 
 public:
-	RenderingSystem(void* nativeWindowHandle);
-
-	RenderingSystem(void* nativeWindowHandle, const filament::backend::Backend backend);
+	explicit RenderingSystem(void* nativeWindowHandle);
+	RenderingSystem(void* nativeWindowHandle, filament::backend::Backend backend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
-	
-	RenderingSystem(RenderingSystem&& other) noexcept;
-
-	RenderingSystem& operator=(RenderingSystem&& other) noexcept;
-	
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
 	void attach(EventQueue& queue);

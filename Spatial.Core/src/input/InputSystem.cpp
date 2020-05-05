@@ -1,11 +1,12 @@
 #include <spatial/input/InputSystem.h>
-#include <spatial/input/Input.h>
-
+#include <spatial/input/Keyboard.h>
+#include <spatial/input/Mouse.h>
 
 namespace spatial
 {
 
-InputSystem::InputSystem()
+InputSystem::InputSystem(Window* window)
+	: m_window{window}
 {
 }
 
@@ -25,18 +26,23 @@ void InputSystem::detach(EventQueue& queue)
 
 void InputSystem::onStartFrame(float delta)
 {
-	Input::s_inputState.reset();
+	if (Mouse::s_mouseState.isMouseWarpRequested()) {
+		m_window->warpMouse(Mouse::position());
+	}
+
+	Keyboard::s_keyboardState.reset();
+	Mouse::s_mouseState.reset();
 }
 
 void InputSystem::onEvent(const MouseMovedEvent& event)
 {
-	Input::s_inputState.setMousePosition({event.x, event.y});
+	Mouse::s_mouseState.set({event.x, event.y});
 }
 
 void InputSystem::onEvent(const KeyEvent& event)
 {
-	auto key = event.key;
-	Input::s_inputState.set(key, event.action);
+	const auto key = event.key;
+	Keyboard::s_keyboardState.set(key, event.action);
 }
 
 void InputSystem::onEvent(const TextEvent& event)

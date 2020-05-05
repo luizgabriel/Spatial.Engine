@@ -1,7 +1,7 @@
 include(CMakeParseArguments)
 
 
-find_program(MATC_PROGRAM matc HINTS ${CMAKE_BINARY_DIR})
+find_program(MATC_PROGRAM matc HINTS ${CONAN_CONFIG_DIR})
 
 function(add_material_resources TARGET)
     set(oneValueArgs OUTPUT)
@@ -11,6 +11,8 @@ function(add_material_resources TARGET)
     if(NOT IS_ABSOLUTE ${ARG_OUTPUT})
         set(ARG_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${ARG_OUTPUT}")
     endif()
+
+    file(MAKE_DIRECTORY ${ARG_OUTPUT})
 
     foreach(SOURCE ${ARG_SOURCES})
         get_filename_component(FILE_NAME ${SOURCE} NAME)

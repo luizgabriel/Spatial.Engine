@@ -2,7 +2,7 @@
 
 #include <spatial/render/CommonResources.h>
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/input/Input.h>
+#include <spatial/input/Keyboard.h>
 #include <spatial/core/Logger.h>
 
 #include <imgui.h>
@@ -12,7 +12,7 @@
 #include <filament/TextureSampler.h>
 
 #include <cmath>
-
+#include <spatial/input/Mouse.h>
 
 namespace fl = filament;
 using namespace filament::math;
@@ -29,10 +29,10 @@ namespace spatial
 
 Logger gLogger = createDefaultLogger();
 
-Sandbox::Sandbox(RenderingSystem& rendering)
-	: m_engine{rendering.getEngine()},
-	  m_camera{rendering.getMainCamera()},
-	  m_view{rendering.getMainView()},
+Sandbox::Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filament::View* mainView)
+	: m_engine{engine},
+	  m_camera{mainCamera},
+	  m_view{mainView},
 
 	  m_scene{createScene(m_engine)},
 	  m_material{createMaterial(m_engine, "materials/default")},
@@ -75,8 +75,7 @@ void Sandbox::onStart()
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
 {
-	const auto mousePos = Input::mouse();
-	const auto offset = (lastMouse - mousePos) * cameraData.sensitivity;
+	const auto offset = Mouse::offset() * -cameraData.sensitivity;
 
 	if (enabledCameraController)
 	{
@@ -90,29 +89,27 @@ void Sandbox::onEvent(const MouseMovedEvent& e)
 						   sin(radians(cameraData.yaw)) * cos(radians(cameraData.pitch))};
 
 	cameraData.front = normalize(direction);
-
-	lastMouse = mousePos;
 }
 
 void Sandbox::onUpdateFrame(float delta)
 {
-	if (Input::released(Key::C))
+	if (Keyboard::released(Key::C))
 		enabledCameraController = !enabledCameraController;
-	
+
 	if (enabledCameraController)
 	{
 		const float cameraSpeed = cameraData.speed * delta;
 
-		if (Input::pressed(Key::W))
+		if (Keyboard::pressed(Key::W))
 			cameraData.pos += cameraSpeed * cameraData.front;
 
-		if (Input::pressed(Key::S))
+		if (Keyboard::pressed(Key::S))
 			cameraData.pos -= cameraSpeed * cameraData.front;
 
-		if (Input::pressed(Key::A))
+		if (Keyboard::pressed(Key::A))
 			cameraData.pos -= normalize(cross(cameraData.front, cameraData.up)) * cameraSpeed;
 
-		if (Input::pressed(Key::D))
+		if (Keyboard::pressed(Key::D))
 			cameraData.pos += normalize(cross(cameraData.front, cameraData.up)) * cameraSpeed;
 	}
 
@@ -126,7 +123,7 @@ void Sandbox::onUpdateFrame(float delta)
 
 void Sandbox::onDrawGui()
 {
-	if (Input::released(Key::G))
+	if (Keyboard::released(Key::G))
 		showEngineGui = !showEngineGui;
 
 	if (showEngineGui)
@@ -145,4 +142,4 @@ void Sandbox::onDrawGui()
 		ImGui::End();
 	}
 }
-} // namespace spatial::sandbox
+} // namespace spatial

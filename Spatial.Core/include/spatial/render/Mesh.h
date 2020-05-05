@@ -54,4 +54,4 @@ public:
 	// endregion
 };
 
-} // namespace spatial::render
+} // namespace spatial

@@ -2,13 +2,10 @@
 
 using namespace std::chrono;
 
-
 namespace spatial
 {
 
-Clock::Clock() 
-	: m_timeStep(steady_clock::duration::zero()),
-	  m_lastTime(steady_clock::now())
+Clock::Clock() : m_timeStep(steady_clock::duration::zero()), m_lastTime(steady_clock::now())
 {
 }
 

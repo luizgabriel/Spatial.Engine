@@ -1,18 +1,21 @@
 #pragma once
 
+#include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/EventQueue.h>
+
 
 namespace spatial
 {
 
 class InputSystem
 {
-public:
-	InputSystem();
+private:
+	Window* m_window;
 
+public:
+	explicit InputSystem(Window* window);
 	InputSystem(const InputSystem& other) = delete;
-	InputSystem(InputSystem&& other) = default;
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);

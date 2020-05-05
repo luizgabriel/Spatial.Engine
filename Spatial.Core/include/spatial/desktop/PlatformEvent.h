@@ -57,4 +57,4 @@ struct MouseScrolledEvent
 	MouseScrolledEvent(double x, double y) : xOffset{x}, yOffset{y} {}
 };
 
-} // namespace spatial::desktop
+} // namespace spatial

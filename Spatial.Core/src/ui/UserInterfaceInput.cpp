@@ -66,4 +66,4 @@ void UserInterfaceInput::setText(const std::string& text)
 	io.AddInputCharactersUTF8(text.c_str());
 }
 
-} // namespace spatial::ui
+} // namespace spatial

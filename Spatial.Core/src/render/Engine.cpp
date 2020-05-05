@@ -3,8 +3,7 @@
 namespace spatial
 {
 
-RenderEngine::RenderEngine(const filament::backend::Backend backend)
-	: m_engine{filament::Engine::create(backend)}
+RenderEngine::RenderEngine(const filament::backend::Backend backend) : m_engine{filament::Engine::create(backend)}
 {
 }
 

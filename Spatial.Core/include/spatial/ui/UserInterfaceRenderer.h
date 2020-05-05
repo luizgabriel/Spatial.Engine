@@ -24,7 +24,7 @@ private:
 	std::vector<SharedVertexBuffer> m_vertexBuffers;
 	std::vector<SharedIndexBuffer> m_indexBuffers;
 	std::vector<SharedMaterialInstance> m_materialInstances;
-	
+
 	ImGuiContext* m_imguiContext;
 
 	void renderDrawData();
@@ -35,7 +35,6 @@ private:
 public:
 	explicit UserInterfaceRenderer(filament::Engine* engine);
 	~UserInterfaceRenderer();
-
 
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
 
@@ -68,4 +67,4 @@ public:
 	// endregion
 };
 
-} // namespace spatial::ui
+} // namespace spatial

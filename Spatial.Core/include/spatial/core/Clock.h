@@ -16,14 +16,11 @@ public:
 
 	auto getLastTime() const { return m_lastTime; }
 
-	auto getDeltaTime() const
-	{
-		return std::chrono::duration_cast<delta_t>(m_timeStep);
-	}
+	auto getDeltaTime() const { return std::chrono::duration_cast<delta_t>(m_timeStep); }
 
 private:
 	std::chrono::steady_clock::duration m_timeStep;
 	std::chrono::steady_clock::time_point m_lastTime;
 };
 
-} // namespace spatial::core
+} // namespace spatial
