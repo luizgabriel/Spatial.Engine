@@ -4,7 +4,6 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/EventQueue.h>
 
-
 namespace spatial
 {
 

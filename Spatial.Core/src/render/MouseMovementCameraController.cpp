@@ -16,9 +16,7 @@ constexpr auto radians(AngleType angle) noexcept
 }
 
 MouseMovementCameraController::MouseMovementCameraController(float mouseSensitivity, float yaw, float pitch) noexcept
-	: m_mouseSensitivity{mouseSensitivity},
-	  m_rotation{yaw, pitch},
-	  m_direction{.0f, .0f, .0f}
+	: m_mouseSensitivity{mouseSensitivity}, m_rotation{yaw, pitch}, m_direction{.0f, .0f, .0f}
 {
 	onMouseMoved(center);
 }
@@ -35,7 +33,8 @@ void MouseMovementCameraController::onMouseMoved(math::float2 normalizedMousePos
 
 void MouseMovementCameraController::updateDirections()
 {
-	auto direction = math::float3{cos(radians(m_rotation.x)) * cos(radians(m_rotation.y)), sin(radians(m_rotation.y)),
+	auto direction = math::float3{cos(radians(m_rotation.x)) * cos(radians(m_rotation.y)),
+								  sin(radians(m_rotation.y)),
 								  sin(radians(m_rotation.x)) * cos(radians(m_rotation.y))};
 
 	m_direction = normalize(direction);

@@ -58,7 +58,10 @@ public:
 	void dispatchCommands();
 
 	// region Getters
-	auto getView() { return m_view.get(); }
+	auto getView()
+	{
+		return m_view.get();
+	}
 	// endregion
 };
 

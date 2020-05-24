@@ -15,11 +15,19 @@ private:
 	entt::sink<CallbackFn> m_sink;
 
 public:
-	Signal() : m_sigh{}, m_sink{m_sigh} {}
+	Signal() : m_sigh{}, m_sink{m_sigh}
+	{
+	}
 
-	void operator()(Args... args) noexcept { trigger(std::template forward<Args>(args)...); }
+	void operator()(Args... args) noexcept
+	{
+		trigger(std::template forward<Args>(args)...);
+	}
 
-	void trigger(Args... args) { m_sigh.publish(std::template forward<Args>(args)...); }
+	void trigger(Args... args)
+	{
+		m_sigh.publish(std::template forward<Args>(args)...);
+	}
 
 	template <auto Function>
 	void connect()

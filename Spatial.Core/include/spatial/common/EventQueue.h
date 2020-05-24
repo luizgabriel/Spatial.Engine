@@ -17,7 +17,10 @@ public:
 		m_dispatcher.update<Event>();
 	}
 
-	void update() const { m_dispatcher.update(); }
+	void update() const
+	{
+		m_dispatcher.update();
+	}
 
 	template <typename Event, auto Function>
 	void connect()

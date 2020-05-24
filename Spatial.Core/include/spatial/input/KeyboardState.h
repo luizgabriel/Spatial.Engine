@@ -27,13 +27,25 @@ public:
 
 	void reset();
 
-	[[nodiscard]] bool released(Key key) const { return m_keyReleased.test(static_cast<size_t>(key)); }
+	[[nodiscard]] bool released(Key key) const
+	{
+		return m_keyReleased.test(static_cast<size_t>(key));
+	}
 
-	[[nodiscard]] bool pressed(Key key) const { return m_keyPressed.test(static_cast<size_t>(key)); }
+	[[nodiscard]] bool pressed(Key key) const
+	{
+		return m_keyPressed.test(static_cast<size_t>(key));
+	}
 
-	[[nodiscard]] bool combined(Key alt1, Key key) const { return pressed(alt1) && released(key); }
+	[[nodiscard]] bool combined(Key alt1, Key key) const
+	{
+		return pressed(alt1) && released(key);
+	}
 
-	[[nodiscard]] bool combined(Key alt1, Key alt2, Key key) const { return pressed(alt1) && pressed(alt2) && released(key); }
+	[[nodiscard]] bool combined(Key alt1, Key alt2, Key key) const
+	{
+		return pressed(alt1) && pressed(alt2) && released(key);
+	}
 
 	[[nodiscard]] bool combined(Key alt1, Key alt2, Key alt3, Key key) const
 	{

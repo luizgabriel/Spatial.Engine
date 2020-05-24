@@ -5,10 +5,7 @@ using namespace filament::math;
 namespace spatial
 {
 
-MouseState::MouseState()
-	: m_currentMousePosition{.0f, .0f},
-	  m_lastMousePosition{.0f, .0f},
-	  m_mouseWarpRequested{false}
+MouseState::MouseState() : m_currentMousePosition{.0f, .0f}, m_lastMousePosition{.0f, .0f}, m_mouseWarpRequested{false}
 {
 }
 
@@ -23,7 +20,8 @@ void MouseState::reset()
 	m_mouseWarpRequested = false;
 }
 
-void MouseState::warpMouseInWindow(float2 position) {
+void MouseState::warpMouseInWindow(float2 position)
+{
 	m_mouseWarpRequested = true;
 	set(position);
 }

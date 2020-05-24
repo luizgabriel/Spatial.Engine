@@ -41,7 +41,9 @@ private:
 	toml::parse_result m_table;
 
 public:
-	explicit Configuration(toml::parse_result table) : m_table{std::move(table)} {}
+	explicit Configuration(toml::parse_result table) : m_table{std::move(table)}
+	{
+	}
 
 	template <typename DataType>
 	DataType get(const std::string_view name) const

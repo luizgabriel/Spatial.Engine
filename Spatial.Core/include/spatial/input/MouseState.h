@@ -17,9 +17,18 @@ public:
 
 	void set(filament::math::float2 position);
 
-	auto getCurrentPosition() { return m_currentMousePosition; }
-	auto getLastPosition() { return m_lastMousePosition; }
-	bool isMouseWarpRequested() { return m_mouseWarpRequested; }
+	auto getCurrentPosition()
+	{
+		return m_currentMousePosition;
+	}
+	auto getLastPosition()
+	{
+		return m_lastMousePosition;
+	}
+	bool isMouseWarpRequested()
+	{
+		return m_mouseWarpRequested;
+	}
 
 	void warpMouseInWindow(filament::math::float2 position);
 	void reset();

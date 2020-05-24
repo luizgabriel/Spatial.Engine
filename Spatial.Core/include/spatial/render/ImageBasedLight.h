@@ -17,8 +17,11 @@ private:
 	Texture m_skyboxTexture;
 
 public:
-	ImageBasedLight(filament::Engine* engine, filament::IndirectLight* light, filament::Texture* texture,
-					filament::Skybox* skybox, filament::Texture* skyboxTexture)
+	ImageBasedLight(filament::Engine* engine,
+					filament::IndirectLight* light,
+					filament::Texture* texture,
+					filament::Skybox* skybox,
+					filament::Texture* skyboxTexture)
 		: m_light{createResource(engine, light)},
 		  m_texture{createResource(engine, texture)},
 		  m_skybox{createResource(engine, skybox)},
@@ -37,9 +40,15 @@ public:
 	ImageBasedLight(const ImageBasedLight& other) = delete;
 	ImageBasedLight& operator=(const ImageBasedLight& w) = delete;
 
-	[[nodiscard]] auto getSkybox() const { return m_skybox.get(); }
+	[[nodiscard]] auto getSkybox() const
+	{
+		return m_skybox.get();
+	}
 
-	[[nodiscard]] auto getLight() const { return m_light.get(); }
+	[[nodiscard]] auto getLight() const
+	{
+		return m_light.get();
+	}
 };
 
 } // namespace spatial

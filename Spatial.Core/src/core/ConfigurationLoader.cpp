@@ -11,7 +11,7 @@ namespace spatial
 Configuration readConfigFile(const fs::path& filePath)
 {
 	const auto path = Asset::absolute(filePath);
-	return Configuration{ toml::parse_file(path.generic_u8string()) };
+	return Configuration{toml::parse_file(path.generic_u8string())};
 }
 
 } // namespace spatial

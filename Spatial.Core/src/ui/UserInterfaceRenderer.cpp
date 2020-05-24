@@ -42,7 +42,8 @@ void UserInterfaceRenderer::setup(const fs::path& fontPath)
 {
 	m_texture = imguiCreateTextureAtlas(m_engine, fontPath);
 
-	m_material->setDefaultParameter("albedo", m_texture.get(),
+	m_material->setDefaultParameter("albedo",
+									m_texture.get(),
 									{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
 	auto& io = ImGui::GetIO();
@@ -194,8 +195,12 @@ void UserInterfaceRenderer::renderDrawData()
 				auto mIter = scissorRects.find(sKey);
 				assert(mIter != scissorRects.end());
 				rBuilder
-					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES, m_vertexBuffers[bufferIndex].get(),
-							  m_indexBuffers[bufferIndex].get(), indexOffset, pcmd.ElemCount)
+					.geometry(primIndex,
+							  fl::RenderableManager::PrimitiveType::TRIANGLES,
+							  m_vertexBuffers[bufferIndex].get(),
+							  m_indexBuffers[bufferIndex].get(),
+							  indexOffset,
+							  pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, mIter->second);
 				primIndex++;
@@ -250,7 +255,8 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 	}
 }
 
-void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
+void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
+											   const ImVector<ImDrawVert>& vb,
 											   const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into

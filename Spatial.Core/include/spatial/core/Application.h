@@ -3,11 +3,8 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/common/Signal.h>
 #include <spatial/common/EventQueue.h>
-#include <spatial/common/Configuration.h>
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/input/InputSystem.h>
-#include <spatial/ui/UserInterfaceSystem.h>
 
 namespace spatial
 {
@@ -16,25 +13,26 @@ class Application final
 {
 private:
 	bool m_running = false;
-	delta_t m_desiredDelta{1.0f / 60.0f};
 
 	EventQueue m_ebus{};
-	Clock m_clock{};
+	Clock<float> m_clock{};
+	float m_desiredDelta{1.0f / 60.0f};
 
 	WindowContext m_windowContext;
-	Window m_window;
-	InputSystem m_input;
-	RenderingSystem m_rendering;
 
 	// region Signals
 	Signal<> m_startSignal;
+
+	Signal<float> m_startFrameSignal;
 	Signal<float> m_updateFrameSignal;
 	Signal<> m_drawGuiSignal;
+	Signal<> m_endFrameSignal;
+
 	Signal<> m_finishSignal;
 	// endregion
 
 public:
-	Application(const Configuration& config);
+	Application();
 	~Application();
 
 	Application(const Application& other) = delete;
@@ -44,59 +42,54 @@ public:
 
 	void stop();
 
-	bool isRunning() const { return m_running; }
+	bool isRunning() const
+	{
+		return m_running;
+	}
 
 	void onEvent(const WindowClosedEvent& event);
 
 	void setMaxFps(float fps);
 
-	// region Getters
-	/**
-	 * \brief Called when the application is start by `run()`
-	 */
-	auto& getStartSignal() { return m_startSignal; }
+	auto& getEBus()
+	{
+		return m_ebus;
+	}
 
-	/**
-	 * \brief Called every update of frame
-	 */
-	auto& getUpdateFrameSignal() { return m_updateFrameSignal; }
+	auto& getWindowContext()
+	{
+		return m_windowContext;
+	}
 
-	/**
-	 * \brief Called every update of frame
-	 */
-	auto& getDrawGuiSignal() { return m_drawGuiSignal; }
+	auto& getStartSignal()
+	{
+		return m_startSignal;
+	}
 
-	/**
-	 * \brief Called when the application is closed
-	 */
-	auto& getFinishSignal() { return m_finishSignal; }
+	auto& getFinishSignal()
+	{
+		return m_finishSignal;
+	}
 
-	/**
-	 * \brief Gets the main application event bus channel
-	 */
-	auto& getEBus() { return m_ebus; }
+	auto& getStartFrameSignal()
+	{
+		return m_startFrameSignal;
+	}
 
-	/*
-	 * \brief Gets the main window
-	 */
-	auto& getWindow() { return m_window; }
+	auto& getUpdateFrameSignal()
+	{
+		return m_updateFrameSignal;
+	}
 
-	/*
-	 * \brief Gets the main window
-	 */
-	auto& getInputSystem() { return m_input; }
+	auto& getEndFrameSignal()
+	{
+		return m_endFrameSignal;
+	}
 
-	/*
-	 * \brief Gets the main window
-	 */
-	auto& getRenderingSystem() { return m_rendering; }
-
-	/*
-	 * \brief Get user interface
-	 */
-	auto& getUserInterfaceSystem() { return m_input; }
-
-	// endregion Getters
+	auto& getDrawGuiSignal()
+	{
+		return m_drawGuiSignal;
+	}
 };
 
 } // namespace spatial

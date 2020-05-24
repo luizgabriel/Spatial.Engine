@@ -10,6 +10,7 @@
 #include <filament/Viewport.h>
 
 #include <deque>
+#include <spatial/desktop/Window.h>
 
 namespace spatial
 {
@@ -26,8 +27,8 @@ private:
 	std::deque<filament::View*> m_views;
 
 public:
-	explicit RenderingSystem(void* nativeWindowHandle);
-	RenderingSystem(void* nativeWindowHandle, filament::backend::Backend backend);
+	explicit RenderingSystem(Window* window);
+	RenderingSystem(Window* window, filament::backend::Backend backend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
@@ -62,11 +63,20 @@ public:
 	void popBackView();
 
 	// region Getters
-	auto getEngine() { return m_engine.get(); }
+	auto getEngine()
+	{
+		return m_engine.get();
+	}
 
-	auto getMainView() { return m_mainView.get(); }
+	auto getMainView()
+	{
+		return m_mainView.get();
+	}
 
-	auto getMainCamera() { return m_mainCamera.get(); }
+	auto getMainCamera()
+	{
+		return m_mainCamera.get();
+	}
 
 	void setupViewport(const std::pair<int, int>& frameBufferSize);
 	// endregion

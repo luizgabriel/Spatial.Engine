@@ -12,7 +12,11 @@ BOOST_TTI_HAS_MEMBER_FUNCTION(detach);
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onStart);
 
+BOOST_TTI_HAS_MEMBER_FUNCTION(onStartFrame);
+
 BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdateFrame);
+
+BOOST_TTI_HAS_MEMBER_FUNCTION(onEndFrame);
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onDrawGui);
 
@@ -28,7 +32,13 @@ template <typename T>
 constexpr bool has_on_start_v = has_member_function_onStart<T, void>::value;
 
 template <typename T>
+constexpr bool has_on_start_frame_v = has_member_function_onStartFrame<T, void, boost::mpl::vector<float>>::value;
+
+template <typename T>
 constexpr bool has_on_update_frame_v = has_member_function_onUpdateFrame<T, void, boost::mpl::vector<float>>::value;
+
+template <typename T>
+constexpr bool has_on_end_frame_v = has_member_function_onEndFrame<T, void>::value;
 
 template <typename T>
 constexpr bool has_on_draw_gui_v = has_member_function_onDrawGui<T, void>::value;
@@ -49,9 +59,19 @@ void connect(Application& app, Handler* instance)
 		app.getStartSignal().connect<&Handler::onStart>(instance);
 	}
 
+	if constexpr (has_on_start_frame_v<Handler>)
+	{
+		app.getStartFrameSignal().connect<&Handler::onStartFrame, Handler>(instance);
+	}
+
 	if constexpr (has_on_update_frame_v<Handler>)
 	{
 		app.getUpdateFrameSignal().connect<&Handler::onUpdateFrame, Handler>(instance);
+	}
+
+	if constexpr (has_on_end_frame_v<Handler>)
+	{
+		app.getEndFrameSignal().connect<&Handler::onEndFrame, Handler>(instance);
 	}
 
 	if constexpr (has_on_draw_gui_v<Handler>)
@@ -84,14 +104,24 @@ void disconnect(Application& app, Handler* instance)
 		app.getStartSignal().disconnect<&Handler::onStart>(instance);
 	}
 
+	if constexpr (has_on_start_frame_v<Handler>)
+	{
+		app.getStartFrameSignal().disconnect<&Handler::onStartFrame, Handler>(instance);
+	}
+
 	if constexpr (has_on_update_frame_v<Handler>)
 	{
 		app.getUpdateFrameSignal().disconnect<&Handler::onUpdateFrame, Handler>(instance);
 	}
 
+	if constexpr (has_on_end_frame_v<Handler>)
+	{
+		app.getEndFrameSignal().disconnect<&Handler::onEndFrame, Handler>(instance);
+	}
+
 	if constexpr (has_on_draw_gui_v<Handler>)
 	{
-		app.getDrawGuiSignal().disconnect<&Handler::onDrawGui, Handler>(instance);
+		app.getDrawGuiSignal().disconnect<&Handler::onDrawGui>(instance);
 	}
 
 	if constexpr (has_on_finish_v<Handler>)

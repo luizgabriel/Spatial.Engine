@@ -8,8 +8,7 @@ namespace spatial
 {
 
 UserInterfaceSystem::UserInterfaceSystem(filament::Engine* engine, fs::path fontPath)
-	: m_renderer{engine},
-	  m_fontPath{std::move(fontPath)}
+	: m_renderer{engine}, m_fontPath{std::move(fontPath)}
 {
 }
 

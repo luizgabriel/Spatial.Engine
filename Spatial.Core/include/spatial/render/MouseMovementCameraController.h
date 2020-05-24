@@ -16,6 +16,7 @@ private:
 
 	math::float2 m_rotation;
 	math::float3 m_direction;
+
 public:
 	explicit MouseMovementCameraController(float mouseSensitivity, float yaw = .0f, float pitch = .0f) noexcept;
 

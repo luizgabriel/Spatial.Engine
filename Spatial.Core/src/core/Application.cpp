@@ -1,37 +1,21 @@
 #include <spatial/core/Application.h>
 #include <chrono>
 #include <thread>
+#include <spatial/core/Logger.h>
 
 using namespace std::chrono_literals;
 
 namespace spatial
 {
 
-Application::Application(const Configuration& config)
-	: m_window{[this, &config]() {
-		  const auto windowTitle = config.get<std::string>("window.title");
-		  const auto windowWidth = config.get<int>("window.width");
-		  const auto windowHeight = config.get<int>("window.height");
-
-		  return this->m_windowContext.createWindow(windowWidth, windowHeight, windowTitle);
-	  }()},
-	  m_input{&m_window},
-	  m_rendering{m_window.getNativeHandle()}
+Application::Application()
 {
 	m_ebus.connect<WindowClosedEvent>(this);
-
-	m_input.attach(m_ebus);
-	m_rendering.attach(m_ebus);
-
-	m_rendering.setupViewport(m_window.getFrameBufferSize());
 }
 
 Application::~Application()
 {
 	m_ebus.disconnect<WindowClosedEvent>(this);
-
-	m_input.detach(m_ebus);
-	m_rendering.detach(m_ebus);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)
@@ -48,15 +32,11 @@ int Application::run()
 {
 	m_running = true;
 
-	m_rendering.onStart();
-
 	m_startSignal();
 
 	while (m_running)
 	{
 		const auto delta = m_clock.getDeltaTime().count();
-
-		m_input.onStartFrame(delta);
 
 		m_windowContext.pollEvents(m_ebus);
 
@@ -64,13 +44,17 @@ int Application::run()
 		m_ebus.update<WindowResizedEvent>();
 		m_ebus.update();
 
-		m_updateFrameSignal(delta);
+		m_startFrameSignal(delta);
 
-		m_drawGuiSignal();
+		while (m_clock.hasLag(m_desiredDelta))
+		{
+			m_updateFrameSignal(m_desiredDelta);
+			m_clock.fixLag();
+		}
 
-		m_rendering.onEndFrame();
+		m_endFrameSignal();
 
-		std::this_thread::sleep_until(m_clock.getLastTime() + m_desiredDelta);
+		std::this_thread::sleep_until(m_clock.getLastTime() + Clock<float>::delta_t{m_desiredDelta});
 
 		m_clock.tick();
 	}
@@ -82,6 +66,7 @@ int Application::run()
 
 void Application::setMaxFps(float fps)
 {
-	m_desiredDelta = delta_t{1.0f / fps};
+	m_desiredDelta = 1.0f / fps;
 }
+
 } // namespace spatial

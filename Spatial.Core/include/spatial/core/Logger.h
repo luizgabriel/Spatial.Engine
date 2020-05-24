@@ -7,8 +7,8 @@ namespace spatial
 
 using Logger = spdlog::logger;
 
-Logger createDefaultLogger();
+Logger createDefaultLogger() noexcept;
 
-Logger createDefaultLogger(const std::string& output);
+Logger createDefaultLogger(const std::string& output) noexcept;
 
 } // namespace spatial

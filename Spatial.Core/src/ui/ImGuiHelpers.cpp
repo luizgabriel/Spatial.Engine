@@ -45,10 +45,16 @@ SharedVertexBuffer imguiCreateVertexBuffer(fl::Engine* engine, size_t capacity)
 				  .vertexCount(capacity)
 				  .bufferCount(1)
 				  .attribute(fl::VertexAttribute::POSITION, 0, fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
-				  .attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2, sizeof(fl::math::float2),
+				  .attribute(fl::VertexAttribute::UV0,
+							 0,
+							 fl::VertexBuffer::AttributeType::FLOAT2,
+							 sizeof(fl::math::float2),
 							 sizeof(ImDrawVert))
-				  .attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
-							 2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
+				  .attribute(fl::VertexAttribute::COLOR,
+							 0,
+							 fl::VertexBuffer::AttributeType::UBYTE4,
+							 2 * sizeof(fl::math::float2),
+							 sizeof(ImDrawVert))
 				  .normalized(fl::VertexAttribute::COLOR)
 				  .build(*engine);
 

@@ -29,7 +29,10 @@ public:
 	~Window();
 
 	void* getNativeHandle() const;
-	SDL_Window* getHandle() const { return m_windowHandle; }
+	SDL_Window* getHandle() const
+	{
+		return m_windowHandle;
+	}
 
 	std::pair<int, int> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;

@@ -64,9 +64,12 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 	int width, height, n;
 	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
 
-	auto buffer = fl::Texture::PixelBufferDescriptor{
-		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
-		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
+	auto buffer =
+		fl::Texture::PixelBufferDescriptor{data,
+										   size_t(width) * height * 4,
+										   fl::Texture::Format::RGBA,
+										   fl::Texture::Type::UBYTE,
+										   reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	const auto texture = fl::Texture::Builder()
 							 .width(uint32_t(width))
@@ -139,16 +142,10 @@ ImageBasedLight createIblFromKtx(fl::Engine* engine, const fs::path& folder)
 	const auto shPath = folder / "sh.txt";
 	auto bands = parseShFile(shPath);
 
-	auto light = fl::IndirectLight::Builder()
-					.reflections(texture.get())
-					.irradiance(3, &bands[0])
-					.intensity(30000.0f)
-					.build(*engine);
+	auto light =
+		fl::IndirectLight::Builder().reflections(texture.get()).irradiance(3, &bands[0]).intensity(30000.0f).build(*engine);
 
-	auto skybox = fl::Skybox::Builder()
-					  .environment(skyboxTexture.get())
-					  .showSun(true)
-					  .build(*engine);
+	auto skybox = fl::Skybox::Builder().environment(skyboxTexture.get()).showSun(true).build(*engine);
 
 	return {engine, light, texture.release(), skybox, skyboxTexture.release()};
 }

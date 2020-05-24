@@ -41,6 +41,9 @@ public:
 
 	void onEvent(const TextEvent& event);
 
-	auto getView() { return m_renderer.getView(); }
+	auto getView()
+	{
+		return m_renderer.getView();
+	}
 };
 } // namespace spatial
