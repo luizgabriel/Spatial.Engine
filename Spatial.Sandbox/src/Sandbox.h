@@ -13,14 +13,6 @@ namespace fl = filament;
 namespace spatial
 {
 
-struct MaterialData
-{
-	float metallic;
-	float roughness;
-	float clearCoat;
-	float clearCoatRoughness;
-};
-
 class Sandbox
 {
 private:
