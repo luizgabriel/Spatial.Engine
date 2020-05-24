@@ -24,7 +24,7 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	  m_camera{createCamera(m_engine)},
 	  m_material{createMaterial(m_engine, "materials/ui_blit")},
 	  m_entity{createEntity(m_engine)},
-	  m_texture{m_engine}
+	  m_texture{createResource<filament::Texture>(m_engine, nullptr)}
 {
 	m_view->setCamera(m_camera.get());
 	m_view->setScene(m_scene.get());
@@ -36,38 +36,6 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	m_view->setShadowsEnabled(false);
 
 	m_imguiContext = ImGui::CreateContext();
-}
-
-UserInterfaceRenderer::UserInterfaceRenderer(UserInterfaceRenderer&& other) noexcept
-	: m_engine{other.m_engine},
-	  m_view{std::move(other.m_view)},
-	  m_scene{std::move(other.m_scene)},
-	  m_camera{std::move(other.m_camera)},
-	  m_material{std::move(other.m_material)},
-	  m_entity{std::move(other.m_entity)},
-	  m_texture{std::move(other.m_texture)},
-	  m_vertexBuffers{std::move(other.m_vertexBuffers)},
-	  m_indexBuffers{std::move(other.m_indexBuffers)},
-	  m_materialInstances{std::move(other.m_materialInstances)},
-	  m_imguiContext{other.m_imguiContext}
-{
-}
-
-UserInterfaceRenderer& UserInterfaceRenderer::operator=(UserInterfaceRenderer&& other) noexcept
-{
-	m_engine = other.m_engine;
-	m_view = std::move(other.m_view);
-	m_scene = std::move(other.m_scene);
-	m_camera = std::move(other.m_camera);
-	m_material = std::move(other.m_material);
-	m_entity = std::move(other.m_entity);
-	m_texture = std::move(other.m_texture);
-	m_vertexBuffers = std::move(other.m_vertexBuffers);
-	m_indexBuffers = std::move(other.m_indexBuffers);
-	m_materialInstances = std::move(other.m_materialInstances);
-	m_imguiContext = other.m_imguiContext;
-
-	return *this;
 }
 
 void UserInterfaceRenderer::setup(const fs::path& fontPath)

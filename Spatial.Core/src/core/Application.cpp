@@ -16,22 +16,14 @@ Application::Application(const Configuration& config)
 		  return this->m_windowContext.createWindow(windowWidth, windowHeight, windowTitle);
 	  }()},
 	  m_input{&m_window},
-	  m_rendering{m_window.getNativeHandle()},
-	  m_ui{[this, &config]() {
-		  const auto fontPath = config.get<std::string>("ui.font-path");
-		  return UserInterfaceSystem{this->m_rendering.getEngine(), fontPath};
-	  }()}
+	  m_rendering{m_window.getNativeHandle()}
 {
 	m_ebus.connect<WindowClosedEvent>(this);
 
 	m_input.attach(m_ebus);
 	m_rendering.attach(m_ebus);
-	m_ui.attach(m_ebus);
 
 	m_rendering.setupViewport(m_window.getFrameBufferSize());
-	m_ui.setupViewport(m_window.getWindowSize(), m_window.getFrameBufferSize());
-
-	m_rendering.pushFrontView(m_ui.getView());
 }
 
 Application::~Application()
@@ -40,7 +32,6 @@ Application::~Application()
 
 	m_input.detach(m_ebus);
 	m_rendering.detach(m_ebus);
-	m_ui.detach(m_ebus);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)
@@ -58,7 +49,6 @@ int Application::run()
 	m_running = true;
 
 	m_rendering.onStart();
-	m_ui.onStart();
 
 	m_startSignal();
 
@@ -67,7 +57,6 @@ int Application::run()
 		const auto delta = m_clock.getDeltaTime().count();
 
 		m_input.onStartFrame(delta);
-		m_ui.onStartFrame(delta);
 
 		m_windowContext.pollEvents(m_ebus);
 
@@ -79,7 +68,6 @@ int Application::run()
 
 		m_drawGuiSignal();
 
-		m_ui.onEndGuiFrame();
 		m_rendering.onEndFrame();
 
 		std::this_thread::sleep_until(m_clock.getLastTime() + m_desiredDelta);

@@ -20,7 +20,7 @@ add_library(Spatial.Core
         src/input/Mouse.cpp
         src/input/MouseState.cpp
 
-        src/render/CommonResources.cpp
+        src/render/Resources.cpp
         src/render/Engine.cpp
         src/render/RenderingSystem.cpp
         src/render/ResourceLoaders.cpp
@@ -29,7 +29,7 @@ add_library(Spatial.Core
         src/ui/UserInterfaceSystem.cpp
         src/ui/UserInterfaceRenderer.cpp
         src/ui/UserInterfaceInput.cpp
-)
+        include/spatial/common/Exceptions.h src/common/Exceptions.cpp src/render/MouseMovementCameraController.cpp)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 20)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
 

@@ -5,7 +5,7 @@
 #include <spatial/desktop/PlatformEvent.h>
 
 #include <spatial/render/Engine.h>
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 
 #include <filament/Viewport.h>
 
@@ -16,7 +16,7 @@ namespace spatial
 class RenderingSystem
 {
 private:
-	RenderEngine m_engine;
+	Engine m_engine;
 	SwapChain m_swapChain;
 	Renderer m_renderer;
 

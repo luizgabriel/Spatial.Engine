@@ -1,15 +1,18 @@
 #include <spatial/render/Engine.h>
 
+namespace fl = filament;
+
 namespace spatial
 {
 
-RenderEngine::RenderEngine(const filament::backend::Backend backend) : m_engine{filament::Engine::create(backend)}
+Engine createEngine(fl::backend::Backend backend)
 {
+	return {fl::Engine::create(backend), FilamentEngineDeleter{}};
 }
 
-RenderEngine::~RenderEngine()
+void FilamentEngineDeleter::operator()(fl::Engine* engine)
 {
-	filament::Engine::destroy(&m_engine);
+	fl::Engine::destroy(engine);
 }
 
 } // namespace spatial

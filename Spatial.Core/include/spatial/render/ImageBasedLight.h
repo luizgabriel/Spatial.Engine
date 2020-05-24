@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 
 #include <filament/Texture.h>
 
@@ -19,10 +19,10 @@ private:
 public:
 	ImageBasedLight(filament::Engine* engine, filament::IndirectLight* light, filament::Texture* texture,
 					filament::Skybox* skybox, filament::Texture* skyboxTexture)
-		: m_light{engine, light},
-		  m_texture{engine, texture},
-		  m_skybox{engine, skybox},
-		  m_skyboxTexture{engine, skyboxTexture}
+		: m_light{createResource(engine, light)},
+		  m_texture{createResource(engine, texture)},
+		  m_skybox{createResource(engine, skybox)},
+		  m_skyboxTexture{createResource(engine, skyboxTexture)}
 	{
 	}
 
@@ -34,9 +34,12 @@ public:
 	{
 	}
 
-	auto getSkybox() const { return m_skybox.get(); }
+	ImageBasedLight(const ImageBasedLight& other) = delete;
+	ImageBasedLight& operator=(const ImageBasedLight& w) = delete;
 
-	auto getLight() const { return m_light.get(); }
+	[[nodiscard]] auto getSkybox() const { return m_skybox.get(); }
+
+	[[nodiscard]] auto getLight() const { return m_light.get(); }
 };
 
 } // namespace spatial

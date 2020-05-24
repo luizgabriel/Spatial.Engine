@@ -5,8 +5,7 @@
 namespace spatial
 {
 
-InputSystem::InputSystem(Window* window)
-	: m_window{window}
+InputSystem::InputSystem(Window* window) : m_window{window}
 {
 }
 
@@ -26,8 +25,11 @@ void InputSystem::detach(EventQueue& queue)
 
 void InputSystem::onStartFrame(float delta)
 {
-	if (Mouse::s_mouseState.isMouseWarpRequested()) {
-		m_window->warpMouse(Mouse::position());
+	if (Mouse::s_mouseState.isMouseWarpRequested())
+	{
+		auto mousePos = Mouse::position();
+		auto [windowWidth, windowHeight] = m_window->getWindowSize();
+		m_window->warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
 	}
 
 	Keyboard::s_keyboardState.reset();
@@ -36,7 +38,8 @@ void InputSystem::onStartFrame(float delta)
 
 void InputSystem::onEvent(const MouseMovedEvent& event)
 {
-	Mouse::s_mouseState.set({event.x, event.y});
+	auto [windowWidth, windowHeight] = m_window->getWindowSize();
+	Mouse::s_mouseState.set({event.x / windowWidth, event.y / windowHeight});
 }
 
 void InputSystem::onEvent(const KeyEvent& event)

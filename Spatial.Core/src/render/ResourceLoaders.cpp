@@ -1,3 +1,4 @@
+#include <spatial/common/Exceptions.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/core/Asset.h>
 #include <spatial/render/Mesh.h>
@@ -25,8 +26,6 @@ namespace fm = filamesh;
 namespace spatial
 {
 
-constexpr const char* errorMessage = "could not open file: ";
-
 fs::path appendExtension(const fs::path& path, const std::string& extension)
 {
 	return path.parent_path() / (path.filename().generic_string() + "." + extension);
@@ -37,24 +36,17 @@ Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
 
 	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
-
-	if (!stream)
-		throw std::runtime_error(errorMessage + absolutePath.generic_string());
-
 	const auto iterator = std::istreambuf_iterator<char>{stream};
-	auto data = std::vector<char>{iterator, {}};
+	const auto data = std::vector<char>{iterator, {}};
 
 	const auto material = fl::Material::Builder().package(&data[0], data.size()).build(*engine);
 
-	return {engine, material};
+	return createResource(engine, material);
 }
 
 Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::path& filePath)
 {
 	const auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
-
-	if (!fs::exists(absolute))
-		throw std::runtime_error(errorMessage + absolute.generic_string());
 
 	auto registry = fm::MeshReader::MaterialRegistry{};
 	registry.registerMaterialInstance(utils::CString("DefaultMaterial"), material);
@@ -68,9 +60,6 @@ Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::pa
 Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 {
 	const auto path = Asset::absolute(filePath);
-
-	if (!fs::exists(path))
-		throw std::runtime_error(errorMessage + path.generic_string());
 
 	int width, height, n;
 	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
@@ -89,7 +78,7 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 
 	texture->setImage(*engine, 0, std::move(buffer));
 
-	return {engine, texture};
+	return createResource(engine, texture);
 }
 
 Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
@@ -99,15 +88,13 @@ Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
 	const auto absolutePath = Asset::absolute(filePath);
 	auto stream = ifstream{absolutePath, std::ios_base::in | ios::binary};
 
-	if (!stream)
-		throw std::runtime_error(errorMessage + filePath.generic_string());
-
-	auto contents = vector<uint8_t>{istreambuf_iterator<char>(stream), {}};
+	const auto contents = vector<uint8_t>{istreambuf_iterator<char>(stream), {}};
 
 	// we are using "new" here because of this legacy api
 	// but this pointer is released with the texture holding it
 	const auto ktxBundle = new image::KtxBundle(contents.data(), contents.size());
-	return {engine, image::ktx::createTexture(engine, ktxBundle, false)};
+
+	return createResource(engine, image::ktx::createTexture(engine, ktxBundle, false));
 }
 
 using bands_t = std::array<float3, 9>;
@@ -119,14 +106,15 @@ bands_t parseShFile(const fs::path& file)
 	auto stream = std::ifstream{absolutePath, std::ios_base::in};
 
 	if (!stream)
-		throw std::runtime_error(errorMessage + absolutePath.generic_string());
+		throw FileNotFoundError(absolutePath);
 
 	stream >> std::skipws;
 
 	char c;
 	for (auto& band : bands)
 	{
-		while (!stream.eof() && stream >> c && c != '(');
+		while (!stream.eof() && stream >> c && c != '(')
+			;
 
 		stream >> band.r;
 		stream >> c;
@@ -138,7 +126,7 @@ bands_t parseShFile(const fs::path& file)
 	return bands;
 }
 
-ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem::path& folder)
+ImageBasedLight createIblFromKtx(fl::Engine* engine, const fs::path& folder)
 {
 	const auto name = folder.filename().generic_string();
 
@@ -151,12 +139,18 @@ ImageBasedLight createIblFromKtx(filament::Engine* engine, const std::filesystem
 	const auto shPath = folder / "sh.txt";
 	auto bands = parseShFile(shPath);
 
-	auto light = IndirectLight{
-		engine,
-		fl::IndirectLight::Builder().reflections(texture.get()).irradiance(3, &bands[0]).intensity(30000.0f).build(*engine)};
+	auto light = fl::IndirectLight::Builder()
+					.reflections(texture.get())
+					.irradiance(3, &bands[0])
+					.intensity(30000.0f)
+					.build(*engine);
 
-	auto skybox = Skybox{engine, fl::Skybox::Builder().environment(skyboxTexture.get()).showSun(true).build(*engine)};
+	auto skybox = fl::Skybox::Builder()
+					  .environment(skyboxTexture.get())
+					  .showSun(true)
+					  .build(*engine);
 
-	return {std::move(light), std::move(texture), std::move(skybox), std::move(skyboxTexture)};
+	return {engine, light, texture.release(), skybox, skyboxTexture.release()};
 }
+
 } // namespace spatial

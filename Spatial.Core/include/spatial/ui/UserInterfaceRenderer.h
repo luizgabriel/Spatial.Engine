@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 #include <vector>
 #include <imgui.h>
 
@@ -37,12 +37,7 @@ public:
 	~UserInterfaceRenderer();
 
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
-
-	UserInterfaceRenderer(UserInterfaceRenderer&& other) noexcept;
-
 	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
-
-	UserInterfaceRenderer& operator=(UserInterfaceRenderer&& other) noexcept;
 
 	void setViewport(int width, int height, float dpiX, float dpiY);
 

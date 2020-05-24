@@ -1,26 +1,18 @@
 #pragma once
 
 #include <filament/Engine.h>
+#include <memory>
 
 namespace spatial
 {
 
-class RenderEngine
+struct FilamentEngineDeleter
 {
-private:
-	filament::Engine* m_engine;
-
-public:
-	RenderEngine(const filament::backend::Backend backend);
-	~RenderEngine();
-
-	filament::Engine* get() { return m_engine; }
-
-	filament::Engine& ref() { return *m_engine; }
-
-	const filament::Engine* get() const { return m_engine; }
-
-	const filament::Engine& ref() const { return *m_engine; }
+	void operator()(filament::Engine* engine);
 };
+
+using Engine = std::unique_ptr<filament::Engine, FilamentEngineDeleter>;
+
+Engine createEngine(filament::backend::Backend backend);
 
 } // namespace spatial

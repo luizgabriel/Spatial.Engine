@@ -1,6 +1,6 @@
 #include "Sandbox.h"
 
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/input/Keyboard.h>
 #include <spatial/core/Logger.h>
@@ -17,13 +17,6 @@
 namespace fl = filament;
 using namespace filament::math;
 
-template <typename AngleType>
-auto radians(AngleType angle) noexcept
-{
-	static const AngleType alpha = std::acos(-1) / AngleType{180};
-	return angle * alpha;
-}
-
 namespace spatial
 {
 
@@ -36,11 +29,12 @@ Sandbox::Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filamen
 
 	  m_scene{createScene(m_engine)},
 	  m_material{createMaterial(m_engine, "materials/default")},
-	  m_instance{m_engine, m_material->createInstance()},
+	  m_instance{createMaterialInstance(m_engine, m_material.get())},
 	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
-	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")}
+	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
+	  m_cam{10.0f, 220.0f, -26.0f}
 {
 }
 
@@ -75,20 +69,13 @@ void Sandbox::onStart()
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
 {
-	const auto offset = Mouse::offset() * -cameraData.sensitivity;
-
+	const auto pos = Mouse::position();
 	if (enabledCameraController)
 	{
-		cameraData.yaw += offset.x;
-		cameraData.pitch += offset.y;
-
-		cameraData.pitch = std::clamp(cameraData.pitch, -89.0f, 89.0f);
+		m_cam.onMouseMoved(pos);
+		Mouse::move({.5f, .5f});
+		gLogger.info("Yaw: {}, Pitch: {}", m_cam.getYaw(), m_cam.getPitch());
 	}
-
-	const float3 direction{cos(radians(cameraData.yaw)) * cos(radians(cameraData.pitch)), sin(radians(cameraData.pitch)),
-						   sin(radians(cameraData.yaw)) * cos(radians(cameraData.pitch))};
-
-	cameraData.front = normalize(direction);
 }
 
 void Sandbox::onUpdateFrame(float delta)
@@ -96,50 +83,21 @@ void Sandbox::onUpdateFrame(float delta)
 	if (Keyboard::released(Key::C))
 		enabledCameraController = !enabledCameraController;
 
-	if (enabledCameraController)
-	{
-		const float cameraSpeed = cameraData.speed * delta;
-
-		if (Keyboard::pressed(Key::W))
-			cameraData.pos += cameraSpeed * cameraData.front;
-
-		if (Keyboard::pressed(Key::S))
-			cameraData.pos -= cameraSpeed * cameraData.front;
-
-		if (Keyboard::pressed(Key::A))
-			cameraData.pos -= normalize(cross(cameraData.front, cameraData.up)) * cameraSpeed;
-
-		if (Keyboard::pressed(Key::D))
-			cameraData.pos += normalize(cross(cameraData.front, cameraData.up)) * cameraSpeed;
-	}
+	if (Keyboard::released(Key::G))
+		showEngineGui = !showEngineGui;
 
 	m_instance->setParameter("metallic", materialData.metallic);
 	m_instance->setParameter("roughness", materialData.roughness);
 	m_instance->setParameter("clearCoat", materialData.clearCoat);
 	m_instance->setParameter("clearCoatRoughness", materialData.clearCoatRoughness);
 
-	m_camera->lookAt(cameraData.pos, cameraData.pos + cameraData.front, cameraData.up);
+	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
+	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};
+	m_camera->lookAt(cameraPos, cameraPos + m_cam.getDirection(), cameraUp);
 }
 
 void Sandbox::onDrawGui()
 {
-	if (Keyboard::released(Key::G))
-		showEngineGui = !showEngineGui;
-
-	if (showEngineGui)
-	{
-		ImGui::SetNextWindowSize({.0f, .0f}, ImGuiCond_Always);
-
-		ImGui::Begin("Camera");
-		ImGui::Checkbox("Enabled (Press C to toggle)", &enabledCameraController);
-		ImGui::InputFloat3("Position", &cameraData.pos[0]);
-		ImGui::InputFloat3("Front", &cameraData.front[0]);
-		ImGui::InputFloat3("Up", &cameraData.up[0]);
-		ImGui::InputFloat("Yaw", &cameraData.yaw);
-		ImGui::InputFloat("Pitch", &cameraData.pitch);
-		ImGui::DragFloat("Velocity", &cameraData.speed, 5.0f, 100.0f, 1000.0f);
-		ImGui::DragFloat("Sensitivity", &cameraData.sensitivity, .001f, .001f, 5.0f);
-		ImGui::End();
-	}
 }
+
 } // namespace spatial

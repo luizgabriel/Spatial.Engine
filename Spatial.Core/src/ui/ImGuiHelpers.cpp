@@ -100,7 +100,7 @@ Texture imguiCreateTextureAtlas(fl::Engine* engine, const fs::path& font)
 
 	texture->setImage(*engine, 0, std::move(pb));
 
-	return {engine, texture};
+	return createResource(engine, texture);
 }
 
 } // namespace spatial

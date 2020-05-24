@@ -17,6 +17,7 @@ void MouseState::set(float2 position)
 	m_lastMousePosition = m_currentMousePosition;
 	m_currentMousePosition = position;
 }
+
 void MouseState::reset()
 {
 	m_mouseWarpRequested = false;

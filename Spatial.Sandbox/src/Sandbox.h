@@ -2,10 +2,11 @@
 
 #include <spatial/common/EventQueue.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/ImageBasedLight.h>
 #include <spatial/render/Mesh.h>
+#include <spatial/render/MouseMovementCameraController.h>
 
 namespace fl = filament;
 
@@ -46,13 +47,7 @@ private:
 	Entity m_light;
 	Mesh m_sphereMesh;
 	ImageBasedLight m_ibl;
-
-	CameraData cameraData{
-		{301, 201, 301},
-		{300, 200, 300},
-		{0, 1.0f, 0},
-		750.0f,
-	};
+	MouseMovementCameraController m_cam;
 
 	MaterialData materialData{
 		0.5f,

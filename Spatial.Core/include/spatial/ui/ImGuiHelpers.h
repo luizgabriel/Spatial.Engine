@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/render/CommonResources.h>
+#include <spatial/render/Resources.h>
 #include <filesystem>
 #include <imgui.h>
 

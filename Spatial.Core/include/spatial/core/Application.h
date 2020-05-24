@@ -25,7 +25,6 @@ private:
 	Window m_window;
 	InputSystem m_input;
 	RenderingSystem m_rendering;
-	UserInterfaceSystem m_ui;
 
 	// region Signals
 	Signal<> m_startSignal;

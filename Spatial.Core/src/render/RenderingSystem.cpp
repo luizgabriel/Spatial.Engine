@@ -6,12 +6,13 @@ namespace bk = filament::backend;
 
 namespace spatial
 {
-RenderingSystem::RenderingSystem(void* nativeWindowHandle) : RenderingSystem(nativeWindowHandle, bk::Backend::OPENGL)
+RenderingSystem::RenderingSystem(void* nativeWindowHandle)
+	: RenderingSystem(nativeWindowHandle, bk::Backend::OPENGL)
 {
 }
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle, const bk::Backend backend)
-	: m_engine{backend},
+	: m_engine{createEngine(backend)},
 	  m_swapChain{createSwapChain(m_engine.get(), nativeWindowHandle)},
 	  m_renderer{createRenderer(m_engine.get())},
 	  m_mainCamera{createCamera(m_engine.get())},
