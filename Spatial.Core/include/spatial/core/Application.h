@@ -56,7 +56,7 @@ public:
 		return m_ebus;
 	}
 
-	auto& getWindowContext()
+	auto& getWindowContext() const
 	{
 		return m_windowContext;
 	}

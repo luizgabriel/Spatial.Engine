@@ -8,8 +8,8 @@
 namespace spatial
 {
 
-Window createDefaultWindow(Application& app, const Configuration& config);
+Window createDefaultWindow(const Application& app, const Configuration& config);
 
-int start(const Configuration& config, const std::function<void(Application&, RenderingSystem&)>& action);
+int setup(const Configuration& config, const std::function<int(Application&, RenderingSystem&)>& action);
 
 } // namespace spatial

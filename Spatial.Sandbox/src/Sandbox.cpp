@@ -55,7 +55,10 @@ void Sandbox::onStart()
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
 	m_instance->setParameter("albedo", m_texture.get(), sampler);
-	// m_instance->setParameter("baseColor", fl::RgbType::sRGB, {0.8, 0.0, 0.0});
+	m_instance->setParameter("metallic", 0.5f);
+	m_instance->setParameter("roughness", 0.4f);
+	m_instance->setParameter("clearCoat", 0.7f);
+	m_instance->setParameter("clearCoatRoughness", 0.0f);
 
 	m_scene->setSkybox(m_ibl.getSkybox());
 	m_scene->setIndirectLight(m_ibl.getLight());
@@ -85,11 +88,6 @@ void Sandbox::onUpdateFrame(float delta)
 
 	if (Keyboard::released(Key::G))
 		showEngineGui = !showEngineGui;
-
-	m_instance->setParameter("metallic", materialData.metallic);
-	m_instance->setParameter("roughness", materialData.roughness);
-	m_instance->setParameter("clearCoat", materialData.clearCoat);
-	m_instance->setParameter("clearCoatRoughness", materialData.clearCoatRoughness);
 
 	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
 	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};

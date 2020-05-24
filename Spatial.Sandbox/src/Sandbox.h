@@ -13,18 +13,6 @@ namespace fl = filament;
 namespace spatial
 {
 
-struct CameraData
-{
-	filament::math::float3 front{};
-	filament::math::float3 pos{};
-	filament::math::float3 up{};
-
-	float speed{1.0f};
-	float yaw{-131.0f};
-	float pitch{-12.0f};
-	float sensitivity{0.1f};
-};
-
 struct MaterialData
 {
 	float metallic;
@@ -48,13 +36,6 @@ private:
 	Mesh m_sphereMesh;
 	ImageBasedLight m_ibl;
 	MouseMovementCameraController m_cam;
-
-	MaterialData materialData{
-		0.5f,
-		0.4f,
-		0.7f,
-		0.0f,
-	};
 
 	bool showEngineGui{true};
 	bool enabledCameraController{true};

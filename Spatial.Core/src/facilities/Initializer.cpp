@@ -8,7 +8,7 @@
 namespace spatial
 {
 
-Window createDefaultWindow(Application& app, const Configuration& config)
+Window createDefaultWindow(const Application& app, const Configuration& config)
 {
 	const auto width = config.get<int>("window.width");
 	const auto height = config.get<int>("window.height");
@@ -19,7 +19,7 @@ Window createDefaultWindow(Application& app, const Configuration& config)
 	return window;
 }
 
-int start(const Configuration& config, const std::function<void(Application&, RenderingSystem&)>& action)
+int setup(const Configuration& config, const std::function<int(Application&, RenderingSystem&)>& action)
 {
 	try
 	{
@@ -28,9 +28,7 @@ int start(const Configuration& config, const std::function<void(Application&, Re
 		auto rendering = System<RenderingSystem>{app, &window};
 		auto input = System<InputSystem>{app, &window};
 
-		action(app, rendering.get());
-
-		return app.run();
+		return action(app, rendering.get());
 	}
 	catch (const std::exception& e)
 	{
