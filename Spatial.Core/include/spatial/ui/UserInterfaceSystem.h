@@ -19,13 +19,13 @@ private:
 
 	std::filesystem::path m_fontPath;
 
+	void setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+
 public:
-	UserInterfaceSystem(filament::Engine* engine, std::filesystem::path fontPath);
+	UserInterfaceSystem(RenderingSystem& rendering, const Window& window, std::filesystem::path fontPath);
 
 	void attach(EventQueue& queue);
 	void detach(EventQueue& queue);
-
-	void setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
 	void onStart();
 

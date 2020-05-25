@@ -26,6 +26,7 @@ private:
 	Signal<float> m_startFrameSignal;
 	Signal<float> m_updateFrameSignal;
 	Signal<> m_drawGuiSignal;
+	Signal<> m_endGuiFrameSignal;
 	Signal<> m_endFrameSignal;
 
 	Signal<> m_finishSignal;
@@ -79,6 +80,11 @@ public:
 	auto& getUpdateFrameSignal()
 	{
 		return m_updateFrameSignal;
+	}
+
+	auto& getEndGuiFrameSignal()
+	{
+		return m_endGuiFrameSignal;
 	}
 
 	auto& getEndFrameSignal()

@@ -40,11 +40,11 @@ int Application::run()
 
 		m_windowContext.pollEvents(m_ebus);
 
+		m_startFrameSignal(delta);
+
 		// Triggers all queued events
 		m_ebus.update<WindowResizedEvent>();
 		m_ebus.update();
-
-		m_startFrameSignal(delta);
 
 		while (m_clock.hasLag(m_desiredDelta))
 		{
@@ -52,6 +52,9 @@ int Application::run()
 			m_clock.fixLag();
 		}
 
+		m_drawGuiSignal();
+
+		m_endGuiFrameSignal();
 		m_endFrameSignal();
 
 		std::this_thread::sleep_until(m_clock.getLastTime() + Clock<float>::delta_t{m_desiredDelta});

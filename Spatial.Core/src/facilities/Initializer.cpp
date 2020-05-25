@@ -2,6 +2,7 @@
 #include <spatial/core/System.h>
 #include <spatial/input/InputSystem.h>
 #include <spatial/desktop/MessageBox.h>
+#include <spatial/ui/UserInterfaceSystem.h>
 
 #include <stdexcept>
 
@@ -25,8 +26,11 @@ int setup(const Configuration& config, const std::function<int(Application&, Ren
 	{
 		auto app = Application{};
 		auto window = createDefaultWindow(app, config);
-		auto rendering = System<RenderingSystem>{app, &window};
 		auto input = System<InputSystem>{app, &window};
+		auto rendering = System<RenderingSystem>{app, window};
+
+		auto fontPath = config.get<std::string>("ui.font-path");
+		auto ui = System<UserInterfaceSystem>(app, rendering.get(), window, fontPath);
 
 		return action(app, rendering.get());
 	}

@@ -11,11 +11,7 @@ int main(int argc, char* argv[])
 	const auto config = readConfigFile("config/application.toml");
 
 	return setup(config, [](auto& app, auto& renderingSystem) {
-		auto sandbox = System<Sandbox>{ app,
-			renderingSystem.getEngine(),
-			renderingSystem.getMainCamera(),
-			renderingSystem.getMainView()
-		};
+		auto sandbox = System<Sandbox>{app, renderingSystem};
 
 		return app.run();
 	});

@@ -15,6 +15,13 @@ namespace spatial
 
 class Sandbox
 {
+	struct MaterialData
+	{
+		float metallic{.5f};
+		float roughness{.4f};
+	};
+
+
 private:
 	fl::Engine* m_engine;
 	fl::Camera* m_camera;
@@ -28,6 +35,8 @@ private:
 	Mesh m_sphereMesh;
 	ImageBasedLight m_ibl;
 	MouseMovementCameraController m_cam;
+
+	MaterialData m_materialData;
 
 	bool showEngineGui{true};
 	bool enabledCameraController{true};

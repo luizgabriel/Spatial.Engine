@@ -26,9 +26,11 @@ private:
 
 	std::deque<filament::View*> m_views;
 
+	void setupViewport(const std::pair<int, int>& frameBufferSize);
+
 public:
-	explicit RenderingSystem(Window* window);
-	RenderingSystem(Window* window, filament::backend::Backend backend);
+	explicit RenderingSystem(const Window& window);
+	RenderingSystem(const Window& window, filament::backend::Backend backend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
@@ -78,7 +80,6 @@ public:
 		return m_mainCamera.get();
 	}
 
-	void setupViewport(const std::pair<int, int>& frameBufferSize);
 	// endregion
 };
 } // namespace spatial

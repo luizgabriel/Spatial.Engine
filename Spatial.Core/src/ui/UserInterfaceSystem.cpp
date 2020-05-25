@@ -7,9 +7,11 @@ namespace fs = std::filesystem;
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(filament::Engine* engine, fs::path fontPath)
-	: m_renderer{engine}, m_fontPath{std::move(fontPath)}
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window, fs::path fontPath)
+	: m_renderer{rendering.getEngine()}, m_fontPath{std::move(fontPath)}
 {
+	setupViewport(window.getWindowSize(), window.getFrameBufferSize());
+	rendering.pushFrontView(getView());
 }
 
 void UserInterfaceSystem::attach(EventQueue& queue)

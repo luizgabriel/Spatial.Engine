@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <spatial/input/Mouse.h>
+#include <spatial/render/RenderingSystem.h>
 
 namespace fl = filament;
 using namespace filament::math;
@@ -22,10 +23,10 @@ namespace spatial
 
 Logger gLogger = createDefaultLogger();
 
-Sandbox::Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filament::View* mainView)
-	: m_engine{engine},
-	  m_camera{mainCamera},
-	  m_view{mainView},
+Sandbox::Sandbox(RenderingSystem renderingSystem)
+	: m_engine{renderingSystem.getEngine()},
+	  m_camera{renderingSystem.getMainCamera()},
+	  m_view{renderingSystem.getMainView()},
 
 	  m_scene{createScene(m_engine)},
 	  m_material{createMaterial(m_engine, "materials/default")},
@@ -33,7 +34,7 @@ Sandbox::Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filamen
 	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
-	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
+	  m_ibl{createIblFromKtx(m_engine, "textures/railway_bridge_2k")},
 	  m_cam{10.0f, 220.0f, -26.0f}
 {
 }
@@ -55,8 +56,6 @@ void Sandbox::onStart()
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
 	m_instance->setParameter("albedo", m_texture.get(), sampler);
-	m_instance->setParameter("metallic", 0.5f);
-	m_instance->setParameter("roughness", 0.4f);
 	m_instance->setParameter("clearCoat", 0.7f);
 	m_instance->setParameter("clearCoatRoughness", 0.0f);
 
@@ -89,6 +88,9 @@ void Sandbox::onUpdateFrame(float delta)
 	if (Keyboard::released(Key::G))
 		showEngineGui = !showEngineGui;
 
+	m_instance->setParameter("metallic", m_materialData.metallic);
+	m_instance->setParameter("roughness", m_materialData.roughness);
+
 	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
 	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};
 	m_camera->lookAt(cameraPos, cameraPos + m_cam.getDirection(), cameraUp);
@@ -96,6 +98,15 @@ void Sandbox::onUpdateFrame(float delta)
 
 void Sandbox::onDrawGui()
 {
+	if (!showEngineGui)
+		return;
+
+	ImGui::Begin("Material");
+
+	ImGui::DragFloat("Metallic", &m_materialData.metallic, .001f, .0f, 1.0f);
+	ImGui::DragFloat("Roughness", &m_materialData.roughness, .001f, .0f, 1.0f);
+
+	ImGui::End();
 }
 
 } // namespace spatial

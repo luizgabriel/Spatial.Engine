@@ -18,6 +18,8 @@ BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdateFrame);
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onEndFrame);
 
+BOOST_TTI_HAS_MEMBER_FUNCTION(onEndGuiFrame);
+
 BOOST_TTI_HAS_MEMBER_FUNCTION(onDrawGui);
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onFinish);
@@ -39,6 +41,9 @@ constexpr bool has_on_update_frame_v = has_member_function_onUpdateFrame<T, void
 
 template <typename T>
 constexpr bool has_on_end_frame_v = has_member_function_onEndFrame<T, void>::value;
+
+template <typename T>
+constexpr bool has_on_end_gui_frame_v = has_member_function_onEndGuiFrame<T, void>::value;
 
 template <typename T>
 constexpr bool has_on_draw_gui_v = has_member_function_onDrawGui<T, void>::value;
@@ -72,6 +77,11 @@ void connect(Application& app, Handler* instance)
 	if constexpr (has_on_end_frame_v<Handler>)
 	{
 		app.getEndFrameSignal().connect<&Handler::onEndFrame, Handler>(instance);
+	}
+
+	if constexpr (has_on_end_gui_frame_v<Handler>)
+	{
+		app.getEndGuiFrameSignal().connect<&Handler::onEndGuiFrame, Handler>(instance);
 	}
 
 	if constexpr (has_on_draw_gui_v<Handler>)
@@ -117,6 +127,11 @@ void disconnect(Application& app, Handler* instance)
 	if constexpr (has_on_end_frame_v<Handler>)
 	{
 		app.getEndFrameSignal().disconnect<&Handler::onEndFrame, Handler>(instance);
+	}
+
+	if constexpr (has_on_end_gui_frame_v<Handler>)
+	{
+		app.getEndGuiFrameSignal().disconnect<&Handler::onEndGuiFrame, Handler>(instance);
 	}
 
 	if constexpr (has_on_draw_gui_v<Handler>)
