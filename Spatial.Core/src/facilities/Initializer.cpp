@@ -20,7 +20,7 @@ Window createDefaultWindow(const Application& app, const Configuration& config)
 	return window;
 }
 
-int setup(const Configuration& config, const std::function<int(Application&, RenderingSystem&)>& action)
+int setup(const Configuration& config, std::function<int(Application&, SystemServices&)>&& action)
 {
 	try
 	{
@@ -32,7 +32,7 @@ int setup(const Configuration& config, const std::function<int(Application&, Ren
 		auto fontPath = config.get<std::string>("ui.font-path");
 		auto ui = System<UserInterfaceSystem>(app, rendering.get(), window, fontPath);
 
-		return action(app, rendering.get());
+		return action(app, SystemServices{window, rendering.get(), input.get(), ui.get()});
 	}
 	catch (const std::exception& e)
 	{

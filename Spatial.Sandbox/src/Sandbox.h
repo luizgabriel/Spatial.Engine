@@ -7,6 +7,7 @@
 #include <spatial/render/ImageBasedLight.h>
 #include <spatial/render/Mesh.h>
 #include <spatial/render/MouseMovementCameraController.h>
+#include <spatial/render/RenderingSystem.h>
 
 namespace fl = filament;
 
@@ -42,7 +43,7 @@ private:
 	bool enabledCameraController{true};
 
 public:
-	Sandbox(filament::Engine* engine, filament::Camera* mainCamera, filament::View* mainView);
+	Sandbox(RenderingSystem& renderingSystem);
 
 	void attach(EventQueue& queue);
 

@@ -23,7 +23,7 @@ namespace spatial
 
 Logger gLogger = createDefaultLogger();
 
-Sandbox::Sandbox(RenderingSystem renderingSystem)
+Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
 	  m_view{renderingSystem.getMainView()},
@@ -34,7 +34,7 @@ Sandbox::Sandbox(RenderingSystem renderingSystem)
 	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
-	  m_ibl{createIblFromKtx(m_engine, "textures/railway_bridge_2k")},
+	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
 	  m_cam{10.0f, 220.0f, -26.0f}
 {
 }
