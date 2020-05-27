@@ -52,7 +52,6 @@ void Sandbox::detach(EventQueue& queue)
 void Sandbox::onStart()
 {
 	m_view->setScene(m_scene.get());
-	m_view->setClearColor({0, 0, 0, 0});
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
 	m_instance->setParameter("albedo", m_texture.get(), sampler);

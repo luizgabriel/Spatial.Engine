@@ -30,8 +30,7 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	m_view->setScene(m_scene.get());
 	m_scene->addEntity(m_entity.get());
 
-	m_view->setClearTargets(false, false, false);
-	m_view->setRenderTarget(fl::View::TargetBufferFlags::DEPTH_AND_STENCIL);
+	//m_view->setRenderTarget(fl::View::TargetBufferFlags::DEPTH_AND_STENCIL);
 	m_view->setPostProcessingEnabled(false);
 	m_view->setShadowsEnabled(false);
 

@@ -17,87 +17,72 @@ set_property(
 )
 
 add_material_resources(Sandbox.Assets.Materials
-        SOURCES
+    SOURCES
         assets/materials/default.mat
         assets/materials/ui_blit.mat
-        OUTPUT
-        assets/materials
-        DEPENDEES
-        Spatial.Sandbox
-        )
+    OUTPUT assets/materials
+    DEPENDEES Spatial.Sandbox
+)
 
 add_mesh_resources(Sandbox.Assets.Models
-        SOURCES
+    SOURCES
         assets/models/sphere.fbx
         assets/models/debug_cube.fbx
-        OUTPUT
+    OUTPUT
         assets/models
-        DEPENDEES
+    DEPENDEES
         Spatial.Sandbox
-        )
+)
 
 add_copy_resources(Sandbox.Assets.Config
-        SOURCES
+    SOURCES
         assets/config/application.toml
-        OUTPUT
-        assets/config
-        DEPENDEES
-        Spatial.Sandbox
-        )
+    OUTPUT assets/config
+    DEPENDEES Spatial.Sandbox
+)
 
 add_copy_resources(Sandbox.Assets.Fonts
-        SOURCES
+    SOURCES
         assets/fonts/Roboto-Regular.ttf
         assets/fonts/Roboto-Medium.ttf
-        OUTPUT
-        assets/fonts
-        DEPENDEES
-        Spatial.Sandbox
-        )
+    OUTPUT assets/fonts
+    DEPENDEES Spatial.Sandbox
+)
 
 add_copy_resources(Sandbox.Assets.Textures
-        SOURCES
+    SOURCES
         assets/textures/debug_cube.png
-        OUTPUT
-        assets/textures
-        DEPENDEES
-        Spatial.Sandbox
-        )
+    OUTPUT assets/textures
+    DEPENDEES Spatial.Sandbox
+)
 
 add_skybox_resources(Sandbox.Assets.Skyboxes
-        SOURCES
+    SOURCES
         assets/textures/pillars_2k.hdr
         assets/textures/railway_bridge_2k.hdr
-        FORMAT
-        ktx
-        RESOLUTION
-        4K
-        OUTPUT
-        assets/textures
-        DEPENDEES
-        Spatial.Sandbox
-        )
+    FORMAT ktx
+    RESOLUTION 4K
+    OUTPUT assets/textures
+    DEPENDEES Spatial.Sandbox
+)
 
 install(
-        FILES
+    FILES
         assets/fonts/Roboto-Medium.ttf
         assets/fonts/Roboto-Regular.ttf
-        DESTINATION
-        assets/fonts
+    DESTINATION assets/fonts
 )
 
 install(
-        FILES
+    FILES
         assets/materials/default.mat
         assets/materials/ui_blit.mat
-        DESTINATION
-        assets/materials
+    DESTINATION assets/materials
 )
 
 install(
-        FILES
+    FILES
         assets/textures/uv_test.png
         assets/textures/pillars_2k.hdr
-        DESTINATION
-        assets/textures
+    DESTINATION assets/textures
 )

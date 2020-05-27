@@ -2,9 +2,8 @@
 
 import os
 
-
 CONAN_DIR = ".conan"
-TMP_DIR = "%s/tmp" % CONAN_DIR
+VENDOR_DIR = "%s/vendor" % CONAN_DIR
 DEFAULT_PROFILE = "default"
 
 
@@ -15,6 +14,17 @@ def run(command):
 
 def conan_repo(name, url):
     return run('conan remote add %s %s' % (name, url))
+
+
+def conan_export(user, package, export_name, branch = "master"):
+    print("Exporting %s" % package)
+    package_dir = os.path.join(VENDOR_DIR, package)
+
+    result = 0
+    result += run("git clone -b %s https://github.com/%s/%s.git %s" % (branch, user, package, package_dir))
+    result += run("conan export %s %s" % (package_dir, export_name))
+
+    return result
 
 
 def conan_install():
@@ -28,7 +38,10 @@ if __name__ == "__main__":
         pass
 
     conan_repo("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
-    conan_repo("luizgabriel", "https://api.bintray.com/conan/luizgabriel/conan-repo")
+
+    conan_export("luizgabriel", "conan-filament", "google/stable", "v1.7.0")
+    conan_export("luizgabriel", "conan-imgui", "ocornut/testing")
+    conan_export("luizgabriel", "conan-tomlplusplus", "marzer/stable")
 
     if conan_install() == 0:
         print("Done! Spatial Engine is now ready for compilation")

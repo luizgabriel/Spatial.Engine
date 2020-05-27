@@ -35,8 +35,6 @@ void RenderingSystem::detach(EventQueue& queue)
 
 void RenderingSystem::onStart()
 {
-	m_mainView->setClearTargets(true, true, true);
-	m_mainView->setClearColor({.0f, .0f, .0f, 1.0f});
 	m_mainView->setCamera(m_mainCamera.get());
 	// m_mainView->setVisibleLayers(0x04, 0x04);
 
