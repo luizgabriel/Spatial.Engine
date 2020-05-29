@@ -10,7 +10,7 @@ imgui/docking@ocornut/testing
 toml++/1.2.0@marzer/stable
 
 [options]
-sdl2:iconv=False
+sdl2:iconv=True
 
 [generators]
 cmake

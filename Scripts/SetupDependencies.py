@@ -3,7 +3,7 @@
 import os
 
 CONAN_DIR = ".conan"
-VENDOR_DIR = "%s/vendor" % CONAN_DIR
+VENDOR_DIR = "%s\\vendor" % CONAN_DIR
 DEFAULT_PROFILE = "default"
 
 
@@ -16,7 +16,7 @@ def conan_repo(name, url):
     return run('conan remote add %s %s' % (name, url))
 
 
-def conan_export(user, package, export_name, branch = "master"):
+def conan_export(user, package, export_name, branch="master"):
     print("Exporting %s" % package)
     package_dir = os.path.join(VENDOR_DIR, package)
 
