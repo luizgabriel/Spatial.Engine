@@ -40,7 +40,7 @@ if __name__ == "__main__":
     conan_repo("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
 
     conan_export("luizgabriel", "conan-filament", "google/stable", "v1.7.0")
-    conan_export("luizgabriel", "conan-imgui", "ocornut/testing")
+    conan_export("luizgabriel", "conan-imgui", "ocornut/testing", "docking")
     conan_export("luizgabriel", "conan-tomlplusplus", "marzer/stable")
 
     if conan_install() == 0:
