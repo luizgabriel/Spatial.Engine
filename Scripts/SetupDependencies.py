@@ -3,7 +3,7 @@
 import os
 
 CONAN_DIR = ".conan"
-VENDOR_DIR = "%s\\vendor" % CONAN_DIR
+VENDOR_DIR = os.path.join(CONAN_DIR, "vendor")
 DEFAULT_PROFILE = "default"
 
 
