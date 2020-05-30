@@ -9,3 +9,4 @@ imgui_log.txt
 __tmp/
 *.log
 CMakeSettings.json
+.DS_Store

@@ -9,14 +9,11 @@ filament/1.7.0@google/stable
 imgui/docking@ocornut/testing
 toml++/1.2.0@marzer/stable
 
-[options]
-sdl2:iconv=True
-
 [generators]
 cmake
 
 [imports]
-bin, * -> ./bin
+filament:bin, * -> ./bin
 
 [build_requires]
 cmake_installer/3.16.3@conan/stable

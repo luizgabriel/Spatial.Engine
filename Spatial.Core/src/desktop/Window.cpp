@@ -2,11 +2,10 @@
 #include <utility>
 #include <cassert>
 
+#include <SDL_syswm.h>
+
 #if !defined(SPATIAL_PLATFORM_WINDOWS)
 #include <unistd.h>
-#else
-#include <SDL_syswm.h>
-#include <utils/unwindows.h>
 #endif
 
 using namespace filament::math;
@@ -72,7 +71,16 @@ void* Window::getNativeHandle() const
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
+
+#if defined(SPATIAL_PLATFORM_WINDOW)
 	return wmInfo.info.win.window;
+#elif defined(SPATIAL_PLATFORM_OSX)
+	return wmInfo.info.cocoa.window;
+#elif defined(SPATIAL_PLATFORM_LINUX)
+	return wmInfo.info.x11.window;
+#else
+	return nullptr;
+#endif
 }
 
 void Window::warpMouse(filament::math::float2 position)

@@ -10,6 +10,7 @@
 #include <filament/Viewport.h>
 
 #include <filesystem>
+#include <unordered_map>
 
 namespace fs = std::filesystem;
 namespace fl = filament;

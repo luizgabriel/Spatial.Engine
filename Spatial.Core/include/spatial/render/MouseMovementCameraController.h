@@ -37,7 +37,7 @@ public:
 
 	void updateDirections();
 
-	[[nodiscard]] const auto& MouseMovementCameraController::getDirection() const
+	[[nodiscard]] const auto& getDirection() const
 	{
 		return m_direction;
 	}

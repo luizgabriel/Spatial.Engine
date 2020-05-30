@@ -31,8 +31,9 @@ int setup(const Configuration& config, std::function<int(Application&, SystemSer
 
 		auto fontPath = config.get<std::string>("ui.font-path");
 		auto ui = System<UserInterfaceSystem>(app, rendering.get(), window, fontPath);
+		auto services = SystemServices{window, rendering.get(), input.get(), ui.get()};
 
-		return action(app, SystemServices{window, rendering.get(), input.get(), ui.get()});
+		return action(app, services);
 	}
 	catch (const std::exception& e)
 	{

@@ -51,7 +51,7 @@ target_include_directories(Spatial.Core
         )
 
 target_link_libraries(Spatial.Core
-        PUBLIC
+    PUBLIC
         CONAN_PKG::fmt
         CONAN_PKG::entt
         CONAN_PKG::filament
@@ -61,7 +61,7 @@ target_link_libraries(Spatial.Core
         CONAN_PKG::stb
         CONAN_PKG::sdl2
         CONAN_PKG::toml++
-        )
+)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
@@ -69,18 +69,31 @@ target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
+    message(STATUS "Detected Linux Device")
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_UNIX)
 
     find_package(Threads REQUIRED)
     target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
 elseif (WIN32)
+    message(STATUS "Detected Windows Device")
+
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
 
     target_link_libraries(Spatial.Core PRIVATE Shlwapi)
 elseif (APPLE)
+    message(STATUS "Detected Apple Device")
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
 
-    target_link_libraries(Spatial.Core PRIVATE "-framework Cocoa" "-framework Metal" "-framework CoreVideo")
+    target_link_libraries(Spatial.Core PRIVATE
+            "-framework Cocoa"
+            "-framework Metal"
+            "-framework CoreVideo"
+            "-framework Carbon"
+            "-framework IOKit"
+            "-framework CoreAudio"
+            "-framework AudioToolbox"
+            "-framework ForceFeedback"
+    )
 endif ()
 
 
@@ -89,9 +102,9 @@ target_compile_definitions(Spatial.Core PUBLIC "$<$<CONFIG:DEBUG>:SPATIAL_DEBUG>
 
 
 install(
-        TARGETS Spatial.Core
-        EXPORT Spatial.Export
-        LIBRARY DESTINATION lib
+    TARGETS Spatial.Core
+    EXPORT Spatial.Export
+    LIBRARY DESTINATION lib
 )
 
 install(DIRECTORY include/ DESTINATION include)
