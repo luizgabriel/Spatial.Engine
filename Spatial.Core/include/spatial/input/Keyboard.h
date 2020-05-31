@@ -29,6 +29,16 @@ public:
 		return s_keyboardState.released(key);
 	}
 
+	static float axis(Key positive, Key negative)
+	{
+		if (pressed(positive))
+			return 1.0f;
+		else if (pressed(negative))
+			return -1.0f;
+		else
+			return .0f;
+	}
+
 	friend class InputSystem;
 };
 

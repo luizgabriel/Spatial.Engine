@@ -3,6 +3,7 @@
 #include <math/vec2.h>
 #include <math/vec3.h>
 #include <math/mat4.h>
+#include <filament/Camera.h>
 
 namespace spatial
 {
@@ -16,6 +17,7 @@ constexpr ValueType halfPi = ValueType{1.57079632679};
 struct SimpleCameraView
 {
 	filament::math::float2 rotation;
+	filament::math::float3 position;
 
 	float& yaw()
 	{
@@ -27,10 +29,10 @@ struct SimpleCameraView
 		return rotation.y;
 	}
 
-	void update(const filament::math::float2& mousePos, float sensitivity);
-};
+	void onMouseMoved(const filament::math::float2& mousePos, float sensitivity);
 
-void incrementCameraRotation(filament::math::float2& rotation, float sensitivity, const filament::math::float2& mousePos);
+	void onUpdate(filament::Camera* camera, float delta);
+};
 
 filament::math::float3 toDirection(const filament::math::float2& rot);
 

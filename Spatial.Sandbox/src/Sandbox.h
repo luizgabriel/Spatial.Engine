@@ -25,6 +25,7 @@ class Sandbox
 	struct CameraData
 	{
 		float sensitivity;
+		float velocity;
 	};
 
 

@@ -3,6 +3,7 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/common/EventQueue.h>
+#include <spatial/common/Key.h>
 
 namespace spatial
 {

@@ -33,8 +33,8 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
 	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
-	  m_cam{{3.89263f, -0.413847}},
-	  m_cameraData{.5f}
+	  m_cam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
+	  m_cameraData{.5f, 500.0f}
 {
 }
 
@@ -65,13 +65,15 @@ void Sandbox::onStart()
 	auto& rcm = m_engine->getRenderableManager();
 	const auto ri = rcm.getInstance(m_sphereMesh.get());
 	rcm.setCastShadows(ri, false);
+
+	m_cam.onUpdate(m_camera, .0f);
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
 {
 	if (enabledCameraController)
 	{
-		m_cam.update(Mouse::position(), m_cameraData.sensitivity);
+		m_cam.onMouseMoved(Mouse::position(), m_cameraData.sensitivity);
 		Mouse::move({.5f, .5f});
 	}
 }
@@ -87,11 +89,9 @@ void Sandbox::onUpdateFrame(float delta)
 	m_instance->setParameter("metallic", m_materialData.metallic);
 	m_instance->setParameter("roughness", m_materialData.roughness);
 
-	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
-	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};
-
-	const auto direction = toDirection(m_cam.rotation);
-	m_camera->lookAt(cameraPos, cameraPos + direction, cameraUp);
+	if (enabledCameraController) {
+		m_cam.onUpdate(m_camera, delta * m_cameraData.velocity);
+	}
 }
 
 void Sandbox::onDrawGui()
@@ -99,16 +99,26 @@ void Sandbox::onDrawGui()
 	if (!showEngineGui)
 		return;
 
-	ImGui::Begin("Camera Controllers");
+	ImGui::Begin("Camera Settings");
 
-	ImGui::Text("Press C to toggle:");
+	ImGui::Text("Use the WASD to move in the scene.");
+	ImGui::Text("Press C to toggle the camera view:");
 	ImGui::Checkbox("Enabled", &enabledCameraController);
+
+	ImGui::Separator();
+
 	ImGui::DragFloat("Yaw", &m_cam.rotation.x, .001f);
 	ImGui::DragFloat("Pitch", &m_cam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
 
+	ImGui::Separator();
+
+	ImGui::DragFloat("Sensitivity", &m_cameraData.sensitivity, .001f, .1f, 5.0f);
+	ImGui::DragFloat("Velocity", &m_cameraData.velocity, 1.0f, 100.0f, 2000.0f);
+
 	ImGui::End();
 
-	ImGui::Begin("Material");
+
+	ImGui::Begin("Material Settings");
 
 	ImGui::DragFloat("Metallic", &m_materialData.metallic, .001f, .0f, 1.0f);
 	ImGui::DragFloat("Roughness", &m_materialData.roughness, .001f, .0f, 1.0f);
