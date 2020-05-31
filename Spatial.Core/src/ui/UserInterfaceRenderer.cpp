@@ -115,7 +115,9 @@ void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize, c
 	m_view->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
 	m_camera->setProjection(fl::Camera::Projection::ORTHO, 0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
 
-	imguiRefreshViewport(fw, fh, dpiScaleX, dpiScaleY);
+	const auto scaleX = w > 0 ? static_cast<float>(fw) / w : 0;
+	const auto scaleY = h > 0 ? static_cast<float>(fh) / h : 0;
+	imguiRefreshViewport(w, h, scaleX, scaleY);
 }
 
 void UserInterfaceRenderer::beforeRender(float delta) const
