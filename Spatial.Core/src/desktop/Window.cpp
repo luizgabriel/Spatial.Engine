@@ -72,7 +72,7 @@ void* Window::getNativeHandle() const
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
 
-#if defined(SPATIAL_PLATFORM_WINDOW)
+#if defined(SPATIAL_PLATFORM_WINDOWS)
 	return wmInfo.info.win.window;
 #elif defined(SPATIAL_PLATFORM_OSX)
 	return wmInfo.info.cocoa.window;

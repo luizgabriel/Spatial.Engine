@@ -73,16 +73,16 @@ if (UNIX AND NOT APPLE)
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_UNIX)
 
     find_package(Threads REQUIRED)
-    target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
+    target_link_libraries(Spatial.Core PUBLIC Threads::Threads)
 elseif (WIN32)
     message(STATUS "Detected Windows Device")
 
-    target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
+    target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_WINDOWS)
 
     target_link_libraries(Spatial.Core PRIVATE Shlwapi)
 elseif (APPLE)
     message(STATUS "Detected Apple Device")
-    target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
+    target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)
 
     target_link_libraries(Spatial.Core PRIVATE
             "-framework Cocoa"
@@ -94,6 +94,8 @@ elseif (APPLE)
             "-framework AudioToolbox"
             "-framework ForceFeedback"
     )
+else ()
+    message(FATAL_ERROR "Unsupported platform")
 endif ()
 
 
