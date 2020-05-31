@@ -66,7 +66,7 @@ void Sandbox::onStart()
 	const auto ri = rcm.getInstance(m_sphereMesh.get());
 	rcm.setCastShadows(ri, false);
 
-	m_cam.onUpdate(m_camera, .0f);
+	m_cam.onUpdate(m_camera, .0f, .0f);
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
@@ -90,7 +90,12 @@ void Sandbox::onUpdateFrame(float delta)
 	m_instance->setParameter("roughness", m_materialData.roughness);
 
 	if (enabledCameraController) {
-		m_cam.onUpdate(m_camera, delta * m_cameraData.velocity);
+		const float velDelta = delta * m_cameraData.velocity;
+		m_cam.onUpdate(
+			m_camera,
+			velDelta * Keyboard::axis(Key::W, Key::S),
+			velDelta * Keyboard::axis(Key::D, Key::A)
+		);
 	}
 }
 
@@ -102,7 +107,13 @@ void Sandbox::onDrawGui()
 	ImGui::Begin("Camera Settings");
 
 	ImGui::Text("Use the WASD to move in the scene.");
-	ImGui::Text("Press C to toggle the camera view:");
+
+	if (enabledCameraController)
+		ImGui::Text("Press C turn the camera movement OFF:");
+	else
+		ImGui::Text("Press C turn the camera movement ON:");
+
+
 	ImGui::Checkbox("Enabled", &enabledCameraController);
 
 	ImGui::Separator();

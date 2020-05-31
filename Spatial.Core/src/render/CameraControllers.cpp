@@ -1,6 +1,4 @@
 #include <spatial/render/CameraControllers.h>
-#include <spatial/input/Mouse.h>
-#include <spatial/input/Keyboard.h>
 
 using namespace filament::math;
 
@@ -25,11 +23,11 @@ void SimpleCameraView::onMouseMoved(const filament::math::float2& mousePos, floa
     rotation.y = std::clamp(rotation.y + delta.y * pi<float> * sensitivity, -halfPi<float>, halfPi<float>);
 }
 
-void SimpleCameraView::onUpdate(filament::Camera* camera, float delta)
+void SimpleCameraView::onUpdate(filament::Camera* camera, float frontDelta, float sideDelta)
 {
     const auto direction = toDirection(rotation);
-    position += direction * delta * Keyboard::axis(Key::W, Key::S);
-    position += cross(direction, up) * delta * Keyboard::axis(Key::D, Key::A);
+    position += direction * frontDelta;
+    position += cross(direction, up) * sideDelta;
 
 	camera->lookAt(position, position + direction, up);
 }

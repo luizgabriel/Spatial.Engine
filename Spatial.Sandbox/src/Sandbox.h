@@ -47,7 +47,7 @@ private:
 	CameraData m_cameraData;
 
 	bool showEngineGui{true};
-	bool enabledCameraController{false};
+	bool enabledCameraController{true};
 
 public:
 	Sandbox(RenderingSystem& renderingSystem);
