@@ -66,7 +66,7 @@ void Sandbox::onStart()
 	const auto ri = rcm.getInstance(m_sphereMesh.get());
 	rcm.setCastShadows(ri, false);
 
-	m_cam.onUpdate(m_camera, .0f, .0f);
+	m_cam.onUpdate(m_camera, .0f);
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
@@ -76,6 +76,15 @@ void Sandbox::onEvent(const MouseMovedEvent& e)
 		m_cam.onMouseMoved(Mouse::position(), m_cameraData.sensitivity);
 		Mouse::move({.5f, .5f});
 	}
+}
+
+float3 defaultInputAxis()
+{
+	return {
+		Keyboard::axis(Key::W, Key::S),
+		Keyboard::axis(Key::D, Key::A),
+		Keyboard::axis(Key::Space, Key::LShift),
+	};
 }
 
 void Sandbox::onUpdateFrame(float delta)
@@ -89,14 +98,7 @@ void Sandbox::onUpdateFrame(float delta)
 	m_instance->setParameter("metallic", m_materialData.metallic);
 	m_instance->setParameter("roughness", m_materialData.roughness);
 
-	if (enabledCameraController) {
-		const float velDelta = delta * m_cameraData.velocity;
-		m_cam.onUpdate(
-			m_camera,
-			velDelta * Keyboard::axis(Key::W, Key::S),
-			velDelta * Keyboard::axis(Key::D, Key::A)
-		);
-	}
+	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
 }
 
 void Sandbox::onDrawGui()
@@ -112,7 +114,6 @@ void Sandbox::onDrawGui()
 		ImGui::Text("Press C turn the camera movement OFF:");
 	else
 		ImGui::Text("Press C turn the camera movement ON:");
-
 
 	ImGui::Checkbox("Enabled", &enabledCameraController);
 

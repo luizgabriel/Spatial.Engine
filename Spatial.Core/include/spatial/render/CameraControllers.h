@@ -31,7 +31,7 @@ struct SimpleCameraView
 
 	void onMouseMoved(const filament::math::float2& mousePos, float sensitivity);
 
-	void onUpdate(filament::Camera* camera, float frontDelta, float sideDelta);
+	void onUpdate(filament::Camera* camera, const filament::math::float3& delta);
 };
 
 filament::math::float3 toDirection(const filament::math::float2& rot);
