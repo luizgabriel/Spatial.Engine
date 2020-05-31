@@ -16,7 +16,6 @@ constexpr ValueType halfPi = ValueType{1.57079632679};
 struct SimpleCameraView
 {
 	filament::math::float2 rotation;
-	filament::math::float3 direction;
 
 	float& yaw()
 	{

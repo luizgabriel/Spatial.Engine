@@ -26,7 +26,6 @@ filament::math::float3 toDirection(const filament::math::float2& rot)
 void SimpleCameraView::update(const filament::math::float2& mousePos, float sensitivity)
 {
 	incrementCameraRotation(rotation, sensitivity, Mouse::position());
-	direction = toDirection(rotation);
 }
 
 } // namespace spatial

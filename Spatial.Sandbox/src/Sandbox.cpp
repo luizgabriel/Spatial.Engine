@@ -21,8 +21,6 @@ using namespace filament::math;
 namespace spatial
 {
 
-Logger gLogger = createDefaultLogger();
-
 Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
@@ -35,7 +33,7 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
 	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
-	  m_cam{.0f, {10.0f, 220.0f, -26.0f}},
+	  m_cam{{3.89263f, -0.413847}},
 	  m_cameraData{.5f}
 {
 }
@@ -74,9 +72,7 @@ void Sandbox::onEvent(const MouseMovedEvent& e)
 	if (enabledCameraController)
 	{
 		m_cam.update(Mouse::position(), m_cameraData.sensitivity);
-
 		Mouse::move({.5f, .5f});
-		gLogger.info("Yaw: {}, Pitch: {}", m_cam.yaw(), m_cam.pitch());
 	}
 }
 
@@ -93,7 +89,9 @@ void Sandbox::onUpdateFrame(float delta)
 
 	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
 	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};
-	m_camera->lookAt(cameraPos, cameraPos + m_cam.direction, cameraUp);
+
+	const auto direction = toDirection(m_cam.rotation);
+	m_camera->lookAt(cameraPos, cameraPos + direction, cameraUp);
 }
 
 void Sandbox::onDrawGui()
@@ -105,7 +103,7 @@ void Sandbox::onDrawGui()
 
 	ImGui::Text("Press C to toggle:");
 	ImGui::Checkbox("Enabled", &enabledCameraController);
-	ImGui::InputFloat("Yaw", &m_cam.rotation.x);
+	ImGui::DragFloat("Yaw", &m_cam.rotation.x, .001f);
 	ImGui::DragFloat("Pitch", &m_cam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
 
 	ImGui::End();
