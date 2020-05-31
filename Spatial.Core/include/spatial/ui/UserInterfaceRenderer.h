@@ -39,7 +39,7 @@ public:
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
 	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
 
-	void setViewport(int width, int height, float dpiX, float dpiY);
+	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
 	/**
 	 * \brief Should be called when applications runs

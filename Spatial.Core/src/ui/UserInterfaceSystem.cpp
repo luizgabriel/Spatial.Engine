@@ -58,12 +58,7 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 
 void UserInterfaceSystem::setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
 {
-	auto [w, h] = windowSize;
-	auto [fw, fh] = frameBufferSize;
-	const auto dpiX = (w > 0) ? static_cast<float>(fw) / w : 0;
-	const auto dpiY = (h > 0) ? static_cast<float>(fh) / h : 0;
-
-	m_renderer.setViewport(w, h, dpiX, dpiY);
+	m_renderer.setViewport(windowSize, frameBufferSize);
 }
 
 void UserInterfaceSystem::onStartFrame(float delta)

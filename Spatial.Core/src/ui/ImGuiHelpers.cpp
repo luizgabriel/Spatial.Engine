@@ -27,10 +27,10 @@ void imguiRefreshDeltaTime(float delta)
 std::pair<int, int> imguiGetFrameSize()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	int fbwidth = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int fbheight = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	int fw = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int fh = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 
-	return {fbwidth, fbheight};
+	return {fw, fh};
 }
 
 bool imguiIsMinimized()

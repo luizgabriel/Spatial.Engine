@@ -104,12 +104,18 @@ UserInterfaceRenderer::~UserInterfaceRenderer()
 	ImGui::DestroyContext(m_imguiContext);
 }
 
-void UserInterfaceRenderer::setViewport(int width, int height, float dpiX, float dpiY)
+void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
 {
-	m_view->setViewport({0, 0, static_cast<uint32_t>(width), static_cast<uint32_t>(height)});
-	m_camera->setProjection(fl::Camera::Projection::ORTHO, 0.0, width / dpiX, height / dpiY, 0.0, 0.0, 1.0);
+	const auto [w, h] = windowSize;
+	const auto [fw, fh] = frameBufferSize;
 
-	imguiRefreshViewport(width, height, dpiX, dpiY);
+	const auto dpiScaleX = static_cast<float>(fw) / w;
+	const auto dpiScaleY = static_cast<float>(fh) / h;
+
+	m_view->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
+	m_camera->setProjection(fl::Camera::Projection::ORTHO, 0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
+
+	imguiRefreshViewport(fw, fh, dpiScaleX, dpiScaleY);
 }
 
 void UserInterfaceRenderer::beforeRender(float delta) const
@@ -136,6 +142,9 @@ void UserInterfaceRenderer::renderDrawData()
 	auto& rcm = m_engine->getRenderableManager();
 	auto& io = ImGui::GetIO();
 	auto [fbWidth, fbHeight] = imguiGetFrameSize();
+
+	if (fbWidth == 0 || fbHeight == 0)
+		return;
 
 	imguiData->ScaleClipRects(io.DisplayFramebufferScale);
 
