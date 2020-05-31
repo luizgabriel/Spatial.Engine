@@ -36,8 +36,6 @@ void RenderingSystem::detach(EventQueue& queue)
 void RenderingSystem::onStart()
 {
 	m_mainView->setCamera(m_mainCamera.get());
-	// m_mainView->setVisibleLayers(0x04, 0x04);
-
 	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
 }
 

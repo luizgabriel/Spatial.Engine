@@ -1,12 +1,9 @@
 #include <spatial/desktop/Window.h>
+#include <spatial/desktop/native/WindowHelper.h>
+
+
 #include <utility>
 #include <cassert>
-
-#include <SDL_syswm.h>
-
-#if !defined(SPATIAL_PLATFORM_WINDOWS)
-#include <unistd.h>
-#endif
 
 using namespace filament::math;
 
@@ -19,7 +16,7 @@ Window::Window(int width, int height, std::string_view title)
 									  SDL_WINDOWPOS_CENTERED,
 									  width,
 									  height,
-									  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
+									  SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
 {
 	assert(m_windowHandle != nullptr);
 	// SDL_SetWindowBordered(m_windowHandle, SDL_FALSE);
@@ -68,19 +65,10 @@ bool Window::hasFocus() const
 
 void* Window::getNativeHandle() const
 {
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(m_windowHandle, &wmInfo);
-
-#if defined(SPATIAL_PLATFORM_WINDOW)
-	return wmInfo.info.win.window;
-#elif defined(SPATIAL_PLATFORM_OSX)
-	return wmInfo.info.cocoa.window;
-#elif defined(SPATIAL_PLATFORM_LINUX)
-	return wmInfo.info.x11.window;
-#else
-	return nullptr;
-#endif
+	SDL_SysWMinfo wmi;
+	SDL_VERSION(&wmi.version);
+	SDL_GetWindowWMInfo(m_windowHandle, &wmi);
+	return ::getNativeWindow(wmi);
 }
 
 void Window::warpMouse(filament::math::float2 position)

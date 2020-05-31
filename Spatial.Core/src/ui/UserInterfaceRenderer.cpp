@@ -31,8 +31,8 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
 	m_view->setScene(m_scene.get());
 	m_scene->addEntity(m_entity.get());
 
-	//m_view->setRenderTarget(fl::View::TargetBufferFlags::DEPTH_AND_STENCIL);
 	m_view->setPostProcessingEnabled(false);
+	m_view->setBlendMode(filament::View::BlendMode::TRANSLUCENT);
 	m_view->setShadowsEnabled(false);
 
 	m_imguiContext = ImGui::CreateContext();

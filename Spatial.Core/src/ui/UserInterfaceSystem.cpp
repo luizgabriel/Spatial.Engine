@@ -60,8 +60,8 @@ void UserInterfaceSystem::setupViewport(const std::pair<int, int>& windowSize, c
 {
 	auto [w, h] = windowSize;
 	auto [fw, fh] = frameBufferSize;
-	const auto dpiX = w / fw;
-	const auto dpiY = h / fh;
+	const auto dpiX = (w > 0) ? static_cast<float>(fw) / w : 0;
+	const auto dpiY = (h > 0) ? static_cast<float>(fh) / h : 0;
 
 	m_renderer.setViewport(w, h, dpiX, dpiY);
 }

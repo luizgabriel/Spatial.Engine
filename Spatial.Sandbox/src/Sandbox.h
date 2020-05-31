@@ -6,7 +6,7 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/ImageBasedLight.h>
 #include <spatial/render/Mesh.h>
-#include <spatial/render/MouseMovementCameraController.h>
+#include <spatial/render/CameraControllers.h>
 #include <spatial/render/RenderingSystem.h>
 
 namespace fl = filament;
@@ -22,6 +22,11 @@ class Sandbox
 		float roughness{.4f};
 	};
 
+	struct CameraData
+	{
+		float sensitivity;
+	};
+
 
 private:
 	fl::Engine* m_engine;
@@ -35,12 +40,13 @@ private:
 	Entity m_light;
 	Mesh m_sphereMesh;
 	ImageBasedLight m_ibl;
-	MouseMovementCameraController m_cam;
+	SimpleCameraView m_cam;
 
 	MaterialData m_materialData;
+	CameraData m_cameraData;
 
 	bool showEngineGui{true};
-	bool enabledCameraController{true};
+	bool enabledCameraController{false};
 
 public:
 	Sandbox(RenderingSystem& renderingSystem);

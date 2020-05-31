@@ -35,7 +35,8 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	  m_light{createEntity(m_engine)},
 	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
 	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
-	  m_cam{10.0f, 220.0f, -26.0f}
+	  m_cam{.0f, {10.0f, 220.0f, -26.0f}},
+	  m_cameraData{.5f}
 {
 }
 
@@ -70,12 +71,12 @@ void Sandbox::onStart()
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
 {
-	const auto pos = Mouse::position();
 	if (enabledCameraController)
 	{
-		m_cam.onMouseMoved(pos);
+		m_cam.update(Mouse::position(), m_cameraData.sensitivity);
+
 		Mouse::move({.5f, .5f});
-		gLogger.info("Yaw: {}, Pitch: {}", m_cam.getYaw(), m_cam.getPitch());
+		gLogger.info("Yaw: {}, Pitch: {}", m_cam.yaw(), m_cam.pitch());
 	}
 }
 
@@ -92,13 +93,22 @@ void Sandbox::onUpdateFrame(float delta)
 
 	constexpr auto cameraPos = float3{300.0f, 300.0f, 300.0f};
 	constexpr auto cameraUp = float3{.0f, 1.0f, .0f};
-	m_camera->lookAt(cameraPos, cameraPos + m_cam.getDirection(), cameraUp);
+	m_camera->lookAt(cameraPos, cameraPos + m_cam.direction, cameraUp);
 }
 
 void Sandbox::onDrawGui()
 {
 	if (!showEngineGui)
 		return;
+
+	ImGui::Begin("Camera Controllers");
+
+	ImGui::Text("Press C to toggle:");
+	ImGui::Checkbox("Enabled", &enabledCameraController);
+	ImGui::InputFloat("Yaw", &m_cam.rotation.x);
+	ImGui::DragFloat("Pitch", &m_cam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
+
+	ImGui::End();
 
 	ImGui::Begin("Material");
 

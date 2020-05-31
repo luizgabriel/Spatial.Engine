@@ -1,55 +1,102 @@
 add_library(Spatial.Core
-        src/common/Key.cpp
-        src/common/StringHelpers.cpp
-        src/common/Configuration.cpp
-        src/common/Exceptions.cpp
 
-        src/core/Application.cpp
-        src/core/Asset.cpp
-        src/core/ConfigurationLoader.cpp
-        src/core/Logger.cpp
+    ## HEADERS
+    include/spatial/common/Configuration.h
+    include/spatial/common/EventQueue.h
+    include/spatial/common/Exceptions.h
+    include/spatial/common/Key.h
+    include/spatial/common/Signal.h
+    include/spatial/common/StringHelpers.h
 
-        src/desktop/Window.cpp
-        src/desktop/WindowContext.cpp
-        src/desktop/MessageBox.cpp
+    include/spatial/core/Application.h
+    include/spatial/core/ApplicationEvents.h
+    include/spatial/core/Asset.h
+    include/spatial/core/Clock.h
+    include/spatial/core/ConfigurationLoader.h
+    include/spatial/core/Logger.h
+    include/spatial/core/System.h
 
-        src/facilities/Initializer.cpp
+    include/spatial/desktop/MessageBox.h
+    include/spatial/desktop/PlatformEvent.h
+    include/spatial/desktop/Window.h
 
-        src/input/InputSystem.cpp
-        src/input/KeyboardState.cpp
-        src/input/Keyboard.cpp
-        src/input/Mouse.cpp
-        src/input/MouseState.cpp
+    include/spatial/facilities/Initializer.h
 
-        src/render/Resources.cpp
-        src/render/Engine.cpp
-        src/render/RenderingSystem.cpp
-        src/render/ResourceLoaders.cpp
-        src/render/MouseMovementCameraController.cpp
+    include/spatial/input/InputSystem.h
+    include/spatial/input/Keyboard.h
+    include/spatial/input/KeyboardState.h
+    include/spatial/input/Mouse.h
+    include/spatial/input/MouseState.h
 
-        src/ui/ImGuiHelpers.cpp
-        src/ui/UserInterfaceSystem.cpp
-        src/ui/UserInterfaceRenderer.cpp
-        src/ui/UserInterfaceInput.cpp include/spatial/init.h)
+    include/spatial/render/Engine.h
+    include/spatial/render/EngineResource.h
+    include/spatial/render/Entity.h
+    include/spatial/render/ImageBasedLight.h
+    include/spatial/render/Mesh.h
+        include/spatial/render/CameraControllers.h
+    include/spatial/render/RenderingSystem.h
+    include/spatial/render/ResourceLoaders.h
+    include/spatial/render/Resources.h
+
+    include/spatial/ui/ImGuiHelpers.h
+    include/spatial/ui/UserInterfaceInput.h
+    include/spatial/ui/UserInterfaceRenderer.h
+    include/spatial/ui/UserInterfaceSystem.h
+
+    include/spatial/init.h
+
+    ## SOURCES
+    src/common/Key.cpp
+    src/common/StringHelpers.cpp
+    src/common/Configuration.cpp
+    src/common/Exceptions.cpp
+
+    src/core/Application.cpp
+    src/core/Asset.cpp
+    src/core/ConfigurationLoader.cpp
+    src/core/Logger.cpp
+
+    src/desktop/Window.cpp
+    src/desktop/WindowContext.cpp
+    src/desktop/MessageBox.cpp
+
+    src/facilities/Initializer.cpp
+
+    src/input/InputSystem.cpp
+    src/input/KeyboardState.cpp
+    src/input/Keyboard.cpp
+    src/input/Mouse.cpp
+    src/input/MouseState.cpp
+
+    src/render/Resources.cpp
+    src/render/Engine.cpp
+    src/render/RenderingSystem.cpp
+    src/render/ResourceLoaders.cpp
+        src/render/CameraControllers.cpp
+
+    src/ui/ImGuiHelpers.cpp
+    src/ui/UserInterfaceSystem.cpp
+    src/ui/UserInterfaceRenderer.cpp
+    src/ui/UserInterfaceInput.cpp
+)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 20)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(
-        TARGET Spatial.Core
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    TARGET Spatial.Core
+    PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
-
-# LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_include_directories(Spatial.Core
-        PUBLIC
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
-        PRIVATE
+    PRIVATE
         src
-        )
+)
 
+# LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.Core
     PUBLIC
         CONAN_PKG::fmt
@@ -74,12 +121,14 @@ if (UNIX AND NOT APPLE)
 
     find_package(Threads REQUIRED)
     target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
+    target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperLinux.cpp)
 elseif (WIN32)
     message(STATUS "Detected Windows Device")
 
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
 
     target_link_libraries(Spatial.Core PRIVATE Shlwapi)
+    target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperWindows.cpp)
 elseif (APPLE)
     message(STATUS "Detected Apple Device")
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
@@ -94,6 +143,7 @@ elseif (APPLE)
             "-framework AudioToolbox"
             "-framework ForceFeedback"
     )
+    target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperCocoa.mm)
 endif ()
 
 
@@ -105,6 +155,5 @@ install(
     TARGETS Spatial.Core
     EXPORT Spatial.Export
     LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include
 )
-
-install(DIRECTORY include/ DESTINATION include)
