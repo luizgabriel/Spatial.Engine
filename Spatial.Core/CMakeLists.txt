@@ -125,13 +125,13 @@ if (UNIX AND NOT APPLE)
 elseif (WIN32)
     message(STATUS "Detected Windows Device")
 
-    target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_WINDOWS)
+    target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_WINDOWS)
 
     target_link_libraries(Spatial.Core PRIVATE Shlwapi)
     target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperWindows.cpp)
 elseif (APPLE)
     message(STATUS "Detected Apple Device")
-    target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_OSX)
+    target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)
 
     target_link_libraries(Spatial.Core PRIVATE
             "-framework Cocoa"
@@ -144,6 +144,8 @@ elseif (APPLE)
             "-framework ForceFeedback"
     )
     target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperCocoa.mm)
+else ()
+    message(FATAL_ERROR "Unsupported platform")
 endif ()
 
 
