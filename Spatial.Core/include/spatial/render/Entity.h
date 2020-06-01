@@ -13,15 +13,21 @@ private:
 	utils::Entity m_entity;
 
 public:
-	Entity(filament::Engine* engine) : m_engine{engine}, m_entity{}
+	Entity(filament::Engine* engine)
+		: m_engine{engine},
+		  m_entity{}
 	{
 	}
 
-	Entity(filament::Engine* engine, utils::Entity entity) noexcept : m_engine{engine}, m_entity{entity}
+	Entity(filament::Engine* engine, utils::Entity entity) noexcept
+		: m_engine{engine},
+		  m_entity{entity}
 	{
 	}
 
-	Entity(Entity&& other) noexcept : m_engine{other.m_engine}, m_entity{std::exchange(other.m_entity, utils::Entity{})}
+	Entity(Entity&& other) noexcept
+		: m_engine{other.m_engine},
+		  m_entity{std::exchange(other.m_entity, utils::Entity{})}
 	{
 	}
 

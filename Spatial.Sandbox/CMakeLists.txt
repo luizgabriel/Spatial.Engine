@@ -4,7 +4,7 @@ add_executable(Spatial.Sandbox
         src/main.cpp
         src/Sandbox.cpp
 
-        )
+        src/ResourceManager.h src/CommonResourceManagers.h)
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
 set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD 20)

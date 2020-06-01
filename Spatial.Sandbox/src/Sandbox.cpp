@@ -25,17 +25,20 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
 	  m_view{renderingSystem.getMainView()},
-
 	  m_scene{createScene(m_engine)},
-	  m_material{createMaterial(m_engine, "materials/default")},
-	  m_instance{createMaterialInstance(m_engine, m_material.get())},
-	  m_texture{createTexture(m_engine, "textures/debug_cube.png")},
 	  m_light{createEntity(m_engine)},
-	  m_sphereMesh{createMesh(m_engine, m_instance.get(), "models/debug_cube")},
 	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
 	  m_cam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
-	  m_cameraData{.5f, 500.0f}
+	  m_cameraData{.5f, 500.0f},
+	  m_textureManager{m_engine},
+	  m_materialManager{m_engine},
+	  m_materialInstanceManager{m_engine},
+	  m_meshManager{m_engine}
 {
+	m_textureManager.load("debug_cube", "textures/debug_cube.png");
+	m_materialManager.load("default", "materials/default");
+	m_materialInstanceManager.load(1, m_materialManager.get("default"));
+	m_meshManager.load("debug_cube", "models/debug_cube", m_materialInstanceManager.get(1));
 }
 
 void Sandbox::attach(EventQueue& queue)
@@ -53,17 +56,20 @@ void Sandbox::onStart()
 	m_view->setScene(m_scene.get());
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
-	m_instance->setParameter("albedo", m_texture.get(), sampler);
-	m_instance->setParameter("clearCoat", 0.7f);
-	m_instance->setParameter("clearCoatRoughness", 0.0f);
+	auto instance = m_materialInstanceManager.get(1);
+	instance->setParameter("albedo", m_textureManager.get("debug_cube"), sampler);
+	instance->setParameter("clearCoat", 0.7f);
+	instance->setParameter("clearCoatRoughness", 0.0f);
 
 	m_scene->setSkybox(m_ibl.getSkybox());
 	m_scene->setIndirectLight(m_ibl.getLight());
 	m_scene->addEntity(m_light.get());
-	m_scene->addEntity(m_sphereMesh.get());
+
+	auto mesh = m_meshManager.get("debug_cube");
+	m_scene->addEntity(mesh);
 
 	auto& rcm = m_engine->getRenderableManager();
-	const auto ri = rcm.getInstance(m_sphereMesh.get());
+	const auto ri = rcm.getInstance(mesh);
 	rcm.setCastShadows(ri, false);
 
 	m_cam.onUpdate(m_camera, .0f);
@@ -95,8 +101,9 @@ void Sandbox::onUpdateFrame(float delta)
 	if (Keyboard::released(Key::G))
 		showEngineGui = !showEngineGui;
 
-	m_instance->setParameter("metallic", m_materialData.metallic);
-	m_instance->setParameter("roughness", m_materialData.roughness);
+	auto instance = m_materialInstanceManager.get(1);
+	instance->setParameter("metallic", m_materialData.metallic);
+	instance->setParameter("roughness", m_materialData.roughness);
 
 	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
 }

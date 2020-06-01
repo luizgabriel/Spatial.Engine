@@ -44,7 +44,7 @@ Material createMaterial(fl::Engine* engine, const fs::path& filePath)
 	return createResource(engine, material);
 }
 
-Mesh createMesh(fl::Engine* engine, fl::MaterialInstance* material, const fs::path& filePath)
+Mesh createMesh(fl::Engine* engine, const fs::path& filePath, fl::MaterialInstance* material)
 {
 	const auto absolute = Asset::absolute(appendExtension(filePath, "filamesh"));
 
@@ -149,5 +149,6 @@ ImageBasedLight createIblFromKtx(fl::Engine* engine, const fs::path& folder)
 
 	return {engine, light, texture.release(), skybox, skyboxTexture.release()};
 }
+
 
 } // namespace spatial
