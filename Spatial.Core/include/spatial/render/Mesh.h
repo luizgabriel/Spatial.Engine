@@ -22,6 +22,20 @@ public:
 	{
 	}
 
+	Mesh(Mesh&& other)
+		: m_entity{std::move(other.m_entity)},
+		  m_vertexBuffer{std::move(other.m_vertexBuffer)},
+		  m_indexBuffer{std::move(other.m_indexBuffer)}
+	{
+	}
+
+	Mesh& operator=(Mesh&& other)
+	{
+		m_entity = std::move(other.m_entity);
+		m_vertexBuffer = std::move(other.m_vertexBuffer);
+		m_indexBuffer = std::move(other.m_indexBuffer);
+	}
+
 	Mesh(Mesh& other) = delete;
 	Mesh& operator=(const Mesh& w) = delete;
 

@@ -11,7 +11,7 @@ namespace spatial
 
 Material createMaterial(filament::Engine* engine, const std::filesystem::path& filePath);
 
-Mesh createMesh(filament::Engine* engine, filament::MaterialInstance* material, const std::filesystem::path& filePath);
+Mesh createMesh(filament::Engine* engine, const std::filesystem::path& filePath, filament::MaterialInstance* material);
 
 Texture createTexture(filament::Engine* engine, const std::filesystem::path& filePath);
 
