@@ -8,7 +8,7 @@
 #include <spatial/render/Mesh.h>
 #include <spatial/render/CameraControllers.h>
 #include <spatial/render/RenderingSystem.h>
-#include "CommonResourceManagers.h"
+#include <spatial/render/ResourceManager.h>
 
 namespace fl = filament;
 
@@ -52,7 +52,7 @@ private:
 	MeshManager m_meshManager;
 
 public:
-	Sandbox(RenderingSystem& renderingSystem);
+	explicit Sandbox(RenderingSystem& renderingSystem);
 
 	void attach(EventQueue& queue);
 

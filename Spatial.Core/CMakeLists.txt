@@ -28,14 +28,15 @@ add_library(Spatial.Core
     include/spatial/input/Mouse.h
     include/spatial/input/MouseState.h
 
-    include/spatial/render/Engine.h
+    include/spatial/render/CameraControllers.h
+        include/spatial/render/Engine.h
     include/spatial/render/EngineResource.h
     include/spatial/render/Entity.h
     include/spatial/render/ImageBasedLight.h
     include/spatial/render/Mesh.h
-        include/spatial/render/CameraControllers.h
     include/spatial/render/RenderingSystem.h
     include/spatial/render/ResourceLoaders.h
+    include/spatial/render/ResourceManager.h
     include/spatial/render/Resources.h
 
     include/spatial/ui/ImGuiHelpers.h
@@ -72,7 +73,7 @@ add_library(Spatial.Core
     src/render/Engine.cpp
     src/render/RenderingSystem.cpp
     src/render/ResourceLoaders.cpp
-        src/render/CameraControllers.cpp
+    src/render/CameraControllers.cpp
 
     src/ui/ImGuiHelpers.cpp
     src/ui/UserInterfaceSystem.cpp
