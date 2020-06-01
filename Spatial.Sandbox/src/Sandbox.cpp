@@ -71,8 +71,6 @@ void Sandbox::onStart()
 	auto& rcm = m_engine->getRenderableManager();
 	const auto ri = rcm.getInstance(mesh);
 	rcm.setCastShadows(ri, false);
-
-	m_cam.onUpdate(m_camera, .0f);
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
