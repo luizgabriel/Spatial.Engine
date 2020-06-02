@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <utility>
-#include <spatial/core/ApplicationEvents.h>
+#include <spatial/core/ApplicationUtils.h>
 
 namespace spatial
 {

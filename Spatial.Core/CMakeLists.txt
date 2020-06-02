@@ -3,13 +3,14 @@ add_library(Spatial.Core
     ## HEADERS
     include/spatial/common/Configuration.h
     include/spatial/common/EventQueue.h
+    include/spatial/common/EventQueueUtils.h
     include/spatial/common/Exceptions.h
     include/spatial/common/Key.h
     include/spatial/common/Signal.h
     include/spatial/common/StringHelpers.h
 
     include/spatial/core/Application.h
-    include/spatial/core/ApplicationEvents.h
+    include/spatial/core/ApplicationUtils.h
     include/spatial/core/Asset.h
     include/spatial/core/Clock.h
     include/spatial/core/ConfigurationLoader.h
@@ -29,15 +30,15 @@ add_library(Spatial.Core
     include/spatial/input/MouseState.h
 
     include/spatial/render/CameraControllers.h
-        include/spatial/render/Engine.h
+    include/spatial/render/Engine.h
     include/spatial/render/EngineResource.h
     include/spatial/render/Entity.h
-    include/spatial/render/ImageBasedLight.h
     include/spatial/render/Mesh.h
     include/spatial/render/RenderingSystem.h
     include/spatial/render/ResourceLoaders.h
     include/spatial/render/ResourceManager.h
     include/spatial/render/Resources.h
+    include/spatial/render/SkyboxResources.h
 
     include/spatial/ui/ImGuiHelpers.h
     include/spatial/ui/UserInterfaceInput.h
@@ -74,6 +75,7 @@ add_library(Spatial.Core
     src/render/RenderingSystem.cpp
     src/render/ResourceLoaders.cpp
     src/render/CameraControllers.cpp
+    src/render/SkyboxResources.cpp
 
     src/ui/ImGuiHelpers.cpp
     src/ui/UserInterfaceSystem.cpp

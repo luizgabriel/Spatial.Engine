@@ -14,6 +14,7 @@
 #include <cmath>
 #include <spatial/input/Mouse.h>
 #include <spatial/render/RenderingSystem.h>
+#include <spatial/render/SkyboxResources.h>
 
 namespace fl = filament;
 using namespace filament::math;
@@ -25,52 +26,46 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
 	  m_view{renderingSystem.getMainView()},
-	  m_scene{createScene(m_engine)},
-	  m_light{createEntity(m_engine)},
-	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
+
 	  m_cam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
 	  m_cameraData{.5f, 500.0f},
 	  m_textureManager{m_engine},
 	  m_materialManager{m_engine},
 	  m_materialInstanceManager{m_engine},
-	  m_meshManager{m_engine}
-{
-	m_textureManager.load("debug_cube", "textures/debug_cube.png");
-	m_materialManager.load("default", "materials/default");
-	m_materialInstanceManager.load(1, m_materialManager.get("default"));
-	m_meshManager.load("debug_cube", "models/debug_cube", m_materialInstanceManager.get(1));
-}
+	  m_meshManager{m_engine},
 
-void Sandbox::attach(EventQueue& queue)
-{
-	queue.connect<MouseMovedEvent>(this);
-}
-
-void Sandbox::detach(EventQueue& queue)
-{
-	queue.disconnect<MouseMovedEvent>(this);
-}
-
-void Sandbox::onStart()
+	  m_scene{createScene(m_engine)},
+	  m_light{createEntity(m_engine)},
+	  m_skybox{createResource<fl::Skybox>(m_engine)},
+	  m_indirectLight{createResource<fl::IndirectLight>(m_engine)}
 {
 	m_view->setScene(m_scene.get());
 
-	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
-	auto instance = m_materialInstanceManager.get(1);
-	instance->setParameter("albedo", m_textureManager.get("debug_cube"), sampler);
-	instance->setParameter("clearCoat", 0.7f);
-	instance->setParameter("clearCoatRoughness", 0.0f);
+	auto& debugCubeTexture = m_textureManager.load("debug_cube", "textures/debug_cube.png");
+	auto& defaultMaterial = m_materialManager.load("default", "materials/default");
 
-	m_scene->setSkybox(m_ibl.getSkybox());
-	m_scene->setIndirectLight(m_ibl.getLight());
+	auto [skyboxPath, iblPath, shPath] = parseKtxFolder("textures/pillars_2k");
+
+	auto& skyboxTexture = m_textureManager.load<&createKtxTexture>("skybox", skyboxPath);
+	m_skybox = createSkybox(m_engine, skyboxTexture.get());
+
+	const auto bands = parseShFile(shPath);
+	auto& iblTexture = m_textureManager.load<&createKtxTexture>("skybox_ibl", iblPath);
+	m_indirectLight = createImageBasedLight(m_engine, iblTexture.get(), bands);
+
+	m_scene->setSkybox(m_skybox.get());
+	m_scene->setIndirectLight(m_indirectLight.get());
+
+	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
+	auto& defaultMaterialInstance = m_materialInstanceManager.load(1, defaultMaterial.get());
+	defaultMaterialInstance->setParameter("albedo", debugCubeTexture.get(), sampler);
+	defaultMaterialInstance->setParameter("clearCoat", 0.7f);
+	defaultMaterialInstance->setParameter("clearCoatRoughness", 0.0f);
+
 	m_scene->addEntity(m_light.get());
 
-	auto mesh = m_meshManager.get("debug_cube");
-	m_scene->addEntity(mesh);
-
-	auto& rcm = m_engine->getRenderableManager();
-	const auto ri = rcm.getInstance(mesh);
-	rcm.setCastShadows(ri, false);
+	auto& mesh = m_meshManager.load("debug_cube", "models/debug_cube", defaultMaterialInstance.get());
+	m_scene->addEntity(mesh.get());
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
@@ -133,7 +128,6 @@ void Sandbox::onDrawGui()
 	ImGui::DragFloat("Velocity", &m_cameraData.velocity, 1.0f, 100.0f, 2000.0f);
 
 	ImGui::End();
-
 
 	ImGui::Begin("Material Settings");
 

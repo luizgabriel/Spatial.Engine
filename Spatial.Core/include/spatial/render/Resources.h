@@ -7,6 +7,8 @@
 #include <filament/View.h>
 #include <filament/Camera.h>
 #include <filament/Texture.h>
+#include <filament/IndirectLight.h>
+#include <filament/Skybox.h>
 
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>

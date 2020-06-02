@@ -7,14 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <image/KtxBundle.h>
-#include <image/KtxUtility.h>
-
-#include <filament/IndirectLight.h>
-#include <filament/Skybox.h>
-
 #include <fstream>
-#include <array>
 #include <string>
 
 using namespace filament::math;
@@ -83,72 +76,5 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 
 	return createResource(engine, texture);
 }
-
-Texture createKtxTexture(filament::Engine* engine, const fs::path& filePath)
-{
-	using namespace std;
-
-	const auto absolutePath = Asset::absolute(filePath);
-	auto stream = ifstream{absolutePath, std::ios_base::in | ios::binary};
-
-	const auto contents = vector<uint8_t>{istreambuf_iterator<char>(stream), {}};
-
-	// we are using "new" here because of this legacy api
-	// but this pointer is released with the texture holding it
-	const auto ktxBundle = new image::KtxBundle(contents.data(), contents.size());
-
-	return createResource(engine, image::ktx::createTexture(engine, ktxBundle, false));
-}
-
-using bands_t = std::array<float3, 9>;
-
-bands_t parseShFile(const fs::path& file)
-{
-	auto bands = bands_t{};
-	const auto absolutePath = Asset::absolute(file);
-	auto stream = std::ifstream{absolutePath, std::ios_base::in};
-
-	if (!stream)
-		throw FileNotFoundError(absolutePath);
-
-	stream >> std::skipws;
-
-	char c;
-	for (auto& band : bands)
-	{
-		while (!stream.eof() && stream >> c && c != '(')
-			;
-
-		stream >> band.r;
-		stream >> c;
-		stream >> band.g;
-		stream >> c;
-		stream >> band.b;
-	}
-
-	return bands;
-}
-
-ImageBasedLight createIblFromKtx(fl::Engine* engine, const fs::path& folder)
-{
-	const auto name = folder.filename().generic_string();
-
-	const auto iblPath = folder / (name + "_ibl.ktx");
-	auto texture = createKtxTexture(engine, iblPath);
-
-	const auto skyPath = folder / (name + "_skybox.ktx");
-	auto skyboxTexture = createKtxTexture(engine, skyPath);
-
-	const auto shPath = folder / "sh.txt";
-	auto bands = parseShFile(shPath);
-
-	auto light =
-		fl::IndirectLight::Builder().reflections(texture.get()).irradiance(3, &bands[0]).intensity(30000.0f).build(*engine);
-
-	auto skybox = fl::Skybox::Builder().environment(skyboxTexture.get()).showSun(true).build(*engine);
-
-	return {engine, light, texture.release(), skybox, skyboxTexture.release()};
-}
-
 
 } // namespace spatial

@@ -1,7 +1,6 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/desktop/native/WindowHelper.h>
 
-
 #include <utility>
 #include <cassert>
 

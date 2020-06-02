@@ -24,9 +24,6 @@ private:
 public:
 	UserInterfaceSystem(RenderingSystem& rendering, const Window& window, std::filesystem::path fontPath);
 
-	void attach(EventQueue& queue);
-	void detach(EventQueue& queue);
-
 	void onStart();
 
 	void onStartFrame(float delta);

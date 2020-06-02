@@ -10,7 +10,7 @@
 namespace spatial
 {
 
-template <typename ResourceType, typename KeyType, auto ResourceCreator>
+template <typename ResourceType, typename KeyType, auto DefaultCreator>
 class ResourceManager
 {
 private:
@@ -18,15 +18,22 @@ private:
 	std::unordered_map<KeyType, ResourceType> m_resources;
 
 public:
-	explicit ResourceManager(filament::Engine* engine)
-		: m_engine{engine}
+	explicit ResourceManager(filament::Engine* engine) : m_engine{engine}
 	{
 	}
 
 	template <typename... Args>
-	void load(KeyType&& key, Args&&... args)
+	ResourceType& load(KeyType&& key, Args&&... args)
 	{
-		m_resources.emplace(key, std::invoke(ResourceCreator, m_engine, std::forward<Args>(args)...));
+		auto [it, _] = m_resources.emplace(key, std::invoke(DefaultCreator, m_engine, std::forward<Args>(args)...));
+		return it->second;
+	}
+
+	template <auto CustomCreator, typename... Args>
+	ResourceType& load(KeyType&& key, Args&&... args)
+	{
+		auto& [it, _] = m_resources.emplace(key, std::invoke(CustomCreator, m_engine, std::forward<Args>(args)...));
+		return it->second;
 	}
 
 	void unload(const KeyType& key)
@@ -34,16 +41,15 @@ public:
 		m_resources.at(name).reset();
 	}
 
-	[[nodiscard]] ResourceType& ref(const KeyType& key)
+	[[nodiscard]] ResourceType& view(const KeyType& key)
 	{
 		return m_resources.at(key);
 	}
 
 	[[nodiscard]] auto get(const KeyType& key)
 	{
-		return ref(key).get();
+		return view(key).get();
 	}
-
 };
 
 using TextureManager = ResourceManager<Texture, std::string, &createTexture>;
@@ -54,4 +60,4 @@ using MaterialInstanceManager = ResourceManager<MaterialInstance, std::uint32_t,
 
 using MeshManager = ResourceManager<Mesh, std::string, &createMesh>;
 
-}
+} // namespace spatial
