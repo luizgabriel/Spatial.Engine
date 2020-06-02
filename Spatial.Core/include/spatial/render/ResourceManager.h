@@ -23,14 +23,14 @@ public:
 	}
 
 	template <typename... Args>
-	ResourceType& load(KeyType&& key, Args&&... args)
+	ResourceType& set(KeyType&& key, Args&&... args)
 	{
 		auto [it, _] = m_resources.emplace(key, std::invoke(DefaultCreator, m_engine, std::forward<Args>(args)...));
 		return it->second;
 	}
 
 	template <auto CustomCreator, typename... Args>
-	ResourceType& load(KeyType&& key, Args&&... args)
+	ResourceType& set(KeyType&& key, Args&&... args)
 	{
 		auto& [it, _] = m_resources.emplace(key, std::invoke(CustomCreator, m_engine, std::forward<Args>(args)...));
 		return it->second;

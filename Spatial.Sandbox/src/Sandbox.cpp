@@ -41,30 +41,30 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 {
 	m_view->setScene(m_scene.get());
 
-	auto& debugCubeTexture = m_textureManager.load("debug_cube", "textures/debug_cube.png");
-	auto& defaultMaterial = m_materialManager.load("default", "materials/default");
+	auto& debugCubeTexture = m_textureManager.set("debug_cube", "textures/debug_cube.png");
+	auto& defaultMaterial = m_materialManager.set("default", "materials/default");
 
 	auto [skyboxPath, iblPath, shPath] = parseKtxFolder("textures/pillars_2k");
 
-	auto& skyboxTexture = m_textureManager.load<&createKtxTexture>("skybox", skyboxPath);
+	auto& skyboxTexture = m_textureManager.set<&createKtxTexture>("skybox", skyboxPath);
 	m_skybox = createSkybox(m_engine, skyboxTexture.get());
 
 	const auto bands = parseShFile(shPath);
-	auto& iblTexture = m_textureManager.load<&createKtxTexture>("skybox_ibl", iblPath);
+	auto& iblTexture = m_textureManager.set<&createKtxTexture>("skybox_ibl", iblPath);
 	m_indirectLight = createImageBasedLight(m_engine, iblTexture.get(), bands);
 
 	m_scene->setSkybox(m_skybox.get());
 	m_scene->setIndirectLight(m_indirectLight.get());
 
 	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
-	auto& defaultMaterialInstance = m_materialInstanceManager.load(1, defaultMaterial.get());
+	auto& defaultMaterialInstance = m_materialInstanceManager.set(1, defaultMaterial.get());
 	defaultMaterialInstance->setParameter("albedo", debugCubeTexture.get(), sampler);
 	defaultMaterialInstance->setParameter("clearCoat", 0.7f);
 	defaultMaterialInstance->setParameter("clearCoatRoughness", 0.0f);
 
 	m_scene->addEntity(m_light.get());
 
-	auto& mesh = m_meshManager.load("debug_cube", "models/debug_cube", defaultMaterialInstance.get());
+	auto& mesh = m_meshManager.set("debug_cube", "models/debug_cube", defaultMaterialInstance.get());
 	m_scene->addEntity(mesh.get());
 }
 
