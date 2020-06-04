@@ -9,20 +9,6 @@ InputSystem::InputSystem(Window* window) : m_window{window}
 {
 }
 
-void InputSystem::attach(EventQueue& queue)
-{
-	queue.connect<MouseMovedEvent>(this);
-	queue.connect<KeyEvent>(this);
-	queue.connect<TextEvent>(this);
-}
-
-void InputSystem::detach(EventQueue& queue)
-{
-	queue.disconnect<MouseMovedEvent>(this);
-	queue.disconnect<KeyEvent>(this);
-	queue.disconnect<TextEvent>(this);
-}
-
 void InputSystem::onStartFrame(float delta)
 {
 	if (Mouse::s_mouseState.isMouseWarpRequested())

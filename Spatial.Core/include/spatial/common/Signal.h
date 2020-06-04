@@ -35,10 +35,10 @@ public:
 		m_sink.template connect<Function>();
 	}
 
-	template <auto MemberFunction, typename Type>
-	void connect(Type* valueOrInstance)
+	template <auto MemberFunction, typename Listener>
+	void connect(Listener& listener)
 	{
-		m_sink.template connect<MemberFunction>(valueOrInstance);
+		m_sink.template connect<MemberFunction>(listener);
 	}
 
 	template <auto Function>
@@ -47,10 +47,10 @@ public:
 		m_sink.template disconnect<Function>();
 	}
 
-	template <auto MemberFunction, typename Type>
-	void disconnect(Type* valueOrInstance)
+	template <auto MemberFunction, typename Listener>
+	void disconnect(Listener& listener)
 	{
-		m_sink.template disconnect<MemberFunction>(valueOrInstance);
+		m_sink.template disconnect<MemberFunction>(listener);
 	}
 };
 

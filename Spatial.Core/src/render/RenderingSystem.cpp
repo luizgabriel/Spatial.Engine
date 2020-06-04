@@ -6,8 +6,7 @@ namespace bk = filament::backend;
 
 namespace spatial
 {
-RenderingSystem::RenderingSystem(const Window& window)
-	: RenderingSystem(window, bk::Backend::OPENGL)
+RenderingSystem::RenderingSystem(const Window& window) : RenderingSystem(window, bk::Backend::OPENGL)
 {
 }
 
@@ -21,16 +20,6 @@ RenderingSystem::RenderingSystem(const Window& window, const bk::Backend backend
 {
 	pushBackView(m_mainView.get());
 	setupViewport(window.getFrameBufferSize());
-}
-
-void RenderingSystem::attach(EventQueue& queue)
-{
-	queue.connect<WindowResizedEvent>(this);
-}
-
-void RenderingSystem::detach(EventQueue& queue)
-{
-	queue.disconnect<WindowResizedEvent>(this);
 }
 
 void RenderingSystem::onStart()

@@ -1,65 +1,112 @@
 #pragma once
 
+#include <cstdint>
+#include <filament/Box.h>
 #include <spatial/render/Resources.h>
-#include <spatial/render/Entity.h>
-#include <filameshio/MeshReader.h>
+#include <filament/RenderableManager.h>
 
 namespace spatial
 {
 
-class Mesh
+struct FilameshFileHeader
+{
+	uint32_t version{};
+	uint32_t parts{};
+	filament::Box aabb;
+	uint32_t flags{};
+	uint32_t offsetPosition{};
+	uint32_t stridePosition{};
+	uint32_t offsetTangents{};
+	uint32_t strideTangents{};
+	uint32_t offsetColor{};
+	uint32_t strideColor{};
+	uint32_t offsetUV0{};
+	uint32_t strideUV0{};
+	uint32_t offsetUV1{};
+	uint32_t strideUV1{};
+	uint32_t vertexCount{};
+	uint32_t vertexSize{};
+	uint32_t indexType{};
+	uint32_t indexCount{};
+	uint32_t indexSize{};
+};
+
+struct MeshPart
+{
+	uint32_t offset{};
+	uint32_t indexCount{};
+	uint32_t minIndex{};
+	uint32_t maxIndex{};
+	uint32_t materialID{};
+	filament::Box boundingBox;
+
+	std::string materialName;
+};
+
+
+struct Mesh
 {
 private:
-	Entity m_entity;
+	filament::Engine* m_engine;
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
 
+	filament::Box m_boundingBox;
+	std::vector<MeshPart> m_parts;
+
 public:
-	Mesh(filament::Engine* engine, const filamesh::MeshReader::Mesh& mesh)
-		: m_entity{engine, mesh.renderable},
-		  m_vertexBuffer{createResource(engine, mesh.vertexBuffer)},
-		  m_indexBuffer{createResource(engine, mesh.indexBuffer)}
+	Mesh(filament::Engine* engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox, size_t numParts);
+
+	[[nodiscard]] size_t size() const
 	{
+		return m_parts.size();
 	}
 
-	Mesh(Mesh&& other)
-		: m_entity{std::move(other.m_entity)},
-		  m_vertexBuffer{std::move(other.m_vertexBuffer)},
-		  m_indexBuffer{std::move(other.m_indexBuffer)}
+	MeshPart& operator[](size_t index)
 	{
+		return m_parts[index];
 	}
 
-	Mesh& operator=(Mesh&& other)
+	const MeshPart& operator[](size_t index) const
 	{
-		m_entity = std::move(other.m_entity);
-		m_vertexBuffer = std::move(other.m_vertexBuffer);
-		m_indexBuffer = std::move(other.m_indexBuffer);
+		return m_parts[index];
 	}
 
-	Mesh(Mesh& other) = delete;
-	Mesh& operator=(const Mesh& w) = delete;
-
-	// region Getters
-	utils::Entity get()
+	[[nodiscard]] auto begin() const noexcept
 	{
-		return getEntity();
+		return m_parts.begin();
 	}
 
-	utils::Entity getEntity()
+	[[nodiscard]] auto end() const noexcept
 	{
-		return m_entity.get();
+		return m_parts.end();
 	}
 
-	filament::VertexBuffer* getVertexBuffer()
+	[[nodiscard]] auto boundingBox() const
+	{
+		return m_boundingBox;
+	}
+
+	[[nodiscard]] auto getVertexBuffer() const
 	{
 		return m_vertexBuffer.get();
 	}
 
-	filament::IndexBuffer* getIndexBuffer()
+	[[nodiscard]] auto getIndexBuffer() const
 	{
 		return m_indexBuffer.get();
 	}
-	// endregion
+
+	[[nodiscard]] auto getEngine() const
+	{
+		return m_engine;
+	}
+
+	void build(utils::Entity entity, filament::MaterialInstance* defaultInstance);
+
+	using MaterialsMap = std::unordered_map<std::string, filament::MaterialInstance*>;
+	void build(utils::Entity entity, const MaterialsMap& map);
 };
+
 
 } // namespace spatial

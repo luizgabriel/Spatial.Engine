@@ -47,8 +47,8 @@ void UserInterfaceInput::setMousePosition(float2 position)
 
 void UserInterfaceInput::setKey(Key key, KeyAction action)
 {
-	if (key == Key::UnknownKey) [[unlikelly]]
-		return;
+	if (key == Key::UnknownKey)
+		[[unlikelly]] return;
 
 	auto pressed = action == KeyAction::Pressed;
 	auto& io = ImGui::GetIO();
@@ -63,10 +63,14 @@ void UserInterfaceInput::setKey(Key key, KeyAction action)
 	io.KeySuper = (key == Key::System) && pressed;
 
 	io.KeyMods = ImGuiKeyModFlags_None;
-	if (io.KeyCtrl) io.KeyMods |= ImGuiKeyModFlags_Ctrl;
-	if (io.KeyShift) io.KeyMods |= ImGuiKeyModFlags_Shift;
-	if (io.KeyAlt) io.KeyMods |= ImGuiKeyModFlags_Alt;
-	if (io.KeySuper) io.KeyMods |= ImGuiKeyModFlags_Super;
+	if (io.KeyCtrl)
+		io.KeyMods |= ImGuiKeyModFlags_Ctrl;
+	if (io.KeyShift)
+		io.KeyMods |= ImGuiKeyModFlags_Shift;
+	if (io.KeyAlt)
+		io.KeyMods |= ImGuiKeyModFlags_Alt;
+	if (io.KeySuper)
+		io.KeyMods |= ImGuiKeyModFlags_Super;
 }
 
 void UserInterfaceInput::setText(const std::string& text)

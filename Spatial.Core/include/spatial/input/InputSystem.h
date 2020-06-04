@@ -15,10 +15,9 @@ private:
 
 public:
 	explicit InputSystem(Window* window);
-	InputSystem(const InputSystem& other) = delete;
 
-	void attach(EventQueue& queue);
-	void detach(EventQueue& queue);
+	InputSystem(const InputSystem& other) = delete;
+	InputSystem& operator=(const InputSystem& w) = delete;
 
 	void onStartFrame(float delta);
 

@@ -14,7 +14,7 @@ class Application final
 private:
 	bool m_running = false;
 
-	EventQueue m_ebus{};
+	EventQueue m_eventQueue{};
 	Clock<float> m_clock{};
 	float m_desiredDelta{1.0f / 60.0f};
 
@@ -52,9 +52,9 @@ public:
 
 	void setMaxFps(float fps);
 
-	auto& getEBus()
+	auto& getEventQueue()
 	{
-		return m_ebus;
+		return m_eventQueue;
 	}
 
 	auto& getWindowContext() const

@@ -14,22 +14,6 @@ UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Windo
 	rendering.pushFrontView(getView());
 }
 
-void UserInterfaceSystem::attach(EventQueue& queue)
-{
-	queue.connect<WindowResizedEvent>(this);
-	queue.connect<MouseMovedEvent>(this);
-	queue.connect<KeyEvent>(this);
-	queue.connect<TextEvent>(this);
-}
-
-void UserInterfaceSystem::detach(EventQueue& queue)
-{
-	queue.disconnect<WindowResizedEvent>(this);
-	queue.disconnect<MouseMovedEvent>(this);
-	queue.disconnect<KeyEvent>(this);
-	queue.disconnect<TextEvent>(this);
-}
-
 void UserInterfaceSystem::onStart()
 {
 	m_renderer.setup(m_fontPath);

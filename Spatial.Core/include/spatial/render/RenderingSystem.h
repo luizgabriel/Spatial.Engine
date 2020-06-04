@@ -35,9 +35,6 @@ public:
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
-	void attach(EventQueue& queue);
-	void detach(EventQueue& queue);
-
 	void onStart();
 
 	void onEndFrame();

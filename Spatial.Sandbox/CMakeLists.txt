@@ -3,7 +3,7 @@ include(ResourcesLibrary)
 add_executable(Spatial.Sandbox
         src/main.cpp
         src/Sandbox.cpp
-)
+        src/Components.h src/DebugCubeSystem.cpp src/DebugCubeSystem.h ../Spatial.Core/src/ecs/RenderableSystem.cpp ../Spatial.Core/include/spatial/ecs/RenderableSystem.h ../Spatial.Core/src/ecs/TransformSystem.cpp ../Spatial.Core/include/spatial/ecs/TransformSystem.h)
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
 set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD 20)

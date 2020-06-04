@@ -14,9 +14,37 @@
 #include <cmath>
 #include <spatial/input/Mouse.h>
 #include <spatial/render/RenderingSystem.h>
+#include <spatial/render/SkyboxResources.h>
+#include <spatial/render/RegistryUtils.h>
+#include <spatial/ecs/Components.h>
+
+#include "Components.h"
 
 namespace fl = filament;
 using namespace filament::math;
+
+namespace MM
+{
+template <>
+void ComponentEditorWidget<spatial::ecs::DebugCube>(entt::registry& reg, entt::registry::entity_type e)
+{
+	auto& t = reg.get<spatial::ecs::DebugCube>(e);
+	ImGui::DragFloat("Metallic", &t.metallic, 0.01f, .0f, 1.0f);
+	ImGui::DragFloat("Roughness", &t.roughness, 0.01f, .0f, 1.0f);
+	ImGui::DragFloat("Clear Coat", &t.clearCoat, 0.01f, .0f, 1.0f);
+	ImGui::DragFloat("Clear Coat Roughness", &t.clearCoatRoughness, 0.01f, .0f, 1.0f);
+}
+
+template <>
+void ComponentEditorWidget<spatial::ecs::Transform>(entt::registry& reg, entt::registry::entity_type e)
+{
+	auto& t = reg.get<spatial::ecs::Transform>(e);
+	ImGui::DragFloat3("Position", &t.position[0], 1.0f);
+	ImGui::DragFloat3("Scale", &t.scale[0], .1f);
+}
+
+
+} // namespace MM
 
 namespace spatial
 {
@@ -25,52 +53,34 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
 	  m_view{renderingSystem.getMainView()},
-	  m_scene{createScene(m_engine)},
-	  m_light{createEntity(m_engine)},
-	  m_ibl{createIblFromKtx(m_engine, "textures/pillars_2k")},
+
 	  m_cam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
 	  m_cameraData{.5f, 500.0f},
-	  m_textureManager{m_engine},
-	  m_materialManager{m_engine},
-	  m_materialInstanceManager{m_engine},
-	  m_meshManager{m_engine}
-{
-	m_textureManager.load("debug_cube", "textures/debug_cube.png");
-	m_materialManager.load("default", "materials/default");
-	m_materialInstanceManager.load(1, m_materialManager.get("default"));
-	m_meshManager.load("debug_cube", "models/debug_cube", m_materialInstanceManager.get(1));
-}
 
-void Sandbox::attach(EventQueue& queue)
-{
-	queue.connect<MouseMovedEvent>(this);
-}
+	  m_scene{createScene(m_engine)},
+	  m_skyboxTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_skybox.ktx")},
+	  m_iblTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_ibl.ktx")},
+	  m_indirectLight{createImageBasedLight(m_engine, m_iblTexture.get(), "textures/pillars_2k/sh.txt")},
+	  m_skybox{createSkybox(m_engine, m_skyboxTexture.get())},
 
-void Sandbox::detach(EventQueue& queue)
+	  m_registry{},
+	  m_renderableSystem{m_scene.get()},
+	  m_debugCubeSystem{m_engine},
+	  m_transformSystem{m_engine},
+	  m_editor{}
 {
-	queue.disconnect<MouseMovedEvent>(this);
-}
+	m_editor.registerComponent<ecs::DebugCube>("Debug Cube");
+	m_editor.registerComponent<ecs::Transform>("Transform");
+	connect<ecs::DebugCube>(m_registry, m_debugCubeSystem);
+	connect<ecs::Renderable>(m_registry, m_renderableSystem);
 
-void Sandbox::onStart()
-{
 	m_view->setScene(m_scene.get());
+	m_scene->setIndirectLight(m_indirectLight.get());
+	m_scene->setSkybox(m_skybox.get());
 
-	const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
-	auto instance = m_materialInstanceManager.get(1);
-	instance->setParameter("albedo", m_textureManager.get("debug_cube"), sampler);
-	instance->setParameter("clearCoat", 0.7f);
-	instance->setParameter("clearCoatRoughness", 0.0f);
-
-	m_scene->setSkybox(m_ibl.getSkybox());
-	m_scene->setIndirectLight(m_ibl.getLight());
-	m_scene->addEntity(m_light.get());
-
-	auto mesh = m_meshManager.get("debug_cube");
-	m_scene->addEntity(mesh);
-
-	auto& rcm = m_engine->getRenderableManager();
-	const auto ri = rcm.getInstance(mesh);
-	rcm.setCastShadows(ri, false);
+	auto entity = m_registry.create();
+	m_registry.emplace<ecs::Transform>(entity);
+	m_registry.emplace<ecs::DebugCube>(entity, 0.5f, 0.5f, 0.5f, 0.5f);
 }
 
 void Sandbox::onEvent(const MouseMovedEvent& e)
@@ -93,17 +103,20 @@ float3 defaultInputAxis()
 
 void Sandbox::onUpdateFrame(float delta)
 {
-	if (Keyboard::released(Key::C))
-		enabledCameraController = !enabledCameraController;
+	if (Keyboard::released(Key::MouseLeft))
+		enabledCameraController = false;
+
+	if (Keyboard::released(Key::MouseRight))
+		enabledCameraController = true;
 
 	if (Keyboard::released(Key::G))
 		showEngineGui = !showEngineGui;
 
-	auto instance = m_materialInstanceManager.get(1);
-	instance->setParameter("metallic", m_materialData.metallic);
-	instance->setParameter("roughness", m_materialData.roughness);
-
+	m_debugCubeSystem.onUpdate(m_registry);
+	m_transformSystem.onUpdate(m_registry);
 	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
+
+	m_registry.each([this](auto entity) { m_editor.render(m_registry, entity); });
 }
 
 void Sandbox::onDrawGui()
@@ -116,9 +129,9 @@ void Sandbox::onDrawGui()
 	ImGui::Text("Use the WASD to move in the scene.");
 
 	if (enabledCameraController)
-		ImGui::Text("Press C turn the camera movement OFF:");
+		ImGui::Text("Left Click to turn the camera movement OFF:");
 	else
-		ImGui::Text("Press C turn the camera movement ON:");
+		ImGui::Text("Right Click to turn the camera movement ON:");
 
 	ImGui::Checkbox("Enabled", &enabledCameraController);
 
@@ -131,14 +144,6 @@ void Sandbox::onDrawGui()
 
 	ImGui::DragFloat("Sensitivity", &m_cameraData.sensitivity, .001f, .1f, 5.0f);
 	ImGui::DragFloat("Velocity", &m_cameraData.velocity, 1.0f, 100.0f, 2000.0f);
-
-	ImGui::End();
-
-
-	ImGui::Begin("Material Settings");
-
-	ImGui::DragFloat("Metallic", &m_materialData.metallic, .001f, .0f, 1.0f);
-	ImGui::DragFloat("Roughness", &m_materialData.roughness, .001f, .0f, 1.0f);
 
 	ImGui::End();
 }

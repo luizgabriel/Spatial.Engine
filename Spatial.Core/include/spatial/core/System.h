@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <utility>
-#include <spatial/core/ApplicationEvents.h>
+#include <spatial/core/ApplicationUtils.h>
 
 namespace spatial
 {
@@ -10,24 +10,24 @@ template <typename S>
 class System
 {
 private:
-	Application* m_app;
+	Application& m_app;
 	S m_system;
 
 public:
-	System(Application& application) : m_app{&application}, m_system{}
+	System(Application& application) : m_app{application}, m_system{}
 	{
-		connect(application, &m_system);
+		connect(application, m_system);
 	}
 
 	template <typename... Args>
-	System(Application& application, Args&&... args) : m_app{&application}, m_system{std::forward<Args>(args)...}
+	System(Application& application, Args&&... args) : m_app{application}, m_system{std::forward<Args>(args)...}
 	{
-		connect(*m_app, &m_system);
+		connect(m_app, m_system);
 	}
 
 	~System()
 	{
-		disconnect(*m_app, &m_system);
+		disconnect(m_app, m_system);
 	}
 
 	System(const System& other) = delete;

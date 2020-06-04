@@ -36,4 +36,4 @@ struct SimpleCameraView
 
 filament::math::float3 toDirection(const filament::math::float2& rot);
 
-} // namespace spatial::math
+} // namespace spatial
