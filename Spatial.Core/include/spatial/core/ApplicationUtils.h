@@ -43,94 +43,80 @@ constexpr bool has_on_draw_gui_v = has_member_function_onDrawGui<T, void>::value
 template <typename T>
 constexpr bool has_on_finish_v = has_member_function_onFinish<T, void>::value;
 
-template <typename Handler>
-void connect(Application& app, Handler* instance)
+template <typename Listener>
+void connect(Application& app, Listener& listener)
 {
-	if constexpr (has_on_start_v<Handler>)
-		app.getStartSignal().connect<&Handler::onStart>(instance);
+	if constexpr (has_on_start_v<Listener>)
+		app.getStartSignal().connect<&Listener::onStart>(listener);
 
-	if constexpr (has_on_start_frame_v<Handler>)
-		app.getStartFrameSignal().connect<&Handler::onStartFrame, Handler>(instance);
+	if constexpr (has_on_start_frame_v<Listener>)
+		app.getStartFrameSignal().connect<&Listener::onStartFrame, Listener>(listener);
 
-	if constexpr (has_on_update_frame_v<Handler>)
-		app.getUpdateFrameSignal().connect<&Handler::onUpdateFrame, Handler>(instance);
+	if constexpr (has_on_update_frame_v<Listener>)
+		app.getUpdateFrameSignal().connect<&Listener::onUpdateFrame, Listener>(listener);
 
-	if constexpr (has_on_end_frame_v<Handler>)
-		app.getEndFrameSignal().connect<&Handler::onEndFrame, Handler>(instance);
+	if constexpr (has_on_end_frame_v<Listener>)
+		app.getEndFrameSignal().connect<&Listener::onEndFrame, Listener>(listener);
 
-	if constexpr (has_on_end_gui_frame_v<Handler>)
-		app.getEndGuiFrameSignal().connect<&Handler::onEndGuiFrame, Handler>(instance);
+	if constexpr (has_on_end_gui_frame_v<Listener>)
+		app.getEndGuiFrameSignal().connect<&Listener::onEndGuiFrame, Listener>(listener);
 
-	if constexpr (has_on_draw_gui_v<Handler>)
-		app.getDrawGuiSignal().connect<&Handler::onDrawGui>(instance);
+	if constexpr (has_on_draw_gui_v<Listener>)
+		app.getDrawGuiSignal().connect<&Listener::onDrawGui>(listener);
 
-	if constexpr (has_on_finish_v<Handler>)
-		app.getFinishSignal().connect<&Handler::onFinish>(instance);
+	if constexpr (has_on_finish_v<Listener>)
+		app.getFinishSignal().connect<&Listener::onFinish>(listener);
 
-	connect<WindowResizedEvent>(app.getEventQueue(), instance);
-	connect<WindowClosedEvent>(app.getEventQueue(), instance);
-	connect<KeyEvent>(app.getEventQueue(), instance);
-	connect<TextEvent>(app.getEventQueue(), instance);
-	connect<MouseMovedEvent>(app.getEventQueue(), instance);
-	connect<MouseScrolledEvent>(app.getEventQueue(), instance);
+	connect<WindowResizedEvent>(app.getEventQueue(), listener);
+	connect<WindowClosedEvent>(app.getEventQueue(), listener);
+	connect<KeyEvent>(app.getEventQueue(), listener);
+	connect<TextEvent>(app.getEventQueue(), listener);
+	connect<MouseMovedEvent>(app.getEventQueue(), listener);
+	connect<MouseScrolledEvent>(app.getEventQueue(), listener);
 }
 
-template <typename... Handlers>
-void connect(Application& app, Handlers*... instance)
+template <typename... Listeners>
+void connect(Application& app, Listeners&... listener)
 {
-	(connect(app, instance), ...);
+	(connect(app, listener), ...);
 }
 
-template <typename Handler>
-void disconnect(Application& app, Handler* instance)
+template <typename Listener>
+void disconnect(Application& app, Listener& listener)
 {
-	if constexpr (has_on_start_v<Handler>)
-	{
-		app.getStartSignal().disconnect<&Handler::onStart>(instance);
-	}
+	if constexpr (has_on_start_v<Listener>)
+		app.getStartSignal().disconnect<&Listener::onStart>(listener);
 
-	if constexpr (has_on_start_frame_v<Handler>)
-	{
-		app.getStartFrameSignal().disconnect<&Handler::onStartFrame, Handler>(instance);
-	}
+	if constexpr (has_on_start_frame_v<Listener>)
+		app.getStartFrameSignal().disconnect<&Listener::onStartFrame, Listener>(listener);
 
-	if constexpr (has_on_update_frame_v<Handler>)
-	{
-		app.getUpdateFrameSignal().disconnect<&Handler::onUpdateFrame, Handler>(instance);
-	}
+	if constexpr (has_on_update_frame_v<Listener>)
+		app.getUpdateFrameSignal().disconnect<&Listener::onUpdateFrame, Listener>(listener);
 
-	if constexpr (has_on_end_frame_v<Handler>)
-	{
-		app.getEndFrameSignal().disconnect<&Handler::onEndFrame, Handler>(instance);
-	}
+	if constexpr (has_on_end_frame_v<Listener>)
+		app.getEndFrameSignal().disconnect<&Listener::onEndFrame, Listener>(listener);
 
-	if constexpr (has_on_end_gui_frame_v<Handler>)
-	{
-		app.getEndGuiFrameSignal().disconnect<&Handler::onEndGuiFrame, Handler>(instance);
-	}
+	if constexpr (has_on_end_gui_frame_v<Listener>)
+		app.getEndGuiFrameSignal().disconnect<&Listener::onEndGuiFrame, Listener>(listener);
 
-	if constexpr (has_on_draw_gui_v<Handler>)
-	{
-		app.getDrawGuiSignal().disconnect<&Handler::onDrawGui>(instance);
-	}
+	if constexpr (has_on_draw_gui_v<Listener>)
+		app.getDrawGuiSignal().disconnect<&Listener::onDrawGui>(listener);
 
-	if constexpr (has_on_finish_v<Handler>)
-	{
-		app.getFinishSignal().disconnect<&Handler::onFinish>(instance);
-	}
+	if constexpr (has_on_finish_v<Listener>)
+		app.getFinishSignal().disconnect<&Listener::onFinish>(listener);
 
-	disconnect<WindowResizedEvent>(app.getEventQueue(), instance);
-	disconnect<WindowClosedEvent>(app.getEventQueue(), instance);
-	disconnect<KeyEvent>(app.getEventQueue(), instance);
-	disconnect<TextEvent>(app.getEventQueue(), instance);
-	disconnect<MouseMovedEvent>(app.getEventQueue(), instance);
-	disconnect<MouseScrolledEvent>(app.getEventQueue(), instance);
+	disconnect<WindowResizedEvent>(app.getEventQueue(), listener);
+	disconnect<WindowClosedEvent>(app.getEventQueue(), listener);
+	disconnect<KeyEvent>(app.getEventQueue(), listener);
+	disconnect<TextEvent>(app.getEventQueue(), listener);
+	disconnect<MouseMovedEvent>(app.getEventQueue(), listener);
+	disconnect<MouseScrolledEvent>(app.getEventQueue(), listener);
 }
 
-template <typename... Handlers>
-void disconnect(Application& app, Handlers*... instance)
+template <typename... Listeners>
+void disconnect(Application& app, Listeners&... listener)
 {
-	(disconnect(app, instance), ...);
+	(disconnect(app, listener), ...);
 }
 
 } // namespace spatial

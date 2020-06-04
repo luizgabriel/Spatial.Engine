@@ -87,4 +87,13 @@ KtxFolderPaths parseKtxFolder(const std::filesystem::path& folder)
 	return std::make_tuple(std::move(iblPath), std::move(skyPath), std::move(shPath));
 }
 
+IndirectLight createImageBasedLight(filament::Engine* engine,
+									filament::Texture* cubemap,
+									const std::filesystem::path& shFile,
+									float intensity)
+{
+	auto bands = parseShFile(shFile);
+	return createImageBasedLight(engine, cubemap, bands, intensity);
+}
+
 } // namespace spatial

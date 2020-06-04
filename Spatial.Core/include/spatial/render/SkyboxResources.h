@@ -18,6 +18,11 @@ Skybox createSkybox(filament::Engine* engine, filament::Texture* skybox, bool sh
 
 IndirectLight createImageBasedLight(filament::Engine* engine,
 									filament::Texture* cubemap,
+									const std::filesystem::path& shFile,
+									float intensity = 30000.0f);
+
+IndirectLight createImageBasedLight(filament::Engine* engine,
+									filament::Texture* cubemap,
 									const bands_t& bands,
 									float intensity = 30000.0f);
 

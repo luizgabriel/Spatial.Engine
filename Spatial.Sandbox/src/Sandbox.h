@@ -4,10 +4,13 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/Resources.h>
 #include <spatial/render/Entity.h>
-#include <spatial/render/Mesh.h>
 #include <spatial/render/CameraControllers.h>
 #include <spatial/render/RenderingSystem.h>
-#include <spatial/render/ResourceManager.h>
+#include <entt/entity/registry.hpp>
+#include <spatial/ui/ImGuiExtensions.h>
+#include "DebugCubeSystem.h"
+#include "spatial/ecs/RenderableSystem.h"
+#include "spatial/ecs/TransformSystem.h"
 
 namespace fl = filament;
 
@@ -16,12 +19,6 @@ namespace spatial
 
 class Sandbox
 {
-	struct MaterialData
-	{
-		float metallic{.5f};
-		float roughness{.4f};
-	};
-
 	struct CameraData
 	{
 		float sensitivity;
@@ -34,21 +31,22 @@ private:
 	fl::View* m_view;
 
 	SimpleCameraView m_cam;
-	MaterialData m_materialData;
 	CameraData m_cameraData;
 
 	bool showEngineGui{true};
 	bool enabledCameraController{true};
 
-	TextureManager m_textureManager;
-	MaterialManager m_materialManager;
-	MaterialInstanceManager m_materialInstanceManager;
-	MeshManager m_meshManager;
-
 	Scene m_scene;
-	Entity m_light;
-	Skybox m_skybox;
+	Texture m_skyboxTexture;
+	Texture m_iblTexture;
 	IndirectLight m_indirectLight;
+	Skybox m_skybox;
+
+	entt::registry m_registry;
+	ecs::RenderableSystem m_renderableSystem;
+	ecs::DebugCubeSystem m_debugCubeSystem;
+	ecs::TransformSystem m_transformSystem;
+	MM::EntityEditor<entt::entity> m_editor;
 
 public:
 	explicit Sandbox(RenderingSystem& renderingSystem);

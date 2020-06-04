@@ -10,12 +10,12 @@ namespace spatial
 
 Application::Application()
 {
-	m_eventQueue.connect<WindowClosedEvent>(this);
+	m_eventQueue.connect<WindowClosedEvent>(*this);
 }
 
 Application::~Application()
 {
-	m_eventQueue.disconnect<WindowClosedEvent>(this);
+	m_eventQueue.disconnect<WindowClosedEvent>(*this);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)

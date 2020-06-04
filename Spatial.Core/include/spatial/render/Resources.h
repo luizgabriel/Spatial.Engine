@@ -9,6 +9,8 @@
 #include <filament/Texture.h>
 #include <filament/IndirectLight.h>
 #include <filament/Skybox.h>
+#include <filament/IndexBuffer.h>
+#include <filament/VertexBuffer.h>
 
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
@@ -33,6 +35,7 @@ using Skybox = EngineResource<filament::Skybox>;
 using IndirectLight = EngineResource<filament::IndirectLight>;
 
 // Shared Pointers
+using SharedScene = SharedEngineResource<filament::Scene>;
 using SharedVertexBuffer = SharedEngineResource<filament::VertexBuffer>;
 using SharedIndexBuffer = SharedEngineResource<filament::IndexBuffer>;
 using SharedMaterial = SharedEngineResource<filament::Material>;

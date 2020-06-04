@@ -33,17 +33,22 @@ add_library(Spatial.Core
     include/spatial/render/Engine.h
     include/spatial/render/EngineResource.h
     include/spatial/render/Entity.h
-    include/spatial/render/Mesh.h
     include/spatial/render/RenderingSystem.h
     include/spatial/render/ResourceLoaders.h
-    include/spatial/render/ResourceManager.h
     include/spatial/render/Resources.h
     include/spatial/render/SkyboxResources.h
+    include/spatial/render/RegistryUtils.h
+    include/spatial/render/Mesh.h
 
     include/spatial/ui/ImGuiHelpers.h
     include/spatial/ui/UserInterfaceInput.h
     include/spatial/ui/UserInterfaceRenderer.h
     include/spatial/ui/UserInterfaceSystem.h
+    include/spatial/ui/ImGuiExtensions.h
+
+    include/spatial/ecs/Components.h
+    include/spatial/ecs/RenderableSystem.h
+    include/spatial/ecs/TransformSystem.h
 
     include/spatial/init.h
 
@@ -76,11 +81,15 @@ add_library(Spatial.Core
     src/render/ResourceLoaders.cpp
     src/render/CameraControllers.cpp
     src/render/SkyboxResources.cpp
+    src/render/Mesh.cpp
 
     src/ui/ImGuiHelpers.cpp
     src/ui/UserInterfaceSystem.cpp
     src/ui/UserInterfaceRenderer.cpp
     src/ui/UserInterfaceInput.cpp
+
+    src/ecs/RenderableSystem.cpp
+    src/ecs/TransformSystem.cpp
 )
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 20)
 set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
