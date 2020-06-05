@@ -3,44 +3,111 @@
 #include <filament/Engine.h>
 #include <memory>
 
+namespace fl = filament;
+
 namespace spatial
 {
 
+/**
+ * A unique_ptr like holder
+ * @tparam ResourceType
+ */
 template <typename ResourceType>
-class FilamentEngineResourceDeleter
+class EngineResource
 {
 private:
-	filament::Engine* m_engine;
+	filament::Engine& m_engine;
+	ResourceType* m_resource;
 
 public:
-	explicit FilamentEngineResourceDeleter(filament::Engine* engine) noexcept : m_engine{engine}
+	explicit EngineResource(fl::Engine& engine, ResourceType* resource = nullptr) noexcept
+		: m_engine{engine}, m_resource{resource}
 	{
-		assert(engine != nullptr);
 	}
 
-	void operator()(ResourceType* resource)
+	EngineResource(const EngineResource&) = delete;
+	EngineResource& operator=(const EngineResource&) = delete;
+
+	EngineResource(EngineResource&& other) noexcept
+		: m_engine{other.m_engine}, m_resource{std::exchange(other.m_resource, nullptr)}
 	{
-		if (resource)
-			m_engine->destroy(resource);
+	}
+
+	EngineResource& operator=(EngineResource&& other) noexcept
+	{
+		reset();
+		m_resource = other.release();
+
+		return *this;
+	}
+
+	auto& getEngine()
+	{
+		return m_engine;
+	}
+
+	ResourceType* get()
+	{
+		return m_resource;
+	}
+
+	ResourceType& ref()
+	{
+		return *m_resource;
+	}
+
+	const ResourceType* get() const
+	{
+		return m_resource;
+	}
+
+	void reset()
+	{
+		if (m_resource)
+			m_engine.destroy(m_resource);
+		m_resource = nullptr;
+	}
+
+	ResourceType* release()
+	{
+		return std::exchange(m_resource, nullptr);
+	}
+
+	~EngineResource()
+	{
+		reset();
+	}
+
+	ResourceType* operator->()
+	{
+		return m_resource;
+	}
+
+	const ResourceType* operator->() const
+	{
+		return m_resource;
 	}
 };
-
-template <typename ResourceType>
-using EngineResource = std::unique_ptr<ResourceType, FilamentEngineResourceDeleter<ResourceType>>;
-
-template <typename ResourceType>
-EngineResource<ResourceType> createResource(filament::Engine* engine, ResourceType* resource = nullptr) noexcept
-{
-	return {resource, FilamentEngineResourceDeleter<ResourceType>{engine}};
-}
 
 template <typename ResourceType>
 using SharedEngineResource = std::shared_ptr<ResourceType>;
 
 template <typename ResourceType>
-SharedEngineResource<ResourceType> createSharedResource(filament::Engine* engine, ResourceType* resource) noexcept
+EngineResource<ResourceType> createResource(filament::Engine& engine, ResourceType* resource)
 {
-	return {resource, FilamentEngineResourceDeleter<ResourceType>{engine}};
+	return EngineResource<ResourceType>{engine, resource};
+}
+
+template <typename ResourceType>
+SharedEngineResource<ResourceType> toShared(EngineResource<ResourceType>&& resource) noexcept
+{
+	return createSharedResource(resource.getEngine(), resource.release());
+}
+
+template <typename ResourceType>
+SharedEngineResource<ResourceType> createSharedResource(filament::Engine& engine, ResourceType* resource) noexcept
+{
+	return {resource, [&engine](ResourceType* resource) { engine.destroy(resource); }};
 }
 
 } // namespace spatial

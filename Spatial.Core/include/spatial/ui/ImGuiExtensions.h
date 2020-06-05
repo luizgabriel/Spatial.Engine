@@ -1,4 +1,3 @@
-// for the license, see the end of the file
 #pragma once
 
 #include <map>
@@ -6,6 +5,8 @@
 
 #include <entt/entt.hpp>
 #include <imgui.h>
+#include <spatial/ecs/Components.h>
+#include <fmt/format.h>
 
 namespace MM {
 

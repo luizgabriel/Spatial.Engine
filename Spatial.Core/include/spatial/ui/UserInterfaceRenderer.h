@@ -12,9 +12,9 @@ namespace spatial
 class UserInterfaceRenderer
 {
 private:
-	filament::Engine* m_engine;
+	filament::Engine& m_engine;
 
-	View m_view;
+	SharedView m_view;
 	Scene m_scene;
 	Camera m_camera;
 	Material m_material;
@@ -33,7 +33,7 @@ private:
 	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
 
 public:
-	explicit UserInterfaceRenderer(filament::Engine* engine);
+	explicit UserInterfaceRenderer(filament::Engine& engine);
 	~UserInterfaceRenderer();
 
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
@@ -58,9 +58,9 @@ public:
 	void dispatchCommands();
 
 	// region Getters
-	auto getView()
+	auto& getView()
 	{
-		return m_view.get();
+		return m_view;
 	}
 	// endregion
 };

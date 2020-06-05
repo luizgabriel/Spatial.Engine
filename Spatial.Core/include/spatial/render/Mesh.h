@@ -47,7 +47,7 @@ struct MeshPart
 struct Mesh
 {
 private:
-	filament::Engine* m_engine;
+	filament::Engine& m_engine;
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
 
@@ -55,7 +55,7 @@ private:
 	std::vector<MeshPart> m_parts;
 
 public:
-	Mesh(filament::Engine* engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox, size_t numParts);
+	Mesh(filament::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox, size_t numParts);
 
 	[[nodiscard]] size_t size() const
 	{
@@ -87,17 +87,27 @@ public:
 		return m_boundingBox;
 	}
 
-	[[nodiscard]] auto getVertexBuffer() const
+	[[nodiscard]] auto& getVertexBuffer()
 	{
-		return m_vertexBuffer.get();
+		return m_vertexBuffer;
 	}
 
-	[[nodiscard]] auto getIndexBuffer() const
+	[[nodiscard]] auto& getIndexBuffer()
 	{
-		return m_indexBuffer.get();
+		return m_indexBuffer;
 	}
 
-	[[nodiscard]] auto getEngine() const
+	[[nodiscard]] auto& getVertexBuffer() const
+	{
+		return m_vertexBuffer;
+	}
+
+	[[nodiscard]] auto& getIndexBuffer() const
+	{
+		return m_indexBuffer;
+	}
+
+	[[nodiscard]] auto& getEngine() const
 	{
 		return m_engine;
 	}

@@ -17,10 +17,10 @@ namespace spatial
 
 using materials_map_t = std::unordered_map<std::string, filament::MaterialInstance*>;
 
-Material createMaterial(filament::Engine* engine, const std::filesystem::path& filePath);
+Material createMaterial(filament::Engine& engine, const std::filesystem::path& filePath);
 
-Texture createTexture(filament::Engine* engine, const std::filesystem::path& filePath);
+Texture createTexture(filament::Engine& engine, const std::filesystem::path& filePath);
 
-Mesh createMesh(filament::Engine* engine, const std::filesystem::path& path);
+Mesh createMesh(filament::Engine& engine, const std::filesystem::path& path);
 
 } // namespace spatial

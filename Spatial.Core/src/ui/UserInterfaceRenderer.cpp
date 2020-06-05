@@ -18,9 +18,9 @@ namespace fl = filament;
 namespace spatial
 {
 
-UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine* engine)
+UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	: m_engine{engine},
-	  m_view{createView(m_engine)},
+	  m_view{toShared(createView(m_engine))},
 	  m_scene{createScene(m_engine)},
 	  m_camera{createCamera(m_engine)},
 	  m_material{createMaterial(m_engine, "materials/ui_blit")},
@@ -141,7 +141,7 @@ void UserInterfaceRenderer::dispatchCommands()
 void UserInterfaceRenderer::renderDrawData()
 {
 	auto imguiData = ImGui::GetDrawData();
-	auto& rcm = m_engine->getRenderableManager();
+	auto& rcm = m_engine.getRenderableManager();
 	auto& io = ImGui::GetIO();
 	auto [fbWidth, fbHeight] = imguiGetFrameSize();
 
@@ -224,7 +224,7 @@ void UserInterfaceRenderer::renderDrawData()
 
 	if (imguiData->CmdListsCount > 0)
 	{
-		rBuilder.build(*m_engine, m_entity.get());
+		rBuilder.build(m_engine, m_entity.get());
 	}
 }
 
@@ -278,7 +278,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
 			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(m_engine, vb.Size);
 
 		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
-		m_vertexBuffers[bufferIndex]->setBufferAt(*m_engine, 0, std::move(vbDescriptor));
+		m_vertexBuffers[bufferIndex]->setBufferAt(m_engine, 0, std::move(vbDescriptor));
 	}
 
 	// Create a new index buffer if the size isn't large enough, then copy the ImGui data into
@@ -289,7 +289,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
 			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(m_engine, ib.Size);
 
 		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);
-		m_indexBuffers[bufferIndex]->setBuffer(*m_engine, std::move(ibDescriptor));
+		m_indexBuffers[bufferIndex]->setBuffer(m_engine, std::move(ibDescriptor));
 	}
 }
 } // namespace spatial

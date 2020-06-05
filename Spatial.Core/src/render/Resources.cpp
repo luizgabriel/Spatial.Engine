@@ -5,39 +5,39 @@ namespace fl = filament;
 namespace spatial
 {
 
-SwapChain createSwapChain(fl::Engine* engine, void* nativeWindowHandle) noexcept
+SwapChain createSwapChain(fl::Engine& engine, void* nativeWindowHandle) noexcept
 {
-	return createResource(engine, engine->createSwapChain(nativeWindowHandle));
+	return SwapChain{engine, engine.createSwapChain(nativeWindowHandle)};
 }
 
-Renderer createRenderer(fl::Engine* engine) noexcept
+Renderer createRenderer(fl::Engine& engine) noexcept
 {
-	return createResource(engine, engine->createRenderer());
+	return Renderer{engine, engine.createRenderer()};
 }
 
-Scene createScene(fl::Engine* engine) noexcept
+Scene createScene(fl::Engine& engine) noexcept
 {
-	return createResource(engine, engine->createScene());
+	return Scene{engine, engine.createScene()};
 }
 
-View createView(fl::Engine* engine) noexcept
+View createView(fl::Engine& engine) noexcept
 {
-	return createResource(engine, engine->createView());
+	return View{engine, engine.createView()};
 }
 
-Camera createCamera(fl::Engine* engine) noexcept
+Camera createCamera(fl::Engine& engine) noexcept
 {
-	return createResource(engine, engine->createCamera());
+	return Camera{engine, engine.createCamera()};
 }
 
-Entity createEntity(fl::Engine* engine) noexcept
+Entity createEntity(fl::Engine& engine) noexcept
 {
-	return {engine, utils::EntityManager::get().create()};
+	return Entity{engine, utils::EntityManager::get().create()};
 }
 
-MaterialInstance createMaterialInstance(filament::Engine* engine, filament::Material* material) noexcept
+MaterialInstance createMaterialInstance(fl::Engine& engine, fl::Material& material, const char* name) noexcept
 {
-	return createResource(engine, material->createInstance());
+	return MaterialInstance{engine, material.createInstance(name)};
 }
 
 } // namespace spatial
