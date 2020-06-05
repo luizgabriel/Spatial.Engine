@@ -1,12 +1,11 @@
 #include "spatial/ecs/TransformSystem.h"
 #include <spatial/ecs/Components.h>
-#include <algorithm>
 #include <execution>
 
 namespace spatial::ecs
 {
 
-TransformSystem::TransformSystem(filament::Engine* engine) : m_transformManager{engine->getTransformManager()}
+TransformSystem::TransformSystem(filament::Engine& engine) : m_transformManager{engine.getTransformManager()}
 {
 }
 

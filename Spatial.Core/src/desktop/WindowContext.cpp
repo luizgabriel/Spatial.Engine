@@ -40,10 +40,6 @@ void WindowContext::pollEvents(EventQueue& queue)
 		{
 			auto key = mapKeyFromScancode(e.key.keysym.scancode);
 			queue.enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
-
-			if (key == Key::Escape)
-				queue.enqueue<WindowClosedEvent>();
-
 			break;
 		}
 

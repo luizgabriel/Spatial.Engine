@@ -7,20 +7,17 @@
 namespace spatial::ecs
 {
 
-class DebugCubeSystem
+class DebugMeshSystem
 {
 private:
-	filament::Engine* m_engine;
-	Texture m_debugCubeTexture;
+	filament::Engine& m_engine;
 	Material m_debugCubeMaterial;
-	Mesh m_debugCubeMesh;
+	Mesh m_debugMesh;
 
-	std::unordered_map<entt::entity, filament::MaterialInstance*> m_instances;
+	std::unordered_map<entt::entity, MaterialInstance> m_instances;
 
 public:
-	DebugCubeSystem(filament::Engine* engine);
-
-	~DebugCubeSystem();
+	explicit DebugMeshSystem(filament::Engine& engine);
 
 	void onConstruct(entt::registry& registry, entt::entity entity);
 

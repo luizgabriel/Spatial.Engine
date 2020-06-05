@@ -1,4 +1,5 @@
 #include <spatial/render/RenderingSystem.h>
+#include <execution>
 
 using namespace spatial;
 namespace fl = filament;
@@ -12,13 +13,13 @@ RenderingSystem::RenderingSystem(const Window& window) : RenderingSystem(window,
 
 RenderingSystem::RenderingSystem(const Window& window, const bk::Backend backend)
 	: m_engine{createEngine(backend)},
-	  m_swapChain{createSwapChain(m_engine.get(), window.getNativeHandle())},
-	  m_renderer{createRenderer(m_engine.get())},
-	  m_mainCamera{createCamera(m_engine.get())},
-	  m_mainView{createView(m_engine.get())},
+	  m_swapChain{createSwapChain(getEngine(), window.getNativeHandle())},
+	  m_renderer{createRenderer(getEngine())},
+	  m_mainCamera{createCamera(getEngine())},
+	  m_mainView{toShared(createView(getEngine()))},
 	  m_views{5}
 {
-	pushBackView(m_mainView.get());
+	pushBackView(m_mainView);
 	setupViewport(window.getFrameBufferSize());
 }
 
@@ -30,13 +31,25 @@ void RenderingSystem::onStart()
 
 void RenderingSystem::onEndFrame()
 {
+	clearExpiredViews();
+
 	if (m_renderer->beginFrame(m_swapChain.get()))
 	{
-		for (const auto view : m_views)
-			m_renderer->render(view);
+		for (const auto& view : m_views)
+		{
+			const auto ownedView = view.lock();
+			m_renderer->render(ownedView.get());
+		}
 
 		m_renderer->endFrame();
 	}
+}
+
+void RenderingSystem::clearExpiredViews() noexcept
+{
+	m_views.erase(
+		std::remove_if(std::execution::par_unseq, m_views.begin(), m_views.end(), [](auto& view) { return view.expired(); }),
+		m_views.end());
 }
 
 void RenderingSystem::onEvent(const WindowResizedEvent& event)
@@ -44,9 +57,9 @@ void RenderingSystem::onEvent(const WindowResizedEvent& event)
 	this->setupViewport(event.frameBufferSize);
 }
 
-void RenderingSystem::pushFrontView(filament::View* view)
+void RenderingSystem::pushFrontView(std::weak_ptr<filament::View>&& view)
 {
-	m_views.emplace_back(view);
+	m_views.emplace_back(std::move(view));
 }
 
 void RenderingSystem::popFrontView()
@@ -54,9 +67,9 @@ void RenderingSystem::popFrontView()
 	m_views.pop_back();
 }
 
-void RenderingSystem::pushBackView(filament::View* view)
+void RenderingSystem::pushBackView(std::weak_ptr<filament::View>&& view)
 {
-	m_views.emplace_front(view);
+	m_views.emplace_front(std::move(view));
 }
 
 void RenderingSystem::popBackView()

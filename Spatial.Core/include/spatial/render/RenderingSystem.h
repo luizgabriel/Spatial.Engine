@@ -22,9 +22,9 @@ private:
 	Renderer m_renderer;
 
 	Camera m_mainCamera;
-	View m_mainView;
+	SharedView m_mainView;
 
-	std::deque<filament::View*> m_views;
+	std::deque<std::weak_ptr<filament::View>> m_views;
 
 	void setupViewport(const std::pair<int, int>& frameBufferSize);
 
@@ -44,7 +44,7 @@ public:
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushFrontView(filament::View* view);
+	void pushFrontView(std::weak_ptr<filament::View>&& view);
 
 	/**
 	 * \brief Deregisters a view to the renderer
@@ -54,7 +54,7 @@ public:
 	/**
 	 * \brief Registers a view to the renderer
 	 */
-	void pushBackView(filament::View* view);
+	void pushBackView(std::weak_ptr<filament::View>&& view);
 
 	/**
 	 * \brief Pops a view to the renderer
@@ -62,21 +62,38 @@ public:
 	void popBackView();
 
 	// region Getters
-	auto getEngine()
+	[[nodiscard]] const auto& getEngine() const
 	{
-		return m_engine.get();
+		return *m_engine.get();
 	}
 
-	auto getMainView()
+	[[nodiscard]] const filament::View& getMainView() const
 	{
-		return m_mainView.get();
+		return *m_mainView.get();
 	}
 
-	auto getMainCamera()
+	[[nodiscard]] const filament::Camera& getMainCamera() const
 	{
-		return m_mainCamera.get();
+		return *m_mainCamera.get();
 	}
 
+	auto& getEngine()
+	{
+		return *m_engine.get();
+	}
+
+	auto& getMainView()
+	{
+		return *m_mainView.get();
+	}
+
+	auto& getMainCamera()
+	{
+		return *m_mainCamera.get();
+	}
 	// endregion
+
+private:
+	void clearExpiredViews() noexcept;
 };
 } // namespace spatial

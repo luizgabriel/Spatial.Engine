@@ -2,20 +2,25 @@
 
 #include <spatial/common/Key.h>
 #include <bitset>
+#include <math/vec2.h>
 
 namespace spatial
 {
 
 constexpr int keysCount = static_cast<size_t>(Key::Count);
 
-class KeyboardState
+class InputState
 {
 private:
 	std::bitset<keysCount> m_keyPressed;
 	std::bitset<keysCount> m_keyReleased;
 
+	filament::math::float2 m_lastMousePosition;
+	filament::math::float2 m_currentMousePosition;
+	bool m_mouseWarpRequested;
+
 public:
-	KeyboardState();
+	InputState();
 
 	void set(Key key, KeyAction action);
 
@@ -26,6 +31,25 @@ public:
 	void reset(Key key);
 
 	void reset();
+
+	void setMousePosition(filament::math::float2 position);
+
+	[[nodiscard]] auto getCurrentPosition() const
+	{
+		return m_currentMousePosition;
+	}
+
+	[[nodiscard]] auto getLastPosition() const
+	{
+		return m_lastMousePosition;
+	}
+
+	[[nodiscard]] bool isMouseWarpRequested() const
+	{
+		return m_mouseWarpRequested;
+	}
+
+	void warpMouseInWindow(filament::math::float2 position);
 
 	[[nodiscard]] bool released(Key key) const
 	{

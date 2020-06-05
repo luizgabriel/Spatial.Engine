@@ -14,7 +14,7 @@ private:
 	filament::TransformManager& m_transformManager;
 
 public:
-	 explicit TransformSystem(filament::Engine* engine);
+	 explicit TransformSystem(filament::Engine& engine);
 
 	 void onUpdate(entt::registry& registry);
 };

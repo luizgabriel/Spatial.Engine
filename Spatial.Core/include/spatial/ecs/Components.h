@@ -15,6 +15,7 @@ struct Transform
 struct Renderable
 {
 	utils::Entity entity;
+	bool castShadows{true};
 };
 
 } // namespace spatial::ecs

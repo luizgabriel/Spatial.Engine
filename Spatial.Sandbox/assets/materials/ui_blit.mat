@@ -1,5 +1,5 @@
 material {
-    name : uiBlit,
+    name : ui,
     parameters : [
         {
             type : sampler2d,

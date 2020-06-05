@@ -14,10 +14,10 @@ namespace spatial
 
 struct SystemServices
 {
-	std::reference_wrapper<Window> window;
-	std::reference_wrapper<RenderingSystem> rendering;
-	std::reference_wrapper<InputSystem> input;
-	std::reference_wrapper<UserInterfaceSystem> ui;
+	Window& window;
+	RenderingSystem& rendering;
+	InputSystem& input;
+	UserInterfaceSystem& ui;
 };
 
 Window createDefaultWindow(const Application& app, const Configuration& config);

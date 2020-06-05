@@ -24,10 +24,8 @@ add_library(Spatial.Core
     include/spatial/facilities/Initializer.h
 
     include/spatial/input/InputSystem.h
-    include/spatial/input/Keyboard.h
-    include/spatial/input/KeyboardState.h
-    include/spatial/input/Mouse.h
-    include/spatial/input/MouseState.h
+    include/spatial/input/Input.h
+    include/spatial/input/InputState.h
 
     include/spatial/render/CameraControllers.h
     include/spatial/render/Engine.h
@@ -70,10 +68,8 @@ add_library(Spatial.Core
     src/facilities/Initializer.cpp
 
     src/input/InputSystem.cpp
-    src/input/KeyboardState.cpp
-    src/input/Keyboard.cpp
-    src/input/Mouse.cpp
-    src/input/MouseState.cpp
+    src/input/InputState.cpp
+    src/input/Input.cpp
 
     src/render/Resources.cpp
     src/render/Engine.cpp

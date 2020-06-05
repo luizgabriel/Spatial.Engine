@@ -21,14 +21,14 @@ void SimpleCameraView::onMouseMoved(const filament::math::float2& mousePos, floa
 	rotation.y = std::clamp(rotation.y + delta.y * pi<float> * sensitivity, -halfPi<float>, halfPi<float>);
 }
 
-void SimpleCameraView::onUpdate(filament::Camera* camera, const float3& delta)
+void SimpleCameraView::onUpdate(filament::Camera& camera, const float3& delta)
 {
 	const auto direction = toDirection(rotation);
 	position += direction * delta.x;
 	position += cross(direction, up) * delta.y;
 	position += up * delta.z;
 
-	camera->lookAt(position, position + direction, up);
+	camera.lookAt(position, position + direction, up);
 }
 
 } // namespace spatial

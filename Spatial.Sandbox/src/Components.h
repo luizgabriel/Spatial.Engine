@@ -2,12 +2,14 @@
 
 #include <utils/Entity.h>
 #include <filament/MaterialInstance.h>
+#include <math/vec3.h>
 
 namespace spatial::ecs
 {
 
-struct DebugCube
+struct DebugMesh
 {
+	filament::math::float4 color;
 	float metallic;
 	float roughness;
 	float clearCoat;

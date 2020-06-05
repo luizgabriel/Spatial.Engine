@@ -8,7 +8,7 @@
 #include <spatial/render/RenderingSystem.h>
 #include <entt/entity/registry.hpp>
 #include <spatial/ui/ImGuiExtensions.h>
-#include "DebugCubeSystem.h"
+#include "DebugMeshSystem.h"
 #include "spatial/ecs/RenderableSystem.h"
 #include "spatial/ecs/TransformSystem.h"
 
@@ -26,9 +26,9 @@ class Sandbox
 	};
 
 private:
-	fl::Engine* m_engine;
-	fl::Camera* m_camera;
-	fl::View* m_view;
+	filament::Engine& m_engine;
+	filament::Camera& m_camera;
+	filament::View& m_view;
 
 	SimpleCameraView m_cam;
 	CameraData m_cameraData;
@@ -44,7 +44,7 @@ private:
 
 	entt::registry m_registry;
 	ecs::RenderableSystem m_renderableSystem;
-	ecs::DebugCubeSystem m_debugCubeSystem;
+	ecs::DebugMeshSystem m_debugCubeSystem;
 	ecs::TransformSystem m_transformSystem;
 	MM::EntityEditor<entt::entity> m_editor;
 

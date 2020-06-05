@@ -104,20 +104,22 @@ fs::path appendExtension(const fs::path& path, const std::string& extension)
 	return path.parent_path() / (path.filename().generic_string() + "." + extension);
 }
 
-Material createMaterial(fl::Engine* engine, const fs::path& filePath)
+Material createMaterial(fl::Engine& engine, const fs::path& filePath)
 {
 	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
 
 	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
+	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
 	const auto iterator = std::istreambuf_iterator<char>{stream};
 	const auto data = std::vector<char>{iterator, {}};
 
-	const auto material = fl::Material::Builder().package(&data[0], data.size()).build(*engine);
+	auto material = fl::Material::Builder().package(&data[0], data.size()).build(engine);
 
-	return createResource(engine, material);
+	return Material{engine, material};
 }
 
-Texture createTexture(filament::Engine* engine, const fs::path& filePath)
+Texture createTexture(fl::Engine& engine, const fs::path& filePath)
 {
 	const auto path = Asset::absolute(filePath);
 
@@ -131,20 +133,20 @@ Texture createTexture(filament::Engine* engine, const fs::path& filePath)
 										   fl::Texture::Type::UBYTE,
 										   reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
-	const auto texture = fl::Texture::Builder()
+	auto texture = fl::Texture::Builder()
 							 .width(uint32_t(width))
 							 .height(uint32_t(height))
 							 .levels(1)
 							 .sampler(fl::Texture::Sampler::SAMPLER_2D)
 							 .format(fl::Texture::InternalFormat::RGBA8)
-							 .build(*engine);
+							 .build(engine);
 
-	texture->setImage(*engine, 0, std::move(buffer));
+	texture->setImage(engine, 0, std::move(buffer));
 
-	return createResource(engine, texture);
+	return Texture{engine, texture};
 }
 
-VertexBuffer createVertexBuffer(filament::Engine* engine, const FilameshFileHeader& header, const std::vector<char>& vertices)
+VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& vertices)
 {
 	const uint32_t FLAG_SNORM16_UV = 0x2;
 	auto uvType = fl::VertexBuffer::AttributeType::HALF2;
@@ -184,29 +186,33 @@ VertexBuffer createVertexBuffer(filament::Engine* engine, const FilameshFileHead
 			.normalized(filament::UV1, uvNormalized);
 	}
 
-	auto vb = VertexBuffer{createResource(engine, vbBuilder.build(*engine))};
+	auto vb = VertexBuffer{engine, vbBuilder.build(engine)};
 
 	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(&vertices[0], header.vertexSize);
-	vb->setBufferAt(*engine, 0, std::move(vbBufferDescriptor));
+	vb->setBufferAt(engine, 0, std::move(vbBufferDescriptor));
+
+	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return vb;
 }
 
-IndexBuffer createIndexBuffer(filament::Engine* engine, const FilameshFileHeader& header, const std::vector<char>& indices)
+IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& indices)
 {
 	auto ibBuilder = fl::IndexBuffer::Builder()
 						 .indexCount(header.indexCount)
 						 .bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
 
-	auto ib = IndexBuffer{createResource(engine, ibBuilder.build(*engine))};
+	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
 
 	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(&indices[0], header.indexSize);
-	ib->setBuffer(*engine, std::move(ibBufferDescriptor));
+	ib->setBuffer(engine, std::move(ibBufferDescriptor));
+
+	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return ib;
 }
 
-Mesh createMesh(filament::Engine* engine, const std::filesystem::path& path)
+Mesh createMesh(fl::Engine& engine, const std::filesystem::path& path)
 {
 	const auto absolutePath = Asset::absolute(appendExtension(path, "filamesh"));
 
@@ -233,14 +239,14 @@ Mesh createMesh(filament::Engine* engine, const std::filesystem::path& path)
 	uint32_t materialCount;
 	stream.read(reinterpret_cast<char*>(&materialCount), 4);
 
-	for (size_t i = 0; i < mesh.size(); i++)
+	for (size_t i = 0; i < materialCount; i++)
 	{
 		uint32_t nameLength;
 		stream.read(reinterpret_cast<char*>(&nameLength), 4);
 		std::getline(stream, mesh[i].materialName, '\0');
 	}
 
-	fl::Fence::waitAndDestroy(engine->createFence());
+	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return mesh;
 }

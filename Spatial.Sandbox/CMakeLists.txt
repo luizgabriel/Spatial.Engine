@@ -1,9 +1,12 @@
 include(ResourcesLibrary)
 
 add_executable(Spatial.Sandbox
-        src/main.cpp
-        src/Sandbox.cpp
-        src/Components.h src/DebugCubeSystem.cpp src/DebugCubeSystem.h ../Spatial.Core/src/ecs/RenderableSystem.cpp ../Spatial.Core/include/spatial/ecs/RenderableSystem.h ../Spatial.Core/src/ecs/TransformSystem.cpp ../Spatial.Core/include/spatial/ecs/TransformSystem.h)
+    src/main.cpp
+    src/Sandbox.cpp
+    src/Components.h
+    src/DebugMeshSystem.h
+    src/DebugMeshSystem.cpp
+)
 
 target_link_libraries(Spatial.Sandbox PUBLIC Spatial.Core)
 set_property(TARGET Spatial.Sandbox PROPERTY CXX_STANDARD 20)
@@ -25,8 +28,8 @@ add_material_resources(Sandbox.Assets.Materials
 
 add_mesh_resources(Sandbox.Assets.Models
     SOURCES
-        assets/models/sphere.fbx
         assets/models/debug_cube.fbx
+        assets/models/corvette.fbx
     OUTPUT
         assets/models
     DEPENDEES

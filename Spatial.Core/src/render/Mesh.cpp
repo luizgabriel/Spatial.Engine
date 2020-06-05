@@ -7,7 +7,7 @@ namespace fl = filament;
 namespace spatial
 {
 
-Mesh::Mesh(fl::Engine* engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, fl::Box boundingBox, size_t numParts)
+Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, fl::Box boundingBox, size_t numParts)
 	: m_engine{engine},
 	  m_vertexBuffer{std::move(vertexBuffer)},
 	  m_indexBuffer{std::move(indexBuffer)},
@@ -30,7 +30,7 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 	size_t index{};
 	for (auto& part : m_parts) {
 		builder.geometry(index, fl::RenderableManager::PrimitiveType::TRIANGLES,
-						 getVertexBuffer(), getIndexBuffer(), part.offset,
+						 getVertexBuffer().get(), getIndexBuffer().get(), part.offset,
 						 part.minIndex, part.maxIndex, part.indexCount);
 
 		if (map.contains(part.materialName))
@@ -41,7 +41,7 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 		index++;
 	}
 
-	builder.build(*getEngine(), entity);
+	builder.build(getEngine(), entity);
 }
 
 }

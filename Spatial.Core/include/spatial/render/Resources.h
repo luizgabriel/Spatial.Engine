@@ -47,33 +47,35 @@ using SharedCamera = SharedEngineResource<filament::Camera>;
 /**
  * \brief Creates a scoped pointer of the filament::SwapChain
  */
-SwapChain createSwapChain(filament::Engine* engine, void* nativeWindowHandle) noexcept;
+SwapChain createSwapChain(filament::Engine& engine, void* nativeWindowHandle) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the filament::Renderer
  */
-Renderer createRenderer(filament::Engine* engine) noexcept;
+Renderer createRenderer(filament::Engine& engine) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the filament::Scene
  */
-Scene createScene(filament::Engine* engine) noexcept;
+Scene createScene(filament::Engine& engine) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the filament::View
  */
-View createView(filament::Engine* engine) noexcept;
+View createView(filament::Engine& engine) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the filament::Camera
  */
-Camera createCamera(filament::Engine* engine) noexcept;
+Camera createCamera(filament::Engine& engine) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the utils::Entity
  */
-Entity createEntity(filament::Engine* engine) noexcept;
+Entity createEntity(filament::Engine& engine) noexcept;
 
-MaterialInstance createMaterialInstance(filament::Engine* engine, filament::Material* material) noexcept;
+MaterialInstance createMaterialInstance(filament::Engine& engine,
+										filament::Material& material,
+										const char* name = nullptr) noexcept;
 
 } // namespace spatial
