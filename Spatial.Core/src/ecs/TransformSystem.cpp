@@ -12,12 +12,10 @@ TransformSystem::TransformSystem(filament::Engine& engine) : m_transformManager{
 void TransformSystem::onUpdate(entt::registry& registry)
 {
 	auto view = registry.view<Transform, Renderable>();
+	std::for_each(std::execution::par_unseq, view.begin(), view.end(), [this, &view](auto entity) {
+		auto& [transform, renderable] = view.get<Transform, Renderable>(entity);
 
-	std::for_each(std::execution::par_unseq, view.begin(), view.end(), [this, &registry](auto entity) {
-		auto& transform = registry.get<Transform>(entity);
-		auto& renderable = registry.get<Renderable>(entity);
-
-		auto transformEntity = m_transformManager.getInstance(renderable.entity);
+		auto transformEntity = m_transformManager.getInstance(renderable.entity.get());
 		auto model = m_transformManager.getTransform(transformEntity);
 		model[3].xyz = transform.position;
 		model[0].x = transform.scale.x;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/Entity.h>
 #include <math/vec3.h>
+#include <spatial/render/Entity.h>
 
 namespace spatial::ecs
 {
@@ -14,8 +14,7 @@ struct Transform
 
 struct Renderable
 {
-	utils::Entity entity;
-	bool castShadows{true};
+	Entity entity;
 };
 
 } // namespace spatial::ecs

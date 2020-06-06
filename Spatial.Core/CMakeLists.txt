@@ -73,6 +73,7 @@ add_library(Spatial.Core
 
     src/render/Resources.cpp
     src/render/Engine.cpp
+    src/render/Entity.cpp
     src/render/RenderingSystem.cpp
     src/render/ResourceLoaders.cpp
     src/render/CameraControllers.cpp

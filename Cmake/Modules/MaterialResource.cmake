@@ -16,7 +16,7 @@ function(add_material_resources TARGET)
 
     foreach(SOURCE ${ARG_SOURCES})
         get_filename_component(FILE_NAME ${SOURCE} NAME)
-        string(REGEX REPLACE "\\.[^.]*$" "" FILE_NAME ${FILE_NAME}) # Removes the .mat extenion
+        string(REGEX REPLACE "\\.[^.]*$" "" FILE_NAME ${FILE_NAME}) # Removes the .mat extension
         set(OUTPUT_FILE "${ARG_OUTPUT}/${FILE_NAME}.filamat")
 
         add_custom_command(

@@ -29,7 +29,6 @@ add_material_resources(Sandbox.Assets.Materials
 add_mesh_resources(Sandbox.Assets.Models
     SOURCES
         assets/models/debug_cube.fbx
-        assets/models/corvette.fbx
     OUTPUT
         assets/models
     DEPENDEES

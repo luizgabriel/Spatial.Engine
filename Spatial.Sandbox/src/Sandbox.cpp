@@ -115,18 +115,17 @@ void Sandbox::onUpdateFrame(float delta)
 
 	m_debugCubeSystem.onUpdate(m_registry);
 	m_transformSystem.onUpdate(m_registry);
-	m_renderableSystem.onUpdate(m_registry);
 
-	if (enabledCameraController)
-		m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
-
-	m_registry.each([this](auto entity) { m_editor.render(m_registry, entity); });
+	if (!enabledCameraController) delta = 0;
+	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
 }
 
 void Sandbox::onDrawGui()
 {
 	if (!showEngineGui)
 		return;
+
+	m_registry.each([this](auto entity) { m_editor.render(m_registry, entity); });
 
 	ImGui::Begin("Camera Settings");
 
@@ -140,7 +139,9 @@ void Sandbox::onDrawGui()
 		ImGui::Text("Right-Click to turn ON:");
 	}
 
-	ImGui::Checkbox("Camera Movement", &enabledCameraController);
+	if (ImGui::Checkbox("Camera Movement", &enabledCameraController)) {
+		Input::warpMouse({.5f, .5f});
+	}
 
 	ImGui::Separator();
 

@@ -16,16 +16,11 @@ namespace spatial::ecs
 	private:
 		filament::RenderableManager& m_manager;
 		filament::Scene& m_scene;
-		std::unordered_map<entt::entity, utils::Entity> m_renderables;
 	public:
 		RenderableSystem(filament::Engine& engine, filament::Scene& scene);
-
-		~RenderableSystem();
 
 		void onConstruct(entt::registry& registry, entt::entity entity);
 
 		void onDestroy(entt::registry& registry, entt::entity entity);
-
-		void onUpdate(entt::registry& registry);
 	};
 }

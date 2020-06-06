@@ -13,46 +13,21 @@ private:
 	utils::Entity m_entity;
 
 public:
-	Entity(filament::Engine& engine)
-		: m_engine{engine}, m_entity{}
-	{
-	}
+	explicit Entity(filament::Engine& engine);
 
-	Entity(filament::Engine& engine, utils::Entity entity) noexcept
-		: m_engine{engine}, m_entity{entity}
-	{
-	}
+	Entity(filament::Engine& engine, utils::Entity entity);
 
-	Entity(Entity&& other) noexcept
-		: m_engine{other.m_engine},
-		  m_entity{std::exchange(other.m_entity, utils::Entity{})}
-	{
-	}
+	~Entity();
 
-	Entity& operator=(Entity&& other) noexcept
-	{
-		if (!m_entity.isNull())
-		{
-			utils::EntityManager::get().destroy(m_entity);
-			m_engine.destroy(m_entity);
-		}
-
-		m_entity = other.get();
-
-		return *this;
-	}
+	Entity(Entity&& other) noexcept;
+	Entity& operator=(Entity&& other) noexcept;
 
 	Entity(const Entity& other) = delete;
 	Entity& operator=(const Entity& w) = delete;
 
-	~Entity()
-	{
-		if (!m_entity.isNull())
-		{
-			utils::EntityManager::get().destroy(m_entity);
-			m_engine.destroy(m_entity);
-		}
-	}
+	[[nodiscard]] utils::Entity release();
+
+	void reset();
 
 	utils::Entity get()
 	{

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <utils/Entity.h>
 #include <filament/MaterialInstance.h>
-#include <math/vec3.h>
+#include <math/vec4.h>
 
 namespace spatial::ecs
 {
