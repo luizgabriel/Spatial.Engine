@@ -2,7 +2,6 @@
 #include <filament/TextureSampler.h>
 #include <spatial/render/RegistryUtils.h>
 #include <spatial/ecs/Components.h>
-#include <execution>
 #include "DebugMeshSystem.h"
 #include "Components.h"
 
@@ -22,7 +21,7 @@ DebugMeshSystem::DebugMeshSystem(fl::Engine& engine)
 void DebugMeshSystem::onUpdate(entt::registry& registry)
 {
 	auto view = registry.view<DebugMesh>();
-	std::for_each(std::execution::par_unseq, view.begin(), view.end(), [this, &view](auto entity) {
+	for (auto entity : view) {
 		auto& component = view.get<DebugMesh>(entity);
 		auto& instance = m_instances.at(entity);
 
@@ -31,27 +30,27 @@ void DebugMeshSystem::onUpdate(entt::registry& registry)
 		instance->setParameter("roughness", component.roughness);
 		instance->setParameter("clearCoat", component.clearCoat);
 		instance->setParameter("clearCoatRoughness", component.clearCoatRoughness);
-	});
+	}
 }
 
 void DebugMeshSystem::onConstruct(entt::registry& registry, entt::entity entity)
 {
-	if (!m_instances.contains(entity))
-	{
-		m_instances.emplace(entity, createMaterialInstance(m_engine, m_debugCubeMaterial.ref()));
+	if (m_instances.find(entity) != m_instances.end())
+		return;
 
-		//const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
-		//materialInstance->setParameter("albedo", m_debugCubeTexture.get(), sampler);
+	m_instances.emplace(entity, createMaterialInstance(m_engine, m_debugCubeMaterial.ref()));
 
-		auto renderable = createEntity(m_engine);
-		m_debugMesh.build(renderable.get(), m_instances.at(entity).get());
-		registry.emplace<Renderable>(entity, std::move(renderable));
-	}
+	//const auto sampler = fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR};
+	//materialInstance->setParameter("albedo", m_debugCubeTexture.get(), sampler);
+
+	auto renderable = createEntity(m_engine);
+	m_debugMesh.build(renderable.get(), m_instances.at(entity).get());
+	registry.emplace<Renderable>(entity, std::move(renderable));
 }
 
 void DebugMeshSystem::onDestroy(entt::registry& registry, entt::entity entity)
 {
-	if (m_instances.contains(entity))
+	if (m_instances.find(entity) != m_instances.end())
 		m_instances.erase(entity);
 
 	registry.remove<Renderable>(entity);

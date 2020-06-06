@@ -107,7 +107,7 @@ void Sandbox::onUpdateFrame(float delta)
 	if (Input::released(Key::MouseLeft))
 		enabledCameraController = false;
 
-	if (Input::released(Key::MouseRight))
+	if (Input::combined(Key::LControl, Key::MouseLeft))
 		enabledCameraController = true;
 
 	if (Input::released(Key::G))
@@ -132,11 +132,11 @@ void Sandbox::onDrawGui()
 	if (enabledCameraController)
 	{
 		ImGui::Text("Use the WASD to move in the scene.");
-		ImGui::Text("Left-Click to turn OFF:");
+		ImGui::Text("Click to turn OFF:");
 	}
 	else
 	{
-		ImGui::Text("Right-Click to turn ON:");
+		ImGui::Text("Ctrl + Click to turn ON:");
 	}
 
 	if (ImGui::Checkbox("Camera Movement", &enabledCameraController)) {

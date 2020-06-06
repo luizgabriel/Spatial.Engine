@@ -48,7 +48,13 @@ void RenderingSystem::onEndFrame()
 void RenderingSystem::clearExpiredViews() noexcept
 {
 	m_views.erase(
-		std::remove_if(std::execution::par_unseq, m_views.begin(), m_views.end(), [](auto& view) { return view.expired(); }),
+#ifndef SPATIAL_PLATFORM_OSX
+		std::remove_if(std::execution::par_unseq, m_views.begin(), m_views.end(),
+#else
+		std::remove_if(m_views.begin(), m_views.end(),
+#endif
+
+	   [](auto& view) { return view.expired(); }),
 		m_views.end());
 }
 

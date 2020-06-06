@@ -25,26 +25,26 @@ template <typename Component, typename Listener>
 void connect(entt::registry& registry, Listener& listener)
 {
 	if constexpr(has_on_construct_v<Listener>)
-		registry.on_construct<Component>().connect<&Listener::onConstruct>(listener);
+		registry.on_construct<Component>().template connect<&Listener::onConstruct>(listener);
 
 	if constexpr(has_on_destroy_v<Listener>)
-		registry.on_destroy<Component>().connect<&Listener::onDestroy>(listener);
+		registry.on_destroy<Component>().template connect<&Listener::onDestroy>(listener);
 
 	if constexpr(has_on_replace_v<Listener>)
-		registry.on_replace<Component>().connect<&Listener::onReplace>(listener);
+		registry.on_replace<Component>().template connect<&Listener::onReplace>(listener);
 }
 
 template <typename Component, typename Listener>
 void disconnect(entt::registry& registry, Listener& listener)
 {
 	if constexpr(has_on_construct_v<Listener>)
-		registry.on_construct<Component>().disconnect<&Listener::onConstruct>(listener);
+		registry.on_construct<Component>().template disconnect<&Listener::onConstruct>(listener);
 
 	if constexpr(has_on_destroy_v<Listener>)
-		registry.on_destroy<Component>().disconnect<&Listener::onDestroy>(listener);
+		registry.on_destroy<Component>().template disconnect<&Listener::onDestroy>(listener);
 
 	if constexpr(has_on_replace_v<Listener>)
-		registry.on_replace<Component>().disconnect<&Listener::onReplace>(listener);
+		registry.on_replace<Component>().template disconnect<&Listener::onReplace>(listener);
 }
 
 }
