@@ -48,7 +48,7 @@ void UserInterfaceInput::setMousePosition(float2 position)
 void UserInterfaceInput::setKey(Key key, KeyAction action)
 {
 	if (key == Key::UnknownKey)
-		[[unlikelly]] return;
+		return;
 
 	auto pressed = action == KeyAction::Pressed;
 	auto& io = ImGui::GetIO();

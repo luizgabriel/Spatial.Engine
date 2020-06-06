@@ -63,11 +63,10 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 	magic[8] = '\0';
 
 	if (strcmp(magic, "FILAMESH") != 0)
-		[[unlikelly]]
-		{
-			stream.setstate(ios_base::failbit);
-			return stream;
-		}
+	{
+		stream.setstate(ios_base::failbit);
+		return stream;
+	}
 
 	stream.read(reinterpret_cast<char*>(&header.version), 4);
 	stream.read(reinterpret_cast<char*>(&header.parts), 4);

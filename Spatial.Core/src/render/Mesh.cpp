@@ -1,5 +1,3 @@
-#pragma once
-
 #include <spatial/render/Mesh.h>
 
 namespace fl = filament;
@@ -33,7 +31,7 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 						 getVertexBuffer().get(), getIndexBuffer().get(), part.offset,
 						 part.minIndex, part.maxIndex, part.indexCount);
 
-		if (map.contains(part.materialName))
+		if (map.find(part.materialName) != map.end())
 			builder.material(index, map.at(part.materialName));
 		else
 			builder.material(index, map.at("default"));

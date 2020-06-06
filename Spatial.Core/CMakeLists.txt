@@ -88,8 +88,6 @@ add_library(Spatial.Core
     src/ecs/RenderableSystem.cpp
     src/ecs/TransformSystem.cpp
 )
-set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD 20)
-set_property(TARGET Spatial.Core PROPERTY CXX_STANDARD_REQUIRED ON)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(

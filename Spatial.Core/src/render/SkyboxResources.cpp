@@ -5,6 +5,7 @@
 #include <image/KtxUtility.h>
 
 #include <fstream>
+#include <vector>
 
 namespace fs = std::filesystem;
 namespace fl = filament;

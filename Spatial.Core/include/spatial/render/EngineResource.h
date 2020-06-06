@@ -99,15 +99,15 @@ EngineResource<ResourceType> createResource(filament::Engine& engine, ResourceTy
 }
 
 template <typename ResourceType>
-SharedEngineResource<ResourceType> toShared(EngineResource<ResourceType>&& resource) noexcept
-{
-	return createSharedResource(resource.getEngine(), resource.release());
-}
-
-template <typename ResourceType>
 SharedEngineResource<ResourceType> createSharedResource(filament::Engine& engine, ResourceType* resource) noexcept
 {
 	return {resource, [&engine](ResourceType* resource) { engine.destroy(resource); }};
+}
+
+template <typename ResourceType>
+SharedEngineResource<ResourceType> toShared(EngineResource<ResourceType>&& resource) noexcept
+{
+	return createSharedResource(resource.getEngine(), resource.release());
 }
 
 } // namespace spatial

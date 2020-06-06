@@ -1,9 +1,13 @@
 #pragma once
 
-#include <cstdint>
-#include <filament/Box.h>
 #include <spatial/render/Resources.h>
+#include <filament/Box.h>
 #include <filament/RenderableManager.h>
+
+#include <cstdint>
+#include <vector>
+#include <string>
+#include <unordered_map>
 
 namespace spatial
 {

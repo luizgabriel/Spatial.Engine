@@ -9,6 +9,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/Cmake/Modules)
 include(SetupDependencies)
 include(CMakePackageConfigHelpers)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 option(SPATIAL_SANDBOX "Build Spatial Sandbox target" ON)
 option(SPATIAL_DEPENDENCY_GRAPH "Generates a depedency graph file. ('.dot' graphviz)" OFF)
 
