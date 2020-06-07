@@ -166,3 +166,5 @@ install(
     LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include
 )
+
+install(DIRECTORY include/ DESTINATION include)
