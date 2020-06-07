@@ -2,7 +2,7 @@ from conans import ConanFile, CMake, tools
 
 
 class SpatialEngineConan(ConanFile):
-    name = "spatial-engine"
+    name = "spatial"
     version = "1.0.0"
     license = "Apache 2.0"
     url = "https://github.com/luizgabriel/Spatial.Engine"
