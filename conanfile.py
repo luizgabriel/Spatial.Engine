@@ -25,9 +25,9 @@ class SpatialEngineConan(ConanFile):
         "imgui/docking@ocornut/testing",
         "toml++/1.2.0@marzer/stable",
     ]
-    imports = [
-        "filament:bin, * -> ./bin"
-    ]
+
+    def imports(self):
+        self.copy("*", "bin", "bin", "filament")
 
     def _cmake(self):
         cmake = CMake(self)
@@ -42,6 +42,7 @@ class SpatialEngineConan(ConanFile):
 
     def package(self):
         cmake = self._cmake()
+        cmake.configure()
         cmake.install()
 
     def package_info(self):
