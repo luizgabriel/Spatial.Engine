@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 
 
 class SpatialEngineConan(ConanFile):
@@ -14,6 +14,7 @@ class SpatialEngineConan(ConanFile):
     default_options = {"sandbox": False}
     generators = "cmake"
     build_requires = "cmake_installer/3.16.3@conan/stable"
+    exports_sources = "*"
     requires = [
         "entt/3.4.0@skypjack/stable",
         "fmt/6.0.0@bincrafters/stable",
@@ -31,7 +32,7 @@ class SpatialEngineConan(ConanFile):
 
     def _cmake(self):
         cmake = CMake(self)
-        cmake.definitions["SPATIAL_SANDBOX"] = self.options["sandbox"]
+        cmake.definitions["SPATIAL_SANDBOX"] = "ON" if self.options["sandbox"] else "OFF"
 
         return cmake
 
@@ -46,4 +47,4 @@ class SpatialEngineConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = self.collect_libs()
+        self.cpp_info.libs = tools.collect_libs(self)

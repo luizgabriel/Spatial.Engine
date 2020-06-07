@@ -1,5 +1,8 @@
 #include <spatial/render/RenderingSystem.h>
+
+#ifndef SPATIAL_PLATFORM_OSX
 #include <execution>
+#endif
 
 using namespace spatial;
 namespace fl = filament;

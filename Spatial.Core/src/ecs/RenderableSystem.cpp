@@ -1,6 +1,5 @@
 #include <spatial/ecs/Components.h>
 #include <spatial/ecs/RenderableSystem.h>
-#include <execution>
 
 namespace spatial::ecs
 {
