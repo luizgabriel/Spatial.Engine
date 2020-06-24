@@ -1,4 +1,4 @@
-#include "Sandbox.h"
+#include "EditorSystem.h"
 
 #include <spatial/init.h>
 
@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	const auto config = readConfigFile("config/application.toml");
 
 	return setup(config, [](auto& app, auto& services) {
-		auto sandbox = System<Sandbox>{app, services.rendering};
+		auto sandbox = System<EditorSystem>{app, services.rendering};
 
 		return app.run();
 	});

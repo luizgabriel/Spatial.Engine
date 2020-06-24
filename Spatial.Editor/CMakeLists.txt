@@ -2,7 +2,7 @@ include(ResourcesLibrary)
 
 add_executable(Spatial.Sandbox
     src/main.cpp
-    src/Sandbox.cpp
+    src/EditorSystem.cpp
     src/Components.h
     src/DebugMeshSystem.h
     src/DebugMeshSystem.cpp

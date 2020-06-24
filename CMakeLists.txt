@@ -12,13 +12,13 @@ include(CMakePackageConfigHelpers)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-option(SPATIAL_SANDBOX "Build Spatial Sandbox target" ON)
+option(SPATIAL_EDITOR "Build Spatial Editor" ON)
 option(SPATIAL_DEPENDENCY_GRAPH "Generates a depedency graph file. ('.dot' graphviz)" OFF)
 
 add_subdirectory(Spatial.Core)
 
-if (SPATIAL_SANDBOX)
-    add_subdirectory(Spatial.Sandbox)
+if (SPATIAL_EDITOR)
+    add_subdirectory(Spatial.Editor)
 endif()
 
 if (SPATIAL_DEPENDENCY_GRAPH)

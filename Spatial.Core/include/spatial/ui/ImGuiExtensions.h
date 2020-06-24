@@ -79,7 +79,7 @@ public:
 	void render(Registry& registry, EntityType& e)
 	{
 		if (show_window) {
-			if (ImGui::Begin("Entity Editor", &show_window)) {
+			if (ImGui::Begin("Entity EditorSystem", &show_window)) {
 				ImGui::TextUnformatted("Editing:");
 				ImGui::SameLine();
 

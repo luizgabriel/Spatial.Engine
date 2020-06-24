@@ -17,7 +17,7 @@ namespace fl = filament;
 namespace spatial
 {
 
-class Sandbox
+class EditorSystem
 {
 	struct CameraData
 	{
@@ -49,7 +49,7 @@ private:
 	MM::EntityEditor<entt::entity> m_editor;
 
 public:
-	explicit Sandbox(RenderingSystem& renderingSystem);
+	explicit EditorSystem(RenderingSystem& renderingSystem);
 
 	void onEvent(const MouseMovedEvent& e);
 

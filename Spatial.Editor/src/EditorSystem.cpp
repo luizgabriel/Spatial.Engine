@@ -1,4 +1,4 @@
-#include "Sandbox.h"
+#include "EditorSystem.h"
 
 #include <spatial/render/Resources.h>
 #include <spatial/render/ResourceLoaders.h>
@@ -49,7 +49,7 @@ void ComponentEditorWidget<spatial::ecs::DebugMesh>(entt::registry& reg, entt::e
 namespace spatial
 {
 
-Sandbox::Sandbox(RenderingSystem& renderingSystem)
+EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	: m_engine{renderingSystem.getEngine()},
 	  m_camera{renderingSystem.getMainCamera()},
 	  m_view{renderingSystem.getMainView()},
@@ -84,7 +84,7 @@ Sandbox::Sandbox(RenderingSystem& renderingSystem)
 	m_registry.emplace<ecs::DebugMesh>(entity, 0.5f, 0.5f, 0.5f, 0.5f);
 }
 
-void Sandbox::onEvent(const MouseMovedEvent& e)
+void EditorSystem::onEvent(const MouseMovedEvent& e)
 {
 	if (enabledCameraController)
 	{
@@ -102,7 +102,7 @@ float3 defaultInputAxis()
 	};
 }
 
-void Sandbox::onUpdateFrame(float delta)
+void EditorSystem::onUpdateFrame(float delta)
 {
 	if (Input::released(Key::MouseLeft))
 		enabledCameraController = false;
@@ -120,7 +120,7 @@ void Sandbox::onUpdateFrame(float delta)
 	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
 }
 
-void Sandbox::onDrawGui()
+void EditorSystem::onDrawGui()
 {
 	if (!showEngineGui)
 		return;

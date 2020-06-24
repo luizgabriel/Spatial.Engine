@@ -10,8 +10,8 @@ class SpatialEngineConan(ConanFile):
                   "https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake " \
                   "features. "
     settings = "os", "compiler", "build_type", "arch"
-    options = {"sandbox": [True, False]}
-    default_options = {"sandbox": False}
+    options = {"editor": [True, False]}
+    default_options = {"editor": True}
     generators = "cmake"
     build_requires = "cmake_installer/3.16.3@conan/stable"
     exports_sources = "*"
@@ -32,19 +32,19 @@ class SpatialEngineConan(ConanFile):
 
     def _cmake(self):
         cmake = CMake(self)
-        cmake.definitions["SPATIAL_SANDBOX"] = "ON" if self.options["sandbox"] else "OFF"
+        cmake.definitions["SPATIAL_EDITOR"] = "ON" if self.options["editor"] else "OFF"
+        cmake.configure()
 
         return cmake
 
     def build(self):
         cmake = self._cmake()
-        cmake.configure()
         cmake.build()
 
     def package(self):
         cmake = self._cmake()
-        cmake.configure()
         cmake.install()
 
     def package_info(self):
+        self.cpp_info.builddirs = ["lib/cmake"]
         self.cpp_info.libs = tools.collect_libs(self)
