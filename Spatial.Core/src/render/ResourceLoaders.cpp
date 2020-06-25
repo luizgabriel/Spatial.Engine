@@ -11,6 +11,8 @@
 #include <string>
 #include <fmt/format.h>
 
+#include <spatial/common/ResourceUtils.h>
+
 using namespace filament::math;
 using namespace std::string_literals;
 namespace fs = std::filesystem;
@@ -123,9 +125,11 @@ Texture createTexture(fl::Engine& engine, const fs::path& filePath)
 	const auto path = Asset::absolute(filePath);
 
 	int width, height, n;
-	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
+	auto stream = createStreamFromPath(path);
+	const auto buffer = createBufferFromStream(std::move(stream));
+	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(buffer.data()), buffer.size(), &width, &height, &n, 4);
 
-	auto buffer =
+	auto bufferDescriptor =
 		fl::Texture::PixelBufferDescriptor{data,
 										   size_t(width) * height * 4,
 										   fl::Texture::Format::RGBA,
@@ -133,14 +137,14 @@ Texture createTexture(fl::Engine& engine, const fs::path& filePath)
 										   reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	auto texture = fl::Texture::Builder()
-							 .width(uint32_t(width))
-							 .height(uint32_t(height))
-							 .levels(1)
-							 .sampler(fl::Texture::Sampler::SAMPLER_2D)
-							 .format(fl::Texture::InternalFormat::RGBA8)
-							 .build(engine);
+					   .width(uint32_t(width))
+					   .height(uint32_t(height))
+					   .levels(1)
+					   .sampler(fl::Texture::Sampler::SAMPLER_2D)
+					   .format(fl::Texture::InternalFormat::RGBA8)
+					   .build(engine);
 
-	texture->setImage(engine, 0, std::move(buffer));
+	texture->setImage(engine, 0, std::move(bufferDescriptor));
 
 	return Texture{engine, texture};
 }

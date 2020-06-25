@@ -1,21 +1,15 @@
 #include "EditorSystem.h"
 
-#include <spatial/render/Resources.h>
-#include <spatial/render/ResourceLoaders.h>
 #include <spatial/input/Input.h>
-#include <spatial/core/Logger.h>
 
 #include <imgui.h>
 
-#include <filament/RenderableManager.h>
 #include <filament/LightManager.h>
 #include <filament/TextureSampler.h>
 
-#include <cmath>
-#include <spatial/render/RenderingSystem.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/render/RegistryUtils.h>
-#include <spatial/ecs/Components.h>
+#include <spatial/render/ResourceLoaders.h>
 
 #include "Components.h"
 
@@ -58,6 +52,7 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	  m_cameraData{.5f, 500.0f},
 
 	  m_scene{createScene(m_engine)},
+	  m_logoTexture{createTexture(m_engine, "textures/spatial_engine_logo.png")},
 	  m_skyboxTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_skybox.ktx")},
 	  m_iblTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_ibl.ktx")},
 	  m_indirectLight{createImageBasedLight(m_engine, m_iblTexture.ref(), "textures/pillars_2k/sh.txt")},
@@ -69,11 +64,11 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	  m_transformSystem{m_engine},
 	  m_editor{}
 {
+	ecs::connect<ecs::DebugMesh>(m_registry, m_debugCubeSystem);
+	ecs::connect<ecs::Renderable>(m_registry, m_renderableSystem);
+
 	m_editor.registerComponent<ecs::DebugMesh>("Debug Cube");
 	m_editor.registerComponent<ecs::Transform>("Transform");
-
-	connect<ecs::DebugMesh>(m_registry, m_debugCubeSystem);
-	connect<ecs::Renderable>(m_registry, m_renderableSystem);
 
 	m_view.setScene(m_scene.get());
 	m_scene->setIndirectLight(m_indirectLight.get());
@@ -116,7 +111,8 @@ void EditorSystem::onUpdateFrame(float delta)
 	m_debugCubeSystem.onUpdate(m_registry);
 	m_transformSystem.onUpdate(m_registry);
 
-	if (!enabledCameraController) delta = 0;
+	if (!enabledCameraController)
+		delta = 0;
 	m_cam.onUpdate(m_camera, delta * m_cameraData.velocity * defaultInputAxis());
 }
 
@@ -139,7 +135,8 @@ void EditorSystem::onDrawGui()
 		ImGui::Text("Ctrl + Click to turn ON:");
 	}
 
-	if (ImGui::Checkbox("Camera Movement", &enabledCameraController)) {
+	if (ImGui::Checkbox("Camera Movement", &enabledCameraController))
+	{
 		Input::warpMouse({.5f, .5f});
 	}
 

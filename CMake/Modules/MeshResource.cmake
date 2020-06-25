@@ -28,12 +28,6 @@ function(add_mesh_resources TARGET)
         list(APPEND OUTPUT_FILES "${OUTPUT_FILE}")
     endforeach()
 
-    add_custom_target(${TARGET}
-        DEPENDS 
-            ${OUTPUT_FILES}
-    )
-
-    foreach(DEPENDEE ${ARG_DEPENDEES})
-        add_dependencies(${DEPENDEE} ${TARGET})
-    endforeach()
+    target_sources(${TARGET} PUBLIC ${OUTPUT_FILES})
+    install(FILES ${OUTPUT_FILES} DESTINATION ${ARG_OUTPUT})
 endfunction()

@@ -1,6 +1,5 @@
 include(CMakeParseArguments)
 
-
 find_program(CMGEN_PROGRAM cmgen HINTS ${CONAN_CONFIG_DIR})
 
 function(add_skybox_resources TARGET)
@@ -28,12 +27,5 @@ function(add_skybox_resources TARGET)
         list(APPEND OUTPUT_FILES "${OUTPUT_FILE}")
     endforeach()
 
-    add_custom_target(${TARGET}
-        DEPENDS
-            ${OUTPUT_FILES}
-    )
-
-    foreach(DEPENDEE ${ARG_DEPENDEES})
-        add_dependencies(${DEPENDEE} ${TARGET})
-    endforeach()
+    target_sources(${TARGET} PUBLIC ${OUTPUT_FILES})
 endfunction()

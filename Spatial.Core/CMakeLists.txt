@@ -87,7 +87,7 @@ add_library(Spatial.Core
 
     src/ecs/RenderableSystem.cpp
     src/ecs/TransformSystem.cpp
-)
+        include/spatial/common/ResourceUtils.h src/common/ResourceUtils.cpp)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(

@@ -3,6 +3,8 @@
 
 #include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
+#include <fstream>
+#include <spatial/common/ResourceUtils.h>
 
 namespace fs = std::filesystem;
 namespace fl = filament;
@@ -85,8 +87,12 @@ Texture imguiCreateTextureAtlas(fl::Engine& engine, const fs::path& font)
 	const auto fontPath = Asset::absolute(font);
 	if (fs::exists(fontPath))
 	{
-		const auto& filePath = fontPath.generic_string();
-		io.Fonts->AddFontFromFileTTF(filePath.c_str(), 16.0f);
+		auto stream = createStreamFromPath(fontPath);
+		auto buffer = createBufferFromStream(std::move(stream));
+
+		ImFontConfig fontConfig;
+		fontConfig.FontDataOwnedByAtlas = false;
+		io.Fonts->AddFontFromMemoryTTF(static_cast<void*>(buffer.data()), buffer.size(), 16.0f, &fontConfig);
 	}
 
 	unsigned char* data;

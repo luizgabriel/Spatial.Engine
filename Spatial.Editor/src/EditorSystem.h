@@ -37,6 +37,7 @@ private:
 	bool enabledCameraController{true};
 
 	Scene m_scene;
+	Texture m_logoTexture;
 	Texture m_skyboxTexture;
 	Texture m_iblTexture;
 	IndirectLight m_indirectLight;
@@ -57,4 +58,5 @@ public:
 
 	void onDrawGui();
 };
+
 } // namespace spatial
