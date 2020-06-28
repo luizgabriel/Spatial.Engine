@@ -28,5 +28,9 @@ function(add_material_resources TARGET)
         list(APPEND OUTPUT_FILES "${OUTPUT_FILE}")
     endforeach()
 
-    target_sources(${TARGET} PUBLIC ${OUTPUT_FILES})
+    add_custom_target(${TARGET} DEPENDS ${OUTPUT_FILES})
+
+    foreach(DEPENDEE ${ARG_DEPENDEES})
+        add_dependencies(${DEPENDEE} ${TARGET})
+    endforeach()
 endfunction()

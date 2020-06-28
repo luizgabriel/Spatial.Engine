@@ -1,48 +1,33 @@
-add_material_resources(Spatial.Editor
+
+add_mesh_resources(Spatial.Editor.Meshes
     SOURCES
-        assets/materials/default.mat
-        assets/materials/ui_blit.mat
-    OUTPUT assets/materials
+        models/debug_cube.fbx
+    OUTPUT models
+    DEPENDEES Spatial.Editor
 )
 
-add_mesh_resources(Spatial.Editor
+add_skybox_resources(Spatial.Editor.Skybox
     SOURCES
-        assets/models/debug_cube.fbx
-    OUTPUT
-        assets/models
+        textures/pillars_2k.hdr
+        textures/railway_bridge_2k.hdr
+    FORMAT ktx
+    RESOLUTION 4K
+    OUTPUT textures
+    DEPENDEES Spatial.Editor
 )
 
-add_skybox_resources(Spatial.Editor
+add_embed_resources(Spatial.Editor.Embed
     SOURCES
-        assets/textures/pillars_2k.hdr
-        assets/textures/railway_bridge_2k.hdr
-        FORMAT ktx
-        RESOLUTION 4K
-    OUTPUT assets/textures
-)
-
-add_resources(Spatial.Editor
-    SOURCES
-        assets/config/application.toml
-    OUTPUT
-        assets/config
-)
-
-add_resources(Spatial.Editor
-    SOURCES
-        assets/fonts/Roboto-Regular.ttf
-        assets/fonts/Roboto-Medium.ttf
-    OUTPUT
-        assets/fonts
-)
-
-add_resources(Spatial.Editor
-    SOURCES
-        assets/textures/debug_cube.png
-        assets/textures/spatial_engine_logo.png
-    OUTPUT
-        assets/textures
+        materials/ui_blit.mat
+        config/application.toml
+        fonts/Roboto-Regular.ttf
+        fonts/Roboto-Medium.ttf
+        textures/debug_cube.png
+        textures/spatial_engine_logo.png
+    OUTPUT generated/
+    PACKAGE resources
+    DEPENDEES Spatial.Editor
 )
 
 install(TARGETS Spatial.Editor RUNTIME DESTINATION bin)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/assets/ DESTINATION assets)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} DESTINATION assets)

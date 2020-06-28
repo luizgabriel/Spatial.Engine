@@ -11,8 +11,8 @@ target_link_libraries(Spatial.Editor PUBLIC Spatial.Core)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(
-        TARGET Spatial.Editor
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    TARGET Spatial.Editor
+    PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
 add_subdirectory(assets)

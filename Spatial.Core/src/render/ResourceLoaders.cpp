@@ -12,6 +12,7 @@
 #include <fmt/format.h>
 
 #include <spatial/common/ResourceUtils.h>
+#include <spatial/core/ResourceLoaders.h>
 
 using namespace filament::math;
 using namespace std::string_literals;

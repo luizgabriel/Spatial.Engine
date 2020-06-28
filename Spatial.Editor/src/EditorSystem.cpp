@@ -52,10 +52,10 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	  m_cameraData{.5f, 500.0f},
 
 	  m_scene{createScene(m_engine)},
-	  m_logoTexture{createTexture(m_engine, "textures/spatial_engine_logo.png")},
-	  m_skyboxTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_skybox.ktx")},
-	  m_iblTexture{createKtxTexture(m_engine, "textures/pillars_2k/pillars_2k_ibl.ktx")},
-	  m_indirectLight{createImageBasedLight(m_engine, m_iblTexture.ref(), "textures/pillars_2k/sh.txt")},
+	  m_logoTexture{createTexture(m_engine, "embed://textures/spatial_engine_logo.png")},
+	  m_skyboxTexture{createKtxTexture(m_engine, "assets://textures/pillars_2k/pillars_2k_skybox.ktx")},
+	  m_iblTexture{createKtxTexture(m_engine, "assets://textures/pillars_2k/pillars_2k_ibl.ktx")},
+	  m_indirectLight{createImageBasedLight(m_engine, m_iblTexture.ref(), "assets://textures/pillars_2k/sh.txt")},
 	  m_skybox{createSkybox(m_engine, m_skyboxTexture.ref())},
 
 	  m_registry{},

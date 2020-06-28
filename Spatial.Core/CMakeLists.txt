@@ -8,6 +8,7 @@ add_library(Spatial.Core
     include/spatial/common/Key.h
     include/spatial/common/Signal.h
     include/spatial/common/StringHelpers.h
+    include/spatial/common/ResourceUtils.h
 
     include/spatial/core/Application.h
     include/spatial/core/ApplicationUtils.h
@@ -17,7 +18,7 @@ add_library(Spatial.Core
     include/spatial/core/Logger.h
     include/spatial/core/System.h
 
-    include/spatial/desktop/MessageBox.h
+        include/spatial/desktop/MessageBox.h
     include/spatial/desktop/PlatformEvent.h
     include/spatial/desktop/Window.h
 
@@ -55,6 +56,7 @@ add_library(Spatial.Core
     src/common/StringHelpers.cpp
     src/common/Configuration.cpp
     src/common/Exceptions.cpp
+    src/common/ResourceUtils.cpp
 
     src/core/Application.cpp
     src/core/Asset.cpp
@@ -87,7 +89,7 @@ add_library(Spatial.Core
 
     src/ecs/RenderableSystem.cpp
     src/ecs/TransformSystem.cpp
-        include/spatial/common/ResourceUtils.h src/common/ResourceUtils.cpp)
+        )
 
 cmake_policy(SET CMP0091 NEW)
 set_property(
