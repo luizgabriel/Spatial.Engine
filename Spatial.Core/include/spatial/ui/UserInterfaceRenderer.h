@@ -12,14 +12,14 @@ namespace spatial
 class UserInterfaceRenderer
 {
 private:
-	filament::Engine& m_engine;
+	filament::Engine& mEngine;
 
-	SharedView m_view;
-	Scene m_scene;
-	Camera m_camera;
-	Material m_material;
-	Entity m_entity;
-	Texture m_texture;
+	SharedView mView;
+	Scene mScene;
+	Camera mCamera;
+	Material mMaterial;
+	Entity mEntity;
+	Texture mTexture;
 
 	std::vector<SharedVertexBuffer> m_vertexBuffers;
 	std::vector<SharedIndexBuffer> m_indexBuffers;
@@ -60,7 +60,7 @@ public:
 	// region Getters
 	auto& getView()
 	{
-		return m_view;
+		return mView;
 	}
 	// endregion
 };

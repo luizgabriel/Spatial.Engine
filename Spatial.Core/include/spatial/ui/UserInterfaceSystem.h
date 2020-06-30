@@ -14,10 +14,10 @@ namespace spatial
 class UserInterfaceSystem
 {
 private:
-	UserInterfaceRenderer m_renderer;
-	UserInterfaceInput m_input{};
+	UserInterfaceRenderer mRenderer;
+	UserInterfaceInput mInput{};
 
-	std::filesystem::path m_fontPath;
+	uint32_t mFontPath;
 
 	void setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
@@ -40,7 +40,7 @@ public:
 
 	auto getView()
 	{
-		return m_renderer.getView();
+		return mRenderer.getView();
 	}
 };
 } // namespace spatial

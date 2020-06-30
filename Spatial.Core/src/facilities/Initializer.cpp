@@ -9,28 +9,15 @@
 namespace spatial
 {
 
-Window createDefaultWindow(const Application& app, const Configuration& config)
-{
-	const auto width = config.get<int>("window.width");
-	const auto height = config.get<int>("window.height");
-	const auto title = config.get<std::string>("window.title");
-
-	auto window = app.getWindowContext().createWindow(width, height, title);
-
-	return window;
-}
-
-int setup(const Configuration& config, std::function<int(Application&, SystemServices&)>&& action)
+int setup(const SetupConfig& config, std::function<int(Application&, SystemServices&)>&& action)
 {
 	try
 	{
 		auto app = Application{};
-		auto window = createDefaultWindow(app, config);
-		auto input = System<InputSystem>{app, &window};
+		auto window = app.getWindowContext().createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
+		auto input = System<InputSystem>{app, window};
 		auto rendering = System<RenderingSystem>{app, window};
-
-		auto fontPath = config.get<std::string>("ui.font-path");
-		auto ui = System<UserInterfaceSystem>(app, rendering.get(), window, fontPath);
+		auto ui = System<UserInterfaceSystem>(app, rendering.get(), window, config.uiFontResourceId);
 		auto services = SystemServices{window, rendering.get(), input.get(), ui.get()};
 
 		return action(app, services);
@@ -40,6 +27,18 @@ int setup(const Configuration& config, std::function<int(Application&, SystemSer
 		showMessageBox(MessageBoxType::Error, "[Spatial Engine] Something went wrong", e.what());
 		return -1;
 	}
+}
+
+SetupConfig SetupConfig::fromConfig(const Configuration& config)
+{
+	auto fontPath = config.get<std::string>("ui.font-path", "");
+
+	return {
+		config.get<std::string>("window.title", "Spatial Engine"),
+		config.get<int>("window.width", 1280),
+		config.get<int>("window.height", 720),
+		hash<uint32_t>(fontPath)
+	};
 }
 
 } // namespace spatial

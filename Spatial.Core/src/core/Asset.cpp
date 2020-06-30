@@ -1,13 +1,15 @@
-#include <spatial/core/Asset.h>
-#include <spatial/common/ResourceUtils.h>
 #include <fstream>
+#include <spatial/common/ResourceUtils.h>
+#include <spatial/core/Asset.h>
 
 namespace spatial
 {
 
-std::istream DefaultAssetLoader::operator()(const std::filesystem::path& resourcePath) const
+Asset::ResourceDelegate Asset::sAssetResolverDelegate{};
+
+Asset::Resource AssetLoader::operator()(Asset::Id resourceId) const
 {
-	return createStreamFromPath(basePath / resourcePath);
+	auto stream = createStreamFromPath(basePath / resourcePath);
 }
 
 } // namespace spatial

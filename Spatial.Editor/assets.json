@@ -1,0 +1,68 @@
+{
+  "resources": [
+    {
+      "id": 0,
+      "name": "defaultUiFont",
+      "type": "font",
+      "source": "${workingDirectory}/assets/Roboto-Medium.ttf",
+      "action": {
+        "command": "copy",
+        "options": []
+      }
+    },
+    {
+      "id": 1,
+      "name": "defaultMaterial",
+      "type": "material",
+      "source": "${workingDirectory}/materials/default.mat",
+      "action": {
+        "command": "filamat",
+        "options": {
+          "debug": false,
+          "api": "opengl",
+          "optimize_size": false
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "uiBlitMaterial",
+      "type": "material",
+      "source": "${workingDirectory}/materials/ui_blit.mat",
+      "action": {
+        "command": "filamat",
+        "options": {
+          "debug": false,
+          "api": "opengl",
+          "optimize_size": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "cubeMesh",
+      "type": "mesh",
+      "source": "${workingDirectory}/meshes/cube.obj",
+      "action": {
+        "command": "filamesh",
+        "options": {
+          "compress": false,
+          "interleaved": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "planeMesh",
+      "type": "mesh",
+      "source": "${workingDirectory}/meshes/place.obj",
+      "action": {
+        "command": "filamesh",
+        "options": {
+          "compress": false,
+          "interleaved": false
+        }
+      }
+    }
+  ]
+}

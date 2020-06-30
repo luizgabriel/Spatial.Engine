@@ -8,12 +8,12 @@ namespace spatial
 WindowContext::WindowContext()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-		m_valid = false;
+		mValid = false;
 }
 
 WindowContext::~WindowContext()
 {
-	if (m_valid)
+	if (mValid)
 		SDL_Quit();
 }
 
@@ -87,14 +87,14 @@ Window WindowContext::createWindow(std::uint16_t width, std::uint16_t height, st
 
 WindowContext::WindowContext(WindowContext&& c) noexcept
 {
-	if (c.m_valid)
+	if (c.mValid)
 	{
-		c.m_valid = false;
+		c.mValid = false;
 	}
 	else
 	{
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-			m_valid = false;
+			mValid = false;
 	}
 }
 

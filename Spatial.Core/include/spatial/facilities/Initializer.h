@@ -20,6 +20,16 @@ struct SystemServices
 	UserInterfaceSystem& ui;
 };
 
+struct SetupConfig
+{
+	std::string windowTitle;
+	int windowWidth;
+    int windowHeight;
+	uint32_t uiFontResourceId;
+
+	static SetupConfig fromConfig(const Configuration& config);
+};
+
 Window createDefaultWindow(const Application& app, const Configuration& config);
 
 int setup(const Configuration& config, std::function<int(Application&, SystemServices&)>&& action);

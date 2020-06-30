@@ -3,10 +3,6 @@ material {
     shadingModel : lit,
     parameters : [
         { type : float4, name : albedo },
-        { type : float, name : metallic },
-        { type : float, name : roughness },
-        { type : float, name : clearCoat },
-        { type : float, name : clearCoatRoughness }
     ]
 }
 
@@ -14,7 +10,7 @@ fragment {
     void material(inout MaterialInputs material) {
         prepareMaterial(material);
         material.baseColor = materialParams.albedo;
-        material.metallic = materialParams.metallic;
+        material.metallic = .0;
         material.roughness = materialParams.roughness;
         material.clearCoat = materialParams.clearCoat;
         material.clearCoatRoughness = materialParams.clearCoatRoughness;

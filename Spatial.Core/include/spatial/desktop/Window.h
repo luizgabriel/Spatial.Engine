@@ -19,7 +19,7 @@ class WindowContext;
 class Window
 {
 private:
-	SDL_Window* m_windowHandle;
+	SDL_Window* mWindowHandle;
 
 	Window(int width, int height, std::string_view title);
 
@@ -31,7 +31,7 @@ public:
 	void* getNativeHandle() const;
 	SDL_Window* getHandle() const
 	{
-		return m_windowHandle;
+		return mWindowHandle;
 	}
 
 	std::pair<int, int> getFrameBufferSize() const;
@@ -49,7 +49,7 @@ public:
 class WindowContext
 {
 private:
-	bool m_valid{true};
+	bool mValid{true};
 
 public:
 	WindowContext();

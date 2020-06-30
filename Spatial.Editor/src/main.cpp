@@ -3,31 +3,59 @@
 #include <spatial/init.h>
 #include <streambuf>
 #include <sstream>
+#include <unordered_map>
+#include <filesystem>
 #include <spatial/common/ResourceUtils.h>
+#include <spatial/common/StringHelpers.h>
+#include <spatial/core/Logger.h>
 
 using namespace spatial;
-using namespace std::filesystem;
+namespace fs = std::filesystem::path;
 
-constexpr uint8_t buff[4] = { 0x00, 0x01, 0x02, 0x03 };
+constexpr char _roboto_medium_ttf[] = {1, 2, 3};
+constexpr char _materials_default[] = {1, 2, 3};
 
-Asset::ResourceStream loadEmbedResource(const path& resourcePath)
-{
-	if (resourcePath == "config/application.toml")
-		return MemoryStream{{buff}};
+auto gLogger = createDefaultLogger();
 
-	throw std::runtime_error("Unknown embed resource.");
-}
+void mountVirtualFileSystem(argh::parser& args);
 
 int main(int argc, char* argv[])
 {
-	Asset::define("assets", DefaultAssetLoader{path{argv[0]}.parent_path() / "assets"});
-	Asset::define<&loadEmbedResource>("embed");
+	const auto args = argh::parser(argc, argv);
+	mountVirtualFileSystem(args);
 
-	const auto config = readConfigFile("embed://config/application.toml");
+	const auto setupConfig = SetupConfig{
+		.windowTitle = "Spatial Engine | Editor",
+		.windowWidth = args({"w", "width"}, 1280),
+		.windowHeight = args({"h", "height"}, 1280),
+		.uiFontResourceId = "editor/fonts/Roboto-Medium.ttf"_sh32
+	};
 
-	return setup(config, [](auto& app, auto& services) {
+	return setup(setupConfig, [](auto& app, auto& services) {
 		auto sandbox = System<EditorSystem>{app, services.rendering};
 
 		return app.run();
 	});
+}
+
+void mountVirtualFileSystem(const argh::parser& args)
+{
+	Asset::mount<MemoryDisk>("editor", {
+		{"fonts/Roboto-Medium.ttf", _roboto_medium_ttf},
+		{"materials/default", _materials_default}
+	});
+
+	for (auto i = 1, auto file = args[i]; !file.empty(); i++) {
+		auto filePath = fs::path{file};
+		if (fs::exists(filePath)) {
+			if (file.ends_with(".zip"))
+				Asset::mount<ArchiveDisk>("assets", filePath);
+			else if (file.ends_with(".json"))
+				Asset::mount<ResourceDescriberDisk>("assets", filePath);
+			else
+				Asset::mount<PhysicalDisk>("assets", filePath);
+		} else {
+			gLogger.error("Could not found: {}", file);
+		}
+	}
 }

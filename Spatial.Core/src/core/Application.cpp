@@ -10,12 +10,12 @@ namespace spatial
 
 Application::Application()
 {
-	m_eventQueue.connect<WindowClosedEvent>(*this);
+	mEventQueue.connect<WindowClosedEvent>(*this);
 }
 
 Application::~Application()
 {
-	m_eventQueue.disconnect<WindowClosedEvent>(*this);
+	mEventQueue.disconnect<WindowClosedEvent>(*this);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)
@@ -38,13 +38,13 @@ int Application::run()
 	{
 		const auto delta = m_clock.getDeltaTime().count();
 
-		m_windowContext.pollEvents(m_eventQueue);
+		m_windowContext.pollEvents(mEventQueue);
 
 		m_startFrameSignal(delta);
 
 		// Triggers all queued events
-		m_eventQueue.update<WindowResizedEvent>();
-		m_eventQueue.update();
+		mEventQueue.update<WindowResizedEvent>();
+		mEventQueue.update();
 
 		while (m_clock.hasLag(m_desiredDelta))
 		{

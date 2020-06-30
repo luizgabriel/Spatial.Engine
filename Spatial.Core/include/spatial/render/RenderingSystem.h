@@ -17,14 +17,14 @@ namespace spatial
 class RenderingSystem
 {
 private:
-	Engine m_engine;
-	SwapChain m_swapChain;
-	Renderer m_renderer;
+	Engine mEngine;
+	SwapChain mSwapChain;
+	Renderer mRenderer;
 
-	Camera m_mainCamera;
-	SharedView m_mainView;
+	Camera mMainCamera;
+	SharedView mMainView;
 
-	std::deque<std::weak_ptr<filament::View>> m_views;
+	std::deque<std::weak_ptr<filament::View>> mViews;
 
 	void setupViewport(const std::pair<int, int>& frameBufferSize);
 
@@ -64,32 +64,32 @@ public:
 	// region Getters
 	[[nodiscard]] const auto& getEngine() const
 	{
-		return *m_engine.get();
+		return *mEngine.get();
 	}
 
 	[[nodiscard]] const filament::View& getMainView() const
 	{
-		return *m_mainView.get();
+		return *mMainView.get();
 	}
 
 	[[nodiscard]] const filament::Camera& getMainCamera() const
 	{
-		return *m_mainCamera.get();
+		return *mMainCamera.get();
 	}
 
 	auto& getEngine()
 	{
-		return *m_engine.get();
+		return *mEngine.get();
 	}
 
 	auto& getMainView()
 	{
-		return *m_mainView.get();
+		return *mMainView.get();
 	}
 
 	auto& getMainCamera()
 	{
-		return *m_mainCamera.get();
+		return *mMainCamera.get();
 	}
 	// endregion
 

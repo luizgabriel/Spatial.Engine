@@ -14,7 +14,7 @@ class Application final
 private:
 	bool m_running = false;
 
-	EventQueue m_eventQueue{};
+	EventQueue mEventQueue{};
 	Clock<float> m_clock{};
 	float m_desiredDelta{1.0f / 60.0f};
 
@@ -54,7 +54,7 @@ public:
 
 	auto& getEventQueue()
 	{
-		return m_eventQueue;
+		return mEventQueue;
 	}
 
 	auto& getWindowContext() const

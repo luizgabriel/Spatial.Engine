@@ -16,30 +16,6 @@
 namespace fl = filament;
 using namespace filament::math;
 
-namespace MM
-{
-
-template <>
-void ComponentEditorWidget<spatial::ecs::Transform>(entt::registry& reg, entt::registry::entity_type e)
-{
-	auto& t = reg.get<spatial::ecs::Transform>(e);
-	ImGui::DragFloat3("Position", &t.position[0], 1.0f);
-	ImGui::DragFloat3("Scale", &t.scale[0], .1f);
-}
-
-template <>
-void ComponentEditorWidget<spatial::ecs::DebugMesh>(entt::registry& reg, entt::entity e)
-{
-	auto& t = reg.get<spatial::ecs::DebugMesh>(e);
-	ImGui::ColorPicker4("Color", &t.color[0]);
-	ImGui::DragFloat("Metallic", &t.metallic, 0.01f, .0f, 1.0f);
-	ImGui::DragFloat("Roughness", &t.roughness, 0.01f, .0f, 1.0f);
-	ImGui::DragFloat("Clear Coat", &t.clearCoat, 0.01f, .0f, 1.0f);
-	ImGui::DragFloat("Clear Coat Roughness", &t.clearCoatRoughness, 0.01f, .0f, 1.0f);
-}
-
-} // namespace MM
-
 namespace spatial
 {
 
@@ -52,7 +28,7 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	  m_cameraData{.5f, 500.0f},
 
 	  m_scene{createScene(m_engine)},
-	  m_logoTexture{createTexture(m_engine, "embed://textures/spatial_engine_logo.png")},
+	  m_logoTexture{createTexture(m_engine, "embed://textures/logo.png")},
 	  m_skyboxTexture{createKtxTexture(m_engine, "assets://textures/pillars_2k/pillars_2k_skybox.ktx")},
 	  m_iblTexture{createKtxTexture(m_engine, "assets://textures/pillars_2k/pillars_2k_ibl.ktx")},
 	  m_indirectLight{createImageBasedLight(m_engine, m_iblTexture.ref(), "assets://textures/pillars_2k/sh.txt")},

@@ -80,12 +80,12 @@ uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect)
 		   (static_cast<uint64_t>(width) << 32ull) | (static_cast<uint64_t>(height) << 48ull);
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const fs::path& font)
+Texture imguiCreateTextureAtlas(fl::Engine& engine, uint32_t fontResourceId)
 {
 	auto& io = ImGui::GetIO();
 
-	const auto fontPath = Asset::absolute(font);
-	if (fs::exists(fontPath))
+	const auto fontData = Asset::resolve(fontResourceId);
+	if (fontData)
 	{
 		auto stream = createStreamFromPath(fontPath);
 		auto buffer = createBufferFromStream(std::move(stream));

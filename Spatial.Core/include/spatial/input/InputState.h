@@ -12,8 +12,8 @@ constexpr int keysCount = static_cast<size_t>(Key::Count);
 class InputState
 {
 private:
-	std::bitset<keysCount> m_keyPressed;
-	std::bitset<keysCount> m_keyReleased;
+	std::bitset<keysCount> mKeyPressed;
+	std::bitset<keysCount> mKeyReleased;
 
 	filament::math::float2 m_lastMousePosition;
 	filament::math::float2 m_currentMousePosition;
@@ -53,12 +53,12 @@ public:
 
 	[[nodiscard]] bool released(Key key) const
 	{
-		return m_keyReleased.test(static_cast<size_t>(key));
+		return mKeyReleased.test(static_cast<size_t>(key));
 	}
 
 	[[nodiscard]] bool pressed(Key key) const
 	{
-		return m_keyPressed.test(static_cast<size_t>(key));
+		return mKeyPressed.test(static_cast<size_t>(key));
 	}
 
 	[[nodiscard]] bool combined(Key alt1, Key key) const

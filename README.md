@@ -1,4 +1,4 @@
-![Spatial Engine](/Spatial.Editor/assets/textures/spatial_engine_logo.png)
+![Spatial Engine](/Spatial.Editor/assets/textures/logo.png)
 
 # Spatial Engine
 

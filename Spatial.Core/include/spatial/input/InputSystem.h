@@ -11,10 +11,10 @@ namespace spatial
 class InputSystem
 {
 private:
-	Window* m_window;
+	Window& mWindow;
 
 public:
-	explicit InputSystem(Window* window);
+	explicit InputSystem(Window& window);
 
 	InputSystem(const InputSystem& other) = delete;
 	InputSystem& operator=(const InputSystem& w) = delete;

@@ -5,7 +5,7 @@ using namespace filament::math;
 namespace spatial
 {
 
-InputState::InputState() : m_keyPressed{}, m_keyReleased{}
+InputState::InputState() : mKeyPressed{}, mKeyReleased{}
 {
 }
 
@@ -24,25 +24,25 @@ void InputState::set(const Key key, const KeyAction action)
 void InputState::setPressed(Key key)
 {
 	const auto flag = static_cast<size_t>(key);
-	m_keyPressed.set(flag);
-	m_keyReleased.reset(flag);
+	mKeyPressed.set(flag);
+	mKeyReleased.reset(flag);
 }
 
 void InputState::setReleased(Key key)
 {
 	const auto flag = static_cast<size_t>(key);
-	m_keyPressed.reset(flag);
-	m_keyReleased.set(flag);
+	mKeyPressed.reset(flag);
+	mKeyReleased.set(flag);
 }
 
 void InputState::reset(Key key)
 {
-	m_keyReleased.reset(static_cast<size_t>(key));
+	mKeyReleased.reset(static_cast<size_t>(key));
 }
 
 void InputState::reset()
 {
-	m_keyReleased.reset();
+	mKeyReleased.reset();
 	m_mouseWarpRequested = false;
 }
 

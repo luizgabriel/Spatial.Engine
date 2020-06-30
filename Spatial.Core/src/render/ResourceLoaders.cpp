@@ -101,21 +101,9 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-fs::path appendExtension(const fs::path& path, const std::string& extension)
+Material createMaterial(fl::Engine& engine, std::uint32_t resourceId)
 {
-	return path.parent_path() / (path.filename().generic_string() + "." + extension);
-}
-
-Material createMaterial(fl::Engine& engine, const fs::path& filePath)
-{
-	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
-
-	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
-	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	const auto iterator = std::istreambuf_iterator<char>{stream};
-	const auto data = std::vector<char>{iterator, {}};
-
+	const auto data = Asset::get(resourceId);
 	auto material = fl::Material::Builder().package(&data[0], data.size()).build(engine);
 
 	return Material{engine, material};

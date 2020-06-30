@@ -25,6 +25,9 @@ class SpatialEngineConan(ConanFile):
         "filament/1.7.0@google/stable",
         "imgui/docking@ocornut/testing",
         "toml++/1.2.0@marzer/stable",
+        "rang/3.1.0@rang/stable",
+        "gtest/1.8.1@bincrafters/stable",
+        "argh/1.2.1@adishavit/stable"
     ]
 
     def imports(self):
