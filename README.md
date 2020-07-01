@@ -4,8 +4,6 @@
 
 Spatial is a cross-platform C++ game engine created on top off google's [filament](https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake features.
 
----
-
 <table>
   <tr>
     <td width="25%">
