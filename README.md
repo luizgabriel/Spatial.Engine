@@ -1,8 +1,12 @@
-![Spatial Engine](/Spatial.Editor/assets/textures/spatial_engine_logo.png)
+<h1 align="center">
+    <img alt="Spatial Engine Logo" src="https://i.imgur.com/tkJzpLU.png" />
+    <br/>
+    Spatial Engine
+</h1>
 
-# Spatial Engine
+Spatial is a cross-platform C++ game engine created on top off google's [filament](https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake features.
 
-Spatial is a cross-platform c++ game engine created on top off google's [filament](https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake features.
+---
 
 <table>
   <tr>
@@ -19,7 +23,7 @@ Spatial is a cross-platform c++ game engine created on top off google's [filamen
       </ol>
     </td>
     <td width="75%">
-       <img src="/Screenshots/DebugCube_2020_06_04.png" alt="Preview image"/>
+       <img src="https://i.imgur.com/67tUMio.png" alt="Engine editor preview"/>
     </td>
   </tr>
 </table>
