@@ -1,7 +1,5 @@
 <h1 align="center">
     <img alt="Spatial Engine Logo" src="https://i.imgur.com/tkJzpLU.png" />
-    <br/>
-    Spatial Engine
 </h1>
 
 Spatial is a cross-platform C++ game engine created on top off google's [filament](https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake features.
