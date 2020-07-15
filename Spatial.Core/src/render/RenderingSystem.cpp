@@ -1,9 +1,5 @@
 #include <spatial/render/RenderingSystem.h>
 
-#ifndef SPATIAL_PLATFORM_OSX
-#include <execution>
-#endif
-
 using namespace spatial;
 namespace fl = filament;
 namespace bk = filament::backend;
@@ -11,26 +7,20 @@ namespace bk = filament::backend;
 namespace spatial
 {
 
-RenderingSystem::RenderingSystem(const Window& window) : RenderingSystem(window, bk::Backend::OPENGL)
-{
-}
-
-RenderingSystem::RenderingSystem(const Window& window, const bk::Backend backend)
+RenderingSystem::RenderingSystem(const bk::Backend backend, void* nativeWindowHandle)
 	: mEngine{createEngine(backend)},
-	  mSwapChain{createSwapChain(getEngine(), window.getNativeHandle())},
+	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
 	  mRenderer{createRenderer(getEngine())},
-	  mMainCamera{createCamera(getEngine())},
 	  mMainView{toShared(createView(getEngine()))},
 	  mViews{5}
 {
 	pushBackView(mMainView);
-	setupViewport(window.getFrameBufferSize());
 }
 
-void RenderingSystem::onStart()
+RenderingSystem::RenderingSystem(const filament::backend::Backend backend, const Window& window)
+	: RenderingSystem(backend, window.getNativeHandle())
 {
-	mMainView->setCamera(mMainCamera.get());
-	mMainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
+	setupViewport(window.getFrameBufferSize());
 }
 
 void RenderingSystem::onEndFrame()
@@ -51,15 +41,7 @@ void RenderingSystem::onEndFrame()
 
 void RenderingSystem::clearExpiredViews() noexcept
 {
-	mViews.erase(
-#ifndef SPATIAL_PLATFORM_OSX
-		std::remove_if(std::execution::par_unseq, mViews.begin(), mViews.end(),
-#else
-		std::remove_if(mViews.begin(), mViews.end(),
-#endif
-
-					   [](auto& view) { return view.expired(); }),
-		mViews.end());
+	std::erase_if(mViews, [](auto& view) { return view.expired(); });
 }
 
 void RenderingSystem::onEvent(const WindowResizedEvent& event)
@@ -91,7 +73,6 @@ void RenderingSystem::setupViewport(const std::pair<int, int>& frameBufferSize)
 {
 	auto [dw, dh] = frameBufferSize;
 	mMainView->setViewport({0, 0, static_cast<uint32_t>(dw), static_cast<uint32_t>(dh)});
-	mMainCamera->setProjection(45.0, double(dw) / dh, 0.1, 1000000.0f, fl::Camera::Fov::VERTICAL);
 }
 
 } // namespace spatial

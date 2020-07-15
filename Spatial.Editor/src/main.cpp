@@ -1,61 +1,55 @@
 #include "EditorSystem.h"
 
-#include <spatial/init.h>
-#include <streambuf>
-#include <sstream>
-#include <unordered_map>
+#include <argh.h>
 #include <filesystem>
-#include <spatial/common/ResourceUtils.h>
-#include <spatial/common/StringHelpers.h>
-#include <spatial/core/Logger.h>
+#include <spatial/spatial.h>
+#include <spatial/ui/UserInterfaceSystem.h>
+#include <generated.h>
 
 using namespace spatial;
-namespace fs = std::filesystem::path;
+namespace fs = std::filesystem;
 
-constexpr char _roboto_medium_ttf[] = {1, 2, 3};
-constexpr char _materials_default[] = {1, 2, 3};
-
-auto gLogger = createDefaultLogger();
-
-void mountVirtualFileSystem(argh::parser& args);
+template <typename BufferType = BasicBufferType>
+auto buildAssetTree(std::filesystem::path executablePath)
+{
+	// clang-format off
+	return DirMapLoader<BufferType>{
+		{"editor"_hs, MemoryLoader<BufferType>{
+			{"fonts/Roboto_Medium.ttf"_hs, {GENERATED_ROBOTO_MEDIUM_DATA, static_cast<size_t>(GENERATED_ROBOTO_MEDIUM_SIZE)}},
+			{"materials/default.filamat"_hs, {GENERATED_DEFAULT_DATA, static_cast<size_t>(GENERATED_DEFAULT_OFFSET)}},
+			{"materials/ui.filamat"_hs, {GENERATED_UI_BLIT_DATA, static_cast<size_t>(GENERATED_UI_BLIT_SIZE)}}
+		}},
+		{"assets"_hs, AggregatorLoader<BufferType>{
+			PhysicalDirLoader<BufferType>{executablePath / "assets"},
+			PhysicalDirLoader<BufferType>{executablePath}
+		}}
+	};
+	// clang-format on
+}
 
 int main(int argc, char* argv[])
 {
-	const auto args = argh::parser(argc, argv);
-	mountVirtualFileSystem(args);
+	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+	const auto executablePath = fs::path{args[0]};
+	auto setupConfig = SetupConfig{"Spatial Engine | Editor", 1280, 720};
+	args({"-w", "--width"}) >> setupConfig.windowWidth;
+	args({"-h", "--height"}) >> setupConfig.windowHeight;
 
-	const auto setupConfig = SetupConfig{
-		.windowTitle = "Spatial Engine | Editor",
-		.windowWidth = args({"w", "width"}, 1280),
-		.windowHeight = args({"h", "height"}, 1280),
-		.uiFontResourceId = "editor/fonts/Roboto-Medium.ttf"_sh32
-	};
+	const auto assets = buildAssetTree(executablePath);
+	auto uiFont = asyncReadAll(assets, "editor/fonts/Roboto_Medium.ttf");
+	auto uiMaterial = asyncReadAll(assets, "editor/materials/ui.filamat");
 
-	return setup(setupConfig, [](auto& app, auto& services) {
+	return setup(setupConfig, [&](auto& app, auto& services) {
+		auto ui = System<UserInterfaceSystem>(app, services.rendering, services.window);
+
+		if (auto uiFontData = uiFont.get(); uiFontData)
+			ui->setDefaultFont({uiFontData->data(), uiFontData->size()});
+
+		if (auto uiMaterialData = uiMaterial.get(); uiMaterialData)
+			ui->setDefaultMaterial({uiMaterialData->data(), uiMaterialData->size()});
+
 		auto sandbox = System<EditorSystem>{app, services.rendering};
 
 		return app.run();
 	});
-}
-
-void mountVirtualFileSystem(const argh::parser& args)
-{
-	Asset::mount<MemoryDisk>("editor", {
-		{"fonts/Roboto-Medium.ttf", _roboto_medium_ttf},
-		{"materials/default", _materials_default}
-	});
-
-	for (auto i = 1, auto file = args[i]; !file.empty(); i++) {
-		auto filePath = fs::path{file};
-		if (fs::exists(filePath)) {
-			if (file.ends_with(".zip"))
-				Asset::mount<ArchiveDisk>("assets", filePath);
-			else if (file.ends_with(".json"))
-				Asset::mount<ResourceDescriberDisk>("assets", filePath);
-			else
-				Asset::mount<PhysicalDisk>("assets", filePath);
-		} else {
-			gLogger.error("Could not found: {}", file);
-		}
-	}
 }

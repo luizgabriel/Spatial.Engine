@@ -1,10 +1,9 @@
 #include <spatial/ui/ImGuiHelpers.h>
-#include <spatial/core/Asset.h>
 
-#include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
-#include <fstream>
-#include <spatial/common/ResourceUtils.h>
+#include <filament/VertexBuffer.h>
+
+#include <span>
 
 namespace fs = std::filesystem;
 namespace fl = filament;
@@ -43,29 +42,25 @@ bool imguiIsMinimized()
 
 SharedVertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
 {
-	auto vb = fl::VertexBuffer::Builder()
-				  .vertexCount(capacity)
-				  .bufferCount(1)
-				  .attribute(fl::VertexAttribute::POSITION, 0, fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
-				  .attribute(fl::VertexAttribute::UV0,
-							 0,
-							 fl::VertexBuffer::AttributeType::FLOAT2,
-							 sizeof(fl::math::float2),
-							 sizeof(ImDrawVert))
-				  .attribute(fl::VertexAttribute::COLOR,
-							 0,
-							 fl::VertexBuffer::AttributeType::UBYTE4,
-							 2 * sizeof(fl::math::float2),
-							 sizeof(ImDrawVert))
-				  .normalized(fl::VertexAttribute::COLOR)
-				  .build(engine);
+	auto vb =
+		fl::VertexBuffer::Builder()
+			.vertexCount(capacity)
+			.bufferCount(1)
+			.attribute(fl::VertexAttribute::POSITION, 0, fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
+			.attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2, sizeof(fl::math::float2),
+					   sizeof(ImDrawVert))
+			.attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
+					   2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
+			.normalized(fl::VertexAttribute::COLOR)
+			.build(engine);
 
 	return createSharedResource(engine, vb);
 }
 
 SharedIndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
 {
-	auto ib = fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine);
+	auto ib =
+		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine);
 
 	return createSharedResource(engine, ib);
 }
@@ -80,20 +75,13 @@ uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect)
 		   (static_cast<uint64_t>(width) << 32ull) | (static_cast<uint64_t>(height) << 48ull);
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, uint32_t fontResourceId)
+Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::span<char> resourceData)
 {
 	auto& io = ImGui::GetIO();
 
-	const auto fontData = Asset::resolve(fontResourceId);
-	if (fontData)
-	{
-		auto stream = createStreamFromPath(fontPath);
-		auto buffer = createBufferFromStream(std::move(stream));
-
-		ImFontConfig fontConfig;
-		fontConfig.FontDataOwnedByAtlas = false;
-		io.Fonts->AddFontFromMemoryTTF(static_cast<void*>(buffer.data()), buffer.size(), 16.0f, &fontConfig);
-	}
+	ImFontConfig fontConfig;
+	fontConfig.FontDataOwnedByAtlas = false;
+	io.Fonts->AddFontFromMemoryTTF(const_cast<char*>(resourceData.data()), resourceData.size(), 16.0f, &fontConfig);
 
 	unsigned char* data;
 	int width, height, bpp;

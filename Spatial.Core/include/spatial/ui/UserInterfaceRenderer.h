@@ -5,6 +5,7 @@
 #include <imgui.h>
 
 #include <filesystem>
+#include <span>
 
 namespace spatial
 {
@@ -16,6 +17,7 @@ private:
 
 	SharedView mView;
 	Scene mScene;
+	Entity mCameraEntity;
 	Camera mCamera;
 	Material mMaterial;
 	Entity mEntity;
@@ -41,10 +43,11 @@ public:
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
-	/**
-	 * \brief Should be called when applications runs
-	 */
-	void setup(const std::filesystem::path& fontPath);
+	void setMaterial(const std::span<char> materialData);
+
+	void setFont(const std::span<char> fontData);
+
+	void setupEngineTheme();
 
 	/**
 	 * \brief Should be called every frame start

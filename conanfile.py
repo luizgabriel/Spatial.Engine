@@ -22,12 +22,11 @@ class SpatialEngineConan(ConanFile):
         "stb/20190512@conan/stable",
         "boost_tti/1.67.0@bincrafters/stable",
         "sdl2/2.0.12@bincrafters/stable",
-        "filament/1.7.0@google/stable",
-        "imgui/docking@ocornut/testing",
-        "toml++/1.2.0@marzer/stable",
-        "rang/3.1.0@rang/stable",
-        "gtest/1.8.1@bincrafters/stable",
-        "argh/1.2.1@adishavit/stable"
+        "imgui/1.73@bincrafters/stable",
+        "filament/1.8.0@google/stable",
+        #"rang/3.1.0@rang/stable",
+        #"gtest/1.8.1@bincrafters/stable",
+        "argh/1.2.1@adishavit/stable",
     ]
 
     def imports(self):

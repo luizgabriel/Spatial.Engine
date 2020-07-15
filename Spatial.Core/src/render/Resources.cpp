@@ -25,9 +25,9 @@ View createView(fl::Engine& engine) noexcept
 	return View{engine, engine.createView()};
 }
 
-Camera createCamera(fl::Engine& engine) noexcept
+Camera createCamera(fl::Engine& engine, utils::Entity entity) noexcept
 {
-	return Camera{engine, engine.createCamera()};
+	return Camera{engine, entity};
 }
 
 Entity createEntity(fl::Engine& engine) noexcept

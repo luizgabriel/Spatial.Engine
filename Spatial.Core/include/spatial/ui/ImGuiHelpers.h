@@ -1,8 +1,8 @@
 #pragma once
 
-#include <spatial/render/Resources.h>
-#include <filesystem>
 #include <imgui.h>
+#include <span>
+#include <spatial/render/Resources.h>
 
 namespace spatial
 {
@@ -21,7 +21,7 @@ SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capaci
 
 uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect);
 
-Texture imguiCreateTextureAtlas(filament::Engine& engine, const std::filesystem::path& font);
+Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::span<char> resourceData);
 
 template <typename FilamentType, typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)

@@ -20,22 +20,17 @@ private:
 	Engine mEngine;
 	SwapChain mSwapChain;
 	Renderer mRenderer;
-
-	Camera mMainCamera;
 	SharedView mMainView;
 
 	std::deque<std::weak_ptr<filament::View>> mViews;
-
-	void setupViewport(const std::pair<int, int>& frameBufferSize);
-
 public:
-	explicit RenderingSystem(const Window& window);
-	RenderingSystem(const Window& window, filament::backend::Backend backend);
+	RenderingSystem(const filament::backend::Backend backend, void* nativeWindowHandle);
+	RenderingSystem(const filament::backend::Backend backend, const Window& window);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
-	void onStart();
+	void setupViewport(const std::pair<int, int>& frameBufferSize);
 
 	void onEndFrame();
 
@@ -72,11 +67,6 @@ public:
 		return *mMainView.get();
 	}
 
-	[[nodiscard]] const filament::Camera& getMainCamera() const
-	{
-		return *mMainCamera.get();
-	}
-
 	auto& getEngine()
 	{
 		return *mEngine.get();
@@ -85,11 +75,6 @@ public:
 	auto& getMainView()
 	{
 		return *mMainView.get();
-	}
-
-	auto& getMainCamera()
-	{
-		return *mMainCamera.get();
 	}
 	// endregion
 

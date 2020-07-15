@@ -1,28 +1,44 @@
 #include <spatial/ui/UserInterfaceSystem.h>
 
-#include <utility>
-
-namespace fs = std::filesystem;
-
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window, fs::path fontPath)
-	: mRenderer{rendering.getEngine()}, mFontPath{std::move(fontPath)}
+UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine)
+	: mRenderer{engine}, mInput{}
 {
-	setupViewport(window.getWindowSize(), window.getFrameBufferSize());
+}
+
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering)
+	: UserInterfaceSystem(rendering.getEngine())
+{
 	rendering.pushFrontView(getView());
+}
+
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window)
+	: UserInterfaceSystem(rendering)
+{
+	setViewport(window.getWindowSize(), window.getFrameBufferSize());
+}
+
+void UserInterfaceSystem::setDefaultFont(const std::span<char> fontData)
+{
+	mRenderer.setFont(fontData);
+}
+
+void UserInterfaceSystem::setDefaultMaterial(const std::span<char> materialData)
+{
+	mRenderer.setMaterial(materialData);
 }
 
 void UserInterfaceSystem::onStart()
 {
-	mRenderer.setup(mFontPath);
+	mRenderer.setupEngineTheme();
 	mInput.setup();
 }
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 {
-	setupViewport(event.windowSize, event.frameBufferSize);
+	setViewport(event.windowSize, event.frameBufferSize);
 }
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
@@ -40,7 +56,7 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 	mInput.setText(event.text);
 }
 
-void UserInterfaceSystem::setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
+void UserInterfaceSystem::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
 {
 	mRenderer.setViewport(windowSize, frameBufferSize);
 }
@@ -54,5 +70,6 @@ void UserInterfaceSystem::onEndGuiFrame()
 {
 	mRenderer.dispatchCommands();
 }
+
 
 } // namespace spatial

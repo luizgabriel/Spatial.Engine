@@ -7,7 +7,9 @@
 #include <spatial/ui/UserInterfaceRenderer.h>
 #include <spatial/ui/UserInterfaceInput.h>
 
-#include <filesystem>
+#include <span>
+#include <string_view>
+#include <utility>
 
 namespace spatial
 {
@@ -15,14 +17,20 @@ class UserInterfaceSystem
 {
 private:
 	UserInterfaceRenderer mRenderer;
-	UserInterfaceInput mInput{};
-
-	uint32_t mFontPath;
-
-	void setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+	UserInterfaceInput mInput;
 
 public:
-	UserInterfaceSystem(RenderingSystem& rendering, const Window& window, std::filesystem::path fontPath);
+	UserInterfaceSystem(filament::Engine& engine);
+
+	UserInterfaceSystem(RenderingSystem& rendering);
+
+	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
+
+	void setDefaultFont(const std::span<char> fontData);
+
+	void setDefaultMaterial(const std::span<char> materialData);
+
+	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
 	void onStart();
 

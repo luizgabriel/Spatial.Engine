@@ -12,7 +12,6 @@
 #include <filesystem>
 #include <unordered_map>
 
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial
@@ -22,8 +21,9 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	: mEngine{engine},
 	  mView{toShared(createView(mEngine))},
 	  mScene{createScene(mEngine)},
-	  mCamera{createCamera(mEngine)},
-	  mMaterial{createMaterial(mEngine, "materials/ui_blit")},
+	  mCameraEntity{createEntity(mEngine)},
+	  mCamera{createCamera(mEngine, mCameraEntity.get())},
+	  mMaterial{mEngine},
 	  mEntity{createEntity(mEngine)},
 	  mTexture{createResource<filament::Texture>(mEngine, nullptr)}
 {
@@ -38,17 +38,25 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	m_imguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setup(const fs::path& fontPath)
+void UserInterfaceRenderer::setMaterial(const std::span<char> materialData)
 {
-	mTexture = imguiCreateTextureAtlas(mEngine, fontPath);
+	mMaterial = createMaterial(mEngine, materialData);
+}
+
+void UserInterfaceRenderer::setFont(const std::span<char> fontData)
+{
+	mTexture = imguiCreateTextureAtlas(mEngine, fontData);
 
 	mMaterial->setDefaultParameter("albedo",
 								   mTexture.get(),
-									{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+}
 
+void UserInterfaceRenderer::setupEngineTheme()
+{
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	auto& style = ImGui::GetStyle();
 
@@ -292,4 +300,5 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
 		m_indexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 	}
 }
+
 } // namespace spatial

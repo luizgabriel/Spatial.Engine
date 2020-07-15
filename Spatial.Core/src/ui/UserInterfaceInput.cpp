@@ -61,16 +61,6 @@ void UserInterfaceInput::setKey(Key key, KeyAction action)
 	io.KeyShift = (key == Key::LShift || key == Key::RShift) && pressed;
 	io.KeyAlt = (key == Key::LAlt || key == Key::RAlt) && pressed;
 	io.KeySuper = (key == Key::System) && pressed;
-
-	io.KeyMods = ImGuiKeyModFlags_None;
-	if (io.KeyCtrl)
-		io.KeyMods |= ImGuiKeyModFlags_Ctrl;
-	if (io.KeyShift)
-		io.KeyMods |= ImGuiKeyModFlags_Shift;
-	if (io.KeyAlt)
-		io.KeyMods |= ImGuiKeyModFlags_Alt;
-	if (io.KeySuper)
-		io.KeyMods |= ImGuiKeyModFlags_Super;
 }
 
 void UserInterfaceInput::setText(const std::string& text)

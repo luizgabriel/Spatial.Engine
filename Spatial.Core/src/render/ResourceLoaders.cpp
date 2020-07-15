@@ -1,18 +1,15 @@
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/common/Exceptions.h>
-#include <spatial/core/Asset.h>
 
 #include <filament/Fence.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <fstream>
-#include <string>
 #include <fmt/format.h>
-
-#include <spatial/common/ResourceUtils.h>
-#include <spatial/core/ResourceLoaders.h>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace filament::math;
 using namespace std::string_literals;
@@ -101,22 +98,17 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-Material createMaterial(fl::Engine& engine, std::uint32_t resourceId)
+Material createMaterial(fl::Engine& engine, const std::span<char> resourceData)
 {
-	const auto data = Asset::get(resourceId);
-	auto material = fl::Material::Builder().package(&data[0], data.size()).build(engine);
+	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
 
 	return Material{engine, material};
 }
 
-Texture createTexture(fl::Engine& engine, const fs::path& filePath)
+Texture createTexture(fl::Engine& engine, const std::span<char> resourceData)
 {
-	const auto path = Asset::absolute(filePath);
-
 	int width, height, n;
-	auto stream = createStreamFromPath(path);
-	const auto buffer = createBufferFromStream(std::move(stream));
-	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(buffer.data()), buffer.size(), &width, &height, &n, 4);
+	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(), &width, &height, &n, 4);
 
 	auto bufferDescriptor =
 		fl::Texture::PixelBufferDescriptor{data,
@@ -204,12 +196,10 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-Mesh createMesh(fl::Engine& engine, const std::filesystem::path& path)
+Mesh createMesh(fl::Engine& engine, const std::span<char> resourceData)
 {
-	const auto absolutePath = Asset::absolute(appendExtension(path, "filamesh"));
-
-	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
-	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	auto stream = std::stringstream{};
+	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));
 
 	FilameshFileHeader header;
 	stream >> header;

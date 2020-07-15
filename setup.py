@@ -41,9 +41,7 @@ def install(folder, conan_profile="default"):
 
     conan_repo("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
 
-    conan_export(vendor_path, "luizgabriel", "conan-filament", "filament/1.7.0@google/stable", "v1.7.0")
-    conan_export(vendor_path, "luizgabriel", "conan-imgui", "imgui/docking@ocornut/testing", "docking")
-    conan_export(vendor_path, "luizgabriel", "conan-tomlplusplus", "toml++/1.2.0@marzer/stable")
+    conan_export(vendor_path, "luizgabriel", "conan-filament", "filament/1.8.0@google/stable", "v1.8.0")
     conan_export(vendor_path, "skypjack", "entt", "entt/3.4.0@skypjack/stable", "v3.4.0")
 
     if conan_install(conan_path, conan_profile) == 0:

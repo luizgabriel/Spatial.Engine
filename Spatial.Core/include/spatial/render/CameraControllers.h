@@ -9,10 +9,10 @@ namespace spatial
 {
 
 template <typename ValueType>
-constexpr ValueType pi = ValueType{3.14159265359};
+constexpr ValueType pi = static_cast<ValueType>(3.14159265359L);
 
 template <typename ValueType>
-constexpr ValueType halfPi = ValueType{1.57079632679};
+constexpr ValueType halfPi = static_cast<ValueType>(1.57079632679L);
 
 struct SimpleCameraView
 {

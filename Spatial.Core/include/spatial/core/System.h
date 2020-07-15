@@ -46,7 +46,12 @@ public:
 		return *this;
 	}
 
-	auto& get()
+	S* operator->() noexcept
+	{
+		return &m_system;
+	}
+
+	auto& get() noexcept
 	{
 		return m_system;
 	}

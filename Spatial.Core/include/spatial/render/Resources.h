@@ -14,6 +14,7 @@
 
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
+#include <spatial/render/Camera.h>
 
 #include <memory>
 
@@ -25,7 +26,6 @@ using SwapChain = EngineResource<filament::SwapChain>;
 using Renderer = EngineResource<filament::Renderer>;
 using Scene = EngineResource<filament::Scene>;
 using View = EngineResource<filament::View>;
-using Camera = EngineResource<filament::Camera>;
 using Material = EngineResource<filament::Material>;
 using MaterialInstance = EngineResource<filament::MaterialInstance>;
 using Texture = EngineResource<filament::Texture>;
@@ -67,7 +67,7 @@ View createView(filament::Engine& engine) noexcept;
 /**
  * \brief Creates a scoped pointer of the filament::Camera
  */
-Camera createCamera(filament::Engine& engine) noexcept;
+Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the utils::Entity

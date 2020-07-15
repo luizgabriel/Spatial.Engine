@@ -1,20 +1,21 @@
 add_library(Spatial.Core
 	
 	## HEADERS
-	include/spatial/common/Configuration.h
+	include/spatial/assets/AggregatorLoader.h
+	include/spatial/assets/DirMapLoader.h
+	include/spatial/assets/MemoryLoader.h
+	include/spatial/assets/PhysicalDirLoader.h
+	
 	include/spatial/common/EventQueue.h
 	include/spatial/common/EventQueueUtils.h
 	include/spatial/common/Exceptions.h
 	include/spatial/common/Key.h
 	include/spatial/common/Signal.h
 	include/spatial/common/StringHelpers.h
-	include/spatial/common/ResourceUtils.h
 	
 	include/spatial/core/Application.h
 	include/spatial/core/ApplicationUtils.h
-	include/spatial/core/Asset.h
 	include/spatial/core/Clock.h
-	include/spatial/core/ConfigurationLoader.h
 	include/spatial/core/Logger.h
 	include/spatial/core/System.h
 	
@@ -36,7 +37,7 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/render/RegistryUtils.h
+	include/spatial/ecs/RegistryUtils.h
 	include/spatial/render/Mesh.h
 	
 	include/spatial/ui/ImGuiHelpers.h
@@ -48,18 +49,14 @@ add_library(Spatial.Core
 	include/spatial/ecs/RenderableSystem.h
 	include/spatial/ecs/TransformSystem.h
 	
-	include/spatial/init.h
+	include/spatial/spatial.h
 	
 	## SOURCES
 	src/common/Key.cpp
 	src/common/StringHelpers.cpp
-	src/common/Configuration.cpp
 	src/common/Exceptions.cpp
-	src/common/ResourceUtils.cpp
 	
 	src/core/Application.cpp
-	src/core/Asset.cpp
-	src/core/ConfigurationLoader.cpp
 	src/core/Logger.cpp
 	
 	src/desktop/Window.cpp
@@ -80,6 +77,7 @@ add_library(Spatial.Core
 	src/render/CameraControllers.cpp
 	src/render/SkyboxResources.cpp
 	src/render/Mesh.cpp
+	src/render/Camera.cpp
 	
 	src/ui/ImGuiHelpers.cpp
 	src/ui/UserInterfaceSystem.cpp
@@ -97,7 +95,7 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
-	PRIVATE <vector> <unordered_map> <future> <optional> <filesystem> <chrono>)
+	PRIVATE <vector> <unordered_map> <future> <optional> <filesystem> <chrono> <utility>)
 
 target_include_directories(Spatial.Core
 	PUBLIC
@@ -108,7 +106,6 @@ target_include_directories(Spatial.Core
 # LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.Core
 	PUBLIC
-	CONAN_PKG::fmt
 	CONAN_PKG::entt
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
@@ -116,7 +113,7 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::boost_tti
 	CONAN_PKG::stb
 	CONAN_PKG::sdl2
-	CONAN_PKG::toml++)
+)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
@@ -130,6 +127,7 @@ if (UNIX AND NOT APPLE)
 	find_package(Threads REQUIRED)
 	target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
 	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperLinux.cpp)
+	set_source_files_properties(src/desktop/native/WindowHelperLinux.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (WIN32)
 	message(STATUS "Detected Windows Device")
 	
@@ -137,6 +135,7 @@ elseif (WIN32)
 	
 	target_link_libraries(Spatial.Core PRIVATE Shlwapi)
 	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperWindows.cpp)
+	set_source_files_properties(src/desktop/native/WindowHelperWindows.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (APPLE)
 	message(STATUS "Detected Apple Device")
 	target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)
@@ -151,6 +150,7 @@ elseif (APPLE)
 		"-framework AudioToolbox"
 		"-framework ForceFeedback")
 	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperCocoa.mm)
+	set_source_files_properties(src/desktop/native/WindowHelperCocoa.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 else ()
 	message(FATAL_ERROR "Unsupported platform")
 endif ()

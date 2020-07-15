@@ -7,8 +7,6 @@
 #include <spatial/render/CameraControllers.h>
 #include <spatial/render/RenderingSystem.h>
 #include <entt/entity/registry.hpp>
-#include <spatial/ui/ImGuiExtensions.h>
-#include "DebugMeshSystem.h"
 #include "spatial/ecs/RenderableSystem.h"
 #include "spatial/ecs/TransformSystem.h"
 
@@ -26,28 +24,22 @@ class EditorSystem
 	};
 
 private:
-	filament::Engine& m_engine;
-	filament::Camera& m_camera;
-	filament::View& m_view;
+	filament::Engine& mEngine;
+	filament::View& mMainView;
 
-	SimpleCameraView m_cam;
-	CameraData m_cameraData;
+	Scene mScene;
+	Entity mCameraEntity;
+	Camera mCameraComponent;
+
+	SimpleCameraView mCam;
+	CameraData mCameraData;
 
 	bool showEngineGui{true};
 	bool enabledCameraController{true};
 
-	Scene m_scene;
-	Texture m_logoTexture;
-	Texture m_skyboxTexture;
-	Texture m_iblTexture;
-	IndirectLight m_indirectLight;
-	Skybox m_skybox;
-
-	entt::registry m_registry;
-	ecs::RenderableSystem m_renderableSystem;
-	ecs::DebugMeshSystem m_debugCubeSystem;
-	ecs::TransformSystem m_transformSystem;
-	MM::EntityEditor<entt::entity> m_editor;
+	entt::registry mRegistry;
+	ecs::RenderableSystem mRenderableSystem;
+	ecs::TransformSystem mTransformSystem;
 
 public:
 	explicit EditorSystem(RenderingSystem& renderingSystem);

@@ -89,6 +89,8 @@ public:
 	}
 };
 
+
+
 template <typename ResourceType>
 using SharedEngineResource = std::shared_ptr<ResourceType>;
 
