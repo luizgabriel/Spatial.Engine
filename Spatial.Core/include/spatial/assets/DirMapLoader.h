@@ -1,29 +1,27 @@
 #pragma once
 
-#include <entt/core/hashed_string.hpp>
-#include <spatial/assets/AssetReadAction.h>
+#include <spatial/assets/ResourcesLoder.h>
+#include <string>
 #include <unordered_map>
 
 namespace spatial
 {
 
-template <typename BufferType = BasicBufferType>
-struct DirMapLoader : public std::unordered_map<entt::hashed_string::hash_type, AssetReadAction<BufferType>>
+template <typename Action = assets::ResourcesLoader>
+struct DirMapLoader : public std::unordered_map<std::string, Action>
 {
-	using Base = std::unordered_map<entt::hashed_string::hash_type, std::function<bool(std::string_view, BufferType)>>;
+	using Base = std::unordered_map<std::string, Action>;
 	using HashedString = entt::hashed_string;
-	using HashedStringId = entt::hashed_string::hash_type;
 
-DirMapLoader(std::initializer_list<typename Base::value_type> args) : Base(args)
+	DirMapLoader(std::initializer_list<typename Base::value_type> args) : Base(args)
 	{
 	}
 
-	bool operator()(const std::string_view fileName, BufferType buffer) const noexcept
+	bool operator()(const std::string_view fileName, auto buffer) const noexcept
 	{
 		auto separator = fileName.find('/');
 		auto rootName = std::string{fileName.begin(), separator};
-		auto fileId = entt::hashed_string{rootName.c_str()}.value();
-		auto it = this->find(fileId);
+		auto it = this->find(rootName);
 
 		if (it != this->end())
 		{

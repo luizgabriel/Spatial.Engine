@@ -5,7 +5,7 @@
 #include <imgui.h>
 
 #include <filesystem>
-#include <span>
+#include <string_view>
 
 namespace spatial
 {
@@ -43,9 +43,9 @@ public:
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
-	void setMaterial(const std::span<char> materialData);
+	void setMaterial(const std::string_view materialData);
 
-	void setFont(const std::span<char> fontData);
+	void setFont(const std::string_view fontData);
 
 	void setupEngineTheme();
 

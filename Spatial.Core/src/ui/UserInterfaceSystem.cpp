@@ -20,12 +20,12 @@ UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Windo
 	setViewport(window.getWindowSize(), window.getFrameBufferSize());
 }
 
-void UserInterfaceSystem::setDefaultFont(const std::span<char> fontData)
+void UserInterfaceSystem::setDefaultFont(const std::string_view fontData)
 {
 	mRenderer.setFont(fontData);
 }
 
-void UserInterfaceSystem::setDefaultMaterial(const std::span<char> materialData)
+void UserInterfaceSystem::setDefaultMaterial(const std::string_view materialData)
 {
 	mRenderer.setMaterial(materialData);
 }

@@ -3,8 +3,6 @@
 #include <filament/IndexBuffer.h>
 #include <filament/VertexBuffer.h>
 
-#include <span>
-
 namespace fs = std::filesystem;
 namespace fl = filament;
 
@@ -75,7 +73,7 @@ uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect)
 		   (static_cast<uint64_t>(width) << 32ull) | (static_cast<uint64_t>(height) << 48ull);
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::span<char> resourceData)
+Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string_view resourceData)
 {
 	auto& io = ImGui::GetIO();
 

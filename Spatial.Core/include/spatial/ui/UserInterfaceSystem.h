@@ -26,9 +26,9 @@ public:
 
 	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
 
-	void setDefaultFont(const std::span<char> fontData);
+	void setDefaultFont(const std::string_view fontData);
 
-	void setDefaultMaterial(const std::span<char> materialData);
+	void setDefaultMaterial(const std::string_view materialData);
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 

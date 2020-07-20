@@ -1,14 +1,15 @@
 #pragma once
 
+#include <entt/entity/registry.hpp>
+#include <spatial/assets/ResourcesLoder.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/render/Resources.h>
-#include <spatial/render/Entity.h>
+#include <spatial/ecs/RenderableSystem.h>
+#include <spatial/ecs/TransformSystem.h>
 #include <spatial/render/CameraControllers.h>
+#include <spatial/render/Entity.h>
 #include <spatial/render/RenderingSystem.h>
-#include <entt/entity/registry.hpp>
-#include "spatial/ecs/RenderableSystem.h"
-#include "spatial/ecs/TransformSystem.h"
+#include <spatial/render/Resources.h>
 
 namespace fl = filament;
 
@@ -24,12 +25,14 @@ class EditorSystem
 	};
 
 private:
+	const assets::ResourcesLoader& mResources;
 	filament::Engine& mEngine;
 	filament::View& mMainView;
 
 	Scene mScene;
 	Entity mCameraEntity;
 	Camera mCameraComponent;
+	Material mDefaultMaterial;
 
 	SimpleCameraView mCam;
 	CameraData mCameraData;
@@ -42,7 +45,7 @@ private:
 	ecs::TransformSystem mTransformSystem;
 
 public:
-	explicit EditorSystem(RenderingSystem& renderingSystem);
+	EditorSystem(const assets::ResourcesLoader& resources, RenderingSystem& renderingSystem);
 
 	void onEvent(const MouseMovedEvent& e);
 

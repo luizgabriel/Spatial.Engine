@@ -9,17 +9,17 @@
 namespace spatial
 {
 
-Texture createKtxTexture(filament::Engine& engine, const std::span<char> resourceData);
+Texture createKtxTexture(filament::Engine& engine, const std::string_view resourceData);
 
 using bands_t = std::array<filament::math::float3, 9>;
 
-bands_t parseShFile(const std::span<char> resourceData);
+bands_t parseShFile(const std::string_view resourceData);
 
 Skybox createSkybox(filament::Engine& engine, filament::Texture& skybox, bool showSun = true);
 
 IndirectLight createImageBasedLight(filament::Engine& engine,
 									filament::Texture& cubemap,
-									const std::span<char> shResourceData,
+									const std::string_view shResourceData,
 									float intensity = 30000.0f);
 
 IndirectLight createImageBasedLight(filament::Engine& engine,

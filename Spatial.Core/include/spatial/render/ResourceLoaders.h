@@ -10,7 +10,7 @@
 #include <math/vec2.h>
 #include <math/vec3.h>
 #include <math/vec4.h>
-#include <span>
+#include <string_view>
 #include <spatial/render/Mesh.h>
 
 namespace spatial
@@ -18,10 +18,10 @@ namespace spatial
 
 using materials_map_t = std::unordered_map<std::string, filament::MaterialInstance*>;
 
-Material createMaterial(filament::Engine& engine, const std::span<char> resourceData);
+Material createMaterial(filament::Engine& engine, const std::string_view resourceData);
 
-Texture createTexture(filament::Engine& engine, const std::span<char> resourceData);
+Texture createTexture(filament::Engine& engine, const std::string_view resourceData);
 
-Mesh createMesh(filament::Engine& engine, const std::span<char> resourceData);
+Mesh createMesh(filament::Engine& engine, const std::string_view resourceData);
 
 } // namespace spatial

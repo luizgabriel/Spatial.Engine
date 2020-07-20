@@ -12,19 +12,23 @@
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 
+#include <spatial/assets/AssetReaderUtils.h>
+
 namespace fl = filament;
 using namespace filament::math;
 
 namespace spatial
 {
 
-EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
-	: mEngine{renderingSystem.getEngine()},
+EditorSystem::EditorSystem(const assets::ResourcesLoader& resources, RenderingSystem& renderingSystem)
+	: mResources{resources},
+	  mEngine{renderingSystem.getEngine()},
 	  mMainView{renderingSystem.getMainView()},
 
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
 	  mCameraComponent{createCamera(mEngine, mCameraEntity.get())},
+	  mDefaultMaterial{mEngine},
 
 	  mCam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
 	  mCameraData{.5f, 500.0f},
@@ -34,6 +38,9 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem)
 	  mTransformSystem{mEngine}
 {
 	mMainView.setScene(mScene.get());
+
+	auto materialData = assets::read(mResources, "editor/materials/default.filamat").value();
+	mDefaultMaterial = createMaterial(mEngine, {materialData.data(), materialData.size()});
 
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Transform>(entity);

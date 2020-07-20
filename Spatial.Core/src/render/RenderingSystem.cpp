@@ -12,7 +12,7 @@ RenderingSystem::RenderingSystem(const bk::Backend backend, void* nativeWindowHa
 	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
 	  mRenderer{createRenderer(getEngine())},
 	  mMainView{toShared(createView(getEngine()))},
-	  mViews{5}
+	  mViews{}
 {
 	pushBackView(mMainView);
 }
@@ -23,10 +23,19 @@ RenderingSystem::RenderingSystem(const filament::backend::Backend backend, const
 	setupViewport(window.getFrameBufferSize());
 }
 
-void RenderingSystem::onEndFrame()
+void RenderingSystem::onStart()
+{
+	mViews.shrink_to_fit();
+	clearExpiredViews();
+}
+
+void RenderingSystem::onFinish()
 {
 	clearExpiredViews();
+}
 
+void RenderingSystem::onEndFrame()
+{
 	if (mRenderer->beginFrame(mSwapChain.get()))
 	{
 		for (const auto& view : mViews)

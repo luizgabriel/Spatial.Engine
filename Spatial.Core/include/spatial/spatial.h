@@ -2,7 +2,7 @@
 
 #include <entt/core/hashed_string.hpp>
 #include <spatial/assets/AggregatorLoader.h>
-#include <spatial/assets/AsyncDiskOperations.h>
+#include <spatial/assets/AssetReaderUtils.h>
 #include <spatial/assets/DirMapLoader.h>
 #include <spatial/assets/MemoryLoader.h>
 #include <spatial/assets/PhysicalDirLoader.h>

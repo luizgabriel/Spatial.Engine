@@ -7,7 +7,6 @@
 namespace spatial
 {
 
-template <typename BufferType = BasicBufferType>
 class PhysicalDirLoader
 {
   public:
@@ -16,7 +15,7 @@ class PhysicalDirLoader
 	{
 	}
 
-	bool operator()(const std::string_view fileName, BufferType buffer) const noexcept
+	bool operator()(const std::string_view fileName, auto buffer) const noexcept
 	{
 		auto fs = std::fstream{mRootPath / fileName};
 		if (!fs)

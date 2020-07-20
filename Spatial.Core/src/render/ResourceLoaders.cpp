@@ -98,14 +98,14 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-Material createMaterial(fl::Engine& engine, const std::span<char> resourceData)
+Material createMaterial(fl::Engine& engine, const std::string_view resourceData)
 {
 	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
 
 	return Material{engine, material};
 }
 
-Texture createTexture(fl::Engine& engine, const std::span<char> resourceData)
+Texture createTexture(fl::Engine& engine, const std::string_view resourceData)
 {
 	int width, height, n;
 	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(), &width, &height, &n, 4);
@@ -196,7 +196,7 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-Mesh createMesh(fl::Engine& engine, const std::span<char> resourceData)
+Mesh createMesh(fl::Engine& engine, const std::string_view resourceData)
 {
 	auto stream = std::stringstream{};
 	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));

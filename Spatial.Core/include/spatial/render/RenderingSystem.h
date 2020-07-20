@@ -30,6 +30,10 @@ public:
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
+	void onStart();
+
+	void onFinish();
+
 	void setupViewport(const std::pair<int, int>& frameBufferSize);
 
 	void onEndFrame();

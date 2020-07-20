@@ -38,12 +38,12 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	m_imguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const std::span<char> materialData)
+void UserInterfaceRenderer::setMaterial(const std::string_view materialData)
 {
 	mMaterial = createMaterial(mEngine, materialData);
 }
 
-void UserInterfaceRenderer::setFont(const std::span<char> fontData)
+void UserInterfaceRenderer::setFont(const std::string_view fontData)
 {
 	mTexture = imguiCreateTextureAtlas(mEngine, fontData);
 
