@@ -3,6 +3,6 @@
 namespace spatial
 {
 
-InputState Input::s_inputState{};
+InputState Input::sInputState{};
 
 }

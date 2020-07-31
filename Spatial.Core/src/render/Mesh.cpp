@@ -5,7 +5,8 @@ namespace fl = filament;
 namespace spatial
 {
 
-Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, fl::Box boundingBox, size_t numParts)
+Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, fl::Box boundingBox,
+		   size_t numParts)
 	: m_engine{engine},
 	  m_vertexBuffer{std::move(vertexBuffer)},
 	  m_indexBuffer{std::move(indexBuffer)},
@@ -26,10 +27,10 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 	builder.boundingBox(boundingBox());
 
 	size_t index{};
-	for (auto& part : m_parts) {
-		builder.geometry(index, fl::RenderableManager::PrimitiveType::TRIANGLES,
-						 getVertexBuffer().get(), getIndexBuffer().get(), part.offset,
-						 part.minIndex, part.maxIndex, part.indexCount);
+	for (auto& part : m_parts)
+	{
+		builder.geometry(index, fl::RenderableManager::PrimitiveType::TRIANGLES, getVertexBuffer().get(),
+						 getIndexBuffer().get(), part.offset, part.minIndex, part.maxIndex, part.indexCount);
 
 		if (map.find(part.materialName) != map.end())
 			builder.material(index, map.at(part.materialName));
@@ -42,4 +43,4 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 	builder.build(getEngine(), entity);
 }
 
-}
+} // namespace spatial

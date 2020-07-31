@@ -1,54 +1,61 @@
-#include <spatial/ui/UserInterfaceRenderer.h>
 #include <spatial/ui/ImGuiHelpers.h>
+#include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <spatial/render/ResourceLoaders.h>
 
-#include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
 #include <filament/TextureSampler.h>
+#include <filament/VertexBuffer.h>
 #include <filament/Viewport.h>
 
 #include <filesystem>
 #include <unordered_map>
 
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial
 {
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
-	: m_engine{engine},
-	  m_view{toShared(createView(m_engine))},
-	  m_scene{createScene(m_engine)},
-	  m_camera{createCamera(m_engine)},
-	  m_material{createMaterial(m_engine, "materials/ui_blit")},
-	  m_entity{createEntity(m_engine)},
-	  m_texture{createResource<filament::Texture>(m_engine, nullptr)}
+	: mEngine{engine},
+	  mView{toShared(createView(mEngine))},
+	  mScene{createScene(mEngine)},
+	  mCameraEntity{createEntity(mEngine)},
+	  mCamera{createCamera(mEngine, mCameraEntity.get())},
+	  mMaterial{mEngine},
+	  mEntity{createEntity(mEngine)},
+	  mTexture{createResource<filament::Texture>(mEngine, nullptr)}
 {
-	m_view->setCamera(m_camera.get());
-	m_view->setScene(m_scene.get());
-	m_scene->addEntity(m_entity.get());
+	mView->setCamera(mCamera.get());
+	mView->setScene(mScene.get());
+	mScene->addEntity(mEntity.get());
 
-	m_view->setPostProcessingEnabled(false);
-	m_view->setBlendMode(filament::View::BlendMode::TRANSLUCENT);
-	m_view->setShadowsEnabled(false);
+	mView->setPostProcessingEnabled(false);
+	mView->setBlendMode(filament::View::BlendMode::TRANSLUCENT);
+	mView->setShadowsEnabled(false);
 
 	m_imguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setup(const fs::path& fontPath)
+void UserInterfaceRenderer::setMaterial(const std::vector<char>& materialData)
 {
-	m_texture = imguiCreateTextureAtlas(m_engine, fontPath);
+	mMaterial = createMaterial(mEngine, materialData);
+}
 
-	m_material->setDefaultParameter("albedo",
-									m_texture.get(),
-									{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+void UserInterfaceRenderer::setFont(const std::vector<char>& fontData)
+{
+	mTexture = imguiCreateTextureAtlas(mEngine, fontData);
 
+	mMaterial->setDefaultParameter("albedo", mTexture.get(),
+								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+}
+
+void UserInterfaceRenderer::setupEngineTheme()
+{
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	// io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	auto& style = ImGui::GetStyle();
 
@@ -104,7 +111,8 @@ UserInterfaceRenderer::~UserInterfaceRenderer()
 	ImGui::DestroyContext(m_imguiContext);
 }
 
-void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
+void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
+										const std::pair<int, int>& frameBufferSize)
 {
 	const auto [w, h] = windowSize;
 	const auto [fw, fh] = frameBufferSize;
@@ -112,8 +120,8 @@ void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize, c
 	const auto dpiScaleX = static_cast<float>(fw) / w;
 	const auto dpiScaleY = static_cast<float>(fh) / h;
 
-	m_view->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
-	m_camera->setProjection(fl::Camera::Projection::ORTHO, 0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
+	mView->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
+	mCamera->setProjection(fl::Camera::Projection::ORTHO, 0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
 
 	const auto scaleX = w > 0 ? static_cast<float>(fw) / w : 0;
 	const auto scaleY = h > 0 ? static_cast<float>(fh) / h : 0;
@@ -141,7 +149,7 @@ void UserInterfaceRenderer::dispatchCommands()
 void UserInterfaceRenderer::renderDrawData()
 {
 	auto imguiData = ImGui::GetDrawData();
-	auto& rcm = m_engine.getRenderableManager();
+	auto& rcm = mEngine.getRenderableManager();
 	auto& io = ImGui::GetIO();
 	auto [fbWidth, fbHeight] = imguiGetFrameSize();
 
@@ -185,7 +193,7 @@ void UserInterfaceRenderer::renderDrawData()
 	}
 
 	// Recreate the Renderable component and point it to the vertex buffers.
-	rcm.destroy(m_entity.get());
+	rcm.destroy(mEntity.get());
 	int bufferIndex = 0;
 	int primIndex = 0;
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
@@ -206,11 +214,8 @@ void UserInterfaceRenderer::renderDrawData()
 				auto mIter = scissorRects.find(sKey);
 				assert(mIter != scissorRects.end());
 				rBuilder
-					.geometry(primIndex,
-							  fl::RenderableManager::PrimitiveType::TRIANGLES,
-							  m_vertexBuffers[bufferIndex].get(),
-							  m_indexBuffers[bufferIndex].get(),
-							  indexOffset,
+					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
+							  m_vertexBuffers[bufferIndex].get(), m_indexBuffers[bufferIndex].get(), indexOffset,
 							  pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, mIter->second);
@@ -224,7 +229,7 @@ void UserInterfaceRenderer::renderDrawData()
 
 	if (imguiData->CmdListsCount > 0)
 	{
-		rBuilder.build(m_engine, m_entity.get());
+		rBuilder.build(mEngine, mEntity.get());
 	}
 }
 
@@ -237,7 +242,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 		for (size_t i = previousSize; i < m_vertexBuffers.size(); i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_vertexBuffers[i] = imguiCreateVertexBuffer(m_engine, 1000);
+			m_vertexBuffers[i] = imguiCreateVertexBuffer(mEngine, 1000);
 		}
 	}
 
@@ -248,7 +253,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 		for (size_t i = previousSize; i < m_indexBuffers.size(); i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_indexBuffers[i] = imguiCreateIndexBuffer(m_engine, 5000);
+			m_indexBuffers[i] = imguiCreateIndexBuffer(mEngine, 5000);
 		}
 	}
 }
@@ -261,13 +266,12 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 		m_materialInstances.resize(numRequiredInstances);
 		for (size_t i = previousSize; i < m_materialInstances.size(); i++)
 		{
-			m_materialInstances[i] = createSharedResource(m_engine, m_material->createInstance());
+			m_materialInstances[i] = createSharedResource(mEngine, mMaterial->createInstance());
 		}
 	}
 }
 
-void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
-											   const ImVector<ImDrawVert>& vb,
+void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
 											   const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
@@ -275,10 +279,10 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
 	{
 		const size_t capacityVertCount = m_vertexBuffers[bufferIndex]->getVertexCount();
 		if (static_cast<size_t>(vb.Size) > capacityVertCount)
-			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(m_engine, vb.Size);
+			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(mEngine, vb.Size);
 
 		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
-		m_vertexBuffers[bufferIndex]->setBufferAt(m_engine, 0, std::move(vbDescriptor));
+		m_vertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
 	}
 
 	// Create a new index buffer if the size isn't large enough, then copy the ImGui data into
@@ -286,10 +290,11 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
 	{
 		const size_t capacityIndexCount = m_indexBuffers[bufferIndex]->getIndexCount();
 		if (static_cast<size_t>(ib.Size) > capacityIndexCount)
-			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(m_engine, ib.Size);
+			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(mEngine, ib.Size);
 
 		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);
-		m_indexBuffers[bufferIndex]->setBuffer(m_engine, std::move(ibDescriptor));
+		m_indexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 	}
 }
+
 } // namespace spatial

@@ -3,28 +3,25 @@
 namespace spatial
 {
 
-std::vector<std::string_view> split(const std::string_view str, const char separator)
+std::vector<std::string_view> split(std::string_view value, char separator)
 {
-	std::vector<std::string_view> arr{2};
-	std::size_t start = 0, end = 0;
+	std::vector<std::string_view> output;
+	size_t first = 0;
 
-	for (size_t i = 0; i < str.length() && end != std::string_view::npos; i++)
+	while (first < value.size())
 	{
-		end = std::string_view::npos;
-		for (auto j = start; j < str.length(); j++)
-		{
-			if (str[j] == separator)
-			{
-				end = j;
-				break;
-			}
-		}
+		const auto second = value.find_first_of(separator, first);
 
-		arr[i] = str.substr(start, end - start);
-		start = end + 1;
+		if (first != second)
+			output.emplace_back(value.substr(first, second - first));
+
+		if (second == std::string_view::npos)
+			break;
+
+		first = second + 1;
 	}
 
-	return arr;
+	return output;
 }
 
 } // namespace spatial

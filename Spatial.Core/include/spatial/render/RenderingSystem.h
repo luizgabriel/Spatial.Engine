@@ -16,26 +16,26 @@ namespace spatial
 {
 class RenderingSystem
 {
-private:
-	Engine m_engine;
-	SwapChain m_swapChain;
-	Renderer m_renderer;
+  private:
+	Engine mEngine;
+	SwapChain mSwapChain;
+	Renderer mRenderer;
+	SharedView mMainView;
 
-	Camera m_mainCamera;
-	SharedView m_mainView;
+	std::deque<std::weak_ptr<filament::View>> mViews;
 
-	std::deque<std::weak_ptr<filament::View>> m_views;
-
-	void setupViewport(const std::pair<int, int>& frameBufferSize);
-
-public:
-	explicit RenderingSystem(const Window& window);
-	RenderingSystem(const Window& window, filament::backend::Backend backend);
+  public:
+	RenderingSystem(const filament::backend::Backend backend, void* nativeWindowHandle);
+	RenderingSystem(const filament::backend::Backend backend, const Window& window);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
 	void onStart();
+
+	void onFinish();
+
+	void setupViewport(const std::pair<int, int>& frameBufferSize);
 
 	void onEndFrame();
 
@@ -64,36 +64,26 @@ public:
 	// region Getters
 	[[nodiscard]] const auto& getEngine() const
 	{
-		return *m_engine.get();
+		return *mEngine.get();
 	}
 
 	[[nodiscard]] const filament::View& getMainView() const
 	{
-		return *m_mainView.get();
-	}
-
-	[[nodiscard]] const filament::Camera& getMainCamera() const
-	{
-		return *m_mainCamera.get();
+		return *mMainView.get();
 	}
 
 	auto& getEngine()
 	{
-		return *m_engine.get();
+		return *mEngine.get();
 	}
 
 	auto& getMainView()
 	{
-		return *m_mainView.get();
-	}
-
-	auto& getMainCamera()
-	{
-		return *m_mainCamera.get();
+		return *mMainView.get();
 	}
 	// endregion
 
-private:
+  private:
 	void clearExpiredViews() noexcept;
 };
 } // namespace spatial

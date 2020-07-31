@@ -1,25 +1,27 @@
 #pragma once
 
+#include <imgui.h>
 #include <spatial/render/Resources.h>
 #include <vector>
-#include <imgui.h>
 
 #include <filesystem>
+#include <string_view>
 
 namespace spatial
 {
 
 class UserInterfaceRenderer
 {
-private:
-	filament::Engine& m_engine;
+  private:
+	filament::Engine& mEngine;
 
-	SharedView m_view;
-	Scene m_scene;
-	Camera m_camera;
-	Material m_material;
-	Entity m_entity;
-	Texture m_texture;
+	SharedView mView;
+	Scene mScene;
+	Entity mCameraEntity;
+	Camera mCamera;
+	Material mMaterial;
+	Entity mEntity;
+	Texture mTexture;
 
 	std::vector<SharedVertexBuffer> m_vertexBuffers;
 	std::vector<SharedIndexBuffer> m_indexBuffers;
@@ -32,7 +34,7 @@ private:
 	void createMaterialInstances(size_t numRequiredInstances);
 	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
 
-public:
+  public:
 	explicit UserInterfaceRenderer(filament::Engine& engine);
 	~UserInterfaceRenderer();
 
@@ -41,10 +43,11 @@ public:
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
-	/**
-	 * \brief Should be called when applications runs
-	 */
-	void setup(const std::filesystem::path& fontPath);
+	void setMaterial(const std::vector<char>& materialData);
+
+	void setFont(const std::vector<char>& fontData);
+
+	void setupEngineTheme();
 
 	/**
 	 * \brief Should be called every frame start
@@ -60,7 +63,7 @@ public:
 	// region Getters
 	auto& getView()
 	{
-		return m_view;
+		return mView;
 	}
 	// endregion
 };

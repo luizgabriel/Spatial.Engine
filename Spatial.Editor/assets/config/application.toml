@@ -1,7 +1,0 @@
-[window]
-	title = "Spatial Engine"
-	width = 1280
-	height = 720
-
-[ui]
-	font-path = "fonts/Roboto-Medium.ttf"

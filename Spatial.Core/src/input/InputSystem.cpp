@@ -1,35 +1,38 @@
-#include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
+#include <spatial/input/InputSystem.h>
 
 namespace spatial
 {
 
-InputSystem::InputSystem(Window* window) : m_window{window}
+InputSystem::InputSystem(Window& window) : mWindow{window}
 {
 }
 
-void InputSystem::onStartFrame(float delta)
+void InputSystem::onStartFrame(float)
 {
-	if (Input::s_inputState.isMouseWarpRequested())
+	if (Input::sInputState.isMouseWarpRequested())
 	{
 		auto mousePos = Input::mouse();
-		auto [windowWidth, windowHeight] = m_window->getWindowSize();
-		m_window->warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
+		auto [windowWidth, windowHeight] = mWindow.getWindowSize();
+		mWindow.warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
 	}
+}
 
-	Input::s_inputState.reset();
+void InputSystem::onEndFrame()
+{
+	Input::sInputState.reset();
 }
 
 void InputSystem::onEvent(const MouseMovedEvent& event)
 {
-	auto [windowWidth, windowHeight] = m_window->getWindowSize();
-	Input::s_inputState.setMousePosition({event.x / windowWidth, event.y / windowHeight});
+	auto [windowWidth, windowHeight] = mWindow.getWindowSize();
+	Input::sInputState.setMousePosition({event.x / windowWidth, event.y / windowHeight});
 }
 
 void InputSystem::onEvent(const KeyEvent& event)
 {
 	const auto key = event.key;
-	Input::s_inputState.set(key, event.action);
+	Input::sInputState.set(key, event.action);
 }
 
 void InputSystem::onEvent(const TextEvent& event)

@@ -8,10 +8,11 @@ namespace spatial
 template <typename Precision = float>
 class Clock
 {
-public:
+  public:
 	using delta_t = std::chrono::duration<Precision>;
 
-	Clock() : m_timeStep(std::chrono::steady_clock::duration::zero()), m_lastTime(std::chrono::steady_clock::now()), m_lag()
+	Clock()
+		: m_timeStep(std::chrono::steady_clock::duration::zero()), m_lastTime(std::chrono::steady_clock::now()), m_lag()
 	{
 	}
 
@@ -43,7 +44,7 @@ public:
 		return std::chrono::duration_cast<delta_t>(m_timeStep);
 	}
 
-private:
+  private:
 	std::chrono::steady_clock::duration m_timeStep;
 	std::chrono::steady_clock::time_point m_lastTime;
 	Precision m_lag;

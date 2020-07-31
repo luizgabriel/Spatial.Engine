@@ -1,15 +1,14 @@
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/common/Exceptions.h>
-#include <spatial/core/Asset.h>
 
 #include <filament/Fence.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
-#include <fmt/format.h>
 
 using namespace filament::math;
 using namespace std::string_literals;
@@ -98,49 +97,32 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-fs::path appendExtension(const fs::path& path, const std::string& extension)
+Material createMaterial(fl::Engine& engine, const std::vector<char>& resourceData)
 {
-	return path.parent_path() / (path.filename().generic_string() + "." + extension);
-}
-
-Material createMaterial(fl::Engine& engine, const fs::path& filePath)
-{
-	const auto absolutePath = Asset::absolute(appendExtension(filePath, "filamat"));
-
-	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
-	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	const auto iterator = std::istreambuf_iterator<char>{stream};
-	const auto data = std::vector<char>{iterator, {}};
-
-	auto material = fl::Material::Builder().package(&data[0], data.size()).build(engine);
+	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
 
 	return Material{engine, material};
 }
 
-Texture createTexture(fl::Engine& engine, const fs::path& filePath)
+Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData)
 {
-	const auto path = Asset::absolute(filePath);
-
 	int width, height, n;
-	const auto data = stbi_load(path.generic_string().c_str(), &width, &height, &n, 4);
+	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(),
+											&width, &height, &n, 4);
 
-	auto buffer =
-		fl::Texture::PixelBufferDescriptor{data,
-										   size_t(width) * height * 4,
-										   fl::Texture::Format::RGBA,
-										   fl::Texture::Type::UBYTE,
-										   reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
+	auto bufferDescriptor = fl::Texture::PixelBufferDescriptor{
+		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
+		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	auto texture = fl::Texture::Builder()
-							 .width(uint32_t(width))
-							 .height(uint32_t(height))
-							 .levels(1)
-							 .sampler(fl::Texture::Sampler::SAMPLER_2D)
-							 .format(fl::Texture::InternalFormat::RGBA8)
-							 .build(engine);
+					   .width(uint32_t(width))
+					   .height(uint32_t(height))
+					   .levels(1)
+					   .sampler(fl::Texture::Sampler::SAMPLER_2D)
+					   .format(fl::Texture::InternalFormat::RGBA8)
+					   .build(engine);
 
-	texture->setImage(engine, 0, std::move(buffer));
+	texture->setImage(engine, 0, std::move(bufferDescriptor));
 
 	return Texture{engine, texture};
 }
@@ -161,25 +143,17 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 						 .bufferCount(1)
 						 .normalized(filament::TANGENTS)
 						 .normalized(filament::COLOR)
-						 .attribute(filament::POSITION,
-									0,
-									fl::VertexBuffer::AttributeType::HALF4,
-									header.offsetPosition,
-									static_cast<uint8_t>(header.stridePosition))
-						 .attribute(filament::TANGENTS,
-									0,
-									fl::VertexBuffer::AttributeType::SHORT4,
-									header.offsetTangents,
-									static_cast<uint8_t>(header.strideTangents))
-						 .attribute(filament::COLOR,
-									0,
-									fl::VertexBuffer::AttributeType::UBYTE4,
-									header.offsetColor,
+						 .attribute(filament::POSITION, 0, fl::VertexBuffer::AttributeType::HALF4,
+									header.offsetPosition, static_cast<uint8_t>(header.stridePosition))
+						 .attribute(filament::TANGENTS, 0, fl::VertexBuffer::AttributeType::SHORT4,
+									header.offsetTangents, static_cast<uint8_t>(header.strideTangents))
+						 .attribute(filament::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4, header.offsetColor,
 									static_cast<uint8_t>(header.strideColor))
 						 .attribute(filament::UV0, 0, uvType, header.offsetUV0, static_cast<uint8_t>(header.strideUV0))
 						 .normalized(filament::UV0, uvNormalized);
 
-	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max() && header.strideUV1 != std::numeric_limits<uint32_t>::max())
+	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max() &&
+		header.strideUV1 != std::numeric_limits<uint32_t>::max())
 	{
 		vbBuilder.attribute(filament::UV1, 0, uvType, header.offsetUV1, static_cast<uint8_t>(header.strideUV1))
 			.normalized(filament::UV1, uvNormalized);
@@ -197,9 +171,10 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 
 IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& indices)
 {
-	auto ibBuilder = fl::IndexBuffer::Builder()
-						 .indexCount(header.indexCount)
-						 .bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
+	auto ibBuilder =
+		fl::IndexBuffer::Builder()
+			.indexCount(header.indexCount)
+			.bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
 
 	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
 
@@ -211,12 +186,10 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-Mesh createMesh(fl::Engine& engine, const std::filesystem::path& path)
+Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 {
-	const auto absolutePath = Asset::absolute(appendExtension(path, "filamesh"));
-
-	auto stream = std::ifstream{absolutePath, std::ios_base::in | std::ios_base::binary};
-	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	auto stream = std::stringstream{};
+	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));
 
 	FilameshFileHeader header;
 	stream >> header;

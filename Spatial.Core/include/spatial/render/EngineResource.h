@@ -15,11 +15,11 @@ namespace spatial
 template <typename ResourceType>
 class EngineResource
 {
-private:
+  private:
 	filament::Engine& m_engine;
 	ResourceType* m_resource;
 
-public:
+  public:
 	explicit EngineResource(fl::Engine& engine, ResourceType* resource = nullptr) noexcept
 		: m_engine{engine}, m_resource{resource}
 	{

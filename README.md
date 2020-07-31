@@ -23,4 +23,3 @@ Spatial is a cross-platform C++ game engine created on top off google's [filamen
     </td>
   </tr>
 </table>
-

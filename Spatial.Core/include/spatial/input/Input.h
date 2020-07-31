@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/input/InputState.h>
 #include <math/vec2.h>
+#include <spatial/input/InputState.h>
 
 namespace spatial
 {
@@ -10,18 +10,18 @@ class InputSystem;
 
 class Input
 {
-private:
-	static InputState s_inputState;
+  private:
+	static InputState sInputState;
 
-public:
+  public:
 	static filament::math::float2 mouse()
 	{
-		return s_inputState.getCurrentPosition();
+		return sInputState.getCurrentPosition();
 	}
 
 	static filament::math::float2 lastMouse()
 	{
-		return s_inputState.getLastPosition();
+		return sInputState.getLastPosition();
 	}
 
 	static filament::math::float2 offset()
@@ -31,23 +31,23 @@ public:
 
 	static void warpMouse(filament::math::float2 position)
 	{
-		s_inputState.warpMouseInWindow(position);
+		sInputState.warpMouseInWindow(position);
 	}
 
 	static bool pressed(Key key)
 	{
-		return s_inputState.pressed(key);
+		return sInputState.pressed(key);
 	}
 
 	template <typename... Args>
 	static bool combined(Args... keys)
 	{
-		return s_inputState.combined(keys...);
+		return sInputState.combined(keys...);
 	}
 
 	static bool released(Key key)
 	{
-		return s_inputState.released(key);
+		return sInputState.released(key);
 	}
 
 	static float axis(Key positive, Key negative)

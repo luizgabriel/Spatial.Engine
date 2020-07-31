@@ -1,18 +1,18 @@
 #pragma once
 
+#include <filament/Camera.h>
+#include <math/mat4.h>
 #include <math/vec2.h>
 #include <math/vec3.h>
-#include <math/mat4.h>
-#include <filament/Camera.h>
 
 namespace spatial
 {
 
 template <typename ValueType>
-constexpr ValueType pi = ValueType{3.14159265359};
+constexpr ValueType pi = static_cast<ValueType>(3.14159265359L);
 
 template <typename ValueType>
-constexpr ValueType halfPi = ValueType{1.57079632679};
+constexpr ValueType halfPi = static_cast<ValueType>(1.57079632679L);
 
 struct SimpleCameraView
 {

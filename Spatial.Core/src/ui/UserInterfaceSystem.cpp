@@ -1,58 +1,73 @@
 #include <spatial/ui/UserInterfaceSystem.h>
 
-#include <utility>
-
-namespace fs = std::filesystem;
-
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window, fs::path fontPath)
-	: m_renderer{rendering.getEngine()}, m_fontPath{std::move(fontPath)}
+UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{engine}, mInput{}
 {
-	setupViewport(window.getWindowSize(), window.getFrameBufferSize());
+}
+
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering) : UserInterfaceSystem(rendering.getEngine())
+{
 	rendering.pushFrontView(getView());
+}
+
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window)
+	: UserInterfaceSystem(rendering)
+{
+	setViewport(window.getWindowSize(), window.getFrameBufferSize());
+}
+
+void UserInterfaceSystem::setDefaultFont(const std::vector<char>& fontData)
+{
+	mRenderer.setFont(fontData);
+}
+
+void UserInterfaceSystem::setDefaultMaterial(const std::vector<char>& materialData)
+{
+	mRenderer.setMaterial(materialData);
 }
 
 void UserInterfaceSystem::onStart()
 {
-	m_renderer.setup(m_fontPath);
-	m_input.setup();
+	mRenderer.setupEngineTheme();
+	mInput.setup();
 }
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 {
-	setupViewport(event.windowSize, event.frameBufferSize);
+	setViewport(event.windowSize, event.frameBufferSize);
 }
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
 {
-	m_input.setMousePosition({event.x, event.y});
+	mInput.setMousePosition({event.x, event.y});
 }
 
 void UserInterfaceSystem::onEvent(const KeyEvent& event)
 {
-	m_input.setKey(event.key, event.action);
+	mInput.setKey(event.key, event.action);
 }
 
 void UserInterfaceSystem::onEvent(const TextEvent& event)
 {
-	m_input.setText(event.text);
+	mInput.setText(event.text);
 }
 
-void UserInterfaceSystem::setupViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
+void UserInterfaceSystem::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
 {
-	m_renderer.setViewport(windowSize, frameBufferSize);
+	mRenderer.setViewport(windowSize, frameBufferSize);
 }
 
 void UserInterfaceSystem::onStartFrame(float delta)
 {
-	m_renderer.beforeRender(delta);
+	mRenderer.beforeRender(delta);
 }
 
-void UserInterfaceSystem::onEndGuiFrame()
+void UserInterfaceSystem::onEndFrame()
 {
-	m_renderer.dispatchCommands();
+	mRenderGuiSignal();
+	mRenderer.dispatchCommands();
 }
 
 } // namespace spatial

@@ -1,17 +1,18 @@
 #pragma once
 
-#include <filament/Engine.h>
-#include <filament/Renderer.h>
-#include <filament/Material.h>
-#include <filament/Scene.h>
-#include <filament/View.h>
 #include <filament/Camera.h>
-#include <filament/Texture.h>
-#include <filament/IndirectLight.h>
-#include <filament/Skybox.h>
+#include <filament/Engine.h>
 #include <filament/IndexBuffer.h>
+#include <filament/IndirectLight.h>
+#include <filament/Material.h>
+#include <filament/Renderer.h>
+#include <filament/Scene.h>
+#include <filament/Skybox.h>
+#include <filament/Texture.h>
 #include <filament/VertexBuffer.h>
+#include <filament/View.h>
 
+#include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
 
@@ -25,7 +26,6 @@ using SwapChain = EngineResource<filament::SwapChain>;
 using Renderer = EngineResource<filament::Renderer>;
 using Scene = EngineResource<filament::Scene>;
 using View = EngineResource<filament::View>;
-using Camera = EngineResource<filament::Camera>;
 using Material = EngineResource<filament::Material>;
 using MaterialInstance = EngineResource<filament::MaterialInstance>;
 using Texture = EngineResource<filament::Texture>;
@@ -67,15 +67,14 @@ View createView(filament::Engine& engine) noexcept;
 /**
  * \brief Creates a scoped pointer of the filament::Camera
  */
-Camera createCamera(filament::Engine& engine) noexcept;
+Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
 
 /**
  * \brief Creates a scoped pointer of the utils::Entity
  */
 Entity createEntity(filament::Engine& engine) noexcept;
 
-MaterialInstance createMaterialInstance(filament::Engine& engine,
-										filament::Material& material,
+MaterialInstance createMaterialInstance(filament::Engine& engine, filament::Material& material,
 										const char* name = nullptr) noexcept;
 
 } // namespace spatial

@@ -1,7 +1,6 @@
 .vs/
 .vscode/
 .idea/
-.conan/
 dependencies/
 build/
 out/

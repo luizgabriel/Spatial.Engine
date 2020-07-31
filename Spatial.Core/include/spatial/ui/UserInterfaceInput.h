@@ -8,7 +8,7 @@ namespace spatial
 
 class UserInterfaceInput
 {
-public:
+  public:
 	UserInterfaceInput();
 
 	void setup();

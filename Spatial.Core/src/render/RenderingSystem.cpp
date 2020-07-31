@@ -1,64 +1,56 @@
 #include <spatial/render/RenderingSystem.h>
 
-#ifndef SPATIAL_PLATFORM_OSX
-#include <execution>
-#endif
-
 using namespace spatial;
 namespace fl = filament;
 namespace bk = filament::backend;
 
 namespace spatial
 {
-RenderingSystem::RenderingSystem(const Window& window) : RenderingSystem(window, bk::Backend::OPENGL)
+
+RenderingSystem::RenderingSystem(const bk::Backend backend, void* nativeWindowHandle)
+	: mEngine{createEngine(backend)},
+	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
+	  mRenderer{createRenderer(getEngine())},
+	  mMainView{toShared(createView(getEngine()))},
+	  mViews{}
 {
+	pushBackView(mMainView);
 }
 
-RenderingSystem::RenderingSystem(const Window& window, const bk::Backend backend)
-	: m_engine{createEngine(backend)},
-	  m_swapChain{createSwapChain(getEngine(), window.getNativeHandle())},
-	  m_renderer{createRenderer(getEngine())},
-	  m_mainCamera{createCamera(getEngine())},
-	  m_mainView{toShared(createView(getEngine()))},
-	  m_views{5}
+RenderingSystem::RenderingSystem(const filament::backend::Backend backend, const Window& window)
+	: RenderingSystem(backend, window.getNativeHandle())
 {
-	pushBackView(m_mainView);
 	setupViewport(window.getFrameBufferSize());
 }
 
 void RenderingSystem::onStart()
 {
-	m_mainView->setCamera(m_mainCamera.get());
-	m_mainCamera->setExposure(16.0f, 1 / 125.0f, 100.0f);
+	mViews.shrink_to_fit();
+	clearExpiredViews();
+}
+
+void RenderingSystem::onFinish()
+{
+	clearExpiredViews();
 }
 
 void RenderingSystem::onEndFrame()
 {
-	clearExpiredViews();
-
-	if (m_renderer->beginFrame(m_swapChain.get()))
+	if (mRenderer->beginFrame(mSwapChain.get()))
 	{
-		for (const auto& view : m_views)
+		for (const auto& view : mViews)
 		{
 			const auto ownedView = view.lock();
-			m_renderer->render(ownedView.get());
+			mRenderer->render(ownedView.get());
 		}
 
-		m_renderer->endFrame();
+		mRenderer->endFrame();
 	}
 }
 
 void RenderingSystem::clearExpiredViews() noexcept
 {
-	m_views.erase(
-#ifndef SPATIAL_PLATFORM_OSX
-		std::remove_if(std::execution::par_unseq, m_views.begin(), m_views.end(),
-#else
-		std::remove_if(m_views.begin(), m_views.end(),
-#endif
-
-	   [](auto& view) { return view.expired(); }),
-		m_views.end());
+	std::erase_if(mViews, [](auto& view) { return view.expired(); });
 }
 
 void RenderingSystem::onEvent(const WindowResizedEvent& event)
@@ -68,28 +60,28 @@ void RenderingSystem::onEvent(const WindowResizedEvent& event)
 
 void RenderingSystem::pushFrontView(std::weak_ptr<filament::View>&& view)
 {
-	m_views.emplace_back(std::move(view));
+	mViews.emplace_back(std::move(view));
 }
 
 void RenderingSystem::popFrontView()
 {
-	m_views.pop_back();
+	mViews.pop_back();
 }
 
 void RenderingSystem::pushBackView(std::weak_ptr<filament::View>&& view)
 {
-	m_views.emplace_front(std::move(view));
+	mViews.emplace_front(std::move(view));
 }
 
 void RenderingSystem::popBackView()
 {
-	m_views.pop_front();
+	mViews.pop_front();
 }
 
 void RenderingSystem::setupViewport(const std::pair<int, int>& frameBufferSize)
 {
 	auto [dw, dh] = frameBufferSize;
-	m_mainView->setViewport({0, 0, static_cast<uint32_t>(dw), static_cast<uint32_t>(dh)});
-	m_mainCamera->setProjection(45.0, double(dw) / dh, 0.1, 1000000.0f, fl::Camera::Fov::VERTICAL);
+	mMainView->setViewport({0, 0, static_cast<uint32_t>(dw), static_cast<uint32_t>(dh)});
 }
+
 } // namespace spatial
