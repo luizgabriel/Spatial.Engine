@@ -1,5 +1,5 @@
 add_executable(Spatial.Core.Tests
-    test.cpp)
+	test.cpp)
 
 target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)
 

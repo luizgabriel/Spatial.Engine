@@ -16,14 +16,15 @@ namespace spatial
 {
 class RenderingSystem
 {
-private:
+  private:
 	Engine mEngine;
 	SwapChain mSwapChain;
 	Renderer mRenderer;
 	SharedView mMainView;
 
 	std::deque<std::weak_ptr<filament::View>> mViews;
-public:
+
+  public:
 	RenderingSystem(const filament::backend::Backend backend, void* nativeWindowHandle);
 	RenderingSystem(const filament::backend::Backend backend, const Window& window);
 
@@ -82,7 +83,7 @@ public:
 	}
 	// endregion
 
-private:
+  private:
 	void clearExpiredViews() noexcept;
 };
 } // namespace spatial

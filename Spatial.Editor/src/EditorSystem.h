@@ -1,7 +1,7 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
-#include <spatial/assets/ResourcesLoder.h>
+#include <spatial/assets/ResourcesLoader.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/ecs/RenderableSystem.h>
@@ -45,7 +45,7 @@ private:
 	ecs::TransformSystem mTransformSystem;
 
 public:
-	EditorSystem(const assets::ResourcesLoader& resources, RenderingSystem& renderingSystem);
+	EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources);
 
 	void onEvent(const MouseMovedEvent& e);
 

@@ -1,16 +1,25 @@
 #pragma once
 
+#include <boost/tti/has_member_function.hpp>
 #include <entt/signal/dispatcher.hpp>
 
 namespace spatial
 {
 
+namespace detail
+{
+BOOST_TTI_HAS_MEMBER_FUNCTION(onEvent);
+
+template <typename T, typename E>
+constexpr bool has_on_event_v = has_member_function_onEvent<T, void, boost::mpl::vector<const E&>>::value;
+} // namespace detail
+
 class EventQueue
 {
-private:
+  private:
 	entt::dispatcher m_dispatcher;
 
-public:
+  public:
 	template <typename Event>
 	void update()
 	{
@@ -64,6 +73,20 @@ public:
 		}
 	}
 
+	template <typename Event, typename Listener>
+	void tryConnect(Listener& listener)
+	{
+		if constexpr (detail::has_on_event_v<Listener, Event>)
+			this->template connect<Event, nullptr, Listener>(listener);
+	}
+
+	template <typename Event, typename Listener>
+	void tryDisconnect(Listener& listener)
+	{
+		if constexpr (detail::has_on_event_v<Listener, Event>)
+			this->template disconnect<Event>(listener);
+	}
+
 	template <typename Event, typename... Args>
 	void enqueue(Args&&... args)
 	{
@@ -75,6 +98,7 @@ public:
 	{
 		m_dispatcher.enqueue<Event>(std::forward<Event>(event));
 	}
+
 };
 
 } // namespace spatial

@@ -1,7 +1,7 @@
-#include <spatial/core/Application.h>
 #include <chrono>
-#include <thread>
+#include <spatial/core/Application.h>
 #include <spatial/core/Logger.h>
+#include <thread>
 
 using namespace std::chrono_literals;
 
@@ -9,13 +9,19 @@ namespace spatial
 {
 
 Application::Application()
+	: mRunning{false},
+	  mClock{},
+	  mDesiredDelta{1.0f / 60.0f},
+	  mStartSignal{},
+	  mStartFrameSignal{},
+	  mUpdateFrameSignal{},
+	  mEndFrameSignal{},
+	  mFinishSignal{}
 {
-	mEventQueue.connect<WindowClosedEvent>(*this);
 }
 
 Application::~Application()
 {
-	mEventQueue.disconnect<WindowClosedEvent>(*this);
 }
 
 void Application::onEvent(const WindowClosedEvent& event)
@@ -25,51 +31,41 @@ void Application::onEvent(const WindowClosedEvent& event)
 
 void Application::stop()
 {
-	m_running = false;
+	mRunning = false;
 }
 
 int Application::run()
 {
-	m_running = true;
+	mRunning = true;
 
-	m_startSignal();
+	mStartSignal();
 
-	while (m_running)
+	while (mRunning)
 	{
-		const auto delta = m_clock.getDeltaTime().count();
+		const auto delta = mClock.getDeltaTime().count();
 
-		m_windowContext.pollEvents(mEventQueue);
+		mStartFrameSignal(delta);
 
-		m_startFrameSignal(delta);
-
-		// Triggers all queued events
-		mEventQueue.update<WindowResizedEvent>();
-		mEventQueue.update();
-
-		while (m_clock.hasLag(m_desiredDelta))
+		while (mClock.hasLag(mDesiredDelta))
 		{
-			m_updateFrameSignal(m_desiredDelta);
-			m_clock.fixLag();
+			mUpdateFrameSignal(mDesiredDelta);
+			mClock.fixLag();
 		}
 
-		m_drawGuiSignal();
+		mEndFrameSignal();
 
-		m_endGuiFrameSignal();
-		m_endFrameSignal();
-
-		std::this_thread::sleep_until(m_clock.getLastTime() + Clock<float>::delta_t{m_desiredDelta});
-
-		m_clock.tick();
+		std::this_thread::sleep_until(mClock.getLastTime() + Clock<float>::delta_t{mDesiredDelta});
+		mClock.tick();
 	}
 
-	m_finishSignal();
+	mFinishSignal();
 
 	return 0;
 }
 
 void Application::setMaxFps(float fps)
 {
-	m_desiredDelta = 1.0f / fps;
+	mDesiredDelta = 1.0f / fps;
 }
 
 } // namespace spatial

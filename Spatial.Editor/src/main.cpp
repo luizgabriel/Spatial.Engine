@@ -1,26 +1,36 @@
 #include "EditorSystem.h"
 
 #include <argh.h>
+#include <assets/generated.h>
 #include <filesystem>
-#include <generated.h>
 #include <spatial/spatial.h>
-#include <spatial/ui/UserInterfaceSystem.h>
 
 using namespace spatial;
 namespace fs = std::filesystem;
 
-const std::string_view robotoFontData = {reinterpret_cast<const char*>(GENERATED_ROBOTO_MEDIUM_DATA), static_cast<size_t>(GENERATED_ROBOTO_MEDIUM_SIZE)};
-const std::string_view defaultMaterialData = {reinterpret_cast<const char*>(GENERATED_DEFAULT_DATA), static_cast<size_t>(GENERATED_DEFAULT_OFFSET)};
-const std::string_view defaultUiMaterialData = {reinterpret_cast<const char*>(GENERATED_UI_BLIT_DATA), static_cast<size_t>(GENERATED_UI_BLIT_SIZE)};
-
-auto buildAssetTree(std::filesystem::path executablePath)
+struct SetupConfig
 {
+	std::string_view windowTitle;
+	std::uint16_t windowWidth;
+	std::uint16_t windowHeight;
+};
+
+void connect(EventQueue& ebus, Application& app, DesktopPlatformContext& windowContext);
+int main(int argc, char* argv[])
+{
+	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+	const auto executablePath = fs::path{args[0]}.parent_path();
+
+	auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
+	args({"-w", "--width"}) >> config.windowWidth;
+	args({"-h", "--height"}) >> config.windowHeight;
+
 	// clang-format off
-	return DirMapLoader{
+	const auto resources = DirMapLoader{
 		{"editor", MemoryLoader{
-			{"fonts/Roboto_Medium.ttf", robotoFontData},
-			{"materials/default.filamat", defaultMaterialData},
-			{"materials/ui.filamat", defaultUiMaterialData}
+			{"fonts/Roboto_Medium.ttf", {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE}},
+			{"materials/default.filamat", {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE}},
+			{"materials/ui.filamat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}}
 		}},
 		{"assets", AggregatorLoader{
 			PhysicalDirLoader{executablePath / "assets"},
@@ -28,25 +38,28 @@ auto buildAssetTree(std::filesystem::path executablePath)
 		}}
 	};
 	// clang-format on
-}
 
-int main(int argc, char* argv[])
-{
-	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
-	const auto executablePath = fs::path{args[0]}.parent_path();
+	auto app = Application{};
+	auto desktopContext = DesktopPlatformContext{};
+	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
 
-	auto setupConfig = SetupConfig{"Spatial Engine | Editor", 1280, 720};
-	args({"-w", "--width"}) >> setupConfig.windowWidth;
-	args({"-h", "--height"}) >> setupConfig.windowHeight;
+	auto input = InputSystem{window};
+	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
-	return setup(setupConfig, [&](auto& app, auto& services) {
-		auto ui = System<UserInterfaceSystem>(app, services.rendering, services.window);
-		ui->setDefaultMaterial(defaultUiMaterialData);
-		ui->setDefaultFont(robotoFontData);
+	auto ui = UserInterfaceSystem(rendering, window);
+	ui.setDefaultMaterial(resources("editor/materials/ui.filamat").value());
+	ui.setDefaultFont(resources("editor/fonts/Roboto_Medium.ttf").value());
 
-		const auto resources = buildAssetTree(executablePath);
-		auto sandbox = System<EditorSystem>{app, resources, services.rendering};
+	auto editor = EditorSystem{rendering, resources};
 
-		return app.run();
-	});
+	// Connect all Systems to the Application Main Loop
+	app >> desktopContext >> input >> rendering >> ui >> editor;
+
+	// Connect Desktop Events to All Systems
+	desktopContext >> app >> input >> rendering >> ui >> editor;
+
+	// Connect Gui Render to Editor
+	ui >> editor;
+
+	return app.run();
 }

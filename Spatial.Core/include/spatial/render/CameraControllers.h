@@ -1,9 +1,9 @@
 #pragma once
 
+#include <filament/Camera.h>
+#include <math/mat4.h>
 #include <math/vec2.h>
 #include <math/vec3.h>
-#include <math/mat4.h>
-#include <filament/Camera.h>
 
 namespace spatial
 {

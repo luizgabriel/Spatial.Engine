@@ -7,8 +7,6 @@ add_library(Spatial.Core
 	include/spatial/assets/PhysicalDirLoader.h
 	
 	include/spatial/common/EventQueue.h
-	include/spatial/common/EventQueueUtils.h
-	include/spatial/common/Exceptions.h
 	include/spatial/common/Key.h
 	include/spatial/common/Signal.h
 	include/spatial/common/StringHelpers.h
@@ -21,9 +19,8 @@ add_library(Spatial.Core
 	
 	include/spatial/desktop/MessageBox.h
 	include/spatial/desktop/PlatformEvent.h
+	include/spatial/desktop/PlatformEventUtils.h
 	include/spatial/desktop/Window.h
-	
-	include/spatial/facilities/Initializer.h
 	
 	include/spatial/input/InputSystem.h
 	include/spatial/input/Input.h
@@ -44,6 +41,7 @@ add_library(Spatial.Core
 	include/spatial/ui/UserInterfaceInput.h
 	include/spatial/ui/UserInterfaceRenderer.h
 	include/spatial/ui/UserInterfaceSystem.h
+	include/spatial/ui/UserInterfaceUtils.h
 	
 	include/spatial/ecs/Components.h
 	include/spatial/ecs/RenderableSystem.h
@@ -54,7 +52,6 @@ add_library(Spatial.Core
 	## SOURCES
 	src/common/Key.cpp
 	src/common/StringHelpers.cpp
-	src/common/Exceptions.cpp
 	
 	src/core/Application.cpp
 	src/core/Logger.cpp
@@ -62,8 +59,6 @@ add_library(Spatial.Core
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
 	src/desktop/MessageBox.cpp
-	
-	src/facilities/Initializer.cpp
 	
 	src/input/InputSystem.cpp
 	src/input/InputState.cpp
@@ -99,8 +94,8 @@ target_precompile_headers(Spatial.Core
 
 target_include_directories(Spatial.Core
 	PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
 	PRIVATE src)
 
 # LINK PLATFORM INDEPENDENT DEPENDENCIES
@@ -113,7 +108,7 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::boost_tti
 	CONAN_PKG::stb
 	CONAN_PKG::sdl2
-)
+	)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
@@ -169,4 +164,4 @@ install(DIRECTORY include/ DESTINATION include)
 
 if (SPATIAL_BUILD_TESTS)
 	add_subdirectory(tests)
-endif()
+endif ()

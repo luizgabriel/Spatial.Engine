@@ -1,12 +1,11 @@
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/common/Exceptions.h>
 
 #include <filament/Fence.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <fmt/format.h>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -98,24 +97,22 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-Material createMaterial(fl::Engine& engine, const std::string_view resourceData)
+Material createMaterial(fl::Engine& engine, const std::vector<char>& resourceData)
 {
 	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
 
 	return Material{engine, material};
 }
 
-Texture createTexture(fl::Engine& engine, const std::string_view resourceData)
+Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData)
 {
 	int width, height, n;
-	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(), &width, &height, &n, 4);
+	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(),
+											&width, &height, &n, 4);
 
-	auto bufferDescriptor =
-		fl::Texture::PixelBufferDescriptor{data,
-										   size_t(width) * height * 4,
-										   fl::Texture::Format::RGBA,
-										   fl::Texture::Type::UBYTE,
-										   reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
+	auto bufferDescriptor = fl::Texture::PixelBufferDescriptor{
+		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
+		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	auto texture = fl::Texture::Builder()
 					   .width(uint32_t(width))
@@ -146,25 +143,17 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 						 .bufferCount(1)
 						 .normalized(filament::TANGENTS)
 						 .normalized(filament::COLOR)
-						 .attribute(filament::POSITION,
-									0,
-									fl::VertexBuffer::AttributeType::HALF4,
-									header.offsetPosition,
-									static_cast<uint8_t>(header.stridePosition))
-						 .attribute(filament::TANGENTS,
-									0,
-									fl::VertexBuffer::AttributeType::SHORT4,
-									header.offsetTangents,
-									static_cast<uint8_t>(header.strideTangents))
-						 .attribute(filament::COLOR,
-									0,
-									fl::VertexBuffer::AttributeType::UBYTE4,
-									header.offsetColor,
+						 .attribute(filament::POSITION, 0, fl::VertexBuffer::AttributeType::HALF4,
+									header.offsetPosition, static_cast<uint8_t>(header.stridePosition))
+						 .attribute(filament::TANGENTS, 0, fl::VertexBuffer::AttributeType::SHORT4,
+									header.offsetTangents, static_cast<uint8_t>(header.strideTangents))
+						 .attribute(filament::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4, header.offsetColor,
 									static_cast<uint8_t>(header.strideColor))
 						 .attribute(filament::UV0, 0, uvType, header.offsetUV0, static_cast<uint8_t>(header.strideUV0))
 						 .normalized(filament::UV0, uvNormalized);
 
-	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max() && header.strideUV1 != std::numeric_limits<uint32_t>::max())
+	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max() &&
+		header.strideUV1 != std::numeric_limits<uint32_t>::max())
 	{
 		vbBuilder.attribute(filament::UV1, 0, uvType, header.offsetUV1, static_cast<uint8_t>(header.strideUV1))
 			.normalized(filament::UV1, uvNormalized);
@@ -182,9 +171,10 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 
 IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& indices)
 {
-	auto ibBuilder = fl::IndexBuffer::Builder()
-						 .indexCount(header.indexCount)
-						 .bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
+	auto ibBuilder =
+		fl::IndexBuffer::Builder()
+			.indexCount(header.indexCount)
+			.bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
 
 	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
 
@@ -196,7 +186,7 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-Mesh createMesh(fl::Engine& engine, const std::string_view resourceData)
+Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 {
 	auto stream = std::stringstream{};
 	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));

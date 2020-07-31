@@ -13,7 +13,7 @@ std::vector<std::string_view> split(std::string_view value, char separator)
 		const auto second = value.find_first_of(separator, first);
 
 		if (first != second)
-			output.emplace_back(value.substr(first, second-first));
+			output.emplace_back(value.substr(first, second - first));
 
 		if (second == std::string_view::npos)
 			break;

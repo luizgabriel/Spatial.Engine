@@ -3,8 +3,7 @@
 namespace spatial
 {
 
-Camera::Camera(filament::Engine& engine)
-	: mEngine{engine}, mEntity{}, mResource{}
+Camera::Camera(filament::Engine& engine) : mEngine{engine}, mEntity{}, mResource{}
 {
 }
 
@@ -18,4 +17,4 @@ Camera::~Camera()
 	mEngine.destroyCameraComponent(mEntity);
 }
 
-}
+} // namespace spatial

@@ -8,7 +8,6 @@
 #include <filament/TextureSampler.h>
 
 #include <spatial/ecs/Components.h>
-#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 
@@ -20,7 +19,7 @@ using namespace filament::math;
 namespace spatial
 {
 
-EditorSystem::EditorSystem(const assets::ResourcesLoader& resources, RenderingSystem& renderingSystem)
+EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources)
 	: mResources{resources},
 	  mEngine{renderingSystem.getEngine()},
 	  mMainView{renderingSystem.getMainView()},
@@ -37,10 +36,11 @@ EditorSystem::EditorSystem(const assets::ResourcesLoader& resources, RenderingSy
 	  mRenderableSystem{mEngine, mScene.ref()},
 	  mTransformSystem{mEngine}
 {
+	mMainView.setCamera(mCameraComponent.get());
 	mMainView.setScene(mScene.get());
 
-	auto materialData = assets::read(mResources, "editor/materials/default.filamat").value();
-	mDefaultMaterial = createMaterial(mEngine, {materialData.data(), materialData.size()});
+	auto materialData = mResources("editor/materials/default.filamat").value();
+	mDefaultMaterial = createMaterial(mEngine, materialData);
 
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Transform>(entity);

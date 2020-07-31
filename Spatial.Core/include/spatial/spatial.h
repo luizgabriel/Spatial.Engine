@@ -1,11 +1,22 @@
 #pragma once
 
-#include <entt/core/hashed_string.hpp>
 #include <spatial/assets/AggregatorLoader.h>
 #include <spatial/assets/AssetReaderUtils.h>
 #include <spatial/assets/DirMapLoader.h>
 #include <spatial/assets/MemoryLoader.h>
 #include <spatial/assets/PhysicalDirLoader.h>
+
+#include <spatial/desktop/PlatformEvent.h>
+#include <spatial/desktop/PlatformEventUtils.h>
+
+#include <spatial/core/Application.h>
+#include <spatial/core/ApplicationUtils.h>
 #include <spatial/core/Logger.h>
-#include <spatial/core/System.h>
-#include <spatial/facilities/Initializer.h>
+
+#include <spatial/input/InputSystem.h>
+
+#include <spatial/ui/UserInterfaceSystem.h>
+#include <spatial/ui/UserInterfaceUtils.h>
+
+#include <spatial/render/RenderingSystem.h>
+

@@ -13,11 +13,16 @@ void InputState::set(const Key key, const KeyAction action)
 {
 	switch (action)
 	{
-	case KeyAction::Pressed: setPressed(key); break;
+	case KeyAction::Pressed:
+		setPressed(key);
+		break;
 
-	case KeyAction::Released: setReleased(key); break;
+	case KeyAction::Released:
+		setReleased(key);
+		break;
 
-	case KeyAction::None: break;
+	case KeyAction::None:
+		break;
 	}
 }
 
@@ -57,6 +62,5 @@ void InputState::warpMouseInWindow(float2 position)
 	m_mouseWarpRequested = true;
 	setMousePosition(position);
 }
-
 
 } // namespace spatial

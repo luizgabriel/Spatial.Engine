@@ -1,5 +1,5 @@
-#include <spatial/input/InputSystem.h>
 #include <spatial/input/Input.h>
+#include <spatial/input/InputSystem.h>
 
 namespace spatial
 {
@@ -8,7 +8,7 @@ InputSystem::InputSystem(Window& window) : mWindow{window}
 {
 }
 
-void InputSystem::onStartFrame(float delta)
+void InputSystem::onStartFrame(float)
 {
 	if (Input::sInputState.isMouseWarpRequested())
 	{
@@ -16,7 +16,10 @@ void InputSystem::onStartFrame(float delta)
 		auto [windowWidth, windowHeight] = mWindow.getWindowSize();
 		mWindow.warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
 	}
+}
 
+void InputSystem::onEndFrame()
+{
 	Input::sInputState.reset();
 }
 

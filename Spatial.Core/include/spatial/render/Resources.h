@@ -1,20 +1,20 @@
 #pragma once
 
-#include <filament/Engine.h>
-#include <filament/Renderer.h>
-#include <filament/Material.h>
-#include <filament/Scene.h>
-#include <filament/View.h>
 #include <filament/Camera.h>
-#include <filament/Texture.h>
-#include <filament/IndirectLight.h>
-#include <filament/Skybox.h>
+#include <filament/Engine.h>
 #include <filament/IndexBuffer.h>
+#include <filament/IndirectLight.h>
+#include <filament/Material.h>
+#include <filament/Renderer.h>
+#include <filament/Scene.h>
+#include <filament/Skybox.h>
+#include <filament/Texture.h>
 #include <filament/VertexBuffer.h>
+#include <filament/View.h>
 
+#include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
-#include <spatial/render/Camera.h>
 
 #include <memory>
 
@@ -74,8 +74,7 @@ Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
  */
 Entity createEntity(filament::Engine& engine) noexcept;
 
-MaterialInstance createMaterialInstance(filament::Engine& engine,
-										filament::Material& material,
+MaterialInstance createMaterialInstance(filament::Engine& engine, filament::Material& material,
 										const char* name = nullptr) noexcept;
 
 } // namespace spatial

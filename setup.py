@@ -1,5 +1,6 @@
 import os
 import os.path
+import sys
 
 
 def run(command):
@@ -7,46 +8,21 @@ def run(command):
     return os.system(command)
 
 
-def conan_repo(name, url):
-    return run('conan remote add %s %s' % (name, url))
+def conan_export(package_dir, export_name):
+    return run("conan export %s %s" % (package_dir, export_name))
 
 
-def conan_export(clone_dir, user, package, export_name, branch="master"):
-    print("Exporting %s" % package)
-    package_dir = os.path.join(clone_dir, package)
-
-    result = 0
-    result += run("git clone -b %s https://github.com/%s/%s.git %s" % (branch, user, package, package_dir))
-    result += run("conan export %s %s" % (package_dir, export_name))
-
-    return result
-
-
-def conan_install(path, profile):
-    return run("cd %s && conan install .. -pr %s -b missing" % (path, profile))
-
-
-def make_dirs(folder):
-    try:
-        os.makedirs(folder)
-    except:
-        print("Could not create folder: %s" % folder)
-
-
-def install(folder, conan_profile="default"):
+def install(folder):
     install_folder = os.path.abspath(folder)
-    conan_path = os.path.join(install_folder, ".conan")
-    vendor_path = os.path.join(conan_path, "vendor")
-    make_dirs(vendor_path)
+    vendor_path = os.path.join(install_folder, "vendor")
 
-    conan_repo("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
-
-    conan_export(vendor_path, "luizgabriel", "conan-filament", "filament/1.8.0@google/stable", "v1.8.0")
-    conan_export(vendor_path, "skypjack", "entt", "entt/3.4.0@skypjack/stable", "v3.4.0")
-
-    if conan_install(conan_path, conan_profile) == 0:
-        print("Done! Spatial Engine is now ready for compilation")
+    conan_export(os.path.join(vendor_path, "filament.py"), "filament/1.8.0@google/stable")
+    conan_export(os.path.join(vendor_path, "entt.py"), "entt/3.4.0@skypjack/stable")
 
 
 if __name__ == "__main__":
-    install(os.path.abspath(os.path.dirname(__file__)))
+    args = iter(sys.argv)
+    next(args)  # skip file name
+
+    root_directory = next(args, os.path.dirname(__file__))
+    install(root_directory)

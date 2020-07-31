@@ -1,6 +1,6 @@
 #include "spatial/ecs/TransformSystem.h"
-#include <spatial/ecs/Components.h>
 #include <math/mat4.h>
+#include <spatial/ecs/Components.h>
 #ifndef SPATIAL_PLATFORM_OSX
 #include <execution>
 #endif

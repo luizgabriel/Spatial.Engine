@@ -1,12 +1,12 @@
-#include <spatial/ui/UserInterfaceRenderer.h>
 #include <spatial/ui/ImGuiHelpers.h>
+#include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <spatial/render/ResourceLoaders.h>
 
-#include <filament/VertexBuffer.h>
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
 #include <filament/TextureSampler.h>
+#include <filament/VertexBuffer.h>
 #include <filament/Viewport.h>
 
 #include <filesystem>
@@ -38,17 +38,16 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	m_imguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const std::string_view materialData)
+void UserInterfaceRenderer::setMaterial(const std::vector<char>& materialData)
 {
 	mMaterial = createMaterial(mEngine, materialData);
 }
 
-void UserInterfaceRenderer::setFont(const std::string_view fontData)
+void UserInterfaceRenderer::setFont(const std::vector<char>& fontData)
 {
 	mTexture = imguiCreateTextureAtlas(mEngine, fontData);
 
-	mMaterial->setDefaultParameter("albedo",
-								   mTexture.get(),
+	mMaterial->setDefaultParameter("albedo", mTexture.get(),
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }
 
@@ -56,7 +55,7 @@ void UserInterfaceRenderer::setupEngineTheme()
 {
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
-	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	// io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	auto& style = ImGui::GetStyle();
 
@@ -112,7 +111,8 @@ UserInterfaceRenderer::~UserInterfaceRenderer()
 	ImGui::DestroyContext(m_imguiContext);
 }
 
-void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
+void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
+										const std::pair<int, int>& frameBufferSize)
 {
 	const auto [w, h] = windowSize;
 	const auto [fw, fh] = frameBufferSize;
@@ -214,11 +214,8 @@ void UserInterfaceRenderer::renderDrawData()
 				auto mIter = scissorRects.find(sKey);
 				assert(mIter != scissorRects.end());
 				rBuilder
-					.geometry(primIndex,
-							  fl::RenderableManager::PrimitiveType::TRIANGLES,
-							  m_vertexBuffers[bufferIndex].get(),
-							  m_indexBuffers[bufferIndex].get(),
-							  indexOffset,
+					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
+							  m_vertexBuffers[bufferIndex].get(), m_indexBuffers[bufferIndex].get(), indexOffset,
 							  pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
 					.material(primIndex, mIter->second);
@@ -274,8 +271,7 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 	}
 }
 
-void UserInterfaceRenderer::populateVertexData(size_t bufferIndex,
-											   const ImVector<ImDrawVert>& vb,
+void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
 											   const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into

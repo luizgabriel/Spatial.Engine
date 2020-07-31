@@ -10,11 +10,11 @@ class Signal
 {
 	using CallbackFn = void(Args...);
 
-private:
+  private:
 	entt::sigh<CallbackFn> m_sigh;
 	entt::sink<CallbackFn> m_sink;
 
-public:
+  public:
 	Signal() : m_sigh{}, m_sink{m_sigh}
 	{
 	}
@@ -52,6 +52,7 @@ public:
 	{
 		m_sink.template disconnect<MemberFunction>(listener);
 	}
+
 };
 
 } // namespace spatial

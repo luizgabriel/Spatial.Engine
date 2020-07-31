@@ -1,13 +1,13 @@
 #pragma once
 
-#include <spatial/render/Resources.h>
 #include <filament/Box.h>
 #include <filament/RenderableManager.h>
+#include <spatial/render/Resources.h>
 
 #include <cstdint>
-#include <vector>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace spatial
 {
@@ -47,10 +47,9 @@ struct MeshPart
 	std::string materialName;
 };
 
-
 struct Mesh
 {
-private:
+  private:
 	filament::Engine& m_engine;
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
@@ -58,8 +57,9 @@ private:
 	filament::Box m_boundingBox;
 	std::vector<MeshPart> m_parts;
 
-public:
-	Mesh(filament::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox, size_t numParts);
+  public:
+	Mesh(filament::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox,
+		 size_t numParts);
 
 	[[nodiscard]] size_t size() const
 	{
@@ -121,6 +121,5 @@ public:
 	using MaterialsMap = std::unordered_map<std::string, filament::MaterialInstance*>;
 	void build(utils::Entity entity, const MaterialsMap& map);
 };
-
 
 } // namespace spatial

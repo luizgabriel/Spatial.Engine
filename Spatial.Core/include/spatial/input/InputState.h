@@ -1,8 +1,8 @@
 #pragma once
 
-#include <spatial/common/Key.h>
 #include <bitset>
 #include <math/vec2.h>
+#include <spatial/common/Key.h>
 
 namespace spatial
 {
@@ -11,7 +11,7 @@ constexpr int keysCount = static_cast<size_t>(Key::Count);
 
 class InputState
 {
-private:
+  private:
 	std::bitset<keysCount> mKeyPressed;
 	std::bitset<keysCount> mKeyReleased;
 
@@ -19,7 +19,7 @@ private:
 	filament::math::float2 m_currentMousePosition;
 	bool m_mouseWarpRequested;
 
-public:
+  public:
 	InputState();
 
 	void set(Key key, KeyAction action);

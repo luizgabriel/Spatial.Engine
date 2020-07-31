@@ -4,8 +4,8 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/render/RenderingSystem.h>
 
-#include <spatial/ui/UserInterfaceRenderer.h>
 #include <spatial/ui/UserInterfaceInput.h>
+#include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <span>
 #include <string_view>
@@ -15,20 +15,21 @@ namespace spatial
 {
 class UserInterfaceSystem
 {
-private:
+  private:
 	UserInterfaceRenderer mRenderer;
 	UserInterfaceInput mInput;
+	Signal<> mRenderGuiSignal;
 
-public:
+  public:
 	UserInterfaceSystem(filament::Engine& engine);
 
 	UserInterfaceSystem(RenderingSystem& rendering);
 
 	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
 
-	void setDefaultFont(const std::string_view fontData);
+	void setDefaultFont(const std::vector<char>& fontData);
 
-	void setDefaultMaterial(const std::string_view materialData);
+	void setDefaultMaterial(const std::vector<char>& materialData);
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
@@ -36,7 +37,7 @@ public:
 
 	void onStartFrame(float delta);
 
-	void onEndGuiFrame();
+	void onEndFrame();
 
 	void onEvent(const WindowResizedEvent& event);
 
@@ -50,5 +51,11 @@ public:
 	{
 		return mRenderer.getView();
 	}
+
+	auto& getDrawGuiSignal()
+	{
+		return mRenderGuiSignal;
+	}
 };
+
 } // namespace spatial

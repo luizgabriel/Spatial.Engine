@@ -3,13 +3,11 @@
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine)
-	: mRenderer{engine}, mInput{}
+UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{engine}, mInput{}
 {
 }
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering)
-	: UserInterfaceSystem(rendering.getEngine())
+UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering) : UserInterfaceSystem(rendering.getEngine())
 {
 	rendering.pushFrontView(getView());
 }
@@ -20,12 +18,12 @@ UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Windo
 	setViewport(window.getWindowSize(), window.getFrameBufferSize());
 }
 
-void UserInterfaceSystem::setDefaultFont(const std::string_view fontData)
+void UserInterfaceSystem::setDefaultFont(const std::vector<char>& fontData)
 {
 	mRenderer.setFont(fontData);
 }
 
-void UserInterfaceSystem::setDefaultMaterial(const std::string_view materialData)
+void UserInterfaceSystem::setDefaultMaterial(const std::vector<char>& materialData)
 {
 	mRenderer.setMaterial(materialData);
 }
@@ -66,10 +64,10 @@ void UserInterfaceSystem::onStartFrame(float delta)
 	mRenderer.beforeRender(delta);
 }
 
-void UserInterfaceSystem::onEndGuiFrame()
+void UserInterfaceSystem::onEndFrame()
 {
+	mRenderGuiSignal();
 	mRenderer.dispatchCommands();
 }
-
 
 } // namespace spatial

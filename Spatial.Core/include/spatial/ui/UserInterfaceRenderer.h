@@ -1,8 +1,8 @@
 #pragma once
 
+#include <imgui.h>
 #include <spatial/render/Resources.h>
 #include <vector>
-#include <imgui.h>
 
 #include <filesystem>
 #include <string_view>
@@ -12,7 +12,7 @@ namespace spatial
 
 class UserInterfaceRenderer
 {
-private:
+  private:
 	filament::Engine& mEngine;
 
 	SharedView mView;
@@ -34,7 +34,7 @@ private:
 	void createMaterialInstances(size_t numRequiredInstances);
 	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
 
-public:
+  public:
 	explicit UserInterfaceRenderer(filament::Engine& engine);
 	~UserInterfaceRenderer();
 
@@ -43,9 +43,9 @@ public:
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
-	void setMaterial(const std::string_view materialData);
+	void setMaterial(const std::vector<char>& materialData);
 
-	void setFont(const std::string_view fontData);
+	void setFont(const std::vector<char>& fontData);
 
 	void setupEngineTheme();
 

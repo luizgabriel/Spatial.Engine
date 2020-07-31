@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/input/InputState.h>
 #include <math/vec2.h>
+#include <spatial/input/InputState.h>
 
 namespace spatial
 {
@@ -10,10 +10,10 @@ class InputSystem;
 
 class Input
 {
-private:
+  private:
 	static InputState sInputState;
 
-public:
+  public:
 	static filament::math::float2 mouse()
 	{
 		return sInputState.getCurrentPosition();

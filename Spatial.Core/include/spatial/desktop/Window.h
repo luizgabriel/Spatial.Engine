@@ -1,11 +1,12 @@
 #pragma once
 
+#include <SDL.h>
+#include <math/vec2.h>
+#include <spatial/common/EventQueue.h>
+#include <spatial/common/Key.h>
+#include <spatial/common/Signal.h>
 #include <string_view>
 #include <type_traits>
-#include <SDL.h>
-#include <spatial/common/Key.h>
-#include <spatial/common/EventQueue.h>
-#include <math/vec2.h>
 
 namespace spatial
 {
@@ -14,18 +15,18 @@ Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept;
 
 Key mapKeyFromMouseButton(int mouseButton) noexcept;
 
-class WindowContext;
+class DesktopPlatformContext;
 
 class Window
 {
-private:
+  private:
 	SDL_Window* mWindowHandle;
 
 	Window(int width, int height, std::string_view title);
 
-	friend class WindowContext;
+	friend class DesktopPlatformContext;
 
-public:
+  public:
 	~Window();
 
 	void* getNativeHandle() const;
@@ -46,24 +47,30 @@ public:
 	void warpMouse(filament::math::float2 position);
 };
 
-class WindowContext
+class DesktopPlatformContext
 {
-private:
-	bool mValid{true};
+  private:
+	bool mValid;
+	EventQueue mEventQueue;
 
-public:
-	WindowContext();
-	~WindowContext();
+  public:
+	DesktopPlatformContext();
+	~DesktopPlatformContext();
 
-	void pollEvents(EventQueue& queue);
+	void onStartFrame(float);
 
 	[[nodiscard]] Window createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept;
 
-	WindowContext(const WindowContext& c) = delete;
-	WindowContext& operator=(const WindowContext& w) = delete;
+	DesktopPlatformContext(const DesktopPlatformContext& c) = delete;
+	DesktopPlatformContext& operator=(const DesktopPlatformContext& w) = delete;
 
-	WindowContext(WindowContext&& c) noexcept;
-	WindowContext& operator=(WindowContext&& other) noexcept = delete;
+	DesktopPlatformContext(DesktopPlatformContext&& c) noexcept;
+	DesktopPlatformContext& operator=(DesktopPlatformContext&& other) noexcept = delete;
+
+	auto& getEventQueue() {
+		return mEventQueue;
+	}
+
 };
 
 } // namespace spatial

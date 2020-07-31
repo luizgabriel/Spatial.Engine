@@ -39,7 +39,6 @@ class Camera
 	{
 		return mEntity;
 	}
-
 };
 
-}
+} // namespace spatial

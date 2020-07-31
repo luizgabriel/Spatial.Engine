@@ -1,38 +1,33 @@
 #pragma once
 
-#include <spatial/desktop/Window.h>
-#include <spatial/common/Signal.h>
 #include <spatial/common/EventQueue.h>
+#include <spatial/common/Signal.h>
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
+#include <spatial/desktop/Window.h>
 
 namespace spatial
 {
 
 class Application final
 {
-private:
-	bool m_running = false;
+  private:
+	bool mRunning;
 
-	EventQueue mEventQueue{};
-	Clock<float> m_clock{};
-	float m_desiredDelta{1.0f / 60.0f};
-
-	WindowContext m_windowContext;
+	Clock<float> mClock;
+	float mDesiredDelta;
 
 	// region Signals
-	Signal<> m_startSignal;
+	Signal<> mStartSignal;
 
-	Signal<float> m_startFrameSignal;
-	Signal<float> m_updateFrameSignal;
-	Signal<> m_drawGuiSignal;
-	Signal<> m_endGuiFrameSignal;
-	Signal<> m_endFrameSignal;
+	Signal<float> mStartFrameSignal;
+	Signal<float> mUpdateFrameSignal;
+	Signal<> mEndFrameSignal;
 
-	Signal<> m_finishSignal;
+	Signal<> mFinishSignal;
 	// endregion
 
-public:
+  public:
 	Application();
 	~Application();
 
@@ -45,57 +40,38 @@ public:
 
 	bool isRunning() const
 	{
-		return m_running;
+		return mRunning;
 	}
 
 	void onEvent(const WindowClosedEvent& event);
 
 	void setMaxFps(float fps);
 
-	auto& getEventQueue()
-	{
-		return mEventQueue;
-	}
-
-	auto& getWindowContext() const
-	{
-		return m_windowContext;
-	}
-
 	auto& getStartSignal()
 	{
-		return m_startSignal;
+		return mStartSignal;
 	}
 
 	auto& getFinishSignal()
 	{
-		return m_finishSignal;
+		return mFinishSignal;
 	}
 
 	auto& getStartFrameSignal()
 	{
-		return m_startFrameSignal;
+		return mStartFrameSignal;
 	}
 
 	auto& getUpdateFrameSignal()
 	{
-		return m_updateFrameSignal;
-	}
-
-	auto& getEndGuiFrameSignal()
-	{
-		return m_endGuiFrameSignal;
+		return mUpdateFrameSignal;
 	}
 
 	auto& getEndFrameSignal()
 	{
-		return m_endFrameSignal;
+		return mEndFrameSignal;
 	}
 
-	auto& getDrawGuiSignal()
-	{
-		return m_drawGuiSignal;
-	}
 };
 
 } // namespace spatial

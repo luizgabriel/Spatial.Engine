@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/assets/ResourcesLoder.h>
+#include <spatial/assets/ResourcesLoader.h>
 #include <sstream>
 #include <string>
 #include <tuple>
@@ -18,13 +18,16 @@ struct AggregatorLoader : public std::vector<Action>
 	{
 	}
 
-	bool operator()(const std::string_view fileName, auto buffer) const noexcept
+	assets::Resource operator()(const std::string_view fileName) const noexcept
 	{
 		for (auto& disk : *this)
-			if (disk(fileName, buffer))
-				return true;
+		{
+			auto resource = disk(fileName);
+			if (resource)
+				return resource;
+		}
 
-		return false;
+		return std::nullopt;
 	}
 };
 

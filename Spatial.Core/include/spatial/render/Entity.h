@@ -8,11 +8,11 @@ namespace spatial
 
 class Entity
 {
-private:
+  private:
 	filament::Engine& m_engine;
 	utils::Entity m_entity;
 
-public:
+  public:
 	explicit Entity(filament::Engine& engine);
 
 	Entity(filament::Engine& engine, utils::Entity entity);

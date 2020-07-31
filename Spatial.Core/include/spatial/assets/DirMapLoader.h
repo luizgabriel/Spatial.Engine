@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/assets/ResourcesLoder.h>
+#include <spatial/assets/ResourcesLoader.h>
 #include <string>
 #include <unordered_map>
 
@@ -17,7 +17,7 @@ struct DirMapLoader : public std::unordered_map<std::string, Action>
 	{
 	}
 
-	bool operator()(const std::string_view fileName, auto buffer) const noexcept
+	assets::Resource operator()(const std::string_view fileName) const noexcept
 	{
 		auto separator = fileName.find('/');
 		auto rootName = std::string{fileName.begin(), separator};
@@ -25,10 +25,10 @@ struct DirMapLoader : public std::unordered_map<std::string, Action>
 
 		if (it != this->end())
 		{
-			return it->second(fileName.substr(separator + 1), buffer);
+			return it->second(fileName.substr(separator + 1));
 		}
 
-		return false;
+		return std::nullopt;
 	}
 };
 
