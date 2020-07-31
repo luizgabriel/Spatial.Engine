@@ -6,9 +6,10 @@ namespace spatial
 
 InputSystem::InputSystem(Window& window) : mWindow{window}
 {
+	Input::sInputState.reset();
 }
 
-void InputSystem::onStartFrame(float)
+void InputSystem::onEndFrame()
 {
 	if (Input::sInputState.isMouseWarpRequested())
 	{
@@ -16,10 +17,7 @@ void InputSystem::onStartFrame(float)
 		auto [windowWidth, windowHeight] = mWindow.getWindowSize();
 		mWindow.warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
 	}
-}
 
-void InputSystem::onEndFrame()
-{
 	Input::sInputState.reset();
 }
 

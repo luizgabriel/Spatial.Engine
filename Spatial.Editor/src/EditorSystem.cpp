@@ -27,10 +27,16 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::Resou
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
 	  mCameraComponent{createCamera(mEngine, mCameraEntity.get())},
-	  mDefaultMaterial{mEngine},
+	  mDefaultMaterial{createMaterial(mEngine, mResources("editor/materials/default.filamat").value())},
 
-	  mCam{{3.89263f, -0.413847}, {300.0f, 300.0f, 300.0f}},
-	  mCameraData{.5f, 500.0f},
+	  mIblTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/ibl.ktx").value())},
+	  mSkyboxTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/skybox.ktx").value())},
+	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(),
+										 mResources("editor/textures/default_skybox/sh.txt").value())},
+	  mSkybox{createSkybox(mEngine, mSkyboxTexture.ref())},
+
+	  mCam{{.0f, .0f}, {300.0f, 300.0f, 300.0f}},
+	  mCameraData{.5f, 100.0f},
 
 	  mRegistry{},
 	  mRenderableSystem{mEngine, mScene.ref()},
@@ -39,18 +45,18 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::Resou
 	mMainView.setCamera(mCameraComponent.get());
 	mMainView.setScene(mScene.get());
 
-	auto materialData = mResources("editor/materials/default.filamat").value();
-	mDefaultMaterial = createMaterial(mEngine, materialData);
+	mScene->setIndirectLight(mSkyboxLight.get());
+	mScene->setSkybox(mSkybox.get());
 
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Transform>(entity);
 }
 
-void EditorSystem::onEvent(const MouseMovedEvent& e)
+void EditorSystem::onEvent(const MouseMovedEvent&)
 {
 	if (enabledCameraController)
 	{
-		mCam.onMouseMoved({e.x, e.y}, mCameraData.sensitivity);
+		mCam.onMouseMoved(Input::mouse(), mCameraData.sensitivity);
 		Input::warpMouse({.5f, .5f});
 	}
 }

@@ -36,4 +36,4 @@ UserInterfaceSystem& operator>>(UserInterfaceSystem& ui, Listener& listener)
 	return ui;
 }
 
-}
+} // namespace spatial

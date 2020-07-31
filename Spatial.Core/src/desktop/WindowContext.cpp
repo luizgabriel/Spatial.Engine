@@ -90,7 +90,8 @@ void DesktopPlatformContext::onStartFrame(float)
 	mEventQueue.update();
 }
 
-Window DesktopPlatformContext::createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept
+Window DesktopPlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
+											std::string_view title) const noexcept
 {
 	return Window{width, height, title};
 }

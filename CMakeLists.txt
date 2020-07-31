@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Spatial
-	LANGUAGES CXX
-	VERSION 1.0.0)
+project(Spatial LANGUAGES CXX VERSION 1.1.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake)
 include(SetupConan)

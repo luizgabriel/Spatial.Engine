@@ -1,3 +1,11 @@
+find_program(CMGEN_COMMAND cmgen)
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/textures/
+	COMMAND ${CMGEN_COMMAND} -q -f ktx -x ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox textures/default_skybox.exr
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 find_program(MATC_COMMAND matc)
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
@@ -15,13 +23,16 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
 	fonts/Roboto_Medium.ttf
 	${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat
 	${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
+	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt
+	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_ibl.ktx
+	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx
 	meshes/cube.obj
 	meshes/plane.obj
 	meshes/sphere.obj)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp
-	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
+	DEPENDS ${SPATIAL_EDITOR_RESOURCE_FILES}
 	COMMAND $<TARGET_FILE:Spatial.Res> -p ASSETS_ -h ${CMAKE_CURRENT_BINARY_DIR}/generated.h -s ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp ${SPATIAL_EDITOR_RESOURCE_FILES}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )

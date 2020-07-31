@@ -15,9 +15,9 @@ class InputState
 	std::bitset<keysCount> mKeyPressed;
 	std::bitset<keysCount> mKeyReleased;
 
-	filament::math::float2 m_lastMousePosition;
-	filament::math::float2 m_currentMousePosition;
-	bool m_mouseWarpRequested;
+	filament::math::float2 mLastMousePosition;
+	filament::math::float2 mCurrentMousePosition;
+	bool mMouseWarpRequested;
 
   public:
 	InputState();
@@ -36,17 +36,17 @@ class InputState
 
 	[[nodiscard]] auto getCurrentPosition() const
 	{
-		return m_currentMousePosition;
+		return mCurrentMousePosition;
 	}
 
 	[[nodiscard]] auto getLastPosition() const
 	{
-		return m_lastMousePosition;
+		return mLastMousePosition;
 	}
 
 	[[nodiscard]] bool isMouseWarpRequested() const
 	{
-		return m_mouseWarpRequested;
+		return mMouseWarpRequested;
 	}
 
 	void warpMouseInWindow(filament::math::float2 position);

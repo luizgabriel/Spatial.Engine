@@ -52,7 +52,6 @@ class Signal
 	{
 		m_sink.template disconnect<MemberFunction>(listener);
 	}
-
 };
 
 } // namespace spatial

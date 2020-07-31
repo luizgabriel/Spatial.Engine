@@ -98,7 +98,6 @@ class EventQueue
 	{
 		m_dispatcher.enqueue<Event>(std::forward<Event>(event));
 	}
-
 };
 
 } // namespace spatial

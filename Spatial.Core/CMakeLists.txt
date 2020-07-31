@@ -15,7 +15,6 @@ add_library(Spatial.Core
 	include/spatial/core/ApplicationUtils.h
 	include/spatial/core/Clock.h
 	include/spatial/core/Logger.h
-	include/spatial/core/System.h
 	
 	include/spatial/desktop/MessageBox.h
 	include/spatial/desktop/PlatformEvent.h

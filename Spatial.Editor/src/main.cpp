@@ -30,6 +30,9 @@ int main(int argc, char* argv[])
 		{"editor", MemoryLoader{
 			{"fonts/Roboto_Medium.ttf", {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE}},
 			{"materials/default.filamat", {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE}},
+			{"textures/default_skybox/sh.txt", {ASSETS_SH, ASSETS_SH_SIZE}},
+			{"textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL, ASSETS_DEFAULT_SKYBOX_IBL_SIZE}},
+			{"textures/default_skybox/skybox.ktx", {ASSETS_DEFAULT_SKYBOX_SKYBOX, ASSETS_DEFAULT_SKYBOX_SKYBOX_SIZE}},
 			{"materials/ui.filamat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}}
 		}},
 		{"assets", AggregatorLoader{

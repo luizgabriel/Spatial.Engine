@@ -19,7 +19,6 @@ class InputSystem
 	InputSystem(const InputSystem& other) = delete;
 	InputSystem& operator=(const InputSystem& w) = delete;
 
-	void onStartFrame(float);
 	void onEndFrame();
 
 	void onEvent(const MouseMovedEvent& event);

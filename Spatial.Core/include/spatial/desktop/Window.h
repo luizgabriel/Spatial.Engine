@@ -67,10 +67,10 @@ class DesktopPlatformContext
 	DesktopPlatformContext(DesktopPlatformContext&& c) noexcept;
 	DesktopPlatformContext& operator=(DesktopPlatformContext&& other) noexcept = delete;
 
-	auto& getEventQueue() {
+	auto& getEventQueue()
+	{
 		return mEventQueue;
 	}
-
 };
 
 } // namespace spatial

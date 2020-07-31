@@ -19,4 +19,3 @@
 #include <spatial/ui/UserInterfaceUtils.h>
 
 #include <spatial/render/RenderingSystem.h>
-

@@ -49,4 +49,4 @@ DesktopPlatformContext& operator>>(DesktopPlatformContext& context, Listener& li
 	return context;
 }
 
-}
+} // namespace spatial

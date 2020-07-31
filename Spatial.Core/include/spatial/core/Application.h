@@ -71,7 +71,6 @@ class Application final
 	{
 		return mEndFrameSignal;
 	}
-
 };
 
 } // namespace spatial

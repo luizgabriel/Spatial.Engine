@@ -24,7 +24,7 @@ class EditorSystem
 		float velocity;
 	};
 
-private:
+  private:
 	const assets::ResourcesLoader& mResources;
 	filament::Engine& mEngine;
 	filament::View& mMainView;
@@ -33,6 +33,11 @@ private:
 	Entity mCameraEntity;
 	Camera mCameraComponent;
 	Material mDefaultMaterial;
+
+	Texture mIblTexture;
+	Texture mSkyboxTexture;
+	IndirectLight mSkyboxLight;
+	Skybox mSkybox;
 
 	SimpleCameraView mCam;
 	CameraData mCameraData;
@@ -44,7 +49,7 @@ private:
 	ecs::RenderableSystem mRenderableSystem;
 	ecs::TransformSystem mTransformSystem;
 
-public:
+  public:
 	EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources);
 
 	void onEvent(const MouseMovedEvent& e);

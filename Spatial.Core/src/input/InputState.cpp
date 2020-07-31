@@ -5,7 +5,12 @@ using namespace filament::math;
 namespace spatial
 {
 
-InputState::InputState() : mKeyPressed{}, mKeyReleased{}
+InputState::InputState()
+	: mKeyPressed{},
+	  mKeyReleased{},
+	  mLastMousePosition{.0f, .0f},
+	  mCurrentMousePosition{.0f, .0f},
+	  mMouseWarpRequested{false}
 {
 }
 
@@ -48,18 +53,18 @@ void InputState::reset(Key key)
 void InputState::reset()
 {
 	mKeyReleased.reset();
-	m_mouseWarpRequested = false;
+	mMouseWarpRequested = false;
 }
 
 void InputState::setMousePosition(float2 position)
 {
-	m_lastMousePosition = m_currentMousePosition;
-	m_currentMousePosition = position;
+	mLastMousePosition = mCurrentMousePosition;
+	mCurrentMousePosition = position;
 }
 
 void InputState::warpMouseInWindow(float2 position)
 {
-	m_mouseWarpRequested = true;
+	mMouseWarpRequested = true;
 	setMousePosition(position);
 }
 
