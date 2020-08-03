@@ -18,12 +18,12 @@ UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Windo
 	setViewport(window.getWindowSize(), window.getFrameBufferSize());
 }
 
-void UserInterfaceSystem::setDefaultFont(const std::vector<char>& fontData)
+void UserInterfaceSystem::setFont(const std::vector<char>& fontData)
 {
 	mRenderer.setFont(fontData);
 }
 
-void UserInterfaceSystem::setDefaultMaterial(const std::vector<char>& materialData)
+void UserInterfaceSystem::setMaterial(const std::vector<char>& materialData)
 {
 	mRenderer.setMaterial(materialData);
 }

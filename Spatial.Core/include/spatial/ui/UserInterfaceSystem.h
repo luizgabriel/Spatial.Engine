@@ -27,9 +27,9 @@ class UserInterfaceSystem
 
 	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
 
-	void setDefaultFont(const std::vector<char>& fontData);
+	void setFont(const std::vector<char>& fontData);
 
-	void setDefaultMaterial(const std::vector<char>& materialData);
+	void setMaterial(const std::vector<char>& materialData);
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 

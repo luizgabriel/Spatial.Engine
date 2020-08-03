@@ -30,10 +30,11 @@ int main(int argc, char* argv[])
 		{"editor", MemoryLoader{
 			{"fonts/Roboto_Medium.ttf", {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE}},
 			{"materials/default.filamat", {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE}},
+			{"textures/uv.png", {ASSETS_UV, ASSETS_UV_SIZE}},
 			{"textures/default_skybox/sh.txt", {ASSETS_SH, ASSETS_SH_SIZE}},
 			{"textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL, ASSETS_DEFAULT_SKYBOX_IBL_SIZE}},
 			{"textures/default_skybox/skybox.ktx", {ASSETS_DEFAULT_SKYBOX_SKYBOX, ASSETS_DEFAULT_SKYBOX_SKYBOX_SIZE}},
-			{"materials/ui.filamat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}}
+			{"materials/ui.mat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}}
 		}},
 		{"assets", AggregatorLoader{
 			PhysicalDirLoader{executablePath / "assets"},
@@ -50,8 +51,8 @@ int main(int argc, char* argv[])
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
 	auto ui = UserInterfaceSystem(rendering, window);
-	ui.setDefaultMaterial(resources("editor/materials/ui.filamat").value());
-	ui.setDefaultFont(resources("editor/fonts/Roboto_Medium.ttf").value());
+	ui.setMaterial(resources("editor/materials/ui.mat").value());
+	ui.setFont(resources("editor/fonts/Roboto_Medium.ttf").value());
 
 	auto editor = EditorSystem{rendering, resources};
 

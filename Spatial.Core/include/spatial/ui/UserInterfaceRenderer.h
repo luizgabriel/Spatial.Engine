@@ -21,13 +21,14 @@ class UserInterfaceRenderer
 	Camera mCamera;
 	Material mMaterial;
 	Entity mEntity;
-	Texture mTexture;
+	Skybox mSkybox;
+	Texture mFontTexture;
 
-	std::vector<SharedVertexBuffer> m_vertexBuffers;
-	std::vector<SharedIndexBuffer> m_indexBuffers;
-	std::vector<SharedMaterialInstance> m_materialInstances;
+	std::vector<VertexBuffer> mVertexBuffers;
+	std::vector<IndexBuffer> mIndexBuffers;
+	std::vector<MaterialInstance> mMaterialInstances;
 
-	ImGuiContext* m_imguiContext;
+	ImGuiContext* mImguiContext;
 
 	void renderDrawData();
 	void createBuffers(size_t numRequiredBuffers);

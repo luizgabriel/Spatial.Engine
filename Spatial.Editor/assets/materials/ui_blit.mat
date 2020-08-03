@@ -4,6 +4,10 @@ material {
         {
             type : sampler2d,
             name : albedo
+        },
+        {
+            type : bool,
+            name : is_texture
         }
     ],
     requires : [
@@ -19,11 +23,15 @@ material {
 fragment {
     void material(inout MaterialInputs material) {
         prepareMaterial(material);
-        vec2 uv = getUV0();
-        uv.y = 1.0 - uv.y;
-        float alpha = texture(materialParams_albedo, uv).r;
-        material.baseColor = getColor();
-        material.baseColor.a *= alpha;
-        material.baseColor.rgb *= material.baseColor.a;
+        if (materialParams.is_texture) {
+            material.baseColor = texture(materialParams_albedo, getUV0());
+        } else {
+            vec2 uv = getUV0();
+            uv.y = 1.0 - uv.y;
+            float alpha = texture(materialParams_albedo, uv).r;
+            material.baseColor = getColor();
+            material.baseColor.a *= alpha;
+            material.baseColor.rgb *= material.baseColor.a;
+        }
     }
 }

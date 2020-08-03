@@ -15,6 +15,8 @@ using bands_t = std::array<filament::math::float3, 9>;
 
 bands_t parseShFile(const std::vector<char>& resourceData);
 
+Skybox createSkybox(fl::Engine& engine, fl::math::float4 color);
+
 Skybox createSkybox(filament::Engine& engine, filament::Texture& skybox, bool showSun = true);
 
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,

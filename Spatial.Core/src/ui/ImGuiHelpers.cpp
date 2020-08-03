@@ -1,8 +1,5 @@
 #include <spatial/ui/ImGuiHelpers.h>
 
-#include <filament/IndexBuffer.h>
-#include <filament/VertexBuffer.h>
-
 namespace fs = std::filesystem;
 namespace fl = filament;
 
@@ -38,29 +35,26 @@ bool imguiIsMinimized()
 	return width == 0 && height == 0;
 }
 
-SharedVertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
+VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
 {
-	auto vb =
-		fl::VertexBuffer::Builder()
-			.vertexCount(capacity)
-			.bufferCount(1)
-			.attribute(fl::VertexAttribute::POSITION, 0, fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
-			.attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2, sizeof(fl::math::float2),
-					   sizeof(ImDrawVert))
-			.attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
-					   2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
-			.normalized(fl::VertexAttribute::COLOR)
-			.build(engine);
-
-	return createSharedResource(engine, vb);
+	return VertexBuffer{engine, fl::VertexBuffer::Builder()
+									.vertexCount(capacity)
+									.bufferCount(1)
+									.attribute(fl::VertexAttribute::POSITION, 0,
+											   fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
+									.attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2,
+											   sizeof(fl::math::float2), sizeof(ImDrawVert))
+									.attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
+											   2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
+									.normalized(fl::VertexAttribute::COLOR)
+									.build(engine)};
 }
 
-SharedIndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
+IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
 {
-	auto ib =
-		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine);
-
-	return createSharedResource(engine, ib);
+	return IndexBuffer{
+		engine,
+		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
 uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect)

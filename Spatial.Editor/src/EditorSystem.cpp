@@ -1,17 +1,8 @@
 #include "EditorSystem.h"
 
-#include <spatial/input/Input.h>
+#include <spatial/spatial.h>
 
 #include <imgui.h>
-
-#include <filament/LightManager.h>
-#include <filament/TextureSampler.h>
-
-#include <spatial/ecs/Components.h>
-#include <spatial/render/ResourceLoaders.h>
-#include <spatial/render/SkyboxResources.h>
-
-#include <spatial/assets/AssetReaderUtils.h>
 
 namespace fl = filament;
 using namespace filament::math;
@@ -19,10 +10,17 @@ using namespace filament::math;
 namespace spatial
 {
 
-EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources)
+EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& resources)
 	: mResources{resources},
-	  mEngine{renderingSystem.getEngine()},
-	  mMainView{renderingSystem.getMainView()},
+	  mEngine{engine},
+	  mSceneView{toShared(createView(mEngine))},
+
+	  mRenderColorTexture{
+		  createTexture(mEngine, {1280, 720}, filament::backend::TextureFormat::RGBA16F,
+						filament::Texture::Usage::COLOR_ATTACHMENT | filament::Texture::Usage::SAMPLEABLE)},
+	  mRenderDepthTexture{createTexture(mEngine, {1280, 720}, filament::backend::TextureFormat::DEPTH16,
+										filament::Texture::Usage::DEPTH_ATTACHMENT)},
+	  mRenderTarget{createRenderTarget(mEngine, mRenderColorTexture.ref(), mRenderDepthTexture.ref())},
 
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
@@ -42,14 +40,19 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::Resou
 	  mRenderableSystem{mEngine, mScene.ref()},
 	  mTransformSystem{mEngine}
 {
-	mMainView.setCamera(mCameraComponent.get());
-	mMainView.setScene(mScene.get());
+	mSceneView->setRenderTarget(mRenderTarget.get());
+	mSceneView->setCamera(mCameraComponent.get());
+	mSceneView->setScene(mScene.get());
+	mSceneView->setBlendMode(fl::View::BlendMode::OPAQUE);
 
 	mScene->setIndirectLight(mSkyboxLight.get());
 	mScene->setSkybox(mSkybox.get());
 
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Transform>(entity);
+
+	mSceneView->setViewport({0, 0, 1280, 720});
+	refreshMainViewSize({1280, 720});
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
@@ -94,34 +97,88 @@ void EditorSystem::onDrawGui()
 	if (!showEngineGui)
 		return;
 
+	static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_None;
+	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+
+	ImGuiViewport *viewport = ImGui::GetMainViewport();
+
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace", nullptr, windowFlags);
+	ImGui::PopStyleVar();
+
+	ImGui::PopStyleVar(2);
+
+	// DockSpace
+	ImGuiID dockSpaceId = ImGui::GetID("SpatialDockSpace");
+	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockFlags);
+
+	ImGui::BeginMainMenuBar();
+		ImGui::Text("Spatial Engine");
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("Options"))
+		{
+			//ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
+			//ImGui::MenuItem("Console", NULL, &gOpenedLogging);
+			ImGui::EndMenu();
+		}
+	ImGui::EndMainMenuBar();
+
 	ImGui::Begin("Camera Settings");
+		if (enabledCameraController)
+		{
+			ImGui::Text("Use the WASD to move in the scene.");
+			ImGui::Text("Click to turn OFF:");
+		}
+		else
+		{
+			ImGui::Text("Ctrl + Click to turn ON:");
+		}
 
-	if (enabledCameraController)
-	{
-		ImGui::Text("Use the WASD to move in the scene.");
-		ImGui::Text("Click to turn OFF:");
-	}
-	else
-	{
-		ImGui::Text("Ctrl + Click to turn ON:");
-	}
+		if (ImGui::Checkbox("Camera Movement", &enabledCameraController))
+		{
+			Input::warpMouse({.5f, .5f});
+		}
 
-	if (ImGui::Checkbox("Camera Movement", &enabledCameraController))
-	{
-		Input::warpMouse({.5f, .5f});
-	}
+		ImGui::Separator();
 
-	ImGui::Separator();
+		ImGui::DragFloat("Yaw", &mCam.rotation.x, .001f);
+		ImGui::DragFloat("Pitch", &mCam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
 
-	ImGui::DragFloat("Yaw", &mCam.rotation.x, .001f);
-	ImGui::DragFloat("Pitch", &mCam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
+		ImGui::Separator();
 
-	ImGui::Separator();
-
-	ImGui::DragFloat("Sensitivity", &mCameraData.sensitivity, .001f, .1f, 5.0f);
-	ImGui::DragFloat("Velocity", &mCameraData.velocity, 1.0f, 100.0f, 2000.0f);
-
+		ImGui::DragFloat("Sensitivity", &mCameraData.sensitivity, .001f, .1f, 5.0f);
+		ImGui::DragFloat("Velocity", &mCameraData.velocity, 1.0f, 100.0f, 2000.0f);
 	ImGui::End();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::Begin("Game (Edit Mode)");
+	auto size = ImGui::GetWindowSize();
+	size.y -= 25;
+	refreshMainViewSize(size);
+	ImGui::Image(mRenderColorTexture.get(), size);
+	ImGui::End();
+	ImGui::PopStyleVar();
+}
+
+void EditorSystem::refreshMainViewSize(const ImVec2& size)
+{
+	auto width = static_cast<double>(size.x);
+	auto height = static_cast<double>(size.y);
+
+	mCameraComponent->setProjection(45.0, width / height, 0.1, 1000000.0, fl::Camera::Fov::VERTICAL);
+}
+
+EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources)
+	: EditorSystem(renderingSystem.getEngine(), resources)
+{
+	renderingSystem.pushBackView(mSceneView);
 }
 
 } // namespace spatial

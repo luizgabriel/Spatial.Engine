@@ -37,6 +37,7 @@ class Window
 
 	std::pair<int, int> getFrameBufferSize() const;
 	std::pair<int, int> getWindowSize() const;
+
 	bool hasFocus() const;
 
 	Window(Window&& other) noexcept;

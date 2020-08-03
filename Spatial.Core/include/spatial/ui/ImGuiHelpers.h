@@ -1,6 +1,8 @@
 #pragma once
 
 #include <imgui.h>
+#include <filament/IndexBuffer.h>
+#include <filament/VertexBuffer.h>
 #include <spatial/render/Resources.h>
 #include <string_view>
 
@@ -15,9 +17,9 @@ std::pair<int, int> imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-SharedVertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
+VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
 
-SharedIndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
+IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
 
 uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect);
 

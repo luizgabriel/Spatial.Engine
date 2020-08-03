@@ -9,6 +9,7 @@ add_custom_command(
 find_program(MATC_COMMAND matc)
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/materials/default.mat ${CMAKE_CURRENT_SOURCE_DIR}/materials/ui_blit.mat
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/materials/
 	COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat materials/default.mat
 	COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat materials/ui_blit.mat
@@ -26,6 +27,7 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_ibl.ktx
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx
+	textures/uv.png
 	meshes/cube.obj
 	meshes/plane.obj
 	meshes/sphere.obj)

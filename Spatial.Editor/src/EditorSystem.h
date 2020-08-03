@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
+#include <imgui.h>
 #include <spatial/assets/ResourcesLoader.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/desktop/PlatformEvent.h>
@@ -27,7 +28,12 @@ class EditorSystem
   private:
 	const assets::ResourcesLoader& mResources;
 	filament::Engine& mEngine;
-	filament::View& mMainView;
+
+	SharedView mSceneView;
+
+	Texture mRenderColorTexture;
+	Texture mRenderDepthTexture;
+	RenderTarget mRenderTarget;
 
 	Scene mScene;
 	Entity mCameraEntity;
@@ -50,13 +56,16 @@ class EditorSystem
 	ecs::TransformSystem mTransformSystem;
 
   public:
-	EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources);
+	EditorSystem(RenderingSystem& rendering, const assets::ResourcesLoader& resources);
+
+	EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& resources);
 
 	void onEvent(const MouseMovedEvent& e);
 
 	void onUpdateFrame(float delta);
 
 	void onDrawGui();
+	void refreshMainViewSize(const ImVec2& size);
 };
 
 } // namespace spatial

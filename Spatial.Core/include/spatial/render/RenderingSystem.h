@@ -20,7 +20,7 @@ class RenderingSystem
 	Engine mEngine;
 	SwapChain mSwapChain;
 	Renderer mRenderer;
-	SharedView mMainView;
+	filament::Renderer::ClearOptions mClearOptions;
 
 	std::deque<std::weak_ptr<filament::View>> mViews;
 
@@ -35,11 +35,7 @@ class RenderingSystem
 
 	void onFinish();
 
-	void setupViewport(const std::pair<int, int>& frameBufferSize);
-
 	void onEndFrame();
-
-	void onEvent(const WindowResizedEvent& event);
 
 	/**
 	 * \brief Registers a view to the renderer
@@ -67,19 +63,9 @@ class RenderingSystem
 		return *mEngine.get();
 	}
 
-	[[nodiscard]] const filament::View& getMainView() const
-	{
-		return *mMainView.get();
-	}
-
 	auto& getEngine()
 	{
 		return *mEngine.get();
-	}
-
-	auto& getMainView()
-	{
-		return *mMainView.get();
 	}
 	// endregion
 

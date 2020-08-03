@@ -45,6 +45,13 @@ bands_t parseShFile(const std::vector<char>& resourceData)
 	return bands;
 }
 
+Skybox createSkybox(fl::Engine& engine, fl::math::float4 color)
+{
+	auto resource = fl::Skybox::Builder().color(color).build(engine);
+
+	return createResource(engine, resource);
+}
+
 Skybox createSkybox(fl::Engine& engine, fl::Texture& skybox, bool showSun)
 {
 	auto resource = fl::Skybox::Builder().environment(&skybox).showSun(showSun).build(engine);

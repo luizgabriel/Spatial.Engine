@@ -104,7 +104,22 @@ Material createMaterial(fl::Engine& engine, const std::vector<char>& resourceDat
 	return Material{engine, material};
 }
 
-Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData)
+Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,
+					  fl::Texture::InternalFormat format, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
+{
+	auto texture = fl::Texture::Builder()
+					   .width(dimensions.first)
+					   .height(dimensions.second)
+					   .levels(1)
+					   .usage(usage)
+					   .sampler(sampler)
+					   .format(format)
+					   .build(engine);
+
+	return Texture{engine, texture};
+}
+
+Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	int width, height, n;
 	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(),
@@ -114,17 +129,11 @@ Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData)
 		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
 		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
-	auto texture = fl::Texture::Builder()
-					   .width(uint32_t(width))
-					   .height(uint32_t(height))
-					   .levels(1)
-					   .sampler(fl::Texture::Sampler::SAMPLER_2D)
-					   .format(fl::Texture::InternalFormat::RGBA8)
-					   .build(engine);
-
+	auto texture = createTexture(engine, {static_cast<uint32_t>(width), static_cast<uint32_t>(height)},
+								 fl::Texture::InternalFormat::RGBA8, usage, sampler);
 	texture->setImage(engine, 0, std::move(bufferDescriptor));
 
-	return Texture{engine, texture};
+	return std::move(texture);
 }
 
 VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& vertices)

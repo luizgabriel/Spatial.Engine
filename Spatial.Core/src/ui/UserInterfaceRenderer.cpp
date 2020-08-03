@@ -2,14 +2,13 @@
 #include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <spatial/render/ResourceLoaders.h>
+#include <spatial/render/SkyboxResources.h>
 
 #include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
 #include <filament/TextureSampler.h>
 #include <filament/VertexBuffer.h>
 #include <filament/Viewport.h>
-
-#include <filesystem>
 #include <unordered_map>
 
 namespace fl = filament;
@@ -25,17 +24,19 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	  mCamera{createCamera(mEngine, mCameraEntity.get())},
 	  mMaterial{mEngine},
 	  mEntity{createEntity(mEngine)},
-	  mTexture{createResource<filament::Texture>(mEngine, nullptr)}
+	  mSkybox{createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
+	  mFontTexture{mEngine}
 {
 	mView->setCamera(mCamera.get());
 	mView->setScene(mScene.get());
+	mScene->setSkybox(mSkybox.get());
 	mScene->addEntity(mEntity.get());
 
 	mView->setPostProcessingEnabled(false);
 	mView->setBlendMode(filament::View::BlendMode::TRANSLUCENT);
 	mView->setShadowsEnabled(false);
 
-	m_imguiContext = ImGui::CreateContext();
+	mImguiContext = ImGui::CreateContext();
 }
 
 void UserInterfaceRenderer::setMaterial(const std::vector<char>& materialData)
@@ -45,9 +46,9 @@ void UserInterfaceRenderer::setMaterial(const std::vector<char>& materialData)
 
 void UserInterfaceRenderer::setFont(const std::vector<char>& fontData)
 {
-	mTexture = imguiCreateTextureAtlas(mEngine, fontData);
+	mFontTexture = imguiCreateTextureAtlas(mEngine, fontData);
 
-	mMaterial->setDefaultParameter("albedo", mTexture.get(),
+	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }
 
@@ -55,60 +56,15 @@ void UserInterfaceRenderer::setupEngineTheme()
 {
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
-	// io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_DpiEnableScaleFonts | ImGuiConfigFlags_IsSRGB;
 
 	auto& style = ImGui::GetStyle();
-
-	ImGui::StyleColorsDark();
-	auto colors = style.Colors;
-
-	colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
-	colors[ImGuiCol_ChildBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.00f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-	colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-	colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
-	colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.29f, 0.29f, 0.29f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-	colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-	colors[ImGuiCol_CheckMark] = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
-	colors[ImGuiCol_SliderGrab] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-	colors[ImGuiCol_Button] = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(0.46f, 0.47f, 0.48f, 1.00f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(0.42f, 0.42f, 0.42f, 1.00f);
-	colors[ImGuiCol_Header] = ImVec4(0.70f, 0.70f, 0.70f, 0.31f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(0.70f, 0.70f, 0.70f, 0.80f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(0.48f, 0.50f, 0.52f, 1.00f);
-	colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-	colors[ImGuiCol_SeparatorHovered] = ImVec4(0.72f, 0.72f, 0.72f, 0.78f);
-	colors[ImGuiCol_SeparatorActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-	colors[ImGuiCol_ResizeGrip] = ImVec4(0.91f, 0.91f, 0.91f, 0.25f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.81f, 0.81f, 0.81f, 0.67f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.95f);
-	colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-	colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-	colors[ImGuiCol_PlotHistogram] = ImVec4(0.73f, 0.60f, 0.15f, 1.00f);
-	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-	colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
-	colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-	colors[ImGuiCol_NavHighlight] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+	ImGui::StyleColorsDark(&style);
 }
 
 UserInterfaceRenderer::~UserInterfaceRenderer()
 {
-	ImGui::DestroyContext(m_imguiContext);
+	ImGui::DestroyContext(mImguiContext);
 }
 
 void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
@@ -130,7 +86,7 @@ void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
 
 void UserInterfaceRenderer::beforeRender(float delta) const
 {
-	ImGui::SetCurrentContext(m_imguiContext);
+	ImGui::SetCurrentContext(mImguiContext);
 	imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();
 }
@@ -162,35 +118,17 @@ void UserInterfaceRenderer::renderDrawData()
 	createBuffers(imguiData->CmdListsCount);
 
 	// Count how many primitives we'll need, then create a Renderable builder.
-	// Also count how many unique scissor rectangles are required.
 	size_t nPrims = 0;
-	std::unordered_map<uint64_t, fl::MaterialInstance*> scissorRects;
-	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
-	{
+	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++) {
 		const ImDrawList* cmds = imguiData->CmdLists[cmdListIndex];
 		nPrims += cmds->CmdBuffer.size();
-		for (const auto& pcmd : cmds->CmdBuffer)
-		{
-			scissorRects[imguiMakeScissorKey(fbHeight, pcmd.ClipRect)] = nullptr;
-		}
 	}
+
 	auto rBuilder = fl::RenderableManager::Builder(nPrims);
 	rBuilder.boundingBox({{0, 0, 0}, {10000, 10000, 10000}}).culling(false);
 
 	// Ensure that we have a material instance for each scissor rectangle.
-	createMaterialInstances(scissorRects.size());
-
-	// Push each unique scissor rectangle to a MaterialInstance.
-	size_t matIndex = 0;
-	for (auto& pair : scissorRects)
-	{
-		pair.second = m_materialInstances[matIndex++].get();
-		uint32_t left = (pair.first >> 0ull) & 0xffffull;
-		uint32_t bottom = (pair.first >> 16ull) & 0xffffull;
-		uint32_t width = (pair.first >> 32ull) & 0xffffull;
-		uint32_t height = (pair.first >> 48ull) & 0xffffull;
-		pair.second->setScissor(left, bottom, width, height);
-	}
+	createMaterialInstances(nPrims);
 
 	// Recreate the Renderable component and point it to the vertex buffers.
 	rcm.destroy(mEntity.get());
@@ -210,15 +148,23 @@ void UserInterfaceRenderer::renderDrawData()
 			}
 			else
 			{
-				auto sKey = imguiMakeScissorKey(fbHeight, pcmd.ClipRect);
-				auto mIter = scissorRects.find(sKey);
-				assert(mIter != scissorRects.end());
+				auto& mi = mMaterialInstances[primIndex];
+				mi->setScissor( pcmd.ClipRect.x, fbHeight - pcmd.ClipRect.w,
+											  (uint16_t) (pcmd.ClipRect.z - pcmd.ClipRect.x),
+											  (uint16_t) (pcmd.ClipRect.w - pcmd.ClipRect.y));
+
+				if (pcmd.TextureId) {
+					mi->setParameter("is_texture", true);
+					mi->setParameter("albedo", reinterpret_cast<const fl::Texture*>(pcmd.TextureId), fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+				}
+
 				rBuilder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
-							  m_vertexBuffers[bufferIndex].get(), m_indexBuffers[bufferIndex].get(), indexOffset,
-							  pcmd.ElemCount)
+							  mVertexBuffers[bufferIndex].get(), mIndexBuffers[bufferIndex].get(),
+							  indexOffset, pcmd.ElemCount)
 					.blendOrder(primIndex, primIndex)
-					.material(primIndex, mIter->second);
+					.material(primIndex, mi.get());
+
 				primIndex++;
 			}
 			indexOffset += pcmd.ElemCount;
@@ -235,38 +181,41 @@ void UserInterfaceRenderer::renderDrawData()
 
 void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 {
-	if (numRequiredBuffers > m_vertexBuffers.size())
+	if (numRequiredBuffers > mVertexBuffers.size())
 	{
-		const size_t previousSize = m_vertexBuffers.size();
-		m_vertexBuffers.resize(numRequiredBuffers, nullptr);
-		for (size_t i = previousSize; i < m_vertexBuffers.size(); i++)
+		const size_t previousSize = mVertexBuffers.size();
+		mVertexBuffers.reserve(numRequiredBuffers);
+
+		for (size_t i = previousSize; i < numRequiredBuffers; i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_vertexBuffers[i] = imguiCreateVertexBuffer(mEngine, 1000);
+			mVertexBuffers.emplace_back(imguiCreateVertexBuffer(mEngine, 1000));
 		}
 	}
 
-	if (numRequiredBuffers > m_indexBuffers.size())
+
+	if (numRequiredBuffers > mIndexBuffers.size())
 	{
-		const size_t previousSize = m_indexBuffers.size();
-		m_indexBuffers.resize(numRequiredBuffers, nullptr);
-		for (size_t i = previousSize; i < m_indexBuffers.size(); i++)
+		const size_t previousSize = mIndexBuffers.size();
+		mIndexBuffers.reserve(numRequiredBuffers);
+
+		for (size_t i = previousSize; i < numRequiredBuffers; i++)
 		{
 			// Pick a reasonable starting capacity; it will grow if needed.
-			m_indexBuffers[i] = imguiCreateIndexBuffer(mEngine, 5000);
+			mIndexBuffers.emplace_back(imguiCreateIndexBuffer(mEngine, 5000));
 		}
 	}
 }
 
 void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 {
-	const size_t previousSize = m_materialInstances.size();
-	if (numRequiredInstances > m_materialInstances.size())
+	const size_t previousSize = mMaterialInstances.size();
+	if (numRequiredInstances > mMaterialInstances.size())
 	{
-		m_materialInstances.resize(numRequiredInstances);
-		for (size_t i = previousSize; i < m_materialInstances.size(); i++)
+		mMaterialInstances.reserve(numRequiredInstances);
+		for (size_t i = previousSize; i < numRequiredInstances; i++)
 		{
-			m_materialInstances[i] = createSharedResource(mEngine, mMaterial->createInstance());
+			mMaterialInstances.emplace_back(mEngine, mMaterial->createInstance());
 		}
 	}
 }
@@ -277,23 +226,23 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
 	{
-		const size_t capacityVertCount = m_vertexBuffers[bufferIndex]->getVertexCount();
+		const size_t capacityVertCount = mVertexBuffers[bufferIndex]->getVertexCount();
 		if (static_cast<size_t>(vb.Size) > capacityVertCount)
-			m_vertexBuffers[bufferIndex] = imguiCreateVertexBuffer(mEngine, vb.Size);
+			mVertexBuffers[bufferIndex] = imguiCreateVertexBuffer(mEngine, vb.Size);
 
 		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
-		m_vertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
+		mVertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
 	}
 
 	// Create a new index buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
 	{
-		const size_t capacityIndexCount = m_indexBuffers[bufferIndex]->getIndexCount();
+		const size_t capacityIndexCount = mIndexBuffers[bufferIndex]->getIndexCount();
 		if (static_cast<size_t>(ib.Size) > capacityIndexCount)
-			m_indexBuffers[bufferIndex] = imguiCreateIndexBuffer(mEngine, ib.Size);
+			mIndexBuffers[bufferIndex] = imguiCreateIndexBuffer(mEngine, ib.Size);
 
 		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);
-		m_indexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
+		mIndexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 	}
 }
 

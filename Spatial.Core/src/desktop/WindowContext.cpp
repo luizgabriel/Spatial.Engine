@@ -109,6 +109,7 @@ DesktopPlatformContext::DesktopPlatformContext(DesktopPlatformContext&& c) noexc
 	}
 }
 
+
 Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept
 {
 	switch (scanCode)

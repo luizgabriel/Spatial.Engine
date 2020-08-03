@@ -40,4 +40,14 @@ MaterialInstance createMaterialInstance(fl::Engine& engine, fl::Material& materi
 	return MaterialInstance{engine, material.createInstance(name)};
 }
 
+RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth)
+{
+	auto target = fl::RenderTarget::Builder()
+		.texture(fl::RenderTarget::AttachmentPoint::COLOR, &color)
+		.texture(fl::RenderTarget::AttachmentPoint::DEPTH, &depth)
+		.build(engine);
+
+	return RenderTarget{engine, target};
+}
+
 } // namespace spatial

@@ -9,8 +9,10 @@
 #include <filament/Scene.h>
 #include <filament/Skybox.h>
 #include <filament/Texture.h>
+#include <filament/TextureSampler.h>
 #include <filament/VertexBuffer.h>
 #include <filament/View.h>
+#include <filament/RenderTarget.h>
 
 #include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>
@@ -33,6 +35,7 @@ using VertexBuffer = EngineResource<filament::VertexBuffer>;
 using IndexBuffer = EngineResource<filament::IndexBuffer>;
 using Skybox = EngineResource<filament::Skybox>;
 using IndirectLight = EngineResource<filament::IndirectLight>;
+using RenderTarget = EngineResource<filament::RenderTarget>;
 
 // Shared Pointers
 using SharedScene = SharedEngineResource<filament::Scene>;
@@ -76,5 +79,7 @@ Entity createEntity(filament::Engine& engine) noexcept;
 
 MaterialInstance createMaterialInstance(filament::Engine& engine, filament::Material& material,
 										const char* name = nullptr) noexcept;
+
+RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
 
 } // namespace spatial
