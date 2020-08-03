@@ -50,70 +50,78 @@ struct MeshPart
 struct Mesh
 {
   private:
-	filament::Engine& m_engine;
-	VertexBuffer m_vertexBuffer;
-	IndexBuffer m_indexBuffer;
+	filament::Engine& mEngine;
+	VertexBuffer mVertexBuffer;
+	IndexBuffer mIndexBuffer;
 
-	filament::Box m_boundingBox;
-	std::vector<MeshPart> m_parts;
+	filament::Box mBoundingBox;
+	std::vector<MeshPart> mParts;
 
   public:
+	explicit Mesh(filament::Engine& engine);
+
 	Mesh(filament::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, filament::Box boundingBox,
 		 size_t numParts);
 
+	Mesh(Mesh&& mesh) noexcept;
+	Mesh& operator=(Mesh&& other) noexcept;
+
+	Mesh(const Mesh& mesh) = delete;
+	Mesh& operator=(const Mesh& other) noexcept = delete;
+
 	[[nodiscard]] size_t size() const
 	{
-		return m_parts.size();
+		return mParts.size();
 	}
 
 	MeshPart& operator[](size_t index)
 	{
-		return m_parts[index];
+		return mParts[index];
 	}
 
 	const MeshPart& operator[](size_t index) const
 	{
-		return m_parts[index];
+		return mParts[index];
 	}
 
 	[[nodiscard]] auto begin() const noexcept
 	{
-		return m_parts.begin();
+		return mParts.begin();
 	}
 
 	[[nodiscard]] auto end() const noexcept
 	{
-		return m_parts.end();
+		return mParts.end();
 	}
 
 	[[nodiscard]] auto boundingBox() const
 	{
-		return m_boundingBox;
+		return mBoundingBox;
 	}
 
 	[[nodiscard]] auto& getVertexBuffer()
 	{
-		return m_vertexBuffer;
+		return mVertexBuffer;
 	}
 
 	[[nodiscard]] auto& getIndexBuffer()
 	{
-		return m_indexBuffer;
+		return mIndexBuffer;
 	}
 
 	[[nodiscard]] auto& getVertexBuffer() const
 	{
-		return m_vertexBuffer;
+		return mVertexBuffer;
 	}
 
 	[[nodiscard]] auto& getIndexBuffer() const
 	{
-		return m_indexBuffer;
+		return mIndexBuffer;
 	}
 
 	[[nodiscard]] auto& getEngine() const
 	{
-		return m_engine;
+		return mEngine;
 	}
 
 	void build(utils::Entity entity, filament::MaterialInstance* defaultInstance);

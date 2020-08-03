@@ -2,7 +2,7 @@ find_program(CMGEN_COMMAND cmgen)
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/textures/
-	COMMAND ${CMGEN_COMMAND} -q -f ktx -x ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox textures/default_skybox.exr
+	COMMAND ${CMGEN_COMMAND} -q -f ktx -s 512 -x ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox textures/default_skybox.exr
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -13,6 +13,17 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/materials/
 	COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat materials/default.mat
 	COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat materials/ui_blit.mat
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+find_program(FILAMESH_COMMAND filamesh)
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh ${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh ${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/meshes/plane.obj ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cube.obj ${CMAKE_CURRENT_SOURCE_DIR}/meshes/sphere.obj
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/meshes/
+	COMMAND ${FILAMESH_COMMAND} -c meshes/plane.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh
+	COMMAND ${FILAMESH_COMMAND} -c meshes/cube.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh
+	COMMAND ${FILAMESH_COMMAND} -c meshes/sphere.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -28,9 +39,9 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_ibl.ktx
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx
 	textures/uv.png
-	meshes/cube.obj
-	meshes/plane.obj
-	meshes/sphere.obj)
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp

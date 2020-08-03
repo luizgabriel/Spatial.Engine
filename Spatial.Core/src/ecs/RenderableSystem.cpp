@@ -5,7 +5,7 @@ namespace spatial::ecs
 {
 
 RenderableSystem::RenderableSystem(filament::Engine& engine, filament::Scene& scene)
-	: mManager{engine.getRenderableManager()}, mScene{scene}
+	: mScene{scene}
 {
 }
 

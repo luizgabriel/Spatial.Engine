@@ -7,11 +7,11 @@ namespace spatial
 
 Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer, fl::Box boundingBox,
 		   size_t numParts)
-	: m_engine{engine},
-	  m_vertexBuffer{std::move(vertexBuffer)},
-	  m_indexBuffer{std::move(indexBuffer)},
-	  m_boundingBox{boundingBox},
-	  m_parts(numParts)
+	: mEngine{engine},
+	  mVertexBuffer{std::move(vertexBuffer)},
+	  mIndexBuffer{std::move(indexBuffer)},
+	  mBoundingBox{boundingBox},
+	  mParts(numParts)
 {
 }
 
@@ -27,7 +27,7 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 	builder.boundingBox(boundingBox());
 
 	size_t index{};
-	for (auto& part : m_parts)
+	for (auto& part : mParts)
 	{
 		builder.geometry(index, fl::RenderableManager::PrimitiveType::TRIANGLES, getVertexBuffer().get(),
 						 getIndexBuffer().get(), part.offset, part.minIndex, part.maxIndex, part.indexCount);
@@ -41,6 +41,30 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 	}
 
 	builder.build(getEngine(), entity);
+}
+
+Mesh::Mesh(filament::Engine& engine)
+	 : mEngine{engine}, mVertexBuffer{engine}, mIndexBuffer{engine}, mBoundingBox{}, mParts(0)
+{
+}
+
+Mesh::Mesh(Mesh&& other) noexcept
+	 : mEngine{other.mEngine},
+	   mVertexBuffer{std::move(other.mVertexBuffer)},
+	   mIndexBuffer{std::move(other.mIndexBuffer)},
+	   mBoundingBox{std::move(other.mBoundingBox)},
+	   mParts(std::move(other.mParts))
+{
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+	mVertexBuffer = std::move(other.mVertexBuffer);
+	mIndexBuffer = std::move(other.mIndexBuffer);
+	mBoundingBox = std::move(other.mBoundingBox);
+	mParts = std::move(other.mParts);
+
+	return *this;
 }
 
 } // namespace spatial

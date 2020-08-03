@@ -14,7 +14,6 @@ namespace spatial::ecs
 class RenderableSystem
 {
   private:
-	filament::RenderableManager& mManager;
 	filament::Scene& mScene;
 
   public:

@@ -34,7 +34,10 @@ int main(int argc, char* argv[])
 			{"textures/default_skybox/sh.txt", {ASSETS_SH, ASSETS_SH_SIZE}},
 			{"textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL, ASSETS_DEFAULT_SKYBOX_IBL_SIZE}},
 			{"textures/default_skybox/skybox.ktx", {ASSETS_DEFAULT_SKYBOX_SKYBOX, ASSETS_DEFAULT_SKYBOX_SKYBOX_SIZE}},
-			{"materials/ui.mat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}}
+			{"materials/ui.mat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}},
+			{"meshes/plane.filamesh", {ASSETS_PLANE, ASSETS_PLANE_SIZE}},
+			{"meshes/cube.filamesh", {ASSETS_CUBE, ASSETS_CUBE_SIZE}},
+			{"meshes/sphere.filamesh", {ASSETS_SPHERE, ASSETS_SPHERE_SIZE}},
 		}},
 		{"assets", AggregatorLoader{
 			PhysicalDirLoader{executablePath / "assets"},

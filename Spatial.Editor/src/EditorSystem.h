@@ -11,6 +11,7 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/Resources.h>
+#include "ShapeSystem.h"
 
 namespace fl = filament;
 
@@ -38,7 +39,6 @@ class EditorSystem
 	Scene mScene;
 	Entity mCameraEntity;
 	Camera mCameraComponent;
-	Material mDefaultMaterial;
 
 	Texture mIblTexture;
 	Texture mSkyboxTexture;
@@ -54,6 +54,7 @@ class EditorSystem
 	entt::registry mRegistry;
 	ecs::RenderableSystem mRenderableSystem;
 	ecs::TransformSystem mTransformSystem;
+	ecs::ShapeSystem mShapeSystem;
 
   public:
 	EditorSystem(RenderingSystem& rendering, const assets::ResourcesLoader& resources);

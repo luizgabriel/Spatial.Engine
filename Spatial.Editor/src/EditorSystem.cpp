@@ -1,8 +1,11 @@
 #include "EditorSystem.h"
 
 #include <spatial/spatial.h>
+#include <spatial/ecs/RegistryUtils.h>
 
 #include <imgui.h>
+
+#include "Components.h"
 
 namespace fl = filament;
 using namespace filament::math;
@@ -25,7 +28,6 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
 	  mCameraComponent{createCamera(mEngine, mCameraEntity.get())},
-	  mDefaultMaterial{createMaterial(mEngine, mResources("editor/materials/default.filamat").value())},
 
 	  mIblTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/ibl.ktx").value())},
 	  mSkyboxTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/skybox.ktx").value())},
@@ -38,8 +40,12 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 
 	  mRegistry{},
 	  mRenderableSystem{mEngine, mScene.ref()},
-	  mTransformSystem{mEngine}
+	  mTransformSystem{mEngine},
+	  mShapeSystem{mEngine, mResources}
 {
+	mShapeSystem.setMaterial("editor/materials/default.filamat");
+	ecs::connect<ecs::Shape>(mRegistry, mShapeSystem);
+
 	mSceneView->setRenderTarget(mRenderTarget.get());
 	mSceneView->setCamera(mCameraComponent.get());
 	mSceneView->setScene(mScene.get());
@@ -50,6 +56,7 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Transform>(entity);
+	mRegistry.emplace<ecs::Shape>(entity, "editor/meshes/cube.filamesh");
 
 	mSceneView->setViewport({0, 0, 1280, 720});
 	refreshMainViewSize({1280, 720});

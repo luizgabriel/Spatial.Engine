@@ -156,6 +156,9 @@ void UserInterfaceRenderer::renderDrawData()
 				if (pcmd.TextureId) {
 					mi->setParameter("is_texture", true);
 					mi->setParameter("albedo", reinterpret_cast<const fl::Texture*>(pcmd.TextureId), fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+				} else {
+					mi->setParameter("albedo", mFontTexture.get(), fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+					mi->setParameter("is_texture", false);
 				}
 
 				rBuilder
