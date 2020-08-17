@@ -41,6 +41,7 @@ add_library(Spatial.Core
 	include/spatial/ui/UserInterfaceRenderer.h
 	include/spatial/ui/UserInterfaceSystem.h
 	include/spatial/ui/UserInterfaceUtils.h
+	include/spatial/ui/ImGuiSceneWindow.h
 	
 	include/spatial/ecs/Components.h
 	include/spatial/ecs/RenderableSystem.h
@@ -77,6 +78,7 @@ add_library(Spatial.Core
 	src/ui/UserInterfaceSystem.cpp
 	src/ui/UserInterfaceRenderer.cpp
 	src/ui/UserInterfaceInput.cpp
+	src/ui/ImGuiSceneWindow.cpp
 	
 	src/ecs/RenderableSystem.cpp
 	src/ecs/TransformSystem.cpp)

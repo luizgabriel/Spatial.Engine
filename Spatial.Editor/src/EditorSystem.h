@@ -11,6 +11,7 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/Resources.h>
+#include <spatial/ui/ImGuiSceneWindow.h>
 #include "ShapeSystem.h"
 
 namespace fl = filament;
@@ -32,10 +33,6 @@ class EditorSystem
 
 	SharedView mSceneView;
 
-	Texture mRenderColorTexture;
-	Texture mRenderDepthTexture;
-	RenderTarget mRenderTarget;
-
 	Scene mScene;
 	Entity mCameraEntity;
 	Camera mCameraComponent;
@@ -47,6 +44,7 @@ class EditorSystem
 
 	SimpleCameraView mCam;
 	CameraData mCameraData;
+	ui::ImGuiSceneWindow mImGuiSceneWindow;
 
 	bool showEngineGui{true};
 	bool enabledCameraController{true};
@@ -66,7 +64,8 @@ class EditorSystem
 	void onUpdateFrame(float delta);
 
 	void onDrawGui();
-	void refreshMainViewSize(const ImVec2& size);
+
+	void onSceneWindowResized(ui::ImGuiSceneWindow::Size size);
 };
 
 } // namespace spatial

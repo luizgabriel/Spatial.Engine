@@ -18,13 +18,6 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 	  mEngine{engine},
 	  mSceneView{toShared(createView(mEngine))},
 
-	  mRenderColorTexture{
-		  createTexture(mEngine, {1280, 720}, filament::backend::TextureFormat::RGBA16F,
-						filament::Texture::Usage::COLOR_ATTACHMENT | filament::Texture::Usage::SAMPLEABLE)},
-	  mRenderDepthTexture{createTexture(mEngine, {1280, 720}, filament::backend::TextureFormat::DEPTH16,
-										filament::Texture::Usage::DEPTH_ATTACHMENT)},
-	  mRenderTarget{createRenderTarget(mEngine, mRenderColorTexture.ref(), mRenderDepthTexture.ref())},
-
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
 	  mCameraComponent{createCamera(mEngine, mCameraEntity.get())},
@@ -37,6 +30,7 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 
 	  mCam{{.0f, .0f}, {300.0f, 300.0f, 300.0f}},
 	  mCameraData{.5f, 100.0f},
+	  mImGuiSceneWindow{mEngine, {1280, 720}},
 
 	  mRegistry{},
 	  mRenderableSystem{mEngine, mScene.ref()},
@@ -44,9 +38,10 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 	  mShapeSystem{mEngine, mResources}
 {
 	mShapeSystem.setMaterial("editor/materials/default.filamat");
-	ecs::connect<ecs::Shape>(mRegistry, mShapeSystem);
+	connect<ecs::Shape>(mRegistry, mShapeSystem);
+	connect<ecs::Renderable>(mRegistry, mRenderableSystem);
 
-	mSceneView->setRenderTarget(mRenderTarget.get());
+	mSceneView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mSceneView->setCamera(mCameraComponent.get());
 	mSceneView->setScene(mScene.get());
 	mSceneView->setBlendMode(fl::View::BlendMode::OPAQUE);
@@ -59,7 +54,9 @@ EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& re
 	mRegistry.emplace<ecs::Shape>(entity, "editor/meshes/cube.filamesh");
 
 	mSceneView->setViewport({0, 0, 1280, 720});
-	refreshMainViewSize({1280, 720});
+	onSceneWindowResized({1280, 720});
+
+	mImGuiSceneWindow >> *this;
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
@@ -164,20 +161,13 @@ void EditorSystem::onDrawGui()
 		ImGui::DragFloat("Velocity", &mCameraData.velocity, 1.0f, 100.0f, 2000.0f);
 	ImGui::End();
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("Game (Edit Mode)");
-	auto size = ImGui::GetWindowSize();
-	size.y -= 25;
-	refreshMainViewSize(size);
-	ImGui::Image(mRenderColorTexture.get(), size);
-	ImGui::End();
-	ImGui::PopStyleVar();
+	mImGuiSceneWindow.draw("Scene View (Editor)");
 }
 
-void EditorSystem::refreshMainViewSize(const ImVec2& size)
+void EditorSystem::onSceneWindowResized(ui::ImGuiSceneWindow::Size size)
 {
-	auto width = static_cast<double>(size.x);
-	auto height = static_cast<double>(size.y);
+	auto width = static_cast<double>(size.first);
+	auto height = static_cast<double>(size.second);
 
 	mCameraComponent->setProjection(45.0, width / height, 0.1, 1000000.0, fl::Camera::Fov::VERTICAL);
 }

@@ -3,7 +3,7 @@
 #include <boost/tti/has_member_function.hpp>
 #include <entt/entity/registry.hpp>
 
-namespace spatial::ecs
+namespace spatial
 {
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onConstruct);
@@ -37,6 +37,12 @@ void connect(entt::registry& registry, Listener& listener)
 		registry.on_replace<Component>().template connect<&Listener::onReplace>(listener);
 }
 
+template <typename Component, typename... Listeners>
+void connect(entt::registry& registry, Listeners&... listener)
+{
+	(connect(registry, listener), ...);
+}
+
 template <typename Component, typename Listener>
 void disconnect(entt::registry& registry, Listener& listener)
 {
@@ -48,6 +54,24 @@ void disconnect(entt::registry& registry, Listener& listener)
 
 	if constexpr (has_on_replace_v<Listener>)
 		registry.on_replace<Component>().template disconnect<&Listener::onReplace>(listener);
+}
+
+template <typename Component, typename... Listeners>
+void disconnect(entt::registry& registry, Listeners&... listener)
+{
+	(disconnect(registry, listener), ...);
+}
+
+template <typename Component>
+struct RegistryConnector {
+	std::reference_wrapper<entt::registry> registry;
+};
+
+template <typename Component, typename Listener>
+RegistryConnector<Component> operator>>(RegistryConnector<Component> connector, Listener& listener)
+{
+	connect<Component>(connector.registry, listener);
+	return connector;
 }
 
 } // namespace spatial::ecs

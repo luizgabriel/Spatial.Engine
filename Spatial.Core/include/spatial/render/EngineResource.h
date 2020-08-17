@@ -56,6 +56,11 @@ class EngineResource
 		return *m_resource;
 	}
 
+    const ResourceType& ref() const
+    {
+        return *m_resource;
+    }
+
 	const ResourceType* get() const
 	{
 		return m_resource;
