@@ -90,9 +90,9 @@ void EditorSystem::onStart()
 	mRenderableSystem.buildShapeRenderables(mRegistry, mMeshSystem);
 
 	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", fl::math::float4{1.0f, 1.0f, 1.0f, 1.0f});
+		materialInstance->setParameter("baseColor", fl::math::float4{0.5f, 1.0f, 0.2f, 1.0f});
 		materialInstance->setParameter("metallic", .1f);
-		materialInstance->setParameter("roughness", .5f);
+		materialInstance->setParameter("roughness", .1f);
 		materialInstance->setParameter("reflectance", .1f);
 	});
 }
@@ -106,7 +106,8 @@ void EditorSystem::onEvent(const MouseMovedEvent&)
 
 		auto& transform = mRegistry.get<ecs::Transform>(mCameraEntity);
 		transform.rotation.x += delta.x * pi<float> * -mMovement.sensitivity;
-		transform.rotation.y = std::clamp(transform.rotation.y + delta.y * pi<float> * mMovement.sensitivity, -halfPi<float>, halfPi<float>);
+		transform.rotation.y = std::clamp(transform.rotation.y + delta.y * pi<float> * mMovement.sensitivity,
+										  -halfPi<float>, halfPi<float>);
 
 		Input::warpMouse({.5f, .5f});
 	}
@@ -179,7 +180,7 @@ void EditorSystem::onDrawGui()
 	ImGui::PopStyleVar(2);
 
 	// DockSpace
-	ImGuiID dockSpaceId = ImGui::GetID("SpatialDockSpace");
+	static ImGuiID dockSpaceId = ImGui::GetID("SpatialDockSpace");
 	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockFlags);
 
 	ImGui::BeginMainMenuBar();
@@ -196,33 +197,85 @@ void EditorSystem::onDrawGui()
 
 	mImGuiSceneWindow.draw("Scene View (Editor)");
 
-	ImGui::Begin("Main Camera");
+	ImGui::Begin("Scene Graph");
 
-	auto& transform = mRegistry.get<ecs::Transform>(mCameraEntity);
-	ui::transformInput(transform, "pr");
-
-	ImGui::Separator();
-
-	ImGui::Checkbox("Warp Mouse", &mMovement.warpMouse);
-	ImGui::InputFloat("Velocity", &mMovement.velocity);
-	ImGui::InputFloat("Sensitivity", &mMovement.sensitivity);
-
-	ImGui::Separator();
-
-	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
-	ui::cameraInput(camera);
+	static entt::entity selectedEntity{};
+	ui::sceneGraph(mRegistry, selectedEntity);
 
 	ImGui::End();
+
+	if (mRegistry.valid(selectedEntity))
+	{
+		ImGui::Begin("Properties");
+
+		auto& name = mRegistry.get<ecs::Name>(selectedEntity);
+		ui::inputText("Name", name.value);
+
+		auto* transform = mRegistry.try_get<ecs::Transform>(selectedEntity);
+		auto* camera = mRegistry.try_get<ecs::Camera>(selectedEntity);
+		auto* mesh = mRegistry.try_get<ecs::Mesh>(selectedEntity);
+		auto* material = mRegistry.try_get<ecs::Material>(selectedEntity);
+
+		if (transform)
+		{
+			ImGui::Text("%s", "Transform");
+
+			if (camera)
+			{
+				ui::transformInput(*transform, "py");
+			}
+			else
+			{
+				ui::transformInput(*transform, "prs");
+			}
+
+			ImGui::Separator();
+		}
+
+		if (mesh)
+		{
+			ImGui::Text("%s", "Mesh");
+			ui::inputText("Resource", mesh->resourceFilePath);
+			ImGui::Separator();
+		}
+
+		if (material)
+		{
+			ImGui::Text("%s", "Material");
+			ui::inputText("Resource", material->resourceFilePath);
+			ImGui::Separator();
+		}
+
+		if (camera)
+		{
+			ImGui::Text("%s", "Camera");
+			ui::cameraInput(*camera);
+
+			ImGui::Separator();
+
+			ImGui::Checkbox("Warp Mouse", &mMovement.warpMouse);
+			ImGui::InputFloat("Velocity", &mMovement.velocity);
+			ImGui::InputFloat("Sensitivity", &mMovement.sensitivity);
+		}
+
+		ImGui::End();
+	}
 }
 
 void EditorSystem::onSceneWindowResized(ui::ImGuiSceneWindow::Size size)
 {
 	auto width = static_cast<float>(size.first);
 	auto height = static_cast<float>(size.second);
+	auto aspectRatio = width / height;
 
 	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
-	if (auto* proj = std::get_if<ecs::Camera::Perspective>(&camera.projection)) {
-		proj->aspectRatio = width / height;
+	if (auto* proj1 = std::get_if<ecs::Camera::Perspective>(&camera.projection))
+	{
+		proj1->aspectRatio = aspectRatio;
+	}
+	else if (auto* proj2 = std::get_if<ecs::Camera::Ortographic>(&camera.projection))
+	{
+		proj2->aspectRatio = aspectRatio;
 	}
 }
 

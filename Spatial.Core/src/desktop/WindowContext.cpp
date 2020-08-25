@@ -20,7 +20,10 @@ DesktopPlatformContext::~DesktopPlatformContext()
 
 void DesktopPlatformContext::onStartFrame(float)
 {
-	SDL_Event e;
+	if (!mValid)
+		return;
+
+	SDL_Event e{};
 	while (SDL_PollEvent(&e))
 	{
 		switch (e.type)
@@ -31,6 +34,7 @@ void DesktopPlatformContext::onStartFrame(float)
 
 		case SDL_TEXTINPUT:
 			mEventQueue.enqueue<TextEvent>(std::string{e.text.text});
+			break;
 
 		case SDL_KEYDOWN: {
 			auto key = mapKeyFromScancode(e.key.keysym.scancode);
@@ -82,7 +86,8 @@ void DesktopPlatformContext::onStartFrame(float)
 
 			break;
 		}
-		default:;
+		default:
+			break;
 		}
 	}
 
@@ -108,7 +113,6 @@ DesktopPlatformContext::DesktopPlatformContext(DesktopPlatformContext&& c) noexc
 			mValid = false;
 	}
 }
-
 
 Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept
 {

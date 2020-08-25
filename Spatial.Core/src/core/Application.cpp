@@ -46,11 +46,7 @@ int Application::run()
 
 		mStartFrameSignal(delta);
 
-		while (mClock.hasLag(mDesiredDelta))
-		{
-			mUpdateFrameSignal(mDesiredDelta);
-			mClock.fixLag();
-		}
+		mUpdateFrameSignal(delta);
 
 		mEndFrameSignal();
 

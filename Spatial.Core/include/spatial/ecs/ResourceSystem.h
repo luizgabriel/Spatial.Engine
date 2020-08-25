@@ -5,11 +5,12 @@
 #include <spatial/assets/ResourcesLoader.h>
 #include <filament/Engine.h>
 #include <unordered_map>
+#include <vector>
 
 namespace spatial::ecs
 {
 
-template <typename ComponentType, typename ResourceType, auto CreatorFunction>
+template <typename ComponentType, typename ResourceType, ResourceType (*CreatorFunction)(filament::Engine&, const std::vector<char>&) >
 class ResourceSystem
 {
   public:
@@ -18,6 +19,9 @@ class ResourceSystem
 	{
 	}
 
+	ResourceSystem(const ResourceSystem& other) = delete;
+	ResourceSystem& operator =(const ResourceSystem& other) = delete;
+
 	void onConstruct(entt::registry& registry, entt::entity entity)
 	{
 		const auto& component = registry.get<ComponentType>(entity);
@@ -25,7 +29,8 @@ class ResourceSystem
 		if (!mResourcesMap.contains(component.resourceFilePath)) {
 			auto resourceData = mResourceLoader(component.resourceFilePath);
 			if (resourceData) {
-				mResourcesMap.emplace(component.resourceFilePath, CreatorFunction(mEngine, resourceData.value()));
+				auto resource = CreatorFunction(mEngine, resourceData.value());
+				mResourcesMap.emplace(component.resourceFilePath, std::move(resource));
 			} else {
 				// Throw?
 			}

@@ -10,6 +10,9 @@
 namespace spatial::ecs
 {
 
+struct DefaultMaterial {
+	filament::math::float4 baseColor;
 
+};
 
 } // namespace spatial::ecs

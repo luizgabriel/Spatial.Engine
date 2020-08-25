@@ -224,10 +224,16 @@ Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 	{
 		uint32_t nameLength;
 		stream.read(reinterpret_cast<char*>(&nameLength), 4);
-		std::getline(stream, mesh[i].materialName, '\0');
-	}
 
-	fl::Fence::waitAndDestroy(engine.createFence());
+		try {
+			mesh[i].materialName.reserve(nameLength);
+			std::getline(stream, mesh[i].materialName, '\0');
+		}
+		catch (std::exception e)
+		{
+			mesh[i].materialName = "DefaultMaterial";
+		}
+	}
 
 	return mesh;
 }
