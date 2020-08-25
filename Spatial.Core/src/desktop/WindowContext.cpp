@@ -21,7 +21,7 @@ DesktopPlatformContext::~DesktopPlatformContext()
 void DesktopPlatformContext::onStartFrame(float)
 {
 	SDL_Event e;
-	while (SDL_PollEvent(&e) != 0)
+	while (SDL_PollEvent(&e))
 	{
 		switch (e.type)
 		{

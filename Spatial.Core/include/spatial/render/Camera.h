@@ -17,8 +17,16 @@ class Camera
 
 	~Camera();
 
+	Camera(Camera&& other) noexcept;
+	Camera& operator=(Camera&& other) noexcept;
+
 	Camera(const Camera& other) = delete;
 	Camera& operator=(const Camera& other) = delete;
+
+	[[nodiscard]] const auto& ref() const
+	{
+		return *mResource;
+	}
 
 	[[nodiscard]] auto& ref()
 	{
@@ -26,6 +34,11 @@ class Camera
 	}
 
 	[[nodiscard]] auto* get()
+	{
+		return mResource;
+	}
+
+	[[nodiscard]] const auto* get() const
 	{
 		return mResource;
 	}

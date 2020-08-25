@@ -35,7 +35,7 @@ Entity createEntity(fl::Engine& engine) noexcept
 	return Entity{engine, utils::EntityManager::get().create()};
 }
 
-MaterialInstance createMaterialInstance(fl::Engine& engine, fl::Material& material, const char* name) noexcept
+MaterialInstance createMaterialInstance(fl::Engine& engine, const fl::Material& material, const char* name) noexcept
 {
 	return MaterialInstance{engine, material.createInstance(name)};
 }

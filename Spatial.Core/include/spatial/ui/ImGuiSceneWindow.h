@@ -46,6 +46,7 @@ class ImGuiSceneWindow
 	Texture mRenderColorTexture;
 	Texture mRenderDepthTexture;
 	RenderTarget mRenderTarget;
+	Size mLastWindowSize;
 	Signal<Size> mWindowResizedSignal;
 };
 

@@ -8,6 +8,6 @@ namespace spatial::assets
 {
 
 using Resource = std::optional<std::vector<char>>;
-using ResourcesLoader = std::function<Resource(std::string_view)>;
+using ResourcesLoader = std::function<Resource(const std::string_view)>;
 
 } // namespace spatial::assets

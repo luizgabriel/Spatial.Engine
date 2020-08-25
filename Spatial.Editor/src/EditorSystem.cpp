@@ -1,69 +1,113 @@
 #include "EditorSystem.h"
 
-#include <spatial/spatial.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ui/ImGuiComponents.h>
 
-#include <imgui.h>
+#include <variant>
 
 #include "Components.h"
+#include "Resources.h"
 
 namespace fl = filament;
 using namespace filament::math;
 
+template <typename ValueType>
+constexpr ValueType pi = static_cast<ValueType>(3.14159265359L);
+
+template <typename ValueType>
+constexpr ValueType halfPi = static_cast<ValueType>(1.57079632679L);
+
+constexpr auto up = float3{.0f, 1.0f, .0f};
+
 namespace spatial
 {
 
-EditorSystem::EditorSystem(fl::Engine& engine, const assets::ResourcesLoader& resources)
-	: mResources{resources},
-	  mEngine{engine},
+EditorSystem::EditorSystem(fl::Engine& engine)
+	: mEngine{engine},
 	  mSceneView{toShared(createView(mEngine))},
 
 	  mScene{createScene(mEngine)},
-	  mCameraEntity{createEntity(mEngine)},
-	  mCameraComponent{createCamera(mEngine, mCameraEntity.get())},
 
-	  mIblTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/ibl.ktx").value())},
-	  mSkyboxTexture{createKtxTexture(mEngine, mResources("editor/textures/default_skybox/skybox.ktx").value())},
+	  mIblTexture{createKtxTexture(mEngine, assets::loadResource("editor/textures/default_skybox/ibl.ktx").value())},
+	  mSkyboxTexture{
+		  createKtxTexture(mEngine, assets::loadResource("editor/textures/default_skybox/skybox.ktx").value())},
 	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(),
-										 mResources("editor/textures/default_skybox/sh.txt").value())},
+										 assets::loadResource("editor/textures/default_skybox/sh.txt").value())},
 	  mSkybox{createSkybox(mEngine, mSkyboxTexture.ref())},
 
-	  mCam{{.0f, .0f}, {300.0f, 300.0f, 300.0f}},
-	  mCameraData{.5f, 100.0f},
 	  mImGuiSceneWindow{mEngine, {1280, 720}},
 
 	  mRegistry{},
-	  mRenderableSystem{mEngine, mScene.ref()},
 	  mTransformSystem{mEngine},
-	  mShapeSystem{mEngine, mResources}
+	  mMeshSystem{mEngine, assets::sResourceLoader},
+	  mMaterialSystem{mEngine, assets::sResourceLoader},
+	  mRenderableSystem{mEngine, mScene.ref()},
+	  mCameraSystem{mEngine},
+
+	  mCameraEntity{},
+
+	  mMovement{true, 1.0f, 100.0f}
 {
-	mShapeSystem.setMaterial("editor/materials/default.filamat");
-	connect<ecs::Shape>(mRegistry, mShapeSystem);
+	connect<ecs::Mesh>(mRegistry, mMeshSystem);
 	connect<ecs::Renderable>(mRegistry, mRenderableSystem);
+	connect<ecs::Transform>(mRegistry, mTransformSystem);
+	connect<ecs::Material>(mRegistry, mMaterialSystem);
+	connect<ecs::Camera>(mRegistry, mCameraSystem);
 
 	mSceneView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
-	mSceneView->setCamera(mCameraComponent.get());
 	mSceneView->setScene(mScene.get());
 	mSceneView->setBlendMode(fl::View::BlendMode::OPAQUE);
 
 	mScene->setIndirectLight(mSkyboxLight.get());
 	mScene->setSkybox(mSkybox.get());
 
-	auto entity = mRegistry.create();
-	mRegistry.emplace<ecs::Transform>(entity);
-	mRegistry.emplace<ecs::Shape>(entity, "editor/meshes/cube.filamesh");
-
 	mSceneView->setViewport({0, 0, 1280, 720});
+
+	mImGuiSceneWindow >> *this; // register imgui window resize events
+}
+
+void EditorSystem::onStart()
+{
+	mCameraEntity = mRegistry.create();
+	mRegistry.emplace<ecs::Name>(mCameraEntity, "Main Camera");
+	mRegistry.emplace<ecs::Transform>(mCameraEntity);
+	mRegistry.emplace<ecs::Camera>(mCameraEntity);
+
 	onSceneWindowResized({1280, 720});
 
-	mImGuiSceneWindow >> *this;
+	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
+	mSceneView->setCamera(&cameraComponent);
+
+	auto cubeEntity = mRegistry.create();
+	mRegistry.emplace<ecs::Name>(cubeEntity, "Cube");
+	mRegistry.emplace<ecs::Transform>(cubeEntity);
+	mRegistry.emplace<ecs::Mesh>(cubeEntity, "editor/meshes/cube.filamesh");
+
+	auto materialEntity = mRegistry.create();
+	mRegistry.emplace<ecs::Material>(materialEntity, cubeEntity, "editor/materials/default.filamat");
+
+	mRenderableSystem.buildMaterialInstances(mRegistry, mMaterialSystem);
+	mRenderableSystem.buildShapeRenderables(mRegistry, mMeshSystem);
+
+	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
+		materialInstance->setParameter("baseColor", fl::math::float4{1.0f, 1.0f, 1.0f, 1.0f});
+		materialInstance->setParameter("metallic", .1f);
+		materialInstance->setParameter("roughness", .5f);
+		materialInstance->setParameter("reflectance", .1f);
+	});
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
 {
-	if (enabledCameraController)
+	if (mMovement.warpMouse)
 	{
-		mCam.onMouseMoved(Input::mouse(), mCameraData.sensitivity);
+		constexpr auto center = float2{0.5f, 0.5f};
+		const auto delta = center - Input::mouse();
+
+		auto& transform = mRegistry.get<ecs::Transform>(mCameraEntity);
+		transform.rotation.x += delta.x * pi<float> * -mMovement.sensitivity;
+		transform.rotation.y = std::clamp(transform.rotation.y + delta.y * pi<float> * mMovement.sensitivity, -halfPi<float>, halfPi<float>);
+
 		Input::warpMouse({.5f, .5f});
 	}
 }
@@ -80,20 +124,33 @@ float3 defaultInputAxis()
 void EditorSystem::onUpdateFrame(float delta)
 {
 	if (Input::released(Key::MouseLeft))
-		enabledCameraController = false;
+		mMovement.warpMouse = false;
 
 	if (Input::combined(Key::LControl, Key::MouseLeft))
-		enabledCameraController = true;
+		mMovement.warpMouse = true;
 
 	if (Input::released(Key::G))
 		showEngineGui = !showEngineGui;
 
 	mTransformSystem.onUpdate(mRegistry);
 
-	if (!enabledCameraController)
+	if (!mMovement.warpMouse)
 		delta = 0;
 
-	mCam.onUpdate(mCameraComponent.ref(), delta * mCameraData.velocity * defaultInputAxis());
+	const auto deltaMouseMovement = delta * mMovement.velocity * defaultInputAxis();
+	auto& cameraTransform = mRegistry.get<ecs::Transform>(mCameraEntity);
+
+	auto& rot = cameraTransform.rotation;
+	const auto direction = normalize(float3{cos(rot.x) * cos(rot.y), sin(rot.y), sin(rot.x) * cos(rot.y)});
+	cameraTransform.position += direction * deltaMouseMovement.x;
+	cameraTransform.position += cross(direction, up) * deltaMouseMovement.y;
+	cameraTransform.position += up * deltaMouseMovement.z;
+
+	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
+	camera.target = cameraTransform.position + direction;
+
+	mTransformSystem.onUpdate(mRegistry);
+	mCameraSystem.onUpdate(mRegistry);
 }
 
 void EditorSystem::onDrawGui()
@@ -102,9 +159,12 @@ void EditorSystem::onDrawGui()
 		return;
 
 	static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_None;
-	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
+										  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+										  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+										  ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 
-	ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
@@ -123,57 +183,50 @@ void EditorSystem::onDrawGui()
 	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockFlags);
 
 	ImGui::BeginMainMenuBar();
-		ImGui::Text("Spatial Engine");
-		ImGui::Separator();
+	ImGui::Text("Spatial Engine");
+	ImGui::Separator();
 
-		if (ImGui::BeginMenu("Options"))
-		{
-			//ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
-			//ImGui::MenuItem("Console", NULL, &gOpenedLogging);
-			ImGui::EndMenu();
-		}
+	if (ImGui::BeginMenu("Options"))
+	{
+		// ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
+		// ImGui::MenuItem("Console", NULL, &gOpenedLogging);
+		ImGui::EndMenu();
+	}
 	ImGui::EndMainMenuBar();
 
-	ImGui::Begin("Camera Settings");
-		if (enabledCameraController)
-		{
-			ImGui::Text("Use the WASD to move in the scene.");
-			ImGui::Text("Click to turn OFF:");
-		}
-		else
-		{
-			ImGui::Text("Ctrl + Click to turn ON:");
-		}
-
-		if (ImGui::Checkbox("Camera Movement", &enabledCameraController))
-		{
-			Input::warpMouse({.5f, .5f});
-		}
-
-		ImGui::Separator();
-
-		ImGui::DragFloat("Yaw", &mCam.rotation.x, .001f);
-		ImGui::DragFloat("Pitch", &mCam.rotation.y, .001f, -halfPi<float>, halfPi<float>);
-
-		ImGui::Separator();
-
-		ImGui::DragFloat("Sensitivity", &mCameraData.sensitivity, .001f, .1f, 5.0f);
-		ImGui::DragFloat("Velocity", &mCameraData.velocity, 1.0f, 100.0f, 2000.0f);
-	ImGui::End();
-
 	mImGuiSceneWindow.draw("Scene View (Editor)");
+
+	ImGui::Begin("Main Camera");
+
+	auto& transform = mRegistry.get<ecs::Transform>(mCameraEntity);
+	ui::transformInput(transform, "pr");
+
+	ImGui::Separator();
+
+	ImGui::Checkbox("Warp Mouse", &mMovement.warpMouse);
+	ImGui::InputFloat("Velocity", &mMovement.velocity);
+	ImGui::InputFloat("Sensitivity", &mMovement.sensitivity);
+
+	ImGui::Separator();
+
+	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
+	ui::cameraInput(camera);
+
+	ImGui::End();
 }
 
 void EditorSystem::onSceneWindowResized(ui::ImGuiSceneWindow::Size size)
 {
-	auto width = static_cast<double>(size.first);
-	auto height = static_cast<double>(size.second);
+	auto width = static_cast<float>(size.first);
+	auto height = static_cast<float>(size.second);
 
-	mCameraComponent->setProjection(45.0, width / height, 0.1, 1000000.0, fl::Camera::Fov::VERTICAL);
+	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
+	if (auto* proj = std::get_if<ecs::Camera::Perspective>(&camera.projection)) {
+		proj->aspectRatio = width / height;
+	}
 }
 
-EditorSystem::EditorSystem(RenderingSystem& renderingSystem, const assets::ResourcesLoader& resources)
-	: EditorSystem(renderingSystem.getEngine(), resources)
+EditorSystem::EditorSystem(RenderingSystem& renderingSystem) : EditorSystem(renderingSystem.getEngine())
 {
 	renderingSystem.pushBackView(mSceneView);
 }

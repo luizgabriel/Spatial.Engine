@@ -11,7 +11,7 @@ namespace spatial::ecs
 class TransformSystem
 {
   private:
-	filament::TransformManager& m_transformManager;
+	filament::TransformManager& mTransformManager;
 
   public:
 	explicit TransformSystem(filament::Engine& engine);

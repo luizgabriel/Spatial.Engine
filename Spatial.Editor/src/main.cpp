@@ -1,4 +1,5 @@
 #include "EditorSystem.h"
+#include "Resources.h"
 
 #include <argh.h>
 #include <assets/generated.h>
@@ -15,7 +16,6 @@ struct SetupConfig
 	std::uint16_t windowHeight;
 };
 
-void connect(EventQueue& ebus, Application& app, DesktopPlatformContext& windowContext);
 int main(int argc, char* argv[])
 {
 	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	args({"-h", "--height"}) >> config.windowHeight;
 
 	// clang-format off
-	const auto resources = DirMapLoader{
+	assets::sResourceLoader = DirMapLoader{
 		{"editor", MemoryLoader{
 			{"fonts/Roboto_Medium.ttf", {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE}},
 			{"materials/default.filamat", {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE}},
@@ -54,10 +54,10 @@ int main(int argc, char* argv[])
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
 	auto ui = UserInterfaceSystem(rendering, window);
-	ui.setMaterial(resources("editor/materials/ui.mat").value());
-	ui.setFont(resources("editor/fonts/Roboto_Medium.ttf").value());
+	ui.setMaterial(assets::loadResource("editor/materials/ui.mat").value());
+	ui.setFont(assets::loadResource("editor/fonts/Roboto_Medium.ttf").value());
 
-	auto editor = EditorSystem{rendering, resources};
+	auto editor = EditorSystem{rendering};
 
 	// Connect all Systems to the Application Main Loop
 	app >> desktopContext >> input >> rendering >> ui >> editor;

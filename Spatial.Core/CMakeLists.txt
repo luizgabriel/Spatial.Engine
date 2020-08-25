@@ -25,7 +25,6 @@ add_library(Spatial.Core
 	include/spatial/input/Input.h
 	include/spatial/input/InputState.h
 	
-	include/spatial/render/CameraControllers.h
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
 	include/spatial/render/Entity.h
@@ -46,6 +45,8 @@ add_library(Spatial.Core
 	include/spatial/ecs/Components.h
 	include/spatial/ecs/RenderableSystem.h
 	include/spatial/ecs/TransformSystem.h
+	include/spatial/ecs/MaterialSystem.h
+	include/spatial/ecs/MeshSystem.h
 	
 	include/spatial/spatial.h
 	
@@ -69,7 +70,6 @@ add_library(Spatial.Core
 	src/render/Entity.cpp
 	src/render/RenderingSystem.cpp
 	src/render/ResourceLoaders.cpp
-	src/render/CameraControllers.cpp
 	src/render/SkyboxResources.cpp
 	src/render/Mesh.cpp
 	src/render/Camera.cpp
@@ -79,9 +79,12 @@ add_library(Spatial.Core
 	src/ui/UserInterfaceRenderer.cpp
 	src/ui/UserInterfaceInput.cpp
 	src/ui/ImGuiSceneWindow.cpp
+	src/ui/ImGuiComponents.cpp
 	
 	src/ecs/RenderableSystem.cpp
-	src/ecs/TransformSystem.cpp)
+	src/ecs/TransformSystem.cpp
+	src/ecs/CameraSystem.cpp
+)
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 

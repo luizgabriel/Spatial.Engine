@@ -11,7 +11,8 @@ ImGuiSceneWindow::ImGuiSceneWindow(filament::Engine& engine, ImGuiSceneWindow::S
 										filament::Texture::Usage::SAMPLEABLE)},
 	  mRenderDepthTexture{createTexture(engine, size, filament::backend::TextureFormat::DEPTH16,
 										filament::Texture::Usage::DEPTH_ATTACHMENT)},
-	  mRenderTarget{createRenderTarget(engine, mRenderColorTexture.ref(), mRenderDepthTexture.ref())}
+	  mRenderTarget{createRenderTarget(engine, mRenderColorTexture.ref(), mRenderDepthTexture.ref())},
+	  mLastWindowSize{.0f, .0f}
 {
 }
 
@@ -21,7 +22,13 @@ void ImGuiSceneWindow::draw(const std::string_view windowTitle)
 	ImGui::Begin(windowTitle.begin());
 	auto size = ImGui::GetWindowSize();
 	size.y -= 25;
-	mWindowResizedSignal({size.x, size.y});
+	auto currentSize = Size{size.x, size.y};
+
+	if (currentSize != mLastWindowSize) {
+		mLastWindowSize = std::move(currentSize);
+		mWindowResizedSignal(mLastWindowSize);
+	}
+
 	ImGui::Image(mRenderColorTexture.get(), size);
 	ImGui::End();
 	ImGui::PopStyleVar();

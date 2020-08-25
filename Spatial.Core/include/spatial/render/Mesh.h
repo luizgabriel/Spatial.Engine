@@ -109,17 +109,22 @@ struct Mesh
 		return mIndexBuffer;
 	}
 
-	[[nodiscard]] auto& getVertexBuffer() const
+	[[nodiscard]] const auto& getVertexBuffer() const
 	{
 		return mVertexBuffer;
 	}
 
-	[[nodiscard]] auto& getIndexBuffer() const
+	[[nodiscard]] const auto& getIndexBuffer() const
 	{
 		return mIndexBuffer;
 	}
 
-	[[nodiscard]] auto& getEngine() const
+	[[nodiscard]] auto& getEngine()
+	{
+		return mEngine;
+	}
+
+	[[nodiscard]] const auto& getEngine() const
 	{
 		return mEngine;
 	}

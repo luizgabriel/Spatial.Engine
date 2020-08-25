@@ -2,6 +2,7 @@
 
 #include <spatial/assets/AggregatorLoader.h>
 #include <spatial/assets/AssetReaderUtils.h>
+#include <spatial/assets/ResourcesLoader.h>
 #include <spatial/assets/DirMapLoader.h>
 #include <spatial/assets/MemoryLoader.h>
 #include <spatial/assets/PhysicalDirLoader.h>
@@ -23,6 +24,20 @@
 #include <spatial/render/Resources.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
+#include <spatial/render/Entity.h>
+#include <spatial/render/RenderingSystem.h>
+#include <spatial/render/Resources.h>
 
 #include <spatial/ecs/Components.h>
+
+#include <spatial/common/EventQueue.h>
+
+#include <spatial/ecs/CameraSystem.h>
+#include <spatial/ecs/MaterialSystem.h>
+#include <spatial/ecs/RenderableSystem.h>
+#include <spatial/ecs/TransformSystem.h>
+#include <spatial/ecs/MeshSystem.h>
+
+
+
 

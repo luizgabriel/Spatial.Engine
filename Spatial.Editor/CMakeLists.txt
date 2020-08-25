@@ -3,9 +3,8 @@ add_subdirectory(assets)
 add_executable(Spatial.Editor
 	src/main.cpp
 	src/EditorSystem.cpp
+	src/Resources.cpp
 	src/Components.h
-	src/ShapeSystem.h
-	src/ShapeSystem.cpp
 )
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
