@@ -63,8 +63,8 @@ struct Camera
 		float far{1.0f};
 	};
 
-	std::variant<Perspective, Ortographic, Custom> projection{Perspective{}};
 	filament::math::float3 target{.0f};
+	std::variant<Perspective, Ortographic, Custom> projection{Perspective{}};
 
 	float* near() {
 		return std::visit([](auto& proj) -> float* {

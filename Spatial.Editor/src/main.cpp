@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
 			{"meshes/plane.filamesh", {ASSETS_PLANE, ASSETS_PLANE_SIZE}},
 			{"meshes/cube.filamesh", {ASSETS_CUBE, ASSETS_CUBE_SIZE}},
 			{"meshes/sphere.filamesh", {ASSETS_SPHERE, ASSETS_SPHERE_SIZE}},
+			{"meshes/cylinder.filamesh", {ASSETS_CYLINDER, ASSETS_CYLINDER_SIZE}},
 		}},
 		{"assets", AggregatorLoader{
 			PhysicalDirLoader{executablePath / "assets"},

@@ -24,7 +24,7 @@ void TransformSystem::onUpdate(entt::registry& registry)
 		const auto rotateX = mat4f::rotation(transform.rotation.x, float3{1, 0, 0});
 		const auto rotateY = mat4f::rotation(transform.rotation.y, float3{0, 1, 0});
 
-		const auto model = translation * scale * rotateX * rotateY * rotateZ;
+		const auto model = translation * (rotateX * rotateY * rotateZ) * scale ;
 		mTransformManager.setTransform(transformEntity, model);
 	});
 }

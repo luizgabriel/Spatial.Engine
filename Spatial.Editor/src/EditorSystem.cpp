@@ -67,8 +67,8 @@ void EditorSystem::onStart()
 {
 	mCameraEntity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(mCameraEntity, "Main Camera");
-	mRegistry.emplace<ecs::Transform>(mCameraEntity);
-	mRegistry.emplace<ecs::Camera>(mCameraEntity);
+	mRegistry.emplace<ecs::Transform>(mCameraEntity, fl::math::float3{10.0f, 10.0f, .0f});
+	mRegistry.emplace<ecs::Camera>(mCameraEntity, fl::math::float3{.0f}, ecs::Camera::Perspective{});
 
 	onSceneWindowResized({1280, 720});
 
