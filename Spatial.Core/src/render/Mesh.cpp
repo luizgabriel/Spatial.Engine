@@ -17,7 +17,7 @@ Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexB
 
 void Mesh::build(utils::Entity entity, filament::MaterialInstance* defaultInstance)
 {
-	auto map = MaterialsMap{{"default", defaultInstance}};
+	auto map = MaterialsMap{{"DefaultMaterial", defaultInstance}};
 	return build(entity, map);
 }
 
@@ -35,7 +35,7 @@ void Mesh::build(utils::Entity entity, const MaterialsMap& map)
 		if (map.find(part.materialName) != map.end())
 			builder.material(index, map.at(part.materialName));
 		else
-			builder.material(index, map.at("default"));
+			builder.material(index, map.at("DefaultMaterial"));
 
 		index++;
 	}

@@ -19,7 +19,7 @@ class Signal
 	{
 	}
 
-	void operator()(Args... args) noexcept
+	void operator()(Args... args)
 	{
 		trigger(std::template forward<Args>(args)...);
 	}

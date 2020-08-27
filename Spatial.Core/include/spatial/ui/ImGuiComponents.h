@@ -10,7 +10,7 @@ void transformInput(ecs::Transform& transform, const std::string_view format);
 
 void cameraInput(ecs::Camera& camera);
 
-bool sceneGraph(const entt::registry& registry, entt::entity& selectedEntity);
+bool sceneHierarchy(const entt::registry& registry, entt::entity& selectedEntity);
 
 void inputText(const std::string_view label, std::string& value);
 

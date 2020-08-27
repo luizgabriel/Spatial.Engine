@@ -14,9 +14,6 @@ using namespace filament::math;
 template <typename ValueType>
 constexpr ValueType pi = static_cast<ValueType>(3.14159265359L);
 
-template <typename ValueType>
-constexpr ValueType halfPi = static_cast<ValueType>(1.57079632679L);
-
 constexpr auto up = float3{.0f, 1.0f, .0f};
 
 namespace spatial
@@ -46,7 +43,7 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 
 	  mCameraEntity{},
 
-	  mMovement{true, 1.0f, 100.0f}
+	  mMovement{true, 1.0f, 10.0f}
 {
 	connect<ecs::Mesh>(mRegistry, mMeshSystem);
 	connect<ecs::Renderable>(mRegistry, mRenderableSystem);
@@ -90,10 +87,10 @@ void EditorSystem::onStart()
 	mRenderableSystem.buildShapeRenderables(mRegistry, mMeshSystem);
 
 	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", fl::math::float4{0.5f, 1.0f, 0.2f, 1.0f});
-		materialInstance->setParameter("metallic", .1f);
-		materialInstance->setParameter("roughness", .1f);
-		materialInstance->setParameter("reflectance", .1f);
+		materialInstance->setParameter("baseColor", fl::math::float4{0.3f, 0.3f, 0.3f, 1.0f});
+		materialInstance->setParameter("metallic", .0f);
+		materialInstance->setParameter("roughness", 1.0f);
+		materialInstance->setParameter("reflectance", .0f);
 	});
 }
 
@@ -107,7 +104,7 @@ void EditorSystem::onEvent(const MouseMovedEvent&)
 		auto& transform = mRegistry.get<ecs::Transform>(mCameraEntity);
 		transform.rotation.x += delta.x * pi<float> * -mMovement.sensitivity;
 		transform.rotation.y = std::clamp(transform.rotation.y + delta.y * pi<float> * mMovement.sensitivity,
-										  -halfPi<float>, halfPi<float>);
+										  -pi<float> / 2.0f, pi<float> / 2.0f);
 
 		Input::warpMouse({.5f, .5f});
 	}
@@ -200,7 +197,7 @@ void EditorSystem::onDrawGui()
 	ImGui::Begin("Scene Graph");
 
 	static entt::entity selectedEntity{};
-	ui::sceneGraph(mRegistry, selectedEntity);
+	ui::sceneHierarchy(mRegistry, selectedEntity);
 
 	ImGui::End();
 
@@ -221,13 +218,9 @@ void EditorSystem::onDrawGui()
 			ImGui::Text("%s", "Transform");
 
 			if (camera)
-			{
 				ui::transformInput(*transform, "py");
-			}
 			else
-			{
 				ui::transformInput(*transform, "prs");
-			}
 
 			ImGui::Separator();
 		}
@@ -269,13 +262,8 @@ void EditorSystem::onSceneWindowResized(ui::ImGuiSceneWindow::Size size)
 	auto aspectRatio = width / height;
 
 	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
-	if (auto* proj1 = std::get_if<ecs::Camera::Perspective>(&camera.projection))
-	{
-		proj1->aspectRatio = aspectRatio;
-	}
-	else if (auto* proj2 = std::get_if<ecs::Camera::Ortographic>(&camera.projection))
-	{
-		proj2->aspectRatio = aspectRatio;
+	if (camera.aspectRatio()) {
+		*camera.aspectRatio() = aspectRatio;
 	}
 }
 

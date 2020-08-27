@@ -198,9 +198,11 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 {
 	auto stream = std::stringstream{};
+	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
 	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));
 
-	FilameshFileHeader header;
+	FilameshFileHeader header{};
 	stream >> header;
 
 	auto vertices = std::vector<char>(header.vertexSize);
@@ -225,13 +227,9 @@ Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 		uint32_t nameLength;
 		stream.read(reinterpret_cast<char*>(&nameLength), 4);
 
-		try {
+		if (nameLength > 0) {
 			mesh[i].materialName.reserve(nameLength);
 			std::getline(stream, mesh[i].materialName, '\0');
-		}
-		catch (std::exception e)
-		{
-			mesh[i].materialName = "DefaultMaterial";
 		}
 	}
 

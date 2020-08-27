@@ -65,6 +65,28 @@ struct Camera
 
 	std::variant<Perspective, Ortographic, Custom> projection{Perspective{}};
 	filament::math::float3 target{.0f};
+
+	float* near() {
+		return std::visit([](auto& proj) -> float* {
+			return &proj.near;
+		}, projection);
+	}
+
+	float* far() {
+		return std::visit([](auto& proj) -> float* {
+		  return &proj.far;
+		}, projection);
+	}
+
+	float* aspectRatio() {
+		return std::visit([](auto& proj) -> float* {
+			if constexpr (std::is_same_v<decltype(proj), Perspective> || std::is_same_v<decltype(proj), Ortographic>){
+				return &proj.aspectRatio;
+			} else {
+				return nullptr;
+			}
+		}, projection);
+	}
 };
 
 } // namespace spatial::ecs

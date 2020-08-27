@@ -16,7 +16,7 @@ struct FilameshFileHeader
 {
 	uint32_t version{};
 	uint32_t parts{};
-	filament::Box aabb;
+	filament::Box aabb{};
 	uint32_t flags{};
 	uint32_t offsetPosition{};
 	uint32_t stridePosition{};
@@ -42,9 +42,8 @@ struct MeshPart
 	uint32_t minIndex{};
 	uint32_t maxIndex{};
 	uint32_t materialID{};
-	filament::Box boundingBox;
-
-	std::string materialName;
+	filament::Box boundingBox{};
+	std::string materialName{"DefaultMaterial"};
 };
 
 struct Mesh
