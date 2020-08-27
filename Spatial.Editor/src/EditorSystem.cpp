@@ -67,7 +67,7 @@ void EditorSystem::onStart()
 {
 	mCameraEntity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(mCameraEntity, "Main Camera");
-	mRegistry.emplace<ecs::Transform>(mCameraEntity, fl::math::float3{10.0f, 10.0f, .0f});
+	mRegistry.emplace<ecs::Transform>(mCameraEntity, fl::math::float3{.0f, .0f, .0f});
 	mRegistry.emplace<ecs::Camera>(mCameraEntity, fl::math::float3{.0f}, ecs::Camera::Perspective{});
 
 	onSceneWindowResized({1280, 720});
@@ -75,23 +75,55 @@ void EditorSystem::onStart()
 	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
 	mSceneView->setCamera(&cameraComponent);
 
-	auto cubeEntity = mRegistry.create();
-	mRegistry.emplace<ecs::Name>(cubeEntity, "Cube");
-	mRegistry.emplace<ecs::Transform>(cubeEntity);
-	mRegistry.emplace<ecs::Mesh>(cubeEntity, "editor/meshes/cube.filamesh");
-
-	auto materialEntity = mRegistry.create();
-	mRegistry.emplace<ecs::Material>(materialEntity, cubeEntity, "editor/materials/default.filamat");
+	auto planeEntity = createObject("Plane", "editor/meshes/plane.filamesh", {3.0f, -1.0f, .0f}, {10.0f, .0f, 10.0f});
+	auto cubeEntity = createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {1.0f});
+	auto cylinderEntity = createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {1.0f});
+	auto sphereEntity = createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {1.0f});
 
 	mRenderableSystem.buildMaterialInstances(mRegistry, mMaterialSystem);
 	mRenderableSystem.buildShapeRenderables(mRegistry, mMeshSystem);
 
-	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", fl::math::float4{0.3f, 0.3f, 0.3f, 1.0f});
-		materialInstance->setParameter("metallic", .0f);
-		materialInstance->setParameter("roughness", 1.0f);
-		materialInstance->setParameter("reflectance", .0f);
+	mRenderableSystem.update(planeEntity, [](auto* materialInstance) {
+		materialInstance->setParameter("baseColor", fl::math::float4{1.0f, 1.0f, 1.0f, 1.0f});
+		materialInstance->setParameter("metallic", .5f);
+		materialInstance->setParameter("roughness", 0.5f);
+		materialInstance->setParameter("reflectance", .2f);
 	});
+
+	mRenderableSystem.update(sphereEntity, [](auto* materialInstance) {
+	  materialInstance->setParameter("baseColor", fl::math::float4{0.2f, 0.5f, 0.3f, 1.0f});
+	  materialInstance->setParameter("metallic", .0f);
+	  materialInstance->setParameter("roughness", 1.0f);
+	  materialInstance->setParameter("reflectance", .0f);
+	});
+
+	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
+	  materialInstance->setParameter("baseColor", fl::math::float4{0.5f, 0.2f, 0.3f, 1.0f});
+	  materialInstance->setParameter("metallic", .0f);
+	  materialInstance->setParameter("roughness", 1.0f);
+	  materialInstance->setParameter("reflectance", .0f);
+	});
+
+	mRenderableSystem.update(cylinderEntity, [](auto* materialInstance) {
+	  materialInstance->setParameter("baseColor", fl::math::float4{0.3f, 0.3f, 0.8f, 1.0f});
+	  materialInstance->setParameter("metallic", .0f);
+	  materialInstance->setParameter("roughness", 1.0f);
+	  materialInstance->setParameter("reflectance", .0f);
+	});
+}
+
+entt::entity EditorSystem::createObject(std::string name, std::string resourcePath, fl::math::float3 position, fl::math::float3 scale)
+{
+	auto objectEntity = mRegistry.create();
+
+	mRegistry.emplace<ecs::Name>(objectEntity, std::move(name));
+	mRegistry.emplace<ecs::Transform>(objectEntity, std::move(position), std::move(scale));
+	mRegistry.emplace<ecs::Mesh>(objectEntity, std::move(resourcePath));
+
+	auto materialEntity = mRegistry.create();
+	mRegistry.emplace<ecs::Material>(materialEntity, objectEntity, "editor/materials/default.filamat");
+
+	return objectEntity;
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)

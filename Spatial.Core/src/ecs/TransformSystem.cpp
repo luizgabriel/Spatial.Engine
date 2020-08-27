@@ -14,7 +14,7 @@ void TransformSystem::onUpdate(entt::registry& registry)
 {
 	using namespace filament::math;
 
-	const auto view = registry.view<const ecs::Transform, Renderable>();
+	const auto view = registry.view<const ecs::Transform, ecs::Renderable>();
 
 	view.each([this, &view](const auto& transform, auto& renderable) {
 		const auto transformEntity = mTransformManager.getInstance(renderable.entity.get());
@@ -24,7 +24,7 @@ void TransformSystem::onUpdate(entt::registry& registry)
 		const auto rotateX = mat4f::rotation(transform.rotation.x, float3{1, 0, 0});
 		const auto rotateY = mat4f::rotation(transform.rotation.y, float3{0, 1, 0});
 
-		const auto model = translation * (rotateX * rotateY * rotateZ) * scale ;
+		const auto model = translation * (rotateX * rotateY * rotateZ) * scale;
 		mTransformManager.setTransform(transformEntity, model);
 	});
 }

@@ -66,6 +66,9 @@ class EditorSystem
 	void onDrawGui();
 
 	void onSceneWindowResized(ui::ImGuiSceneWindow::Size size);
+
+  private:
+    entt::entity createObject(std::string name, std::string resourcePath, filament::math::float3 position, filament::math::float3 scale);
 };
 
 } // namespace spatial
