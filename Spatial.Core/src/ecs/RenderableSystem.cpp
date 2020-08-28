@@ -6,7 +6,7 @@ namespace spatial::ecs
 {
 
 RenderableSystem::RenderableSystem(filament::Engine& engine, filament::Scene& scene)
-	: mEngine{engine}, mScene{scene}, mMaterialInstances{}
+	: mEngine{engine}, mScene{scene}, mRenderableManager{mEngine.getRenderableManager()}, mMaterialInstances{}
 {
 }
 
@@ -72,6 +72,17 @@ void RenderableSystem::update(entt::entity entity, const std::string& name,
 {
 	auto& materialInstance = mMaterialInstances.at(entity).at(name);
 	callback(materialInstance.get());
+}
+
+void RenderableSystem::onUpdate(entt::registry& registry)
+{
+	const auto materialsView = registry.view<ecs::Renderable>();
+	materialsView.each([&](ecs::Renderable& renderable){
+		auto instance = mRenderableManager.getInstance(renderable.entity.get());
+		mRenderableManager.setCastShadows(instance, renderable.castShadows);
+		mRenderableManager.setReceiveShadows(instance, renderable.receiveShadows);
+		mRenderableManager.setScreenSpaceContactShadows(instance, renderable.screenSpaceContactShadows);
+	});
 }
 
 } // namespace spatial::ecs

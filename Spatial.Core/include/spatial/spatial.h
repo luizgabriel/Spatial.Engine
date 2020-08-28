@@ -31,12 +31,14 @@
 #include <spatial/ecs/Components.h>
 
 #include <spatial/common/EventQueue.h>
+#include <spatial/common/Math.h>
 
 #include <spatial/ecs/CameraSystem.h>
 #include <spatial/ecs/MaterialSystem.h>
 #include <spatial/ecs/RenderableSystem.h>
 #include <spatial/ecs/TransformSystem.h>
 #include <spatial/ecs/MeshSystem.h>
+#include <spatial/ecs/LightSystem.h>
 
 
 

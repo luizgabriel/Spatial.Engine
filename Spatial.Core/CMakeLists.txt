@@ -47,6 +47,7 @@ add_library(Spatial.Core
 	include/spatial/ecs/TransformSystem.h
 	include/spatial/ecs/MaterialSystem.h
 	include/spatial/ecs/MeshSystem.h
+	include/spatial/ecs/LightSystem.h
 	
 	include/spatial/spatial.h
 	
@@ -84,6 +85,7 @@ add_library(Spatial.Core
 	src/ecs/RenderableSystem.cpp
 	src/ecs/TransformSystem.cpp
 	src/ecs/CameraSystem.cpp
+	src/ecs/LightSystem.cpp
 )
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

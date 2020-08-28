@@ -43,7 +43,7 @@ struct MeshPart
 	uint32_t maxIndex{};
 	uint32_t materialID{};
 	filament::Box boundingBox{};
-	std::string materialName{"DefaultMaterial"};
+	std::string materialName{};
 };
 
 struct Mesh

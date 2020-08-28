@@ -222,15 +222,12 @@ Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
 	uint32_t materialCount;
 	stream.read(reinterpret_cast<char*>(&materialCount), 4);
 
-	for (size_t i = 0; i < materialCount; i++)
+	for (size_t i = 0; i < header.parts; i++)
 	{
 		uint32_t nameLength;
 		stream.read(reinterpret_cast<char*>(&nameLength), 4);
 
-		if (nameLength > 0) {
-			mesh[i].materialName.reserve(nameLength);
-			std::getline(stream, mesh[i].materialName, '\0');
-		}
+		std::getline(stream, mesh[i].materialName, '\0');
 	}
 
 	return mesh;

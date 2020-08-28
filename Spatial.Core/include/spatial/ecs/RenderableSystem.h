@@ -24,6 +24,8 @@ class RenderableSystem
 
 	void update(entt::entity entity, const std::string& name, std::function<void(filament::MaterialInstance*)>&& callback);
 
+	void onUpdate(entt::registry& registry);
+
 	void onConstruct(entt::registry& registry, entt::entity entity);
 
 	void onDestroy(entt::registry& registry, entt::entity entity);
@@ -31,6 +33,7 @@ class RenderableSystem
   private:
 	filament::Engine& mEngine;
 	filament::Scene& mScene;
+	filament::RenderableManager& mRenderableManager;
 
 	std::unordered_map<entt::entity, std::unordered_map<std::string, MaterialInstance>> mMaterialInstances;
 };
