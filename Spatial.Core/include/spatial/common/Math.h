@@ -24,7 +24,7 @@ template <typename T>
 constexpr T epsilon = static_cast<T>(FLT_EPSILON);
 
 template <typename T>
-details::TQuaternion<T> directionToQuaternion(const details::TVec3<T>& dir) {
+constexpr details::TQuaternion<T> directionToQuaternion(const details::TVec3<T>& dir) {
 	float dn = length(dir);
 	auto out = details::TQuaternion<T>{};
 
@@ -44,9 +44,15 @@ details::TQuaternion<T> directionToQuaternion(const details::TVec3<T>& dir) {
 }
 
 template <typename T>
-const details::TVec3<T> quaternionToDirection(details::TQuaternion<T>& dir) {
+constexpr details::TVec3<T> quaternionToDirection(details::TQuaternion<T>& dir) {
 	float3 d = dir * details::TVec3<T>(1, 0, 0);
 	return d / length(d);
+}
+
+template <typename T>
+constexpr T toDegree(T radians)
+{
+	return radians * (static_cast<T>(180.0) / pi<T>);
 }
 
 }

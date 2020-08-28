@@ -6,31 +6,35 @@
 namespace spatial::ui
 {
 
-void transformInput(ecs::Transform& transform, const std::string_view format)
+bool transformInput(ecs::Transform& transform, const std::string_view format)
 {
+	bool changed = false;
+
 	for (char c : format)
 	{
 		switch (c)
 		{
 		case 'p':
-			ImGui::DragFloat3("Position", &transform.position[0]);
+			changed |= ImGui::DragFloat3("Position", &transform.position[0]);
 			break;
 		case 'r':
-			ImGui::DragFloat3("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
+			changed |= ImGui::DragFloat3("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
 			break;
 		case 'y':
-			ImGui::DragFloat2("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
+			changed |= ImGui::DragFloat2("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
 			break;
 		case 's':
-			ImGui::DragFloat3("Scale", &transform.scale[0]);
+			changed |= ImGui::DragFloat3("Scale", &transform.scale[0]);
 			break;
 		}
 	}
+
+	return changed;
 }
 
-void cameraInput(ecs::Camera& camera)
+bool cameraInput(ecs::Camera& camera)
 {
-	ImGui::InputFloat3("Target", &camera.target[0]);
+	bool changed = ImGui::InputFloat3("Target", &camera.target[0]);
 
 	auto isPerspective = std::holds_alternative<ecs::Camera::Perspective>(camera.projection);
 	auto isOrthographic = std::holds_alternative<ecs::Camera::Ortographic>(camera.projection);
@@ -45,7 +49,7 @@ void cameraInput(ecs::Camera& camera)
 	else if (isCustom)
 		currentItem = 2;
 
-	if (ImGui::Combo("Projection", &currentItem, &options[0], options.size()))
+	if (changed = ImGui::Combo("Projection", &currentItem, &options[0], options.size()); changed)
 	{
 		if (currentItem == 0)
 			camera.projection = ecs::Camera::Perspective{};
@@ -58,24 +62,26 @@ void cameraInput(ecs::Camera& camera)
 	if (currentItem == 0)
 	{
 		auto& proj = std::get<ecs::Camera::Perspective>(camera.projection);
-		ImGui::SliderFloat("Field of View", &proj.fieldOfView, 15.0f, 120.0f, "%.0f");
-		ImGui::InputFloat("Aspect Ratio", &proj.aspectRatio);
-		ImGui::InputFloat("Near", &proj.near);
-		ImGui::InputFloat("Far", &proj.far);
+		changed |= ImGui::SliderFloat("Field of View", &proj.fieldOfView, 15.0f, 120.0f, "%.0f");
+		changed |= ImGui::InputFloat("Aspect Ratio", &proj.aspectRatio);
+		changed |= ImGui::InputFloat("Near", &proj.near);
+		changed |= ImGui::InputFloat("Far", &proj.far);
 	}
 	else if (currentItem == 1)
 	{
 		auto& proj = std::get<ecs::Camera::Ortographic>(camera.projection);
-		ImGui::InputFloat("Aspect Ratio", &proj.aspectRatio);
-		ImGui::InputFloat("Near", &proj.near);
-		ImGui::InputFloat("Far", &proj.far);
+		changed |= ImGui::InputFloat("Aspect Ratio", &proj.aspectRatio);
+		changed |= ImGui::InputFloat("Near", &proj.near);
+		changed |= ImGui::InputFloat("Far", &proj.far);
 	}
 	else if (currentItem == 2)
 	{
 		auto& proj = std::get<ecs::Camera::Custom>(camera.projection);
-		ImGui::InputFloat("Near", &proj.near);
-		ImGui::InputFloat("Far", &proj.far);
+		changed |= ImGui::InputFloat("Near", &proj.near);
+		changed |= ImGui::InputFloat("Far", &proj.far);
 	}
+
+	return changed;
 }
 
 bool sceneHierarchy(const entt::registry& registry, entt::entity& selectedEntity)
@@ -115,9 +121,9 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 	return 1;
 };
 
-void inputText(const std::string_view label, std::string& value)
+bool inputText(const std::string_view label, std::string& value)
 {
-	ImGui::InputText(label.data(), value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
+	return ImGui::InputText(label.data(), value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
 					 &inputTextCallback, &value);
 }
 
@@ -420,6 +426,56 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 	}
 	ImGui::EndGroup();
 	ImGui::PopID();
+
+	return changed;
+}
+bool lightInput(ecs::Light& light)
+{
+	bool changed = ImGui::ColorEdit3("Color##light", &light.color[0]);
+	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
+
+	auto isPoint = std::holds_alternative<ecs::Light::Point>(light.type);
+	auto isSpot = std::holds_alternative<ecs::Light::SpotLight>(light.type);
+	auto isDirectional = std::holds_alternative<ecs::Light::Directional>(light.type);
+	auto options = std::array{"Point", "Spot", "Directional"};
+	int currentItem = -1;
+
+	if (isPoint)
+		currentItem = 0;
+	else if (isSpot)
+		currentItem = 1;
+	else if (isDirectional)
+		currentItem = 2;
+
+	if (changed = ImGui::Combo("Type", &currentItem, &options[0], options.size()); changed)
+	{
+		if (currentItem == 0)
+			light.type = ecs::Light::Point{};
+		else if (currentItem == 1)
+			light.type = ecs::Light::SpotLight{};
+		else if (currentItem == 2)
+			light.type = ecs::Light::Directional{};
+	}
+
+	if (currentItem == 1)
+	{
+		auto& type = std::get<ecs::Light::SpotLight>(light.type);
+
+		ui::directionWidget("Direction##light", type.direction);
+
+		changed |= ImGui::Checkbox("Focused", &type.focused);
+		changed |= ImGui::SliderAngle("Inner Cone", &type.innerCone, .0f, 90.0f);
+
+		type.outerCone = std::clamp(type.outerCone, type.innerCone, math::pi<float>/2.0f);
+		changed |= ImGui::SliderAngle("Outer Cone", &type.outerCone, math::toDegree(type.innerCone), 90.0f);
+	}
+	else if (currentItem == 2)
+	{
+		auto& type = std::get<ecs::Light::Directional>(light.type);
+
+		ui::directionWidget("Direction##light", type.direction);
+		changed |= ImGui::Checkbox("Is Sun", &type.isSun);
+	}
 
 	return changed;
 }

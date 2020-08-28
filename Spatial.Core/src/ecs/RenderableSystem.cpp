@@ -81,7 +81,6 @@ void RenderableSystem::onUpdate(entt::registry& registry)
 		auto instance = mRenderableManager.getInstance(renderable.entity.get());
 		mRenderableManager.setCastShadows(instance, renderable.castShadows);
 		mRenderableManager.setReceiveShadows(instance, renderable.receiveShadows);
-		mRenderableManager.setScreenSpaceContactShadows(instance, renderable.screenSpaceContactShadows);
 	});
 }
 

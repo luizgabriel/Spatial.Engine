@@ -259,7 +259,7 @@ void EditorSystem::onDrawGui()
 				if (camera)
 					ui::transformInput(*transform, "py");
 				else if (light)
-					ui::transformInput(*transform, "pr");
+					ui::transformInput(*transform, "p");
 				else
 					ui::transformInput(*transform, "prs");
 
@@ -303,13 +303,8 @@ void EditorSystem::onDrawGui()
 			{
 				ImGui::Indent();
 
-				ui::directionWidget("Direction##light", light->direction);
+				ui::lightInput(*light);
 
-				ImGui::ColorEdit3("Color##light", &light->color[0]);
-				ImGui::SliderFloat("Lux", &light->intensity, 0.0f, 150000.0f);
-				ImGui::SliderFloat("Sun size", &light->sunAngularRadius, 0.1f, 10.0f);
-				ImGui::SliderFloat("Halo size", &light->sunHaloSize, 1.01f, 40.0f);
-				ImGui::SliderFloat("Halo falloff", &light->sunHaloFalloff, 0.0f, 2048.0f);
 				ImGui::Unindent();
 			}
 		}
@@ -322,7 +317,6 @@ void EditorSystem::onDrawGui()
 
 				ImGui::Checkbox("Cast Shadows", &renderable->castShadows);
 				ImGui::Checkbox("Receive Shadows", &renderable->receiveShadows);
-				ImGui::Checkbox("Screen-space contact shadows", &renderable->screenSpaceContactShadows);
 
 				ImGui::Unindent();
 			}
@@ -364,8 +358,10 @@ entt::entity EditorSystem::createLight(std::string name)
 {
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(entity, std::move(name));
-	mRegistry.emplace<ecs::Transform>(entity);
-	mRegistry.emplace<ecs::Light>(entity, 1000.0f);
+	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
+	mRegistry.emplace<ecs::Light>(entity, ecs::Light{
+		.type = ecs::Light::SpotLight{}
+	});
 
 	return entity;
 }

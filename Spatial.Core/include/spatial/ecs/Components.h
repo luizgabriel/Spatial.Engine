@@ -3,9 +3,8 @@
 #include <string>
 #include <variant>
 #include <entt/entity/entity.hpp>
-#include <math/vec3.h>
-#include <math/mat4.h>
 #include <spatial/render/Entity.h>
+#include <spatial/common/Math.h>
 
 namespace spatial::ecs
 {
@@ -20,27 +19,34 @@ struct Transform
 struct Renderable
 {
 	Entity entity;
-	bool castShadows{true};
-	bool receiveShadows{true};
-	bool screenSpaceContactShadows{true};
+	bool castShadows{false};
+	bool receiveShadows{false};
 };
 
 struct Light
 {
-	filament::math::float3 direction{.0f};
 	filament::math::float3 color{1.0f};
-	float intensity{30000.0f};
-	float sunAngularRadius{1.9f};
-	float sunHaloSize{10.0f};
-	float sunHaloFalloff{80.0f};
+	float intensity{100.0f};
 
-	bool stableShadowMap{false};
-	float normalBias{1.0f};
-	float constantBias{1.0f};
-	float polygonOffsetConstant{.5f};
-	float polygonOffsetSlope{2.0f};
-	float maxShadowDistance{.3f};
-	std::uint8_t stepCount{8};
+	struct Directional
+	{
+		filament::math::float3 direction{.0f, -1.0f, .0f};
+		bool isSun{false};
+	};
+
+	struct SpotLight
+	{
+		filament::math::float3 direction{.0f, -1.0f, .0f};
+		float innerCone{math::pi<float>/4};
+		float outerCone{math::pi<float>/4};
+		bool focused{false};
+	};
+
+	struct Point
+	{
+	};
+
+	std::variant<Directional, SpotLight, Point> type{Point{}};
 };
 
 struct Mesh

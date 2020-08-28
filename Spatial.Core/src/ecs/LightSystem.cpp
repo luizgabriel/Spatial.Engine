@@ -1,23 +1,67 @@
-#include <spatial/ecs/LightSystem.h>
-#include <spatial/ecs/Components.h>
 #include <filament/IndirectLight.h>
 #include <math/mat3.h>
+#include <spatial/ecs/Components.h>
+#include <spatial/ecs/LightSystem.h>
+
+namespace fl = filament;
 
 namespace spatial::ecs
 {
 
-LightSystem::LightSystem(filament::Engine& engine)
-	: mEngine{engine}, mLightManager{engine.getLightManager()}
+LightSystem::LightSystem(filament::Engine& engine) : mEngine{engine}, mLightManager{engine.getLightManager()}
 {
 }
 
 void LightSystem::onConstruct(entt::registry& registry, entt::entity entity)
 {
 	const auto& light = registry.get<ecs::Light>(entity);
-	const auto& transform = registry.get<ecs::Transform>(entity);
 
-	auto renderable = createEntity(mEngine);
-	registry.emplace<ecs::Renderable>(entity, std::move(renderable));
+	auto* renderable = registry.try_get<ecs::Renderable>(entity);
+
+	utils::Entity lightEntity;
+	if (renderable)
+	{
+		lightEntity = renderable->entity.get();
+		mLightManager.destroy(lightEntity);
+	}
+	else
+	{
+		lightEntity = utils::EntityManager::get().create();
+		renderable = &registry.emplace<ecs::Renderable>(entity, spatial::Entity{mEngine, lightEntity});
+	}
+
+	auto builder = std::visit(
+		[&](const auto& type) -> fl::LightManager::Builder {
+			using type_t = std::decay_t<decltype(type)>;
+			if constexpr (std::is_same_v<type_t, ecs::Light::Point>)
+			{
+				const auto& transform = registry.get_or_emplace<ecs::Transform>(entity);
+
+				return fl::LightManager::Builder(fl::LightManager::Type::POINT).position(transform.position);
+			}
+			else if constexpr (std::is_same_v<type_t, ecs::Light::Directional>)
+			{
+				registry.remove_if_exists<ecs::Transform>(entity);
+				return fl::LightManager::Builder(type.isSun ? fl::LightManager::Type::SUN
+															: fl::LightManager::Type::DIRECTIONAL)
+					.direction(type.direction);
+			}
+			else if constexpr (std::is_same_v<type_t, ecs::Light::SpotLight>)
+			{
+				const auto& transform = registry.get_or_emplace<ecs::Transform>(entity);
+				return fl::LightManager::Builder(type.focused ? fl::LightManager::Type::FOCUSED_SPOT
+															  : fl::LightManager::Type::DIRECTIONAL)
+					.direction(type.direction)
+					.position(transform.position)
+					.spotLightCone(type.innerCone, type.outerCone);
+			}
+		},
+		light.type);
+
+	builder.castShadows(renderable->castShadows)
+		.intensity(light.intensity)
+		.color(fl::Color::toLinear<fl::ACCURATE>(light.color))
+		.build(mEngine, lightEntity);
 }
 
 void LightSystem::onDestruct(entt::registry& registry, entt::entity entity)
@@ -27,36 +71,36 @@ void LightSystem::onDestruct(entt::registry& registry, entt::entity entity)
 
 void LightSystem::onUpdate(entt::registry& registry)
 {
-	auto view = registry.view<ecs::Light, ecs::Transform, ecs::Renderable>();
+	auto view = registry.view<ecs::Light, ecs::Renderable>();
 
-	for (entt::entity entity : view) {
+	for (entt::entity entity : view)
+	{
 		const auto& light = view.get<ecs::Light>(entity);
-		const auto& transform = view.get<ecs::Transform>(entity);
 		auto& renderable = view.get<ecs::Renderable>(entity);
-
 		auto instance = mLightManager.getInstance(renderable.entity.get());
 
-		mLightManager.setPosition(instance, transform.position);
-		mLightManager.setColor(instance, light.color);
 		mLightManager.setIntensity(instance, light.intensity);
-		mLightManager.setDirection(instance, light.direction);
-		mLightManager.setSunAngularRadius(instance, light.sunAngularRadius);
-		mLightManager.setSunHaloSize(instance, light.sunHaloSize);
-		mLightManager.setSunHaloFalloff(instance, light.sunHaloFalloff);
-		mLightManager.setShadowCaster(instance, renderable.castShadows);
-		mLightManager.setSpotLightCone(instance, 3.14f /4.0f, 3.14f /4.0f);
+		mLightManager.setColor(instance, fl::Color::toLinear<fl::ACCURATE>(light.color));
 
-		/*filament::LightManager::ShadowOptions options = mLightManager.getShadowOptions(instance);
-		options.stable = light.stableShadowMap;
-		options.normalBias = light.normalBias;
-		options.constantBias = light.constantBias;
-		options.polygonOffsetConstant = light.polygonOffsetConstant;
-		options.polygonOffsetSlope = light.polygonOffsetSlope;
-		options.screenSpaceContactShadows = renderable.screenSpaceContactShadows;
-		options.stepCount = light.stepCount;
-		options.maxShadowDistance = light.maxShadowDistance;
-		mLightManager.setShadowOptions(instance, options);*/
+		std::visit([&](const auto& type){
+
+		  using type_t = std::decay_t<decltype(type)>;
+
+		  if constexpr (std::is_same_v<type_t, ecs::Light::Directional> || std::is_same_v<type_t, ecs::Light::SpotLight>)
+			  mLightManager.setDirection(instance, type.direction);
+
+		  if constexpr (std::is_same_v<type_t, ecs::Light::SpotLight>)
+			  mLightManager.setSpotLightCone(instance, type.innerCone, type.outerCone);
+
+		}, light.type);
+
+		mLightManager.setShadowCaster(instance, renderable.castShadows);
+
+		auto* transform = registry.try_get<ecs::Transform>(entity);
+		if (transform) {
+			mLightManager.setPosition(instance, transform->position);
+		}
 	}
 }
 
-}
+} // namespace spatial::ecs
