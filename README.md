@@ -1,25 +1,58 @@
+
 <h1 align="center">
-    <img alt="Spatial Engine Logo" src="https://imgur.com/FCtZik3" />
+  <br>
+  <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/tkJzpLU.png" alt="Spatial Engine" width="300"></a>
 </h1>
 
-Spatial is a cross-platform C++ game engine created on top off google's [filament](https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake features.
+<h4 align="center">
+Spatial is a cross-platform C++ game engine created on top off google's <a href="https://github.com/google/filament">filament</a> rendering engine. This projects uses C++17 and modern cmake features.
+</h4>
 
-<table>
-  <tr>
-    <td width="25%">
-      <h2>Wiki</h2>
-      <ol>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki">Introduction</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/External-Dependencies">External Dependencies</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/Building-on-Windows">Building on Windows</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/Building-on-Linux">Building on Linux</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/Building-on-MacOS">Building on MacOS</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/Getting-Started">Getting Started</a></li>
-        <li><a href="https://github.com/luizgabriel/Spatial.Engine/wiki/Handling-Events">Handling Events</a></li>
-      </ol>
-    </td>
-    <td width="75%">
-       <img src="https://i.imgur.com/sZ1wdON.png" alt="Engine editor preview"/>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <a href="https://github.com/luizgabriel/Spatial.Engine/workflows/Build">
+    <img src="https://github.com/luizgabriel/Spatial.Engine/workflows/Build/badge.svg" />
+  </a>
+
+  <img src="https://img.shields.io/badge/code%20quality-A-brightgreen" />
+  
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=shields" />
+
+  <a href="https://buymeacoffee.com/luizgabriel" title="Donate to this project using Buy Me A Coffee">
+    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="#key-features">Key Features</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="https://github.com/luizgabriel/Spatial.Engine/wiki">Wiki</a> •
+  <a href="#license">License</a>
+</p>
+
+![screenshot](https://i.imgur.com/2XbkMxT.png)
+
+## Key Features
+
+* Cross platform
+  - Windows, macOS and Linux ready.
+* Easy installation
+  - All dependencies are resolved by Conan
+* Google Filament Rendering Engine Support
+  - This engines makes full use off the powerfull Google's rendering library
+* Full Entity-Component-System
+  - This engines uses the famous ENTT library
+* Virtual Filesystem 
+  - Locate and load resource files direct from disk, embed inside the executable or other packing format
+* Docking UI
+  - Integrated ImGui interface
+* Beautiful Code and Modern C++
+  - Do you like reading beautiful code? I do too.
+
+## Support
+
+<a href="https://www.buymeacoffee.com/luizgabriel" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+## License
+
+Apache 2.0
+
