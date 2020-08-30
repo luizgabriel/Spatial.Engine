@@ -56,6 +56,7 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 	connect<ecs::PointLight>(mRegistry, mLightSystem);
 	connect<ecs::DirectionalLight>(mRegistry, mLightSystem);
 	connect<ecs::SpotLight>(mRegistry, mLightSystem);
+	connect<ecs::Renderable>(mRegistry, mRenderableSystem);
 
 	mSceneView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mSceneView->setScene(mScene.get());
@@ -85,7 +86,7 @@ void EditorSystem::onStart()
 	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
 	mSceneView->setCamera(&cameraComponent);
 
-	createObject("Plane", "editor/meshes/plane.filamesh", {3.0f, -1.0f, .0f}, {.8f, .8f, .8f, 1.0f});
+	createObject("Plane", "editor/meshes/plane.filamesh", {3.0f, -1.0f, .0f}, {.8f, .8f, .8f, 1.0f}, 10.0f);
 	createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {.4f, 0.1f, 0.1f, 1.0f});
 	createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {.1f, 0.4f, 0.1f, 1.0f});
 	createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {.1f, 0.1f, 0.4f, 1.0f});
@@ -338,11 +339,12 @@ EditorSystem::EditorSystem(RenderingSystem& renderingSystem) : EditorSystem(rend
 }
 
 entt::entity EditorSystem::createObject(std::string name, const std::string_view shape, math::float3 position,
-										math::float4 color)
+										math::float4 color, float scale)
 {
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(entity, std::move(name));
-	mRegistry.emplace<ecs::Transform>(entity, std::move(position));
+	mRegistry.emplace<ecs::Transform>(
+		entity, ecs::Transform{.position = std::move(position), .scale = math::float3{scale, 1.0f, scale}});
 
 	auto meshId = std::async(std::launch::async, [&]() { return mMeshRegistry.load(shape); });
 

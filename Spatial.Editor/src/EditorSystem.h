@@ -72,7 +72,7 @@ class EditorSystem
 	void onSceneWindowResized(ui::ImGuiSceneWindow::Size size);
 
   private:
-	entt::entity createObject(std::string name, const std::string_view shape, math::float3 position, math::float4 color);
+	entt::entity createObject(std::string name, const std::string_view shape, math::float3 position, math::float4 color, float scale = 1.0f);
 };
 
 } // namespace spatial
