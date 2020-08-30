@@ -37,6 +37,8 @@ void RenderableSystem::onConstruct(entt::registry& registry, entt::entity entity
 					   .boundingBox(mesh.boundingBox())
 					   .geometry(renderable.subMeshId, fl::RenderableManager::PrimitiveType::TRIANGLES, mesh.getVertexBuffer().get(),
 						 mesh.getIndexBuffer().get(), part.offset, part.minIndex, part.maxIndex, part.indexCount)
+					   .receiveShadows(renderable.receiveShadows)
+					   .castShadows(renderable.castShadows)
 					   .build(mMeshRegistry.getEngine(), sceneEntity.entity);
 }
 

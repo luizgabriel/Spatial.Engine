@@ -3,6 +3,7 @@
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ui/ImGuiComponents.h>
 
+#include <future>
 #include <variant>
 
 #include "Components.h"
@@ -81,8 +82,6 @@ void EditorSystem::onStart()
 	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
 	mRegistry.emplace<ecs::DirectionalLight>(entity);
 
-	onSceneWindowResized({1280, 720});
-
 	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
 	mSceneView->setCamera(&cameraComponent);
 
@@ -90,6 +89,8 @@ void EditorSystem::onStart()
 	createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {.4f, 0.1f, 0.1f, 1.0f});
 	createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {.1f, 0.4f, 0.1f, 1.0f});
 	createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {.1f, 0.1f, 0.4f, 1.0f});
+
+	onSceneWindowResized({1280, 720});
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
@@ -343,15 +344,19 @@ entt::entity EditorSystem::createObject(std::string name, const std::string_view
 	mRegistry.emplace<ecs::Name>(entity, std::move(name));
 	mRegistry.emplace<ecs::Transform>(entity, std::move(position));
 
-	auto materialId = mMaterialRegistry.load("editor/materials/default.filamat", [=](auto& instance) {
-		instance.setParameter("baseColor", color);
-		instance.setParameter("metallic", .2f);
-		instance.setParameter("roughness", 0.3f);
-		instance.setParameter("reflectance", .1f);
+	auto meshId = std::async(std::launch::async, [&]() { return mMeshRegistry.load(shape); });
+
+	auto materialId = std::async(std::launch::async, [&]() {
+		return mMaterialRegistry.load("editor/materials/default.filamat", [=](auto& instance) {
+			instance.setParameter("baseColor", color);
+			instance.setParameter("metallic", .2f);
+			instance.setParameter("roughness", 0.3f);
+			instance.setParameter("reflectance", .1f);
+		});
 	});
 
-	mRegistry.emplace<ecs::Renderable>(entity, ecs::Renderable{.meshId = mMeshRegistry.load(shape),
-															   .materialId = materialId,
+	mRegistry.emplace<ecs::Renderable>(entity, ecs::Renderable{.meshId = meshId.get(),
+															   .materialId = materialId.get(),
 															   .castShadows = true,
 															   .receiveShadows = true});
 

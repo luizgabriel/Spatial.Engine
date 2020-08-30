@@ -429,7 +429,6 @@ bool lightInput(ecs::DirectionalLight& light)
 
 	changed |= ImGui::ColorEdit3("Color", &light.color[0]);
 	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
-	changed |= ImGui::Checkbox("Is Sun", &light.isSun);
 	changed |= ui::directionWidget("Direction", light.direction);
 
 	return changed;
@@ -441,7 +440,6 @@ bool lightInput(ecs::SpotLight& light)
 
 	changed |= ImGui::ColorEdit3("Color", &light.color[0]);
 	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
-	changed |= ImGui::Checkbox("Focused", &light.focused);
 	changed |= ImGui::SliderAngle("Inner Cone", &light.innerCone, .0f, 90.0f);
 
 	light.outerCone = std::clamp(light.outerCone, light.innerCone, math::pi<float>/2.0f);
