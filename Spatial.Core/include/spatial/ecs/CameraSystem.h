@@ -13,6 +13,8 @@ class CameraSystem
 
 	void onConstruct(entt::registry& registry, entt::entity entity);
 
+	void onDestroy(entt::registry& registry, entt::entity entity);
+
 	void onUpdate(const entt::registry& registry);
 
 	const filament::Camera& get(entt::entity entity) const

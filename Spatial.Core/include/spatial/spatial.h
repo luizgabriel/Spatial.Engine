@@ -34,12 +34,8 @@
 #include <spatial/common/Math.h>
 
 #include <spatial/ecs/CameraSystem.h>
-#include <spatial/ecs/MaterialSystem.h>
-#include <spatial/ecs/RenderableSystem.h>
-#include <spatial/ecs/TransformSystem.h>
-#include <spatial/ecs/MeshSystem.h>
 #include <spatial/ecs/LightSystem.h>
-
-
-
-
+#include <spatial/ecs/MaterialRegistry.h>
+#include <spatial/ecs/MeshRegistry.h>
+#include <spatial/ecs/SceneManagerSystem.h>
+#include <spatial/ecs/TransformSystem.h>

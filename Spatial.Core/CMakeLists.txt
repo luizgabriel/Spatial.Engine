@@ -43,10 +43,10 @@ add_library(Spatial.Core
 	include/spatial/ui/ImGuiSceneWindow.h
 	
 	include/spatial/ecs/Components.h
-	include/spatial/ecs/RenderableSystem.h
+	include/spatial/ecs/SceneManagerSystem.h
 	include/spatial/ecs/TransformSystem.h
-	include/spatial/ecs/MaterialSystem.h
-	include/spatial/ecs/MeshSystem.h
+	include/spatial/ecs/MaterialRegistry.h
+	include/spatial/ecs/MeshRegistry.h
 	include/spatial/ecs/LightSystem.h
 	
 	include/spatial/spatial.h
@@ -82,11 +82,13 @@ add_library(Spatial.Core
 	src/ui/ImGuiSceneWindow.cpp
 	src/ui/ImGuiComponents.cpp
 	
-	src/ecs/RenderableSystem.cpp
+	src/ecs/SceneManagerSystem.cpp
 	src/ecs/TransformSystem.cpp
 	src/ecs/CameraSystem.cpp
 	src/ecs/LightSystem.cpp
-)
+	src/ecs/MaterialRegistry.cpp
+	src/ecs/MeshRegistry.cpp
+	src/ecs/RenderableSystem.cpp)
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 
@@ -96,7 +98,7 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
-	PRIVATE <vector> <unordered_map> <future> <optional> <filesystem> <chrono> <utility>)
+	PRIVATE <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility>)
 
 target_include_directories(Spatial.Core
 	PUBLIC

@@ -42,11 +42,11 @@ class EditorSystem
 	bool showEngineGui{true};
 
 	entt::registry mRegistry;
+	ecs::MeshRegistry mMeshRegistry;
+	ecs::MaterialRegistry mMaterialRegistry;
 
 	ecs::TransformSystem mTransformSystem;
-	ecs::MeshSystem mMeshSystem;
-	ecs::MaterialSystem mMaterialSystem;
-	ecs::RenderableSystem mRenderableSystem;
+	ecs::SceneManagerSystem mRenderableSystem;
 	ecs::CameraSystem mCameraSystem;
 	ecs::LightSystem mLightSystem;
 
@@ -71,8 +71,8 @@ class EditorSystem
 	void onSceneWindowResized(ui::ImGuiSceneWindow::Size size);
 
   private:
-    entt::entity createObject(std::string name, std::string resourcePath, filament::math::float3 position, filament::math::float3 scale);
 	entt::entity createLight(std::string name);
+	entt::entity createObject(std::string name, const std::string_view shape, math::float3 position, math::float4 color);
 };
 
 } // namespace spatial

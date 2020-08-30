@@ -35,9 +35,9 @@ Entity createEntity(fl::Engine& engine) noexcept
 	return Entity{engine, utils::EntityManager::get().create()};
 }
 
-MaterialInstance createMaterialInstance(fl::Engine& engine, const fl::Material& material, const char* name) noexcept
+MaterialInstance createMaterialInstance(fl::Engine& engine, const fl::Material& material, const std::string_view name) noexcept
 {
-	return MaterialInstance{engine, material.createInstance(name)};
+	return MaterialInstance{engine, material.createInstance(name.data())};
 }
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth)

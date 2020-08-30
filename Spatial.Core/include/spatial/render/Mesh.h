@@ -127,11 +127,6 @@ struct Mesh
 	{
 		return mEngine;
 	}
-
-	void build(utils::Entity entity, filament::MaterialInstance* defaultInstance);
-
-	using MaterialsMap = std::unordered_map<std::string, filament::MaterialInstance*>;
-	void build(utils::Entity entity, const MaterialsMap& map);
 };
 
 } // namespace spatial

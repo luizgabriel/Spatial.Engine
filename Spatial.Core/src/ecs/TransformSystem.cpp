@@ -14,10 +14,10 @@ void TransformSystem::onUpdate(entt::registry& registry)
 {
 	using namespace filament::math;
 
-	const auto view = registry.view<const ecs::Transform, ecs::Renderable>();
+	const auto view = registry.view<const ecs::Transform, const ecs::SceneEntity>();
 
-	view.each([this, &view](const auto& transform, auto& renderable) {
-		const auto transformEntity = mTransformManager.getInstance(renderable.entity.get());
+	view.each([this, &view](const auto& transform, const auto& renderable) {
+		const auto transformEntity = mTransformManager.getInstance(renderable.entity);
 		const auto translation = mat4f::translation(transform.position);
 		const auto scale = mat4f::scaling(transform.scale);
 		const auto rotateZ = mat4f::rotation(transform.rotation.z, float3{0, 0, 1});

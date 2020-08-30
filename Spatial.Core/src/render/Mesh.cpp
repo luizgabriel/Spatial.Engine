@@ -15,34 +15,6 @@ Mesh::Mesh(fl::Engine& engine, VertexBuffer&& vertexBuffer, IndexBuffer&& indexB
 {
 }
 
-void Mesh::build(utils::Entity entity, filament::MaterialInstance* defaultInstance)
-{
-	auto map = MaterialsMap{{"DefaultMaterial", defaultInstance}};
-	return build(entity, map);
-}
-
-void Mesh::build(utils::Entity entity, const MaterialsMap& map)
-{
-	auto builder = fl::RenderableManager::Builder(size());
-	builder.boundingBox(boundingBox());
-
-	size_t index{};
-	for (auto& part : mParts)
-	{
-		builder.geometry(index, fl::RenderableManager::PrimitiveType::TRIANGLES, getVertexBuffer().get(),
-						 getIndexBuffer().get(), part.offset, part.minIndex, part.maxIndex, part.indexCount);
-
-		if (map.find(part.materialName) != map.end())
-			builder.material(index, map.at(part.materialName));
-		else
-			builder.material(index, map.at("DefaultMaterial"));
-
-		index++;
-	}
-
-	builder.build(getEngine(), entity);
-}
-
 Mesh::Mesh(filament::Engine& engine)
 	 : mEngine{engine}, mVertexBuffer{engine}, mIndexBuffer{engine}, mBoundingBox{}, mParts(0)
 {

@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 #include <entt/entity/entity.hpp>
-#include <spatial/render/Entity.h>
+#include <utils/Entity.h>
 #include <spatial/common/Math.h>
 
 namespace spatial::ecs
@@ -11,54 +11,48 @@ namespace spatial::ecs
 
 struct Transform
 {
-	filament::math::float3 position{.0f};
-	filament::math::float3 scale{1.0f};
-	filament::math::float3 rotation{0.0f};
+	math::float3 position{.0f};
+	math::float3 scale{1.0f};
+	math::float3 rotation{0.0f};
+};
+
+struct SceneEntity
+{
+	utils::Entity entity;
+};
+
+struct PointLight
+{
+	filament::math::float3 color{1.0f};
+	float intensity{30000.0f};
+};
+
+struct DirectionalLight
+{
+	math::float3 color{1.0f};
+	float intensity{30000.0f};
+	math::float3 direction{.0f, -1.0f, .0f};
+	bool isSun{false};
+};
+
+struct SpotLight
+{
+	filament::math::float3 color{1.0f};
+	float intensity{30000.0f};
+	filament::math::float3 direction{.0f, -1.0f, .0f};
+	float innerCone{math::pi<float>/4};
+	float outerCone{math::pi<float>/4};
+	bool focused{false};
 };
 
 struct Renderable
 {
-	Entity entity;
+	std::uint32_t meshId;
+	std::size_t materialId;
+	std::size_t subMeshId{0};
+
 	bool castShadows{false};
 	bool receiveShadows{false};
-};
-
-struct Light
-{
-	filament::math::float3 color{1.0f};
-	float intensity{100.0f};
-
-	struct Directional
-	{
-		filament::math::float3 direction{.0f, -1.0f, .0f};
-		bool isSun{false};
-	};
-
-	struct SpotLight
-	{
-		filament::math::float3 direction{.0f, -1.0f, .0f};
-		float innerCone{math::pi<float>/4};
-		float outerCone{math::pi<float>/4};
-		bool focused{false};
-	};
-
-	struct Point
-	{
-	};
-
-	std::variant<Directional, SpotLight, Point> type{Point{}};
-};
-
-struct Mesh
-{
-	std::string resourceFilePath;
-};
-
-struct Material
-{
-	entt::entity parentShape;
-	std::string resourceFilePath;
-	std::string name{"DefaultMaterial"};
 };
 
 struct Name
@@ -66,54 +60,31 @@ struct Name
 	std::string value;
 };
 
-struct Camera
+struct OrtographicCamera
 {
-	struct Perspective
-	{
-		float fieldOfView{45.f};
-		float aspectRatio{16.0f / 9.0f};
-		float near{0.1f};
-		float far{1000000.0};
-	};
+	float near{0.1f};
+	float far{1000000.0};
+	float aspectRatio{16.0 / 9.0};
+};
 
-	struct Ortographic
-	{
-		float aspectRatio{16.0f / 9.0f};
-		float near{.0f};
-		float far{1.0f};
-	};
+struct PerspectiveCamera
+{
+	float near{0.1f};
+	float far{1000000.0};
+	float aspectRatio{16.0 / 9.0};
+	float fieldOfView{45.0};
+};
 
-	struct Custom
-	{
-		filament::math::mat4 projection{};
-		float near{.0f};
-		float far{1.0f};
-	};
+struct CustomCamera
+{
+	float near{0.1f};
+	float far{1000000.0};
+	filament::math::mat4 projection;
+};
 
-	filament::math::float3 target{.0f};
-	std::variant<Perspective, Ortographic, Custom> projection{Perspective{}};
-
-	float* near() {
-		return std::visit([](auto& proj) -> float* {
-			return &proj.near;
-		}, projection);
-	}
-
-	float* far() {
-		return std::visit([](auto& proj) -> float* {
-		  return &proj.far;
-		}, projection);
-	}
-
-	float* aspectRatio() {
-		return std::visit([](auto& proj) -> float* {
-			if constexpr (std::is_same_v<decltype(proj), Perspective&> || std::is_same_v<decltype(proj), Ortographic&>){
-				return &proj.aspectRatio;
-			} else {
-				return nullptr;
-			}
-		}, projection);
-	}
+struct CameraTarget
+{
+	math::float3 target{.0f};
 };
 
 } // namespace spatial::ecs

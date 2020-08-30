@@ -35,9 +35,10 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 	  mImGuiSceneWindow{mEngine, {1280, 720}},
 
 	  mRegistry{},
+	  mMeshRegistry{mEngine},
+	  mMaterialSystem{mEngine},
+
 	  mTransformSystem{mEngine},
-	  mMeshSystem{mEngine, assets::sResourceLoader},
-	  mMaterialSystem{mEngine, assets::sResourceLoader},
 	  mRenderableSystem{mEngine, mScene.ref()},
 	  mCameraSystem{mEngine},
 	  mLightSystem{mEngine},
@@ -46,10 +47,8 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 
 	  mMovement{true, 1.0f, 10.0f}
 {
-	connect<ecs::Mesh>(mRegistry, mMeshSystem);
-	connect<ecs::Renderable>(mRegistry, mRenderableSystem);
+	connect<ecs::SceneEntity>(mRegistry, mRenderableSystem);
 	connect<ecs::Transform>(mRegistry, mTransformSystem);
-	connect<ecs::Material>(mRegistry, mMaterialSystem);
 	connect<ecs::Camera>(mRegistry, mCameraSystem);
 	connect<ecs::Light>(mRegistry, mLightSystem);
 
@@ -77,57 +76,11 @@ void EditorSystem::onStart()
 	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
 	mSceneView->setCamera(&cameraComponent);
 
-	auto planeEntity = createObject("Plane", "editor/meshes/plane.filamesh", {3.0f, -1.0f, .0f}, {10.0f, .0f, 10.0f});
-	auto cubeEntity = createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {1.0f});
-	auto cylinderEntity = createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {1.0f});
-	auto sphereEntity = createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {1.0f});
+	createObject("Plane", "editor/meshes/plane.filamesh", {3.0f, -1.0f, .0f}, {.8f, .8f, .8f, 1.0f});
+	createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {.4f, 0.1f, 0.1f, 1.0f});
+	createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {.1f, 0.4f, 0.1f, 1.0f});
+	createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {.1f, 0.1f, 0.4f, 1.0f});
 	createLight("Main Light");
-
-	mRenderableSystem.buildMaterialInstances(mRegistry, mMaterialSystem);
-	mRenderableSystem.buildShapeRenderables(mRegistry, mMeshSystem);
-
-	mRenderableSystem.update(planeEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", math::float4{1.0f, 1.0f, 1.0f, 1.0f});
-		materialInstance->setParameter("metallic", .0f);
-		materialInstance->setParameter("roughness", 1.0f);
-		materialInstance->setParameter("reflectance", .2f);
-	});
-
-	mRenderableSystem.update(sphereEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", math::float4{0.2f, 0.5f, 0.3f, 1.0f});
-		materialInstance->setParameter("metallic", .5f);
-		materialInstance->setParameter("roughness", 0.2f);
-		materialInstance->setParameter("reflectance", .0f);
-	});
-
-	mRenderableSystem.update(cubeEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", math::float4{0.5f, 0.2f, 0.3f, 1.0f});
-		materialInstance->setParameter("metallic", .5f);
-		materialInstance->setParameter("roughness", 0.2f);
-		materialInstance->setParameter("reflectance", .0f);
-	});
-
-	mRenderableSystem.update(cylinderEntity, [](auto* materialInstance) {
-		materialInstance->setParameter("baseColor", math::float4{0.3f, 0.3f, 0.8f, 1.0f});
-		materialInstance->setParameter("metallic", .5f);
-		materialInstance->setParameter("roughness", 0.2f);
-		materialInstance->setParameter("reflectance", .0f);
-	});
-}
-
-entt::entity EditorSystem::createObject(std::string name, std::string resourcePath, math::float3 position,
-										math::float3 scale)
-{
-	auto objectEntity = mRegistry.create();
-
-	mRegistry.emplace<ecs::Name>(objectEntity, std::move(name));
-	mRegistry.emplace<ecs::Transform>(objectEntity, std::move(position), std::move(scale));
-	mRegistry.emplace<ecs::Mesh>(objectEntity, std::move(resourcePath));
-
-	auto materialEntity = mRegistry.create();
-	mRegistry.emplace<ecs::Material>(materialEntity, objectEntity, "editor/materials/default.filamat");
-
-	return objectEntity;
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
@@ -246,19 +199,27 @@ void EditorSystem::onDrawGui()
 		ui::inputText("Name", name.value);
 
 		auto* transform = mRegistry.try_get<ecs::Transform>(mSelectedEntity);
-		auto* camera = mRegistry.try_get<ecs::Camera>(mSelectedEntity);
-		auto* mesh = mRegistry.try_get<ecs::Mesh>(mSelectedEntity);
+
+		auto* perspectiveCamera = mRegistry.try_get<ecs::PerspectiveCamera>(mSelectedEntity);
+		auto* orthographicCamera = mRegistry.try_get<ecs::OrtographicCamera>(mSelectedEntity);
+		auto* customCamera = mRegistry.try_get<ecs::CustomCamera>(mSelectedEntity);
+
+		auto* mesh = mRegistry.try_get<ecs::Renderable>(mSelectedEntity);
 		auto* material = mRegistry.try_get<ecs::Material>(mSelectedEntity);
-		auto* renderable = mRegistry.try_get<ecs::Renderable>(mSelectedEntity);
-		auto* light = mRegistry.try_get<ecs::Light>(mSelectedEntity);
+		auto* renderable = mRegistry.try_get<ecs::SceneEntity>(mSelectedEntity);
+
+		auto* pointLight = mRegistry.try_get<ecs::PointLight>(mSelectedEntity);
+		auto* directionalLight = mRegistry.try_get<ecs::DirectionalLight>(mSelectedEntity);
+		auto* spotLight = mRegistry.try_get<ecs::SpotLight>(mSelectedEntity);
 
 		if (transform)
 		{
-			if (ImGui::CollapsingHeader("Transform", nullptr, ImGuiTreeNodeFlags_DefaultOpen)) {
+			if (ImGui::CollapsingHeader("Transform", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			{
 				ImGui::Indent();
-				if (camera)
+				if (perspectiveCamera || orthographicCamera || customCamera)
 					ui::transformInput(*transform, "py");
-				else if (light)
+				else if (pointLight || directionalLight || spotLight)
 					ui::transformInput(*transform, "p");
 				else
 					ui::transformInput(*transform, "prs");
@@ -267,49 +228,67 @@ void EditorSystem::onDrawGui()
 			}
 		}
 
-		if (mesh)
+		if (perspectiveCamera)
 		{
-			if (ImGui::CollapsingHeader("Mesh"))
+			if (ImGui::CollapsingHeader("Perspective Camera", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Indent();
-				ui::inputText("Resource", mesh->resourceFilePath);
+				ui::cameraInput(*perspectiveCamera);
 				ImGui::Unindent();
 			}
 		}
 
-		if (material)
+		if (orthographicCamera)
 		{
-			if (ImGui::CollapsingHeader("Material"))
+			if (ImGui::CollapsingHeader("Orthographic Camera", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Indent();
-				ui::inputText("Resource", material->resourceFilePath);
+				ui::cameraInput(*orthographicCamera);
 				ImGui::Unindent();
 			}
 		}
 
-		if (camera)
+		if (customCamera)
 		{
-			if (ImGui::CollapsingHeader("Camera", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("Custom Camera", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Indent();
-				ui::cameraInput(*camera);
+				ui::cameraInput(*customCamera);
 				ImGui::Unindent();
 			}
 		}
 
-		if (light)
+		if (pointLight)
 		{
-			if (ImGui::CollapsingHeader("Light", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("Point Light", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Indent();
-
-				ui::lightInput(*light);
-
+				ui::lightInput(*pointLight);
 				ImGui::Unindent();
 			}
 		}
 
-		if (renderable && !camera)
+		if (directionalLight)
+		{
+			if (ImGui::CollapsingHeader("Directional Light", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Indent();
+				ui::lightInput(*directionalLight);
+				ImGui::Unindent();
+			}
+		}
+
+		if (spotLight)
+		{
+			if (ImGui::CollapsingHeader("Spot Light", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Indent();
+				ui::lightInput(*spotLight);
+				ImGui::Unindent();
+			}
+		}
+
+		if (renderable && !(perspectiveCamera || orthographicCamera || customCamera))
 		{
 			if (ImGui::CollapsingHeader("Renderable"))
 			{
@@ -329,7 +308,6 @@ void EditorSystem::onDrawGui()
 			ImGui::Checkbox("Warp Mouse", &mMovement.warpMouse);
 			ImGui::InputFloat("Velocity", &mMovement.velocity);
 			ImGui::InputFloat("Sensitivity", &mMovement.sensitivity);
-
 		}
 
 		ImGui::End();
@@ -359,9 +337,29 @@ entt::entity EditorSystem::createLight(std::string name)
 	auto entity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(entity, std::move(name));
 	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
-	mRegistry.emplace<ecs::Light>(entity, ecs::Light{
-		.type = ecs::Light::SpotLight{}
+	mRegistry.emplace<ecs::DirectionalLight>(entity);
+
+	return entity;
+}
+
+entt::entity EditorSystem::createObject(std::string name, const std::string_view shape, math::float3 position,
+										math::float4 color)
+{
+	auto entity = mRegistry.create();
+	mRegistry.emplace<ecs::Name>(entity, std::move(name));
+	mRegistry.emplace<ecs::Transform>(entity, std::move(position));
+
+	auto materialId = mMaterialRegistry.load("editor/materials/default.filamat", [=](auto& instance) {
+		instance.setParameter("baseColor", color);
+		instance.setParameter("metallic", .2f);
+		instance.setParameter("roughness", 0.3f);
+		instance.setParameter("reflectance", .1f);
 	});
+
+	mRegistry.emplace<ecs::Renderable>(entity, ecs::Renderable{.meshId = mMeshRegistry.load(shape),
+															   .materialId = materialId,
+															   .castShadows = true,
+															   .receiveShadows = true});
 
 	return entity;
 }
