@@ -19,7 +19,7 @@ bool sceneHierarchy(const entt::registry& registry, entt::entity& selectedEntity
 
 bool inputText(const std::string_view label, std::string& value);
 
-bool directionWidget(const std::string_view label, math::float3& v, float size = 100.0f, std::uint32_t color = 0xffff0000);
+bool directionWidget(const std::string_view label, math::float3& v, float size = 100.0f, std::uint32_t color = 0x22ff2200);
 
 bool lightInput(ecs::PointLight& light);
 
