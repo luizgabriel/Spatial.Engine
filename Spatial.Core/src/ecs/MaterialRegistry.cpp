@@ -25,7 +25,7 @@ std::size_t MaterialRegistry::load(const std::string_view resourcePath)
 		mLoadedMaterials.emplace(hash, createMaterial(mEngine, materialData.value()));
 	}
 
-	auto& material = mLoadedMaterials[hash];
+	auto& material = mLoadedMaterials.at(hash);
 	auto materialInstanceIdx = mMaterialInstancesLastIdx++;
 	mMaterialInstances.emplace_back(createMaterialInstance(mEngine, material.ref()));
 

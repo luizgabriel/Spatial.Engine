@@ -45,8 +45,9 @@ class EditorSystem
 	ecs::MeshRegistry mMeshRegistry;
 	ecs::MaterialRegistry mMaterialRegistry;
 
+	ecs::RenderableSystem mRenderableSystem;
 	ecs::TransformSystem mTransformSystem;
-	ecs::SceneManagerSystem mRenderableSystem;
+	ecs::SceneManagerSystem mSceneManagerSystem;
 	ecs::CameraSystem mCameraSystem;
 	ecs::LightSystem mLightSystem;
 
@@ -71,7 +72,6 @@ class EditorSystem
 	void onSceneWindowResized(ui::ImGuiSceneWindow::Size size);
 
   private:
-	entt::entity createLight(std::string name);
 	entt::entity createObject(std::string name, const std::string_view shape, math::float3 position, math::float4 color);
 };
 

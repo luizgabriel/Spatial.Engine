@@ -16,35 +16,37 @@ void LightSystem::onConstruct(entt::registry& registry, entt::entity entity)
 {
 	auto& renderable = registry.get_or_emplace<ecs::SceneEntity>(entity);
 
-	if (auto* light = registry.try_get<ecs::PointLight>(entity); light) {
+	if (auto* light = registry.try_get<ecs::PointLight>(entity); light)
+	{
 		const auto& transform = registry.get_or_emplace<ecs::Transform>(entity);
 
 		fl::LightManager::Builder(fl::LightManager::Type::POINT)
-			.castShadows(renderable->castShadows)
+			.castShadows(light->castShadows)
 			.intensity(light->intensity)
 			.color(fl::Color::toLinear<fl::ACCURATE>(light->color))
 			.position(transform.position)
 			.build(mEngine, renderable.entity);
 	}
 
-	if (auto* light = registry.try_get<ecs::DirectionalLight>(entity); light) {
+	if (auto* light = registry.try_get<ecs::DirectionalLight>(entity); light)
+	{
 		registry.remove_if_exists<ecs::Transform>(entity);
 
-		fl::LightManager::Builder(light->isSun ? fl::LightManager::Type::SUN
-													: fl::LightManager::Type::DIRECTIONAL)
-			.castShadows(renderable->castShadows)
+		fl::LightManager::Builder(light->isSun ? fl::LightManager::Type::SUN : fl::LightManager::Type::DIRECTIONAL)
+			.castShadows(light->castShadows)
 			.intensity(light->intensity)
 			.color(fl::Color::toLinear<fl::ACCURATE>(light->color))
 			.direction(light->direction)
 			.build(mEngine, renderable.entity);
 	}
 
-	if (auto* light = registry.try_get<ecs::SpotLight>(entity); light) {
+	if (auto* light = registry.try_get<ecs::SpotLight>(entity); light)
+	{
 		const auto& transform = registry.get_or_emplace<ecs::Transform>(entity);
 
 		fl::LightManager::Builder(light->focused ? fl::LightManager::Type::FOCUSED_SPOT
-													  : fl::LightManager::Type::DIRECTIONAL)
-			.castShadows(renderable->castShadows)
+												 : fl::LightManager::Type::DIRECTIONAL)
+			.castShadows(light->castShadows)
 			.intensity(light->intensity)
 			.color(fl::Color::toLinear<fl::ACCURATE>(light->color))
 			.direction(light->direction)
@@ -52,46 +54,41 @@ void LightSystem::onConstruct(entt::registry& registry, entt::entity entity)
 			.spotLightCone(light->innerCone, light->outerCone)
 			.build(mEngine, renderable.entity);
 	}
-
 }
 
 void LightSystem::onDestruct(entt::registry& registry, entt::entity entity)
 {
-	registry.remove<ecs::SceneEntity>(entity);
+	auto sceneEntity = registry.get<ecs::SceneEntity>(entity);
+	mLightManager.destroy(sceneEntity.entity);
 }
 
 void LightSystem::onUpdate(entt::registry& registry)
 {
-	auto view = registry.view<ecs::Light, ecs::SceneEntity>();
+	registry.view<ecs::PointLight, ecs::SceneEntity, ecs::Transform>().each(
+		[this](const auto& light, const auto& sceneEntity, const auto& transform) {
+			auto instance = mLightManager.getInstance(sceneEntity.entity);
 
-	for (entt::entity entity : view)
-	{
-		const auto& light = view.get<ecs::Light>(entity);
-		auto& renderable = view.get<ecs::SceneEntity>(entity);
-		auto instance = mLightManager.getInstance(renderable.entity.get());
+			mLightManager.setPosition(instance, transform.position);
+			mLightManager.setIntensity(instance, light.intensity);
+			mLightManager.setColor(instance, fl::Color::toLinear<fl::ACCURATE>(light.color));
+		});
 
+	registry.view<ecs::DirectionalLight, ecs::SceneEntity>().each([this](const auto& light, const auto& sceneEntity) {
+		auto instance = mLightManager.getInstance(sceneEntity.entity);
+
+		mLightManager.setDirection(instance, light.direction);
 		mLightManager.setIntensity(instance, light.intensity);
 		mLightManager.setColor(instance, fl::Color::toLinear<fl::ACCURATE>(light.color));
+	});
 
-		std::visit([&](const auto& type){
+	registry.view<ecs::SpotLight, ecs::SceneEntity>().each([this](const auto& light, const auto& sceneEntity) {
+		auto instance = mLightManager.getInstance(sceneEntity.entity);
 
-		  using type_t = std::decay_t<decltype(type)>;
-
-		  if constexpr (std::is_same_v<type_t, ecs::Light::Directional> || std::is_same_v<type_t, ecs::Light::SpotLight>)
-			  mLightManager.setDirection(instance, type.direction);
-
-		  if constexpr (std::is_same_v<type_t, ecs::Light::SpotLight>)
-			  mLightManager.setSpotLightCone(instance, type.innerCone, type.outerCone);
-
-		}, light.type);
-
-		mLightManager.setShadowCaster(instance, renderable.castShadows);
-
-		auto* transform = registry.try_get<ecs::Transform>(entity);
-		if (transform) {
-			mLightManager.setPosition(instance, transform->position);
-		}
-	}
+		mLightManager.setDirection(instance, light.direction);
+		mLightManager.setSpotLightCone(instance, light.innerCone, light.outerCone);
+		mLightManager.setIntensity(instance, light.intensity);
+		mLightManager.setColor(instance, fl::Color::toLinear<fl::ACCURATE>(light.color));
+	});
 }
 
 } // namespace spatial::ecs

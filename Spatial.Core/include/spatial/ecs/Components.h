@@ -25,6 +25,7 @@ struct PointLight
 {
 	filament::math::float3 color{1.0f};
 	float intensity{30000.0f};
+	bool castShadows{true};
 };
 
 struct DirectionalLight
@@ -33,6 +34,7 @@ struct DirectionalLight
 	float intensity{30000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	bool isSun{false};
+	bool castShadows{true};
 };
 
 struct SpotLight
@@ -43,6 +45,7 @@ struct SpotLight
 	float innerCone{math::pi<float>/4};
 	float outerCone{math::pi<float>/4};
 	bool focused{false};
+	bool castShadows{true};
 };
 
 struct Renderable
@@ -63,22 +66,22 @@ struct Name
 struct OrtographicCamera
 {
 	float near{0.1f};
-	float far{1000000.0};
-	float aspectRatio{16.0 / 9.0};
+	float far{1000000.0f};
+	float aspectRatio{16.0f / 9.0f};
 };
 
 struct PerspectiveCamera
 {
 	float near{0.1f};
-	float far{1000000.0};
-	float aspectRatio{16.0 / 9.0};
-	float fieldOfView{45.0};
+	float far{1000000.0f};
+	float aspectRatio{16.0f / 9.0f};
+	float fieldOfView{45.0f};
 };
 
 struct CustomCamera
 {
 	float near{0.1f};
-	float far{1000000.0};
+	float far{1000000.0f};
 	filament::math::mat4 projection;
 };
 

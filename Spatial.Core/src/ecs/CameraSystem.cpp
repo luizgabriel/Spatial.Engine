@@ -39,8 +39,6 @@ void CameraSystem::onDestroy(entt::registry& registry, entt::entity entity)
 
 void CameraSystem::onUpdate(const entt::registry& registry)
 {
-	using namespace filament::math;
-
 	const auto pView = registry.view<const ecs::PerspectiveCamera>();
 	for (entt::entity entity : pView)
 	{

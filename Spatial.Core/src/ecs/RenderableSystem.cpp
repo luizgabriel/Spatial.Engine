@@ -19,7 +19,7 @@ void RenderableSystem::onUpdate(entt::registry& registry)
 
 	  auto& mesh = mMeshRegistry.at(renderable.meshId);
 	  auto& material = mMaterialRegistry.at(renderable.materialId);
-	  mRenderableManager.setMaterialInstanceAt(instance, renderable.subMeshId, material.get())
+	  mRenderableManager.setMaterialInstanceAt(instance, renderable.subMeshId, material.get());
 	});
 }
 
@@ -36,21 +36,14 @@ void RenderableSystem::onConstruct(entt::registry& registry, entt::entity entity
 	auto builder = fl::RenderableManager::Builder(mesh.size())
 					   .boundingBox(mesh.boundingBox())
 					   .geometry(renderable.subMeshId, fl::RenderableManager::PrimitiveType::TRIANGLES, mesh.getVertexBuffer().get(),
-						 mesh.getIndexBuffer().get(), mesh[renderable.subMeshId].offset, mesh[renderable.subMeshId].minIndex, mesh[renderable.subMeshId].maxIndex, mesh[renderable.subMeshId].indexCount);
-
-		if (map.find(part.materialName) != map.end())
-			builder.material(index, map.at(part.materialName));
-		else
-			builder.material(index, map.at("DefaultMaterial"));
-
-		index++;
-	}
-
-	builder.build(getEngine(), entity);
+						 mesh.getIndexBuffer().get(), part.offset, part.minIndex, part.maxIndex, part.indexCount)
+					   .build(mMeshRegistry.getEngine(), sceneEntity.entity);
 }
 
 void RenderableSystem::onDestroy(entt::registry& registry, entt::entity entity)
 {
+	auto& sceneEntity = registry.get<ecs::SceneEntity>(entity);
+	mRenderableManager.destroy(sceneEntity.entity);
 }
 
 }

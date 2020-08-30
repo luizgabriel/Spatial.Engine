@@ -35,11 +35,11 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 	  mImGuiSceneWindow{mEngine, {1280, 720}},
 
 	  mRegistry{},
-	  mMeshRegistry{mEngine},
-	  mMaterialSystem{mEngine},
-
+	  mMeshRegistry{mEngine, assets::sResourceLoader},
+	  mMaterialRegistry{mEngine, assets::sResourceLoader},
+	  mRenderableSystem{mMaterialRegistry, mMeshRegistry},
 	  mTransformSystem{mEngine},
-	  mRenderableSystem{mEngine, mScene.ref()},
+	  mSceneManagerSystem{mEngine, mScene.ref()},
 	  mCameraSystem{mEngine},
 	  mLightSystem{mEngine},
 
@@ -47,10 +47,14 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 
 	  mMovement{true, 1.0f, 10.0f}
 {
-	connect<ecs::SceneEntity>(mRegistry, mRenderableSystem);
+	connect<ecs::SceneEntity>(mRegistry, mSceneManagerSystem);
 	connect<ecs::Transform>(mRegistry, mTransformSystem);
-	connect<ecs::Camera>(mRegistry, mCameraSystem);
-	connect<ecs::Light>(mRegistry, mLightSystem);
+	connect<ecs::PerspectiveCamera>(mRegistry, mCameraSystem);
+	connect<ecs::OrtographicCamera>(mRegistry, mCameraSystem);
+	connect<ecs::CustomCamera>(mRegistry, mCameraSystem);
+	connect<ecs::PointLight>(mRegistry, mLightSystem);
+	connect<ecs::DirectionalLight>(mRegistry, mLightSystem);
+	connect<ecs::SpotLight>(mRegistry, mLightSystem);
 
 	mSceneView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mSceneView->setScene(mScene.get());
@@ -68,8 +72,14 @@ void EditorSystem::onStart()
 {
 	mCameraEntity = mRegistry.create();
 	mRegistry.emplace<ecs::Name>(mCameraEntity, "Main Camera");
-	mRegistry.emplace<ecs::Transform>(mCameraEntity, math::float3{.0f, .0f, .0f});
-	mRegistry.emplace<ecs::Camera>(mCameraEntity, math::float3{.0f}, ecs::Camera::Perspective{});
+	mRegistry.emplace<ecs::Transform>(mCameraEntity, math::float3{.6f, .3f, .6f});
+	mRegistry.emplace<ecs::PerspectiveCamera>(mCameraEntity);
+	mRegistry.emplace<ecs::CameraTarget>(mCameraEntity, math::float3{.0f, .0f, .0f});
+
+	auto entity = mRegistry.create();
+	mRegistry.emplace<ecs::Name>(entity, "Main Light");
+	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
+	mRegistry.emplace<ecs::DirectionalLight>(entity);
 
 	onSceneWindowResized({1280, 720});
 
@@ -80,7 +90,6 @@ void EditorSystem::onStart()
 	createObject("Cube", "editor/meshes/cube.filamesh", {.0f, .0f, .0f}, {.4f, 0.1f, 0.1f, 1.0f});
 	createObject("Cylinder", "editor/meshes/cylinder.filamesh", {3.0f, .0f, .0f}, {.1f, 0.4f, 0.1f, 1.0f});
 	createObject("Sphere", "editor/meshes/sphere.filamesh", {6.0f, .0f, .0f}, {.1f, 0.1f, 0.4f, 1.0f});
-	createLight("Main Light");
 }
 
 void EditorSystem::onEvent(const MouseMovedEvent&)
@@ -133,7 +142,7 @@ void EditorSystem::onUpdateFrame(float delta)
 	cameraTransform.position += cross(direction, up) * deltaMouseMovement.y;
 	cameraTransform.position += up * deltaMouseMovement.z;
 
-	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
+	auto& camera = mRegistry.get<ecs::CameraTarget>(mCameraEntity);
 	camera.target = cameraTransform.position + direction;
 
 	mTransformSystem.onUpdate(mRegistry);
@@ -204,9 +213,7 @@ void EditorSystem::onDrawGui()
 		auto* orthographicCamera = mRegistry.try_get<ecs::OrtographicCamera>(mSelectedEntity);
 		auto* customCamera = mRegistry.try_get<ecs::CustomCamera>(mSelectedEntity);
 
-		auto* mesh = mRegistry.try_get<ecs::Renderable>(mSelectedEntity);
-		auto* material = mRegistry.try_get<ecs::Material>(mSelectedEntity);
-		auto* renderable = mRegistry.try_get<ecs::SceneEntity>(mSelectedEntity);
+		auto* renderable = mRegistry.try_get<ecs::Renderable>(mSelectedEntity);
 
 		auto* pointLight = mRegistry.try_get<ecs::PointLight>(mSelectedEntity);
 		auto* directionalLight = mRegistry.try_get<ecs::DirectionalLight>(mSelectedEntity);
@@ -288,7 +295,7 @@ void EditorSystem::onDrawGui()
 			}
 		}
 
-		if (renderable && !(perspectiveCamera || orthographicCamera || customCamera))
+		if (renderable)
 		{
 			if (ImGui::CollapsingHeader("Renderable"))
 			{
@@ -320,26 +327,13 @@ void EditorSystem::onSceneWindowResized(ui::ImGuiSceneWindow::Size size)
 	auto height = static_cast<float>(size.second);
 	auto aspectRatio = width / height;
 
-	auto& camera = mRegistry.get<ecs::Camera>(mCameraEntity);
-	if (camera.aspectRatio())
-	{
-		*camera.aspectRatio() = aspectRatio;
-	}
+	auto& camera = mRegistry.get<ecs::PerspectiveCamera>(mCameraEntity);
+	camera.aspectRatio = aspectRatio;
 }
 
 EditorSystem::EditorSystem(RenderingSystem& renderingSystem) : EditorSystem(renderingSystem.getEngine())
 {
 	renderingSystem.pushBackView(mSceneView);
-}
-
-entt::entity EditorSystem::createLight(std::string name)
-{
-	auto entity = mRegistry.create();
-	mRegistry.emplace<ecs::Name>(entity, std::move(name));
-	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
-	mRegistry.emplace<ecs::DirectionalLight>(entity);
-
-	return entity;
 }
 
 entt::entity EditorSystem::createObject(std::string name, const std::string_view shape, math::float3 position,

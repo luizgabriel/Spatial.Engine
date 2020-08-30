@@ -78,7 +78,7 @@ Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
 Entity createEntity(filament::Engine& engine) noexcept;
 
 MaterialInstance createMaterialInstance(filament::Engine& engine, const filament::Material& material,
-										const char* name = nullptr) noexcept;
+										const std::string_view = {nullptr, 0}) noexcept;
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
 
