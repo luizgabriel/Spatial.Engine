@@ -15,7 +15,9 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
 
   <img src="https://img.shields.io/badge/code%20quality-A-brightgreen" />
   
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=shields" />
+  <a href="https://github.com/luizgabriel/Spatial.Engine/pulls">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=shields" />
+  </a>
 
   <a href="https://buymeacoffee.com/luizgabriel" title="Donate to this project using Buy Me A Coffee">
     <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" />
