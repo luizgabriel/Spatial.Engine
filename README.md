@@ -5,7 +5,7 @@
 </h1>
 
 <h4 align="center">
-Spatial is a cross-platform C++ game engine created on top off google's <a href="https://github.com/google/filament">filament</a> rendering engine. This projects uses C++17 and modern cmake features.
+Spatial is a cross-platform C++ game engine created on top off google's <a href="https://github.com/google/filament">filament</a> rendering engine. <br>This projects uses C++17 and modern cmake features.
 </h4>
 
 <p align="center">
@@ -35,15 +35,15 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
 * Cross platform
   - Windows, macOS and Linux ready.
 * Easy installation
-  - All dependencies are resolved by Conan
+  - All dependencies are resolved by [Conan](https://conan.io)
 * Google Filament Rendering Engine Support
-  - This engines makes full use off the powerfull Google's rendering library
+  - This engines makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
 * Full Entity-Component-System
-  - This engines uses the famous ENTT library
+  - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
 * Virtual Filesystem 
   - Locate and load resource files direct from disk, embed inside the executable or other packing format
 * Docking UI
-  - Integrated ImGui interface
+  - Integrated [ImGui](https://github.com/ocornut/imgui) interface
 * Beautiful Code and Modern C++
   - Do you like reading beautiful code? I do too.
 
