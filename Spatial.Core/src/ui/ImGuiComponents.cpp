@@ -15,7 +15,7 @@ bool transformInput(ecs::Transform& transform, const std::string_view format)
 		switch (c)
 		{
 		case 'p':
-			changed |= ImGui::DragFloat3("Position", &transform.position[0];
+			changed |= ImGui::DragFloat3("Position", &transform.position[0]);
 			break;
 		case 'r':
 			changed |= ImGui::DragFloat3("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
