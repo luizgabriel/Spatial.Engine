@@ -81,9 +81,10 @@ void LightSystem::onUpdate(entt::registry& registry)
 		mLightManager.setColor(instance, fl::Color::toLinear<fl::ACCURATE>(light.color));
 	});
 
-	registry.view<ecs::SpotLight, ecs::SceneEntity>().each([this](const auto& light, const auto& sceneEntity) {
+	registry.view<ecs::SpotLight, ecs::SceneEntity, ecs::Transform>().each([this](const auto& light, const auto& sceneEntity, const auto& transform) {
 		auto instance = mLightManager.getInstance(sceneEntity.entity);
 
+		mLightManager.setPosition(instance, transform.position);
 		mLightManager.setDirection(instance, light.direction);
 		mLightManager.setSpotLightCone(instance, light.innerCone, light.outerCone);
 		mLightManager.setIntensity(instance, light.intensity);

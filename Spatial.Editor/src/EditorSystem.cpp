@@ -76,12 +76,11 @@ void EditorSystem::onStart()
 	mRegistry.emplace<ecs::Name>(mCameraEntity, "Main Camera");
 	mRegistry.emplace<ecs::Transform>(mCameraEntity, math::float3{.6f, .3f, .6f});
 	mRegistry.emplace<ecs::PerspectiveCamera>(mCameraEntity);
-	mRegistry.emplace<ecs::CameraTarget>(mCameraEntity, math::float3{.0f, .0f, .0f});
+	mRegistry.emplace<ecs::CameraTarget>(mCameraEntity);
 
-	auto entity = mRegistry.create();
-	mRegistry.emplace<ecs::Name>(entity, "Main Light");
-	mRegistry.emplace<ecs::Transform>(entity, math::float3{.0f, 10.0f, .0f});
-	mRegistry.emplace<ecs::DirectionalLight>(entity);
+	auto mainLight = mRegistry.create();
+	mRegistry.emplace<ecs::Name>(mainLight, "Main Light");
+	mRegistry.emplace<ecs::DirectionalLight>(mainLight);
 
 	auto& cameraComponent = mCameraSystem.get(mCameraEntity);
 	mSceneView->setCamera(&cameraComponent);
