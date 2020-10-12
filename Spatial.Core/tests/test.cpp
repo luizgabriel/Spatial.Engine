@@ -74,9 +74,8 @@ TEST(Application, OnStartFrameListener)
 	auto listener = MockListener{};
 
 	ASSERT_EQ(listener.onStartFrameCalledTimes, 0);
-	app >> listener;
-	ASSERT_EQ(listener.onStartFrameCalledTimes, 0);
 
+	app >> listener;
 	simulateRuntime(app, 1ms);
 
 	ASSERT_GT(listener.onStartFrameCalledTimes, 0);
