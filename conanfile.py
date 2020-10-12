@@ -22,6 +22,7 @@ class SpatialEngineConan(ConanFile):
         "boost_tti/1.67.0@bincrafters/stable",
         "sdl2/2.0.12@bincrafters/stable",
         "argh/1.2.1@adishavit/stable",
+        "gtest/1.8.1@bincrafters/stable",
 
         "imgui/docking@ocornut/stable",  # Installed with vendor/imgui.py
         "entt/3.4.0@skypjack/stable",  # Installed with vendor/entt.py
