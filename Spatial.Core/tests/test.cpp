@@ -40,6 +40,7 @@ TEST(Application, CreateAndStop)
 struct MockListener {
 	MOCK_METHOD0(onStart, void());
 	MOCK_METHOD1(onStartFrame, void(float));
+	MOCK_METHOD1(onUpdateFrame, void(float));
 };
 
 TEST(Application, OnStartListener)
@@ -64,6 +65,18 @@ TEST(Application, OnStartFrameListener)
 
 	app.getStartFrameSignal().connect<&MockListener::onStartFrame>(listener);
 	simulateRuntime(app, 1ms);
+}
+
+TEST(Application, OnUpdateFrameListener)
+{
+	auto app = spatial::Application{};
+	auto listener = MockListener{};
+
+	EXPECT_CALL(listener, onUpdateFrame(_))
+		.Times(AtLeast(2));
+
+	app.getUpdateFrameSignal().connect<&MockListener::onUpdateFrame>(listener);
+	simulateRuntime(app, 500ms);
 }
 
 int main(int argc, char** argv)
