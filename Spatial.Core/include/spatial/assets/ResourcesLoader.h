@@ -7,7 +7,12 @@
 namespace spatial::assets
 {
 
-using Resource = std::optional<std::vector<char>>;
-using ResourcesLoader = std::function<Resource(const std::string_view)>;
+using ResourceData = std::optional<std::vector<char>>;
+
+struct ResourcesLoader
+{
+	virtual ~ResourcesLoader() = default;
+	virtual ResourceData load(const std::string_view resourceName) const = 0;
+};
 
 } // namespace spatial::assets

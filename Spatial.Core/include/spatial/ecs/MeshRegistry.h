@@ -13,13 +13,12 @@ class MeshRegistry
 {
   private:
 	filament::Engine& mEngine;
-	const assets::ResourcesLoader& mResourcesLoader;
 	std::unordered_map<std::uint32_t, spatial::Mesh> mLoadedMeshes;
 
   public:
-	MeshRegistry(filament::Engine& engine, assets::ResourcesLoader& resourcesLoader);
+	MeshRegistry(filament::Engine& engine);
 
-	std::uint32_t load(const std::string_view resourcePath);
+	std::uint32_t load(const assets::ResourcesLoader& loader, const std::string_view resourcePath);
 
 	spatial::Mesh& at(std::uint32_t meshId)
 	{

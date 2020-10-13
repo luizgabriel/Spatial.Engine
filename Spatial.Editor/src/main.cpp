@@ -2,9 +2,15 @@
 #include "Resources.h"
 
 #include <argh.h>
-#include <assets/generated.h>
 #include <filesystem>
-#include <spatial/spatial.h>
+
+#include <spatial/core/Application.h>
+#include <spatial/core/ApplicationUtils.h>
+#include <spatial/input/InputSystem.h>
+#include <spatial/ui/UserInterfaceSystem.h>
+#include <spatial/ui/UserInterfaceUtils.h>
+#include <spatial/desktop/Window.h>
+#include <spatial/desktop/PlatformEventUtils.h>
 
 using namespace spatial;
 namespace fs = std::filesystem;
@@ -25,27 +31,7 @@ int main(int argc, char* argv[])
 	args({"-w", "--width"}) >> config.windowWidth;
 	args({"-h", "--height"}) >> config.windowHeight;
 
-	// clang-format off
-	assets::sResourceLoader = DirMapLoader{
-		{"editor", MemoryLoader{
-			{"fonts/Roboto_Medium.ttf", {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE}},
-			{"materials/default.filamat", {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE}},
-			{"textures/uv.png", {ASSETS_UV, ASSETS_UV_SIZE}},
-			{"textures/default_skybox/sh.txt", {ASSETS_SH, ASSETS_SH_SIZE}},
-			{"textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL, ASSETS_DEFAULT_SKYBOX_IBL_SIZE}},
-			{"textures/default_skybox/skybox.ktx", {ASSETS_DEFAULT_SKYBOX_SKYBOX, ASSETS_DEFAULT_SKYBOX_SKYBOX_SIZE}},
-			{"materials/ui.mat", {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE}},
-			{"meshes/plane.filamesh", {ASSETS_PLANE, ASSETS_PLANE_SIZE}},
-			{"meshes/cube.filamesh", {ASSETS_CUBE, ASSETS_CUBE_SIZE}},
-			{"meshes/sphere.filamesh", {ASSETS_SPHERE, ASSETS_SPHERE_SIZE}},
-			{"meshes/cylinder.filamesh", {ASSETS_CYLINDER, ASSETS_CYLINDER_SIZE}},
-		}},
-		{"assets", AggregatorLoader{
-			PhysicalDirLoader{executablePath / "assets"},
-			PhysicalDirLoader{executablePath}
-		}}
-	};
-	// clang-format on
+	editor::initAssets(executablePath);
 
 	auto app = Application{};
 	auto desktopContext = DesktopPlatformContext{};
@@ -54,9 +40,9 @@ int main(int argc, char* argv[])
 	auto input = InputSystem{window};
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
-	auto ui = UserInterfaceSystem(rendering, window);
-	ui.setMaterial(assets::loadResource("editor/materials/ui.mat").value());
-	ui.setFont(assets::loadResource("editor/fonts/Roboto_Medium.ttf").value());
+	auto ui = UserInterfaceSystem{rendering, window};
+	ui.setMaterial(editor::load("editor/materials/ui.mat").value());
+	ui.setFont(editor::load("editor/fonts/Roboto_Medium.ttf").value());
 
 	auto editor = EditorSystem{rendering};
 

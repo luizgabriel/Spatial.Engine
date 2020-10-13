@@ -2,10 +2,17 @@
 
 #include <imgui.h>
 
-#include <spatial/spatial.h>
-
 #include <entt/entity/registry.hpp>
 #include <spatial/ui/ImGuiSceneWindow.h>
+#include <spatial/render/RenderingSystem.h>
+#include <spatial/ecs/CameraSystem.h>
+#include <spatial/ecs/LightSystem.h>
+#include <spatial/ecs/MaterialRegistry.h>
+#include <spatial/ecs/MeshRegistry.h>
+#include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/RenderableSystem.h>
+#include <spatial/ecs/SceneManagerSystem.h>
+#include <spatial/ecs/TransformSystem.h>
 
 #include <math/mat4.h>
 #include <math/vec2.h>

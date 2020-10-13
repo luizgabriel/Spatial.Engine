@@ -2,6 +2,9 @@
 
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ui/ImGuiComponents.h>
+#include <spatial/render/ResourceLoaders.h>
+#include <spatial/render/SkyboxResources.h>
+#include <spatial/input/Input.h>
 
 #include <future>
 #include <variant>
@@ -26,18 +29,18 @@ EditorSystem::EditorSystem(fl::Engine& engine)
 
 	  mScene{createScene(mEngine)},
 
-	  mIblTexture{createKtxTexture(mEngine, assets::loadResource("editor/textures/default_skybox/ibl.ktx").value())},
+	  mIblTexture{createKtxTexture(mEngine, editor::load("editor/textures/default_skybox/ibl.ktx").value())},
 	  mSkyboxTexture{
-		  createKtxTexture(mEngine, assets::loadResource("editor/textures/default_skybox/skybox.ktx").value())},
+		  createKtxTexture(mEngine, editor::load("editor/textures/default_skybox/skybox.ktx").value())},
 	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(),
-										 assets::loadResource("editor/textures/default_skybox/sh.txt").value())},
+										 editor::load("editor/textures/default_skybox/sh.txt").value())},
 	  mSkybox{createSkybox(mEngine, mSkyboxTexture.ref())},
 
 	  mImGuiSceneWindow{mEngine, {1280, 720}},
 
 	  mRegistry{},
-	  mMeshRegistry{mEngine, assets::sResourceLoader},
-	  mMaterialRegistry{mEngine, assets::sResourceLoader},
+	  mMeshRegistry{mEngine},
+	  mMaterialRegistry{mEngine},
 	  mRenderableSystem{mMaterialRegistry, mMeshRegistry},
 	  mTransformSystem{mEngine},
 	  mSceneManagerSystem{mEngine, mScene.ref()},
@@ -345,10 +348,10 @@ entt::entity EditorSystem::createObject(std::string name, const std::string_view
 	mRegistry.emplace<ecs::Transform>(
 		entity, ecs::Transform{.position = std::move(position), .scale = math::float3{scale, 1.0f, scale}});
 
-	auto meshId = std::async(std::launch::async, [&]() { return mMeshRegistry.load(shape); });
+	auto meshId = std::async(std::launch::async, [&]() { return mMeshRegistry.load(editor::gResourceLoader, shape); });
 
 	auto materialId = std::async(std::launch::async, [&]() {
-		return mMaterialRegistry.load("editor/materials/default.filamat", [=](auto& instance) {
+		return mMaterialRegistry.load(editor::gResourceLoader, "editor/materials/default.filamat", [=](auto& instance) {
 			instance.setParameter("baseColor", color);
 			instance.setParameter("metallic", .2f);
 			instance.setParameter("roughness", 0.3f);

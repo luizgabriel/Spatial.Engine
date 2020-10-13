@@ -1,11 +1,13 @@
 #include <spatial/core/Application.h>
-#include <spatial/core/ApplicationUtils.h>
 #include <thread>
 #include <chrono>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 using namespace std::chrono_literals;
+using ::testing::AtLeast;
+using ::testing::_;
 
 std::thread startApplicationRuntime(spatial::Application& app)
 {
@@ -19,12 +21,6 @@ void simulateRuntime(spatial::Application& app, const std::chrono::nanoseconds& 
 	std::this_thread::sleep_for(duration);
 	app.onEvent(spatial::WindowClosedEvent{});
 	runtime.join();
-}
-
-TEST(Application, CreateEmpty)
-{
-	auto app = spatial::Application{};
-	ASSERT_EQ(app.isRunning(), false);
 }
 
 TEST(Application, CreateAndStop)
@@ -41,18 +37,9 @@ TEST(Application, CreateAndStop)
 	ASSERT_EQ(app.isRunning(), false);
 }
 
-//TODO: Use GMock instead
 struct MockListener {
-	int onStartCalledTimes = 0;
-	int onStartFrameCalledTimes = 0;
-
-	void onStart() {
-		onStartCalledTimes++;
-	};
-
-	void onStartFrame(float) {
-		onStartFrameCalledTimes++;
-	}
+	MOCK_METHOD0(onStart, void());
+	MOCK_METHOD1(onStartFrame, void(float));
 };
 
 TEST(Application, OnStartListener)
@@ -60,12 +47,11 @@ TEST(Application, OnStartListener)
 	auto app = spatial::Application{};
 	auto listener = MockListener{};
 
-	ASSERT_EQ(listener.onStartCalledTimes, 0);
+	EXPECT_CALL(listener, onStart())
+		.Times(1);
 
-	app >> listener;
+	app.getStartSignal().connect<&MockListener::onStart>(listener);
 	simulateRuntime(app, 1ms);
-
-	ASSERT_EQ(listener.onStartCalledTimes, 1);
 }
 
 TEST(Application, OnStartFrameListener)
@@ -73,12 +59,11 @@ TEST(Application, OnStartFrameListener)
 	auto app = spatial::Application{};
 	auto listener = MockListener{};
 
-	ASSERT_EQ(listener.onStartFrameCalledTimes, 0);
+	EXPECT_CALL(listener, onStartFrame(_))
+		.Times(AtLeast(1));
 
-	app >> listener;
+	app.getStartFrameSignal().connect<&MockListener::onStartFrame>(listener);
 	simulateRuntime(app, 1ms);
-
-	ASSERT_GT(listener.onStartFrameCalledTimes, 0);
 }
 
 int main(int argc, char** argv)

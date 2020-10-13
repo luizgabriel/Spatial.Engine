@@ -1,12 +1,15 @@
 #pragma once
 
+#include <spatial/assets/AggregatorLoader.h>
 #include <spatial/assets/ResourcesLoader.h>
 
-namespace spatial::assets
+namespace spatial::editor
 {
 
-extern assets::ResourcesLoader sResourceLoader;
+extern assets::AggregatorLoader gResourceLoader;
 
-assets::Resource loadResource(const std::string_view resourcePath);
+void initAssets(const std::filesystem::path& executablePath);
+
+assets::ResourceData load(const std::string_view resourceName);
 
 }

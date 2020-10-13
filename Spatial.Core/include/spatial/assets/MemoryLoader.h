@@ -1,33 +1,33 @@
 #pragma once
 
+#include "ResourcesLoader.h"
 #include <sstream>
 #include <string_view>
 #include <unordered_map>
+#include <initializer_list>
 
-namespace spatial
+namespace spatial::assets
 {
 
-class MemoryLoader : public std::unordered_map<std::string, std::pair<const char*, std::size_t>>
+class MemoryLoader : public ResourcesLoader
 {
+  private:
+	std::unordered_map<std::string, std::pair<const char*, std::size_t>> mData;
+
   public:
-	using Base = std::unordered_map<std::string, std::pair<const char*, std::size_t>>;
-	using ValueType = typename Base::value_type;
+	using ValueType = typename decltype(mData)::value_type;
 
-	MemoryLoader(std::initializer_list<ValueType> args) : Base(args)
-	{
-	}
+	MemoryLoader();
 
-	assets::Resource operator()(const std::string_view fileName) const noexcept
-	{
-		const auto it = this->find(std::string{fileName});
-		if (it != this->end())
-		{
-			const auto resourceSpan = it->second;
-			return std::vector<char>{resourceSpan.first, resourceSpan.first + resourceSpan.second};
-		}
+	explicit MemoryLoader(std::size_t size);
 
-		return std::nullopt;
-	}
+	MemoryLoader(std::initializer_list<ValueType> values);
+	MemoryLoader(const MemoryLoader& other) = delete;
+	MemoryLoader(MemoryLoader&& other) = default;
+
+	MemoryLoader&& add(std::string resourceName, std::pair<const char*, std::size_t> resourceData);
+
+	virtual ResourceData load(const std::string_view fileName) const override;
 };
 
 } // namespace spatial

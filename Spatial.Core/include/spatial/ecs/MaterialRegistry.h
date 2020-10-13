@@ -14,21 +14,19 @@ class MaterialRegistry
 {
   private:
 	filament::Engine& mEngine;
-	const assets::ResourcesLoader& mResourcesLoader;
-
 	std::size_t mMaterialInstancesLastIdx;
 	std::unordered_map<std::uint32_t, spatial::Material> mLoadedMaterials;
 	std::vector<spatial::MaterialInstance> mMaterialInstances;
 
   public:
-	MaterialRegistry(filament::Engine& engine, const assets::ResourcesLoader& resourcesLoader);
+	MaterialRegistry(filament::Engine& engine);
 
-	std::size_t load(const std::string_view resourcePath);
+	std::size_t load(const assets::ResourcesLoader& loader, const std::string_view resourcePath);
 
 	template <typename Callback>
-	std::size_t load(const std::string_view resourcePath, Callback callback)
+	std::size_t load(const assets::ResourcesLoader& loader, const std::string_view resourcePath, Callback callback)
 	{
-		auto materialInstanceId = load(resourcePath);
+		auto materialInstanceId = load(loader, resourcePath);
 		callback(mMaterialInstances[materialInstanceId].ref());
 		return materialInstanceId;
 	}

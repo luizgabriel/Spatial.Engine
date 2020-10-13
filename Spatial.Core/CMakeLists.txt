@@ -49,14 +49,17 @@ add_library(Spatial.Core
 	include/spatial/ecs/MeshRegistry.h
 	include/spatial/ecs/LightSystem.h
 	
-	include/spatial/spatial.h
-	
 	## SOURCES
 	src/common/Key.cpp
 	src/common/StringHelpers.cpp
 	
 	src/core/Application.cpp
 	src/core/Logger.cpp
+	
+	src/assets/AggregatorLoader.cpp
+	src/assets/DirMapLoader.cpp
+	src/assets/MemoryLoader.cpp
+	src/assets/PhysicalDirLoader.cpp
 	
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
@@ -89,6 +92,7 @@ add_library(Spatial.Core
 	src/ecs/MaterialRegistry.cpp
 	src/ecs/MeshRegistry.cpp
 	src/ecs/RenderableSystem.cpp)
+
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 
@@ -98,7 +102,7 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
-	PRIVATE <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility>)
+	PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility>)
 
 target_include_directories(Spatial.Core
 	PUBLIC
@@ -115,8 +119,7 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::imgui
 	CONAN_PKG::boost_tti
 	CONAN_PKG::stb
-	CONAN_PKG::sdl2
-	)
+	CONAN_PKG::sdl2)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

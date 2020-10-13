@@ -1,30 +1,22 @@
 #pragma once
 
+#include <spatial/assets/ResourcesLoader.h>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 
-namespace spatial
+namespace spatial::assets
 {
 
-class PhysicalDirLoader
+class PhysicalDirLoader : public ResourcesLoader
 {
   public:
-	PhysicalDirLoader(std::filesystem::path basePath) : mRootPath{std::move(basePath)}
-	{
-	}
+	PhysicalDirLoader(std::filesystem::path basePath);
 
-	assets::Resource operator()(const std::string_view fileName) const noexcept
-	{
-		auto fs = std::fstream{mRootPath / fileName};
-		if (!fs)
-			return std::nullopt;
-
-		return std::vector<char>{std::istreambuf_iterator<char>{fs}, std::istreambuf_iterator<char>{}};
-	}
+	assets::ResourceData load(const std::string_view fileName) const override;
 
   private:
 	std::filesystem::path mRootPath;
 };
 
-} // namespace spatial
+} // namespace spatial::assets

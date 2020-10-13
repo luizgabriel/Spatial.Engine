@@ -4,31 +4,38 @@
 #include <string>
 #include <unordered_map>
 
-namespace spatial
+namespace spatial::assets
 {
 
-template <typename Action = assets::ResourcesLoader>
-struct DirMapLoader : public std::unordered_map<std::string, Action>
+struct DirMapLoader : public ResourcesLoader
 {
-	using Base = std::unordered_map<std::string, Action>;
+  private:
+	std::unordered_map<std::string, std::shared_ptr<ResourcesLoader>> mData;
 
-	DirMapLoader(std::initializer_list<typename Base::value_type> args) : Base(args)
+  public:
+	DirMapLoader();
+
+	DirMapLoader&& add(std::string folderName, std::shared_ptr<ResourcesLoader> loader);
+
+	template <typename LoaderType>
+	DirMapLoader&& emplace(std::string folderName, LoaderType&& loader)
 	{
+		auto sharedLoader = std::make_shared<LoaderType>(std::move(loader));
+		return add(std::move(folderName), std::move(sharedLoader));
 	}
 
-	assets::Resource operator()(const std::string_view fileName) const noexcept
+	template <typename LoaderType, typename... Args>
+	DirMapLoader&& emplace(std::string folderName, Args&&... args)
 	{
-		const auto separator = fileName.find('/');
-		const auto rootName = std::string{fileName.begin(), separator};
-		const auto it = this->find(rootName);
-
-		if (it != this->end())
-		{
-			return it->second(fileName.substr(separator + 1));
-		}
-
-		return std::nullopt;
+		auto loader = std::make_shared<LoaderType>(std::forward<Args>(args)...);
+		return add(std::move(folderName), std::move(loader));
 	}
+
+	DirMapLoader(const DirMapLoader& other) = delete;
+
+	DirMapLoader(DirMapLoader&& other) = default;
+
+	ResourceData load(const std::string_view fileName) const override;
 };
 
-} // namespace spatial
+} // namespace spatial::assets

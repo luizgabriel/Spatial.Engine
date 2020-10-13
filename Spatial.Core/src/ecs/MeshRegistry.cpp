@@ -5,19 +5,19 @@
 namespace spatial::ecs
 {
 
-MeshRegistry::MeshRegistry(filament::Engine& engine, assets::ResourcesLoader& resourcesLoader)
-	: mEngine{engine}, mResourcesLoader{resourcesLoader}, mLoadedMeshes{}
+MeshRegistry::MeshRegistry(filament::Engine& engine)
+	: mEngine{engine}, mLoadedMeshes{}
 {
 }
 
-std::uint32_t MeshRegistry::load(const std::string_view resourcePath)
+std::uint32_t MeshRegistry::load(const assets::ResourcesLoader& loader, const std::string_view resourcePath)
 {
 	auto hash = entt::hashed_string{resourcePath.data()}.value();
 
 	if (mLoadedMeshes.contains(hash))
 		return hash;
 
-	auto meshData = mResourcesLoader(resourcePath);
+	auto meshData = loader.load(resourcePath);
 	if (!meshData) throw std::runtime_error("Mesh resource not found");
 
 	mLoadedMeshes.emplace(hash, createMesh(mEngine, meshData.value()));
