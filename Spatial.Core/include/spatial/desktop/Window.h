@@ -51,8 +51,8 @@ class Window
 class DesktopPlatformContext
 {
   private:
-	bool mValid;
-	EventQueue mEventQueue;
+	static bool sValid;
+	static EventQueue sEventQueue;
 
   public:
 	DesktopPlatformContext();
@@ -65,12 +65,12 @@ class DesktopPlatformContext
 	DesktopPlatformContext(const DesktopPlatformContext& c) = delete;
 	DesktopPlatformContext& operator=(const DesktopPlatformContext& w) = delete;
 
-	DesktopPlatformContext(DesktopPlatformContext&& c) noexcept;
+	DesktopPlatformContext(DesktopPlatformContext&& c) noexcept = delete;
 	DesktopPlatformContext& operator=(DesktopPlatformContext&& other) noexcept = delete;
 
 	auto& getEventQueue()
 	{
-		return mEventQueue;
+		return sEventQueue;
 	}
 };
 

@@ -78,9 +78,3 @@ TEST(Application, OnUpdateFrameListener)
 	app.getUpdateFrameSignal().connect<&MockListener::onUpdateFrame>(listener);
 	simulateRuntime(app, 500ms);
 }
-
-int main(int argc, char** argv)
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}

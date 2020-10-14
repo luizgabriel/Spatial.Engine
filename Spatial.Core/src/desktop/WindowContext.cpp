@@ -6,21 +6,24 @@
 namespace spatial
 {
 
-DesktopPlatformContext::DesktopPlatformContext() : mValid{true}, mEventQueue{}
+bool DesktopPlatformContext::sValid{false};
+EventQueue DesktopPlatformContext::sEventQueue{};
+
+DesktopPlatformContext::DesktopPlatformContext()
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-		mValid = false;
+	if (!sValid)
+		sValid = SDL_Init(SDL_INIT_EVERYTHING) == 0;
 }
 
 DesktopPlatformContext::~DesktopPlatformContext()
 {
-	if (mValid)
+	if (sValid)
 		SDL_Quit();
 }
 
 void DesktopPlatformContext::onStartFrame(float)
 {
-	if (!mValid)
+	if (!sValid)
 		return;
 
 	SDL_Event e{};
@@ -29,40 +32,40 @@ void DesktopPlatformContext::onStartFrame(float)
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			mEventQueue.enqueue<WindowClosedEvent>();
+			sEventQueue.enqueue<WindowClosedEvent>();
 			break;
 
 		case SDL_TEXTINPUT:
-			mEventQueue.enqueue<TextEvent>(std::string{e.text.text});
+			sEventQueue.enqueue<TextEvent>(std::string{e.text.text});
 			break;
 
 		case SDL_KEYDOWN: {
 			auto key = mapKeyFromScancode(e.key.keysym.scancode);
-			mEventQueue.enqueue<KeyEvent>(key, KeyAction::Pressed, e.key.repeat);
+			sEventQueue.enqueue<KeyEvent>(key, KeyAction::Pressed, e.key.repeat);
 
 			break;
 		}
 
 		case SDL_KEYUP: {
 			auto key = mapKeyFromScancode(e.key.keysym.scancode);
-			mEventQueue.enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
+			sEventQueue.enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
 			break;
 		}
 
 		case SDL_MOUSEWHEEL:
-			mEventQueue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
+			sEventQueue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
-			mEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
+			sEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			mEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
+			sEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
 			break;
 
 		case SDL_MOUSEMOTION:
-			mEventQueue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
+			sEventQueue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
 			break;
 
 		case SDL_DROPFILE:
@@ -77,7 +80,7 @@ void DesktopPlatformContext::onStartFrame(float)
 				auto* sdlWindow = SDL_GetWindowFromID(e.window.windowID);
 				SDL_GetWindowSize(sdlWindow, &windowSize.first, &windowSize.second);
 				SDL_GL_GetDrawableSize(sdlWindow, &frameBufferSize.first, &frameBufferSize.second);
-				mEventQueue.enqueue<WindowResizedEvent>(windowSize, frameBufferSize);
+				sEventQueue.enqueue<WindowResizedEvent>(windowSize, frameBufferSize);
 				break;
 			}
 			default:
@@ -91,27 +94,14 @@ void DesktopPlatformContext::onStartFrame(float)
 		}
 	}
 
-	mEventQueue.update<WindowResizedEvent>();
-	mEventQueue.update();
+	sEventQueue.update<WindowResizedEvent>();
+	sEventQueue.update();
 }
 
 Window DesktopPlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
 											std::string_view title) const noexcept
 {
 	return Window{width, height, title};
-}
-
-DesktopPlatformContext::DesktopPlatformContext(DesktopPlatformContext&& c) noexcept
-{
-	if (c.mValid)
-	{
-		c.mValid = false;
-	}
-	else
-	{
-		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-			mValid = false;
-	}
 }
 
 Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept

@@ -10,7 +10,7 @@ BOOST_TTI_HAS_MEMBER_FUNCTION(onConstruct);
 
 BOOST_TTI_HAS_MEMBER_FUNCTION(onDestroy);
 
-BOOST_TTI_HAS_MEMBER_FUNCTION(onReplace);
+BOOST_TTI_HAS_MEMBER_FUNCTION(onUpdate);
 
 template <typename T>
 constexpr bool has_on_construct_v =
@@ -21,8 +21,8 @@ constexpr bool has_on_destroy_v =
 	has_member_function_onDestroy<T, void, boost::mpl::vector<entt::registry&, entt::entity>>::value;
 
 template <typename T>
-constexpr bool has_on_replace_v =
-	has_member_function_onReplace<T, void, boost::mpl::vector<entt::registry&, entt::entity>>::value;
+constexpr bool has_on_update_v =
+	has_member_function_onUpdate<T, void, boost::mpl::vector<entt::registry&, entt::entity>>::value;
 
 template <typename Component, typename Listener>
 void connect(entt::registry& registry, Listener& listener)
@@ -33,8 +33,8 @@ void connect(entt::registry& registry, Listener& listener)
 	if constexpr (has_on_destroy_v<Listener>)
 		registry.on_destroy<Component>().template connect<&Listener::onDestroy>(listener);
 
-	if constexpr (has_on_replace_v<Listener>)
-		registry.on_replace<Component>().template connect<&Listener::onReplace>(listener);
+	if constexpr (has_on_update_v<Listener>)
+		registry.on_update<Component>().template connect<&Listener::onUpdate>(listener);
 }
 
 template <typename Component, typename... Listeners>
@@ -52,8 +52,8 @@ void disconnect(entt::registry& registry, Listener& listener)
 	if constexpr (has_on_destroy_v<Listener>)
 		registry.on_destroy<Component>().template disconnect<&Listener::onDestroy>(listener);
 
-	if constexpr (has_on_replace_v<Listener>)
-		registry.on_replace<Component>().template disconnect<&Listener::onReplace>(listener);
+	if constexpr (has_on_update_v<Listener>)
+		registry.on_update<Component>().template disconnect<&Listener::onUpdate>(listener);
 }
 
 template <typename Component, typename... Listeners>
