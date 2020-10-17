@@ -9,7 +9,8 @@ PhysicalDirLoader::PhysicalDirLoader(std::filesystem::path basePath) : mRootPath
 
 assets::ResourceData PhysicalDirLoader::load(const std::string_view fileName) const
 {
-	auto fs = std::fstream{mRootPath / fileName};
+	auto absolute = std::filesystem::absolute(mRootPath / fileName);
+	auto fs = std::fstream{absolute};
 	if (!fs)
 		return std::nullopt;
 
