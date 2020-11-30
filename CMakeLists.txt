@@ -7,7 +7,6 @@ include(CMakePackageConfigHelpers)
 include(CompilerWarnings)
 include(Doxygen)
 include(Sanitizers)
-include(GraphViz)
 include(StandardSettings)
 include(StaticAnalyzers)
 

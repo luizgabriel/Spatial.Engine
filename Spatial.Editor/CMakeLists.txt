@@ -2,9 +2,13 @@ add_subdirectory(assets)
 
 add_executable(Spatial.Editor
 	src/main.cpp
-	src/EditorSystem.cpp
-	src/Resources.cpp
+	src/SceneEditorSystem.cpp
+	src/Editor.cpp
 	src/Components.h
+	src/ImGuiComponents.h
+	src/ImGuiComponents.cpp
+	src/ImGuiSceneWindow.h
+	src/ImGuiSceneWindow.cpp
 )
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)

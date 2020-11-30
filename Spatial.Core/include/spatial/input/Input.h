@@ -1,53 +1,51 @@
 #pragma once
 
-#include <math/vec2.h>
+#include <spatial/common/Math.h>
 #include <spatial/input/InputState.h>
 
 namespace spatial
 {
 
-class InputSystem;
-
 class Input
 {
   private:
-	static InputState sInputState;
+	static std::shared_ptr<InputState> sInputState;
 
   public:
-	static filament::math::float2 mouse()
+	static math::float2 mouse()
 	{
-		return sInputState.getCurrentPosition();
+		return sInputState->getCurrentPosition();
 	}
 
-	static filament::math::float2 lastMouse()
+	static math::float2 lastMouse()
 	{
-		return sInputState.getLastPosition();
+		return sInputState->getLastPosition();
 	}
 
-	static filament::math::float2 offset()
+	static math::float2 offset()
 	{
 		return mouse() - lastMouse();
 	}
 
-	static void warpMouse(filament::math::float2 position)
+	static void warpMouse(math::float2 position)
 	{
-		sInputState.warpMouseInWindow(position);
+		sInputState->warpMouseInWindow(position);
 	}
 
 	static bool pressed(Key key)
 	{
-		return sInputState.pressed(key);
+		return sInputState->pressed(key);
 	}
 
 	template <typename... Args>
 	static bool combined(Args... keys)
 	{
-		return sInputState.combined(keys...);
+		return sInputState->combined(keys...);
 	}
 
 	static bool released(Key key)
 	{
-		return sInputState.released(key);
+		return sInputState->released(key);
 	}
 
 	static float axis(Key positive, Key negative)
@@ -60,7 +58,9 @@ class Input
 			return .0f;
 	}
 
-	friend class InputSystem;
+	static void with(std::shared_ptr<InputState>& inputState) {
+		sInputState = inputState;
+	}
 };
 
 } // namespace spatial

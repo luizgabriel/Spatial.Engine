@@ -21,11 +21,9 @@ VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
 
 IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
 
-uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect);
-
 Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::vector<char>& resourceData);
 
-template <typename FilamentType, typename ImGuiType>
+template <typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)
 {
 	auto nVec = imVector.Size;

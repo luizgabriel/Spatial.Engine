@@ -1,87 +1,125 @@
+#include "ImGuiComponents.h"
 #include <array>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <spatial/ui/ImGuiComponents.h>
 
-namespace spatial::ui
+namespace spatial::editor
 {
 
-bool transformInput(ecs::Transform& transform, const std::string_view format)
+void transformInput(Transform& transform, const std::string_view format)
 {
-	bool changed = false;
+	math::float3 position, rotation, scale;
+	constexpr auto velocity = 20.0f;
 
 	for (char c : format)
 	{
 		switch (c)
 		{
 		case 'p':
-			changed |= ImGui::DragFloat3("Position", &transform.position[0]);
+			position = transform.getPosition();
+			if (ImGui::DragFloat3("Position", &position[0]))
+			{
+				transform.setPosition(position);
+			}
 			break;
 		case 'r':
-			changed |= ImGui::DragFloat3("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
+			rotation = transform.getRotation();
+			if (ImGui::DragFloat3("Rotation", &rotation[0], velocity, .0f, .0f))
+			{
+				transform.setRotation(rotation);
+			}
 			break;
 		case 'y':
-			changed |= ImGui::DragFloat2("Rotation", &transform.rotation[0], math::pi<double> / 20.0, .0f, .0f);
+			rotation = transform.getRotation();
+			if (ImGui::DragFloat2("Rotation", &rotation[0], velocity, .0f, .0f))
+			{
+				transform.setRotation(rotation);
+			}
 			break;
 		case 's':
-			changed |= ImGui::DragFloat3("Scale", &transform.scale[0]);
+			scale = transform.getScale();
+			if (ImGui::DragFloat3("Scale", &scale[0], velocity, .0f, .0f))
+			{
+				transform.setScale(scale);
+			}
 			break;
 		}
 	}
-
-	return changed;
 }
 
-bool cameraInput(ecs::PerspectiveCamera& camera)
+void cameraInput(Camera& camera)
 {
-	bool changed = false;
-	changed |= ImGui::InputFloat("Near", &camera.near);
-	changed |= ImGui::InputFloat("Far", &camera.far);
-	changed |= ImGui::SliderFloat("Field of View", &camera.fieldOfView, 15.0f, 120.0f, "%.0f");
-	changed |= ImGui::InputFloat("Aspect Ratio", &camera.aspectRatio);
+	constexpr auto projections = std::array<std::string_view, 3>{"Perspective", "Ortographic", "Custom"};
+	size_t selected;
+	if (camera.isPerspective()) selected = 0;
+	else if (camera.isOrthographic()) selected = 1;
+	else selected = 2;
 
-	return changed;
+	if (ImGui::BeginCombo("##projectionsCombo", projections[selected].data()))
+	{
+		for (size_t i = 0; i < projections.size(); i++)
+		{
+			if (ImGui::Selectable(projections[i].data()))
+			{
+				selected = i;
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
+	auto aspectRatio = camera.getAspectRatio();
+	auto near = camera.getNear();
+	auto far = camera.getFar();
+
+	if (camera.isOrthographic() && selected == 0) {
+		camera.setPerspectiveProjection(90.0f, aspectRatio, near, far);
+	} else if (camera.isPerspective() && selected == 1) {
+		camera.setOrthographicProjection(aspectRatio, near, far);
+	}
+
+	if (ImGui::InputFloat("Aspect Ratio", &aspectRatio))
+	{
+		camera.setAspectRatio(aspectRatio);
+	}
+
+	if (ImGui::InputFloat("Near", &near))
+	{
+		camera.setNear(near);
+	}
+
+	if (ImGui::InputFloat("Far", &far))
+	{
+		camera.setFar(far);
+	}
+
+	if (selected == 0)
+	{
+		auto fieldOfView = camera.getFieldOfView();
+		if (ImGui::DragFloat("Field Of View", &fieldOfView, 1.0f,15.0f, 120.0f))
+		{
+			camera.setFieldOfView(fieldOfView);
+		}
+	}
 }
 
-bool cameraInput(ecs::OrtographicCamera& camera)
+bool sceneHierarchy(spatial::Stage& stage, Actor& selectedActor)
 {
-	bool changed = false;
-	changed |= ImGui::InputFloat("Near", &camera.near);
-	changed |= ImGui::InputFloat("Far", &camera.far);
-	changed |= ImGui::InputFloat("Aspect Ratio", &camera.aspectRatio);
-
-	return changed;
-}
-
-bool cameraInput(ecs::CustomCamera& camera)
-{
-	bool changed = false;
-	changed |= ImGui::InputFloat("Near", &camera.near);
-	changed |= ImGui::InputFloat("Far", &camera.far);
-
-	changed |= ImGui::InputScalarN("t0: ", ImGuiDataType_Double, &camera.projection[0], 4);
-	changed |= ImGui::InputScalarN("t1: ", ImGuiDataType_Double, &camera.projection[1], 4);
-	changed |= ImGui::InputScalarN("t2: ", ImGuiDataType_Double, &camera.projection[2], 4);
-	changed |= ImGui::InputScalarN("t3: ", ImGuiDataType_Double, &camera.projection[3], 4);
-
-	return changed;
-}
-
-bool sceneHierarchy(const entt::registry& registry, entt::entity& selectedEntity)
-{
-	const auto view = registry.view<const ecs::Name>();
 	bool hasSelectedEntity = false;
 
-	for (entt::entity entity : view)
+	auto view = stage.getRegistry().view<spatial::Name>();
+	for (auto entity : view)
 	{
-		const auto& name = view.get<const ecs::Name>(entity);
-		ImGuiTreeNodeFlags flags = (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+		auto& name = view.get<spatial::Name>(entity);
+
+		ImGuiTreeNodeFlags flags = (selectedActor.getEntity() == entity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
 		flags |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-		bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(entity), flags, "%s", name.value.c_str());
+		bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(entity), flags, "%s", name.getValue().c_str());
 		if (ImGui::IsItemClicked())
 		{
-			selectedEntity = entity;
+			selectedActor = stage.getActor(entity);
+			hasSelectedEntity = true;
 		}
 
 		if (opened)
@@ -97,7 +135,7 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 	{
 		// Resize string callback
 		auto* str = reinterpret_cast<std::string*>(data->UserData);
-		str->resize(data->BufTextLen);
+		str->resize(static_cast<unsigned long>(data->BufTextLen));
 		data->Buf = str->data();
 	}
 
@@ -107,7 +145,7 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 bool inputText(const std::string_view label, std::string& value)
 {
 	return ImGui::InputText(label.data(), value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
-					 &inputTextCallback, &value);
+							&inputTextCallback, &value);
 }
 
 float quatD(float w, float h)
@@ -125,12 +163,12 @@ float quatPY(float y, float w, float h)
 	return (-y * 0.5f * quatD(w, h) + h * 0.5f - 0.5f);
 }
 
-float quatIX(int x, float w, float h)
+float quatIX(float x, float w, float h)
 {
 	return (2.0f * x - w - 1.0f) / quatD(w, h);
 }
 
-float quatIY(int y, float w, float h)
+float quatIY(float y, float w, float h)
 {
 	return (-2.0f * y + h - 1.0f) / quatD(w, h);
 }
@@ -231,16 +269,19 @@ ImU32 blendColor(ImU32 c1, ImU32 c2, float t)
 	return color1;
 }
 
-inline float ImVec2Cross(const ImVec2& left, const ImVec2& right) {
+inline float ImVec2Cross(const ImVec2& left, const ImVec2& right)
+{
 	return (left.x * right.y) - (left.y * right.x);
 }
 
-inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs) {
-	return ImVec2(lhs.x+rhs.x, lhs.y+rhs.y);
+inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+	return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
-inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs) {
-	return ImVec2(lhs.x-rhs.x, lhs.y-rhs.y);
+inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+{
+	return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
 }
 
 void drawTriangles(ImDrawList* draw_list, const ImVec2& offset, const ImVector<ImVec2>& triProj,
@@ -304,11 +345,11 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 		if (ImGui::IsMouseClicked(0))
 		{
 			origQuat = directionQuaternion;
-			coordOld = math::float3(quatIX((int)mouse.x, w, h), quatIY((int)mouse.y, w, h), 1.0f);
+			coordOld = math::float3(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
 		}
 		else if (ImGui::IsMouseDragging(0))
 		{
-			math::float3 coord(quatIX((int)mouse.x, w, h), quatIY((int)mouse.y, w, h), 1.0f);
+			math::float3 coord(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
 			math::float3 pVec = coord;
 			math::float3 oVec = coordOld;
 			coord.z = 0.0f;
@@ -322,7 +363,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 				float sa = length(axis);
 				float ca = dot(v0, v1);
 				float angle = atan2(sa, ca);
-				if (coord.x * coord.x + coord.y * coord.y > 1.0)
+				if (coord.x * coord.x + coord.y * coord.y > 1.0f)
 				{
 					angle *= 1.0f + 1.5f * (length(coord) - 1.0f);
 				}
@@ -351,8 +392,9 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 	}
 	else
 	{
-		ImColor color(ImGui::IsItemHovered() ? style.Colors[ImGuiCol_FrameBgHovered] : style.Colors[ImGuiCol_FrameBg]);
-		draw_list->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size), color,
+		auto imcolor =
+			ImColor{ImGui::IsItemHovered() ? style.Colors[ImGuiCol_FrameBgHovered] : style.Colors[ImGuiCol_FrameBg]};
+		draw_list->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size), imcolor,
 								 style.FrameRounding);
 	}
 
@@ -366,7 +408,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 		int j = (arrowDir.z > 0) ? 3 - k : k;
 		assert(s_ArrowTriProj[j].size() == (s_ArrowTri[j].size()) &&
 			   s_ArrowColLight[j].size() == s_ArrowTri[j].size() && s_ArrowNorm[j].size() == s_ArrowTri[j].size());
-		size_t ntri = s_ArrowTri[j].size();
+
+		auto ntri = s_ArrowTri[j].size();
 		for (int i = 0; i < ntri; ++i)
 		{
 			math::float3 coord = s_ArrowTri[j][i];
@@ -413,42 +456,23 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 	return changed;
 }
 
-bool lightInput(ecs::PointLight& light)
+void lightInput(Light& light)
 {
-	bool changed = false;
+	auto color = light.getColor();
+	if (ImGui::ColorEdit3("Color", &color[0])) {
+		light.setColor(color);
+	}
 
-	changed |= ImGui::ColorEdit3("Color", &light.color[0]);
-	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
+	auto intensity = light.getIntensity();
+	if (ImGui::SliderFloat("Lux", &intensity, 0.0f, 150000.0f)) {
+		light.setIntensity(intensity);
+	}
 
-	return changed;
+	if (!light.isPointLight()) {
+		auto direction = light.getDirection();
+		editor::directionWidget("Direction", direction);
+	}
+
 }
-
-bool lightInput(ecs::DirectionalLight& light)
-{
-	bool changed = false;
-
-	changed |= ImGui::ColorEdit3("Color", &light.color[0]);
-	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
-	changed |= ui::directionWidget("Direction", light.direction);
-
-	return changed;
-}
-
-bool lightInput(ecs::SpotLight& light)
-{
-	bool changed = false;
-
-	changed |= ImGui::ColorEdit3("Color", &light.color[0]);
-	changed |= ImGui::SliderFloat("Lux", &light.intensity, 0.0f, 150000.0f);
-	changed |= ImGui::SliderAngle("Inner Cone", &light.innerCone, .0f, 90.0f);
-
-	light.outerCone = std::clamp(light.outerCone, light.innerCone, math::pi<float>/2.0f);
-	changed |= ImGui::SliderAngle("Outer Cone", &light.outerCone, math::toDegree(light.innerCone), 90.0f);
-
-	changed |= ui::directionWidget("Direction", light.direction);
-
-	return changed;
-}
-
 
 } // namespace spatial::ui

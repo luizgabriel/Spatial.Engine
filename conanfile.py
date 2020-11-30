@@ -20,13 +20,13 @@ class SpatialEngineConan(ConanFile):
         "sdl2/2.0.12@bincrafters/stable",
         "argh/1.2.1@adishavit/stable",
         "gtest/1.10.0",
-        "fmt/7.0.3",
+        "fmt/7.1.2",
         "spdlog/1.8.0",
         "stb/20200203",
         "entt/3.5.2",
 
         "imgui/docking@ocornut/stable",  # Installed with vendor/imgui.py
-        "filament/1.8.1@google/stable",  # Installed with vendor/filament.py
+        "filament/1.9.9@google/stable",  # Installed with vendor/filament.py
     ]
 
     def imports(self):

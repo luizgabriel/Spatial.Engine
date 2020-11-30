@@ -1,4 +1,4 @@
-#include "Resources.h"
+#include "Editor.h"
 
 #include <spatial/assets/AggregatorLoader.h>
 #include <spatial/assets/ResourcesLoader.h>

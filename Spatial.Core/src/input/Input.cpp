@@ -3,6 +3,8 @@
 namespace spatial
 {
 
-InputState Input::sInputState{};
+std::shared_ptr<InputState> Input::sInputState{
+	std::make_shared<InputState>()
+};
 
 }

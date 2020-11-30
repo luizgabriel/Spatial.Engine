@@ -3,9 +3,9 @@
 namespace spatial
 {
 
-Entity::Entity(filament::Engine& engine) : m_engine{engine}, m_entity{}
+Entity::Entity(filament::Engine& engine) : mEngine{engine}, mEntity{}
 {
-	m_entity.clear();
+	mEntity.clear();
 }
 
 Entity::~Entity()
@@ -13,38 +13,43 @@ Entity::~Entity()
 	reset();
 }
 
-Entity::Entity(filament::Engine& engine, utils::Entity entity) : m_engine{engine}, m_entity{entity}
+Entity::Entity(filament::Engine& engine, utils::Entity entity) : mEngine{engine}, mEntity{entity}
 {
 }
 
-Entity::Entity(Entity&& other) noexcept : m_engine{other.m_engine}, m_entity{other.release()}
+Entity::Entity(Entity&& other) noexcept : mEngine{other.mEngine}, mEntity{other.release()}
 {
 }
 
 Entity& Entity::operator=(Entity&& other) noexcept
 {
 	reset();
-	m_entity = other.release();
+	mEntity = other.release();
 
 	return *this;
 }
 
-utils::Entity Entity::release()
+utils::Entity Entity::release() noexcept
 {
 	auto null = utils::Entity{};
 	null.clear();
 
-	return std::exchange(m_entity, null);
+	return std::exchange(mEntity, null);
 }
 
 void Entity::reset()
 {
-	if (m_entity.isNull())
+	if (!isValid())
 		return;
 
-	utils::EntityManager::get().destroy(m_entity);
-	m_engine.destroy(m_entity);
-	m_entity.clear();
+	utils::EntityManager::get().destroy(mEntity);
+	mEngine.destroy(mEntity);
+	mEntity.clear();
+}
+
+bool Entity::isValid() const noexcept
+{
+	return !mEntity.isNull();
 }
 
 } // namespace spatial

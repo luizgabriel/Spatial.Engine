@@ -32,22 +32,20 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/ecs/RegistryUtils.h
 	include/spatial/render/Mesh.h
+	include/spatial/render/Light.h
+	include/spatial/render/Stage.h
+	include/spatial/render/Actor.h
+	include/spatial/render/ActorBuilder.h
+	include/spatial/render/Transform.h
+	include/spatial/render/Name.h
+	include/spatial/render/Renderable.h
 	
 	include/spatial/ui/ImGuiHelpers.h
 	include/spatial/ui/UserInterfaceInput.h
 	include/spatial/ui/UserInterfaceRenderer.h
 	include/spatial/ui/UserInterfaceSystem.h
 	include/spatial/ui/UserInterfaceUtils.h
-	include/spatial/ui/ImGuiSceneWindow.h
-	
-	include/spatial/ecs/Components.h
-	include/spatial/ecs/SceneManagerSystem.h
-	include/spatial/ecs/TransformSystem.h
-	include/spatial/ecs/MaterialRegistry.h
-	include/spatial/ecs/MeshRegistry.h
-	include/spatial/ecs/LightSystem.h
 	
 	## SOURCES
 	src/common/Key.cpp
@@ -69,6 +67,7 @@ add_library(Spatial.Core
 	src/input/InputState.cpp
 	src/input/Input.cpp
 	
+	src/render/Stage.cpp
 	src/render/Resources.cpp
 	src/render/Engine.cpp
 	src/render/Entity.cpp
@@ -77,21 +76,16 @@ add_library(Spatial.Core
 	src/render/SkyboxResources.cpp
 	src/render/Mesh.cpp
 	src/render/Camera.cpp
+	src/render/ActorBuilder.cpp
+	src/render/Transform.cpp
+	src/render/Name.cpp
+	src/render/Light.cpp
+	src/render/Renderable.cpp
 	
 	src/ui/ImGuiHelpers.cpp
 	src/ui/UserInterfaceSystem.cpp
 	src/ui/UserInterfaceRenderer.cpp
-	src/ui/UserInterfaceInput.cpp
-	src/ui/ImGuiSceneWindow.cpp
-	src/ui/ImGuiComponents.cpp
-	
-	src/ecs/SceneManagerSystem.cpp
-	src/ecs/TransformSystem.cpp
-	src/ecs/CameraSystem.cpp
-	src/ecs/LightSystem.cpp
-	src/ecs/MaterialRegistry.cpp
-	src/ecs/MeshRegistry.cpp
-	src/ecs/RenderableSystem.cpp)
+	src/ui/UserInterfaceInput.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

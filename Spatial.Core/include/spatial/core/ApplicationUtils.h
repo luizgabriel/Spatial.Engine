@@ -37,12 +37,6 @@ template <typename T>
 constexpr bool has_on_end_frame_v = has_member_function_onEndFrame<T, void>::value;
 
 template <typename T>
-constexpr bool has_on_end_gui_frame_v = has_member_function_onEndGuiFrame<T, void>::value;
-
-template <typename T>
-constexpr bool has_on_draw_gui_v = has_member_function_onDrawGui<T, void>::value;
-
-template <typename T>
 constexpr bool has_on_finish_v = has_member_function_onFinish<T, void>::value;
 
 } // namespace detail
@@ -66,12 +60,6 @@ void connect(Application& app, Listener& listener)
 		app.getFinishSignal().connect<&Listener::onFinish>(listener);
 }
 
-template <typename... Listeners>
-void connect(Application& app, Listeners&... listener)
-{
-	(connect(app, listener), ...);
-}
-
 template <typename Listener>
 void disconnect(Application& app, Listener& listener)
 {
@@ -89,12 +77,6 @@ void disconnect(Application& app, Listener& listener)
 
 	if constexpr (detail::has_on_finish_v<Listener>)
 		app.getFinishSignal().disconnect<&Listener::onFinish>(listener);
-}
-
-template <typename... Listeners>
-void disconnect(Application& app, Listeners&... listener)
-{
-	(disconnect(app, listener), ...);
 }
 
 template <typename Listener>

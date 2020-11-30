@@ -4,10 +4,10 @@ add_custom_command(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
 add_executable(Spatial.Core.Tests
 	${CMAKE_CURRENT_BINARY_DIR}/assets/test.txt
 	Application.test.cpp
+	Stage.test.cpp
 	DesktopWindowContext.test.cpp
 	PhysicalDirLoader.test.cpp)
 

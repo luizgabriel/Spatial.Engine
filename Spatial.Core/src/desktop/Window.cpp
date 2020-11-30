@@ -9,12 +9,10 @@ using namespace filament::math;
 namespace spatial
 {
 
-Window::Window(int width, int height, std::string_view title)
-	: mWindowHandle{SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-									 SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
+Window::Window(SDL_Window* windowHandle)
+	: mWindowHandle{windowHandle}
 {
 	assert(mWindowHandle != nullptr);
-	// SDL_SetWindowBordered(mWindowHandle, SDL_FALSE);
 }
 
 Window::Window(Window&& other) noexcept : mWindowHandle(std::exchange(other.mWindowHandle, nullptr))
@@ -66,9 +64,14 @@ void* Window::getNativeHandle() const
 	return ::getNativeWindow(wmi);
 }
 
-void Window::warpMouse(filament::math::float2 position)
+void Window::warpMouse(math::float2 position)
 {
+	auto [width, height] = getWindowSize();
+	position = position * math::float2{width, height};
+
 	SDL_WarpMouseInWindow(mWindowHandle, position.x, position.y);
 }
+
+
 
 } // namespace spatial

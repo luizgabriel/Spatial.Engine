@@ -57,16 +57,6 @@ IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect)
-{
-	auto left = static_cast<uint16_t>(clipRect.x);
-	auto bottom = frameBufferHeight - static_cast<uint16_t>(clipRect.w);
-	auto width = static_cast<uint16_t>(clipRect.z - clipRect.x);
-	auto height = static_cast<uint16_t>(clipRect.w - clipRect.y);
-	return (static_cast<uint64_t>(left) << 0ull) | (static_cast<uint64_t>(bottom) << 16ull) |
-		   (static_cast<uint64_t>(width) << 32ull) | (static_cast<uint64_t>(height) << 48ull);
-}
-
 Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::vector<char>& resourceData)
 {
 	auto& io = ImGui::GetIO();

@@ -23,6 +23,10 @@ constexpr T pi = static_cast<T>(F_PI);
 template <typename T>
 constexpr T epsilon = static_cast<T>(FLT_EPSILON);
 
+constexpr auto axisX = float3{1.0f, .0f, .0f};
+constexpr auto axisY = float3{.0, 1.0, .0};
+constexpr auto axisZ = float3{.0f, .0f, 1.0f};
+
 template <typename T>
 constexpr details::TQuaternion<T> directionToQuaternion(const details::TVec3<T>& dir) {
 	float dn = length(dir);

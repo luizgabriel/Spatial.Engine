@@ -129,4 +129,6 @@ struct Mesh
 	}
 };
 
+using SharedMesh = std::shared_ptr<Mesh>;
+
 } // namespace spatial

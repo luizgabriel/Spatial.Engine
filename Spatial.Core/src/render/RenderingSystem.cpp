@@ -7,7 +7,7 @@ namespace bk = filament::backend;
 namespace spatial
 {
 
-RenderingSystem::RenderingSystem(const bk::Backend backend, void* nativeWindowHandle)
+RenderingSystem::RenderingSystem(const RenderingSystem::Backend backend, void* nativeWindowHandle)
 	: mEngine{createEngine(backend)},
 	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
 	  mRenderer{createRenderer(getEngine())},
@@ -17,7 +17,7 @@ RenderingSystem::RenderingSystem(const bk::Backend backend, void* nativeWindowHa
 	mRenderer->setClearOptions(mClearOptions);
 }
 
-RenderingSystem::RenderingSystem(const filament::backend::Backend backend, const Window& window)
+RenderingSystem::RenderingSystem(const RenderingSystem::Backend backend, const Window& window)
 	: RenderingSystem(backend, window.getNativeHandle())
 {
 }
@@ -52,7 +52,7 @@ void RenderingSystem::clearExpiredViews() noexcept
 	std::erase_if(mViews, [](auto& view) { return view.expired(); });
 }
 
-void RenderingSystem::pushFrontView(std::weak_ptr<filament::View>&& view)
+void RenderingSystem::pushFrontView(std::weak_ptr<filament::View> view)
 {
 	mViews.emplace_back(std::move(view));
 }
@@ -62,7 +62,7 @@ void RenderingSystem::popFrontView()
 	mViews.pop_back();
 }
 
-void RenderingSystem::pushBackView(std::weak_ptr<filament::View>&& view)
+void RenderingSystem::pushBackView(std::weak_ptr<filament::View> view)
 {
 	mViews.emplace_front(std::move(view));
 }
@@ -70,6 +70,14 @@ void RenderingSystem::pushBackView(std::weak_ptr<filament::View>&& view)
 void RenderingSystem::popBackView()
 {
 	mViews.pop_front();
+}
+
+void RenderingSystem::popView(const SharedView& view)
+{
+	std::erase_if(mViews, [&view](std::weak_ptr<filament::View>& v){
+		const auto vw = v.lock();
+		return vw.get() == view.get();
+	});
 }
 
 } // namespace spatial

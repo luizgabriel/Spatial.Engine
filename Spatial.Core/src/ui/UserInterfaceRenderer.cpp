@@ -27,14 +27,14 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	  mSkybox{createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
 	  mFontTexture{mEngine}
 {
-	mView->setCamera(mCamera.get());
+	mView->setCamera(mCamera.getInstance());
 	mView->setScene(mScene.get());
 	mScene->setSkybox(mSkybox.get());
 	mScene->addEntity(mEntity.get());
 
 	mView->setPostProcessingEnabled(false);
 	mView->setBlendMode(filament::View::BlendMode::TRANSLUCENT);
-	mView->setShadowsEnabled(false);
+	mView->setShadowingEnabled(false);
 
 	mImguiContext = ImGui::CreateContext();
 }
@@ -77,7 +77,7 @@ void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
 	const auto dpiScaleY = static_cast<float>(fh) / h;
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
-	mCamera->setProjection(fl::Camera::Projection::ORTHO, 0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
+	mCamera.setOrthographicProjection(0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0);
 
 	const auto scaleX = w > 0 ? static_cast<float>(fw) / w : 0;
 	const auto scaleY = h > 0 ? static_cast<float>(fh) / h : 0;
@@ -233,7 +233,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 		if (static_cast<size_t>(vb.Size) > capacityVertCount)
 			mVertexBuffers[bufferIndex] = imguiCreateVertexBuffer(mEngine, vb.Size);
 
-		auto vbDescriptor = imguiCreateDescriptor<fl::VertexBuffer, ImDrawVert>(vb);
+		auto vbDescriptor = imguiCreateDescriptor<ImDrawVert>(vb);
 		mVertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
 	}
 
@@ -244,7 +244,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 		if (static_cast<size_t>(ib.Size) > capacityIndexCount)
 			mIndexBuffers[bufferIndex] = imguiCreateIndexBuffer(mEngine, ib.Size);
 
-		auto ibDescriptor = imguiCreateDescriptor<fl::IndexBuffer, ImDrawIdx>(ib);
+		auto ibDescriptor = imguiCreateDescriptor<ImDrawIdx>(ib);
 		mIndexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 	}
 }

@@ -16,7 +16,7 @@ def install(folder):
     install_folder = os.path.abspath(folder)
     vendor_path = os.path.join(install_folder, "vendor")
 
-    conan_export(os.path.join(vendor_path, "filament.py"), "filament/1.8.1@google/stable")
+    conan_export(os.path.join(vendor_path, "filament.py"), "filament/1.9.9@google/stable")
     conan_export(os.path.join(vendor_path, "imgui.py"), "imgui/docking@ocornut/stable")
 
 

@@ -1,36 +1,32 @@
-#include <spatial/input/Input.h>
 #include <spatial/input/InputSystem.h>
 
 namespace spatial
 {
 
-InputSystem::InputSystem(Window& window) : mWindow{window}
+InputSystem::InputSystem() : mInputState{std::make_shared<InputState>()}, mMouseWarpSignal{}
 {
-	Input::sInputState.reset();
+	mInputState->reset();
 }
 
 void InputSystem::onEndFrame()
 {
-	if (Input::sInputState.isMouseWarpRequested())
+	if (mInputState->isMouseWarpRequested())
 	{
-		auto mousePos = Input::mouse();
-		auto [windowWidth, windowHeight] = mWindow.getWindowSize();
-		mWindow.warpMouse({mousePos.x * windowWidth, mousePos.y * windowHeight});
+		mMouseWarpSignal.trigger(mInputState->getCurrentPosition());
 	}
 
-	Input::sInputState.reset();
+	mInputState->reset();
 }
 
 void InputSystem::onEvent(const MouseMovedEvent& event)
 {
-	auto [windowWidth, windowHeight] = mWindow.getWindowSize();
-	Input::sInputState.setMousePosition({event.x / windowWidth, event.y / windowHeight});
+	mInputState->setMousePosition({event.x, event.y});
 }
 
 void InputSystem::onEvent(const KeyEvent& event)
 {
 	const auto key = event.key;
-	Input::sInputState.set(key, event.action);
+	mInputState->set(key, event.action);
 }
 
 void InputSystem::onEvent(const TextEvent& event)

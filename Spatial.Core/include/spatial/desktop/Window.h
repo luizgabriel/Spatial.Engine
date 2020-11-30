@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SDL.h>
-#include <math/vec2.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/Signal.h>
+#include <spatial/common/Math.h>
 #include <string_view>
 #include <type_traits>
 
@@ -22,7 +22,7 @@ class Window
   private:
 	SDL_Window* mWindowHandle;
 
-	Window(int width, int height, std::string_view title);
+	explicit Window(SDL_Window* windowHandle);
 
 	friend class DesktopPlatformContext;
 
@@ -45,7 +45,8 @@ class Window
 
 	Window& operator=(Window&& other) noexcept;
 	Window& operator=(const Window& w) = delete;
-	void warpMouse(filament::math::float2 position);
+
+	void warpMouse(math::float2 position);
 };
 
 class DesktopPlatformContext

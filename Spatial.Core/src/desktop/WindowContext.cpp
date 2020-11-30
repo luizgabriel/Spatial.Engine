@@ -73,11 +73,12 @@ void DesktopPlatformContext::onStartFrame(float)
 			break;
 
 		case SDL_WINDOWEVENT: {
+			std::pair<int, int> windowSize, frameBufferSize;
+			auto* sdlWindow = SDL_GetWindowFromID(e.window.windowID);
+
 			switch (e.window.event)
 			{
 			case SDL_WINDOWEVENT_RESIZED: {
-				std::pair<int, int> windowSize, frameBufferSize;
-				auto* sdlWindow = SDL_GetWindowFromID(e.window.windowID);
 				SDL_GetWindowSize(sdlWindow, &windowSize.first, &windowSize.second);
 				SDL_GL_GetDrawableSize(sdlWindow, &frameBufferSize.first, &frameBufferSize.second);
 				sEventQueue.enqueue<WindowResizedEvent>(windowSize, frameBufferSize);
@@ -101,7 +102,8 @@ void DesktopPlatformContext::onStartFrame(float)
 Window DesktopPlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
 											std::string_view title) const noexcept
 {
-	return Window{width, height, title};
+	return Window{SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+								   SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)};
 }
 
 Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept

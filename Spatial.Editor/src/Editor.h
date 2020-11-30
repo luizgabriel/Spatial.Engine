@@ -2,6 +2,7 @@
 
 #include <spatial/assets/AggregatorLoader.h>
 #include <spatial/assets/ResourcesLoader.h>
+#include <spatial/desktop/Window.h>
 
 namespace spatial::editor
 {

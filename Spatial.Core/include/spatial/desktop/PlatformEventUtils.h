@@ -18,12 +18,6 @@ void connect(DesktopPlatformContext& context, Listener& listener)
 	eventQueue.tryConnect<MouseScrolledEvent>(listener);
 }
 
-template <typename... Listeners>
-void connect(DesktopPlatformContext& context, Listeners&... listener)
-{
-	(connect(context, listener), ...);
-}
-
 template <typename Listener>
 void disconnect(DesktopPlatformContext& context, Listener& listener)
 {
@@ -34,12 +28,6 @@ void disconnect(DesktopPlatformContext& context, Listener& listener)
 	eventQueue.tryDisconnect<TextEvent>(listener);
 	eventQueue.tryDisconnect<MouseMovedEvent>(listener);
 	eventQueue.tryDisconnect<MouseScrolledEvent>(listener);
-}
-
-template <typename... Listeners>
-void disconnect(DesktopPlatformContext& context, Listeners&... listener)
-{
-	(disconnect(context, listener), ...);
 }
 
 template <typename Listener>
