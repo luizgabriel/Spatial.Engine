@@ -50,7 +50,7 @@ class Transform
 
 	math::float3 mPosition{.0f};
 	math::float3 mScale{1.0f};
-	math::float3 mRotation{.0f};
+	math::float3 mRotation{.0f, .0f, .0f};
 
 	void refreshTransformMatrix() noexcept;
 	void set(const math::mat4f& localTransform) noexcept;

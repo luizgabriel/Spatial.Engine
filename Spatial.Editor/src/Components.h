@@ -13,6 +13,7 @@ namespace spatial::editor
 struct BasicCameraMovement {
 	float sensitivity;
 	float velocity;
+	bool enabled{false};
 };
 
 } // namespace spatial::ecs

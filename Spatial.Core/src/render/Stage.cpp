@@ -36,10 +36,8 @@ void Stage::disable()
 
 ActorBuilder Stage::createActor(std::string name)
 {
-	auto builder = ActorBuilder{mRenderingSystem.getEngine(), mRegistry};
-	builder.add<spatial::Name>(std::move(name));
-
-	return builder;
+	return ActorBuilder{mRenderingSystem.getEngine(), mRegistry}
+		.add<spatial::Name>(std::move(name));
 }
 
 void Stage::setMainCamera(const Actor& actor)

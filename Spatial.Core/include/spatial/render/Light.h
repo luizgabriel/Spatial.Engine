@@ -1,9 +1,9 @@
 #pragma once
 
+#include <spatial/common/Math.h>
 #include <filament/Color.h>
 #include <filament/Engine.h>
 #include <filament/LightManager.h>
-#include <spatial/common/Math.h>
 
 namespace spatial
 {
@@ -12,9 +12,9 @@ class Light
 {
   public:
 	using Manager = filament::LightManager;
-	using Instance = Manager::Instance;
-	using Type = Manager::Type;
-	using ShadowOptions = Manager::ShadowOptions;
+	using Instance = filament::LightManager::Instance;
+	using Type = filament::LightManager::Type;
+	using ShadowOptions = filament::LightManager::ShadowOptions;
 
 	Light(filament::Engine& engine, utils::Entity entity, Type type = Type::POINT);
 

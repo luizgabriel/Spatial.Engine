@@ -1,10 +1,4 @@
 #include <spatial/render/ActorBuilder.h>
-#include <spatial/render/Camera.h>
-#include <spatial/render/Entity.h>
-#include <spatial/render/Light.h>
-#include <spatial/render/Name.h>
-#include <spatial/render/Resources.h>
-#include <spatial/render/Transform.h>
 
 namespace spatial
 {
@@ -15,7 +9,8 @@ ActorBuilder::ActorBuilder(filament::Engine& engine, Actor actor) : mEngine{engi
 	mActor.getOrAddComponent<spatial::Transform>(mEngine, sceneEntity.get());
 }
 
-ActorBuilder::ActorBuilder(filament::Engine& engine, entt::registry& registry) : ActorBuilder(engine, Actor{&registry})
+ActorBuilder::ActorBuilder(filament::Engine& engine, entt::registry& registry)
+	: ActorBuilder(engine, Actor{&registry, registry.create()})
 {
 }
 
@@ -64,6 +59,10 @@ LightActorBuilder ActorBuilder::asLight(filament::LightManager::Type type)
 	return LightActorBuilder{mEngine, mActor, type};
 }
 
+RenderableActorBuilder ActorBuilder::asRenderable(size_t primitivesCount)
+{
+	return RenderableActorBuilder{mEngine, mActor, primitivesCount};
+}
 
 CameraActorBuilder::CameraActorBuilder(filament::Engine& engine, Actor actor) : ActorBuilder(engine, actor)
 {
@@ -71,19 +70,36 @@ CameraActorBuilder::CameraActorBuilder(filament::Engine& engine, Actor actor) : 
 	mActor.getOrAddComponent<spatial::Camera>(mEngine, sceneEntity.get());
 }
 
-CameraActorBuilder& CameraActorBuilder::withPerspectiveProjection(float fieldOfView, float aspectRatio, float near,
-																  float far)
+CameraActorBuilder& CameraActorBuilder::withPerspectiveProjection(double fieldOfView, double aspectRatio, double near,
+																  double far)
 {
 	auto& camera = mActor.getComponent<spatial::Camera>();
-	camera.setPerspectiveProjection(fieldOfView, aspectRatio, near, far);
+	camera.setProjection(PerspectiveProjection{fieldOfView, aspectRatio, near, far});
 
 	return *this;
 }
 
-CameraActorBuilder& CameraActorBuilder::withOrthographicProjection(float aspectRatio, float near, float far)
+CameraActorBuilder& CameraActorBuilder::withOrthographicProjection(double aspectRatio, double near, double far)
 {
 	auto& camera = mActor.getComponent<spatial::Camera>();
-	camera.setOrthographicProjection(aspectRatio, near, far);
+	camera.setProjection(OrthographicProjection{aspectRatio, near, far});
+
+	return *this;
+}
+
+CameraActorBuilder& CameraActorBuilder::withOrthographicProjection(double left, double right, double bottom, double top,
+																   double near, double far)
+{
+	auto& camera = mActor.getComponent<spatial::Camera>();
+	camera.setProjection(OrthographicProjection{left, right, bottom, top, near, far});
+
+	return *this;
+}
+
+CameraActorBuilder& CameraActorBuilder::withCustomProjection(math::mat4 projectionMatrix, double near, double far)
+{
+	auto& camera = mActor.getComponent<spatial::Camera>();
+	camera.setProjection(CustomProjection{std::move(projectionMatrix), near, far});
 
 	return *this;
 }
@@ -109,6 +125,12 @@ LightActorBuilder& LightActorBuilder::withDirection(const math::float3& directio
 	component.setDirection(direction);
 
 	return *this;
+}
+
+RenderableActorBuilder::RenderableActorBuilder(filament::Engine& engine, Actor actor, size_t primitivesCount) : ActorBuilder(engine, actor)
+{
+	auto& sceneEntity = mActor.getComponent<spatial::Entity>();
+	mActor.getOrAddComponent<spatial::Renderable>(mEngine, sceneEntity.get(), primitivesCount);
 }
 
 } // namespace spatial

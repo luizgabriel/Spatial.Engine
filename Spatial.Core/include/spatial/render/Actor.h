@@ -6,53 +6,24 @@
 namespace spatial
 {
 
-namespace detail
-{
-
-template <typename Registry>
-class EntityAdapter
+class Actor
 {
   private:
-	Registry* mRegistry;
+	entt::registry* mRegistry;
 	entt::entity mEntity;
 
   public:
-	EntityAdapter() : mRegistry{nullptr}, mEntity{}
+	Actor() : mRegistry{nullptr}, mEntity{}
 	{
 	}
 
-	EntityAdapter(Registry* registry) : mRegistry{registry}, mEntity{mRegistry->create()}
+	Actor(entt::registry* registry, entt::entity entity) : mRegistry{registry}, mEntity{entity}
 	{
-	}
-
-	EntityAdapter(Registry* registry, entt::entity entity) : mRegistry{registry}, mEntity{entity}
-	{
-	}
-
-	EntityAdapter(const EntityAdapter& other) : EntityAdapter(other.mRegistry, other.mEntity)
-	{
-	}
-
-	EntityAdapter(EntityAdapter&& other) : EntityAdapter(other.mRegistry, other.mEntity)
-	{
-	}
-
-	EntityAdapter& operator=(const EntityAdapter& other) noexcept
-	{
-		mRegistry = other.mRegistry;
-		mEntity = other.mEntity;
-		return *this;
-	}
-
-	EntityAdapter& operator=(EntityAdapter&& other) noexcept
-	{
-		mRegistry = other.mRegistry;
-		mEntity = other.mEntity;
-		return *this;
 	}
 
 	void destroy()
 	{
+		assert(isValid());
 		mRegistry->destroy(mEntity);
 	}
 
@@ -103,25 +74,30 @@ class EntityAdapter
 		mRegistry->template remove<Component>(mEntity);
 	}
 
-	entt::entity getEntity() const noexcept
-	{
-		return mEntity;
-	}
-
-	bool operator==(const EntityAdapter& rhs) const
+	bool operator==(const Actor& rhs) const
 	{
 		return mRegistry == rhs.mRegistry && mEntity == rhs.mEntity;
 	}
 
-	bool operator!=(const EntityAdapter& rhs) const
+	bool operator!=(const Actor& rhs) const
 	{
 		return !(rhs == *this);
 	}
+
+	operator bool() const noexcept
+	{
+		return isValid();
+	}
+
+	uint32_t getId() const noexcept
+	{
+		return static_cast<uint32_t>(mEntity);
+	}
+
+	operator uint32_t() const noexcept
+	{
+		return getId();
+	}
 };
-
-} // namespace detail
-
-using ConstActor = detail::EntityAdapter<const entt::registry>;
-using Actor = detail::EntityAdapter<entt::registry>;
 
 } // namespace spatial

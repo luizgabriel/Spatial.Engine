@@ -135,4 +135,16 @@ Renderable::Instance Renderable::getInstance() const noexcept
 	return mManager.getInstance(mEntity);
 }
 
+Renderable::Renderable(Renderable&& other) : mManager{other.mManager}, mEntity(std::exchange(other.mEntity, {}))
+{
+}
+
+Renderable& Renderable::operator=(Renderable&& other)
+{
+	assert(&other.mManager == &mManager);
+	mEntity = std::exchange(other.mEntity, {});
+
+	return *this;
+}
+
 } // namespace spatial

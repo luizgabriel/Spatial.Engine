@@ -17,8 +17,6 @@
 namespace spatial
 {
 
-using materials_map_t = std::unordered_map<std::string, filament::MaterialInstance*>;
-
 Material createMaterial(filament::Engine& engine, const std::vector<char>& resourceData);
 
 Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,

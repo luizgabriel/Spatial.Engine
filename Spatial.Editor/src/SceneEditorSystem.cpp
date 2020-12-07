@@ -44,19 +44,21 @@ SceneEditorSystem::SceneEditorSystem(RenderingSystem& renderingSystem)
 void SceneEditorSystem::onStart()
 {
 	mMainStage.setMainCamera(mMainStage.createActor("Main Camera")
-							 .withPosition({.6f, .3f, .6f})
-							 .asCamera()
-							 .withPerspectiveProjection()
-							 .add<editor::BasicCameraMovement>());
+								 .withPosition({.6f, .3f, .6f})
+								 .asCamera()
+								 .withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
+								 .add<editor::BasicCameraMovement>(20.0f, 10.0f));
 
 	mMainStage.createActor("Main Light").asLight(spatial::Light::Type::DIRECTIONAL).build();
 
+	/*
 	auto material = createMaterial(mEngine, editor::load("editor/materials/default.filamat").value());
 	material->setDefaultParameter("metallic", .2f);
 	material->setDefaultParameter("roughness", 0.3f);
 	material->setDefaultParameter("reflectance", .1f);
+	*/
 
-	mMainStage.createActor("Plane").withPosition({3.0f, -1.0f, .0f}).withScale({10.0f});
+	mSelectedActor = mMainStage.createActor("Plane").withPosition({3.0f, -1.0f, .0f}).withScale(10.0f).asRenderable(1);
 	//.asMesh(editor::load("editor/meshes/plane.filamesh").value())
 	//.withMaterial(material, {{"baseColor", {.8f, .8f, .8f, 1.0f}}});
 
@@ -79,6 +81,25 @@ void SceneEditorSystem::onStart()
 
 void SceneEditorSystem::onEvent(const MouseMovedEvent&)
 {
+	auto mainCamera = mMainStage.getFirstActorWith<Transform, const BasicCameraMovement>();
+	if (mainCamera)
+	{
+		auto& cameraTransform = mainCamera.getComponent<Transform>();
+		auto& basicCameraMovement = mainCamera.getComponent<BasicCameraMovement>();
+
+		if (basicCameraMovement.enabled)
+		{
+			constexpr auto center = float2{0.5f};
+			const auto mouseRelativePosition = Input::mouse() / math::float2{mViewport.width, mViewport.height};
+			const auto mouseDelta = (center - mouseRelativePosition) * basicCameraMovement.sensitivity;
+			auto rotation = cameraTransform.getRotation();
+			rotation.x -= mouseDelta.x;
+			rotation.y = std::clamp(rotation.y + mouseDelta.y, -90.0f, 90.0f);
+			cameraTransform.setRotation(rotation);
+
+			Input::warpMouse({.5f, .5f});
+		}
+	}
 }
 
 float3 defaultInputAxis()
@@ -92,35 +113,28 @@ float3 defaultInputAxis()
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	static bool warpMouse = false;
+	auto mainCamera = mMainStage.getFirstActorWith<Camera, Transform, BasicCameraMovement>();
+	if (mainCamera)
+	{
+		auto& cameraController = mainCamera.getComponent<Camera>();
+		auto& cameraTransform = mainCamera.getComponent<Transform>();
+		auto& cameraMovement = mainCamera.getComponent<BasicCameraMovement>();
 
-	if (Input::released(Key::MouseLeft))
-		warpMouse = false;
-
-	if (Input::combined(Key::LControl, Key::MouseLeft))
-		warpMouse = true;
-
-	auto view = mMainStage.getRegistry().view<spatial::Transform, const editor::BasicCameraMovement>();
-	view.each([&](auto& cameraTransform, const auto& cameraMovement) {
-	  	const auto keyboardDelta = delta * cameraMovement.velocity * defaultInputAxis();
-
-		auto& rot = cameraTransform.getRotation();
+		const auto keyboardDelta = delta * cameraMovement.velocity * defaultInputAxis();
+		const auto rot = math::toRadians(cameraTransform.getRotation());
 		const auto direction = normalize(float3{cos(rot.x) * cos(rot.y), sin(rot.y), sin(rot.x) * cos(rot.y)});
 
-		cameraTransform.translate(direction * keyboardDelta.x +
-								  cross(direction, math::axisY) * keyboardDelta.y
-								  + math::axisY * keyboardDelta.z);
+		cameraTransform.translate(direction * keyboardDelta.x + cross(direction, math::axisY) * keyboardDelta.y +
+								  math::axisY * keyboardDelta.z);
 
-		if (warpMouse)
-		{
-			constexpr auto center = float2{0.5f};
-			auto mouseRelativePosition = Input::mouse() / math::float2{mViewport.width, mViewport.height};
-			const auto mouseDelta = (center - mouseRelativePosition) * cameraMovement.sensitivity;
-			cameraTransform.rotate({-mouseDelta, .0f});
+		cameraController.lookAt(cameraTransform.getPosition(), cameraTransform.getPosition() + direction);
 
-			Input::warpMouse({.5f, .5f});
-		}
-	});
+		if (Input::released(Key::MouseLeft))
+			cameraMovement.enabled = false;
+
+		if (Input::combined(Key::LControl, Key::MouseLeft))
+			cameraMovement.enabled = true;
+	}
 }
 
 void SceneEditorSystem::onDrawGui()
@@ -169,7 +183,7 @@ void SceneEditorSystem::onDrawGui()
 	}
 	ImGui::EndMainMenuBar();
 
-	mImGuiSceneWindow.draw("Scene View (Editor)");
+	mImGuiSceneWindow.draw("Scene View");
 
 	ImGui::Begin("Scene Graph");
 
@@ -184,7 +198,8 @@ void SceneEditorSystem::onDrawGui()
 		{
 			auto& name = mSelectedActor.getComponent<Name>();
 			auto nameValue = name.getValue();
-			if (editor::inputText("Name", nameValue)) {
+			if (editor::inputText("Name", nameValue))
+			{
 				name.setValue(nameValue);
 			}
 		}
@@ -219,9 +234,8 @@ void SceneEditorSystem::onDrawGui()
 					ImGui::Separator();
 
 					auto& movement = mSelectedActor.getComponent<editor::BasicCameraMovement>();
-					ImGui::InputFloat("Velocity", &movement.velocity);
-					ImGui::InputFloat("Sensitivity", &movement.sensitivity);
-
+					ImGui::DragFloat("Velocity", &movement.velocity);
+					ImGui::DragFloat("Sensitivity", &movement.sensitivity);
 				}
 
 				ImGui::Unindent();
@@ -247,12 +261,28 @@ void SceneEditorSystem::onDrawGui()
 
 void SceneEditorSystem::onSceneWindowResized(ImGuiSceneWindow::Size size)
 {
-	auto width = static_cast<float>(size.first);
-	auto height = static_cast<float>(size.second);
+	auto width = static_cast<double>(size.first);
+	auto height = static_cast<double>(size.second);
 	auto aspectRatio = width / height;
 
 	auto& camera = mMainStage.getMainCamera().getComponent<Camera>();
-	camera.setAspectRatio(aspectRatio);
+	std::visit(
+		[&](auto projection) {
+			using T = std::decay_t<decltype(projection)>;
+
+			if constexpr (std::is_same_v<T, PerspectiveProjection>)
+			{
+				projection.aspectRatio = aspectRatio;
+			}
+			else if constexpr (std::is_same_v<T, OrthographicProjection>)
+			{
+				projection.left = -aspectRatio;
+				projection.right = aspectRatio;
+			}
+
+			camera.setProjection(projection);
+		},
+		camera.getProjection());
 }
 
 void SceneEditorSystem::onEvent(const WindowResizedEvent& e)

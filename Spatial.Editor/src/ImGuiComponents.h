@@ -23,4 +23,10 @@ bool directionWidget(const std::string_view label, math::float3& v, float size =
 
 void lightInput(Light& light);
 
+bool vec2Input(const std::string_view label, math::float2& v, float resetValue = .0f, const std::string_view format = "%.2f", float columnWidth = 70.0f);
+
+bool vec3Input(const std::string_view label, math::float3& v, float resetValue = .0f, const std::string_view format = "%.2f", float columnWidth = 70.0f);
+
+bool vec4Input(const std::string_view label, math::float4& v, float resetValue = .0f, const std::string_view format = "%.2f", float columnWidth = 70.0f);
+
 } // namespace spatial::editor

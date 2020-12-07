@@ -1,14 +1,15 @@
 #pragma once
 
+#include <spatial/render/ActorBuilder.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/Resources.h>
-#include <spatial/render/ActorBuilder.h>
+#include <spatial/render/StageView.h>
 #include <string>
-
-#include <entt/entity/registry.hpp>
 
 namespace spatial
 {
+
+class ActorBuilder;
 
 class Stage
 {
@@ -50,24 +51,22 @@ class Stage
 		return mCameraActor;
 	}
 
-	const auto& getRegistry() const noexcept
+	size_t size() const noexcept
 	{
-		return mRegistry;
+		return mRegistry.size();
 	}
 
-	auto& getRegistry() noexcept
+	template <typename... Component, typename... Exclude>
+	auto getActorsWith(ExcludeComponent<Exclude...> excludes = {})
 	{
-		return mRegistry;
+		return StageView<ExcludeComponent<Exclude...>, Component...>{&mRegistry, mRegistry.view<Component...>(std::move(excludes))};
 	}
 
-	Actor getActor(entt::entity entity)
+	template <typename... Component, typename... Exclude>
+	auto getFirstActorWith(ExcludeComponent<Exclude...> excludes = {})
 	{
-		return {&mRegistry, entity};
-	}
-
-	ConstActor getActor(entt::entity entity) const
-	{
-		return {&mRegistry, entity};
+		auto view = getActorsWith<Component...>(std::move(excludes));
+		return *view.begin();
 	}
 
   private:
@@ -81,4 +80,4 @@ class Stage
 	Actor mCameraActor;
 };
 
-} // namespace spatial::ecs
+} // namespace spatial

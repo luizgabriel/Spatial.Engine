@@ -1,23 +1,68 @@
 #pragma once
 
 #include <filament/Camera.h>
+#include <filament/Engine.h>
 #include <filament/Frustum.h>
 #include <spatial/common/Math.h>
-#include <spatial/render/Entity.h>
+#include <utils/Entity.h>
+#include <variant>
 
 namespace spatial
 {
 
+struct CameraProjection
+{
+	double near;
+	double far;
+
+	constexpr CameraProjection(double near, double far) : near{near}, far{far}
+	{
+	}
+};
+
+struct PerspectiveProjection : public CameraProjection
+{
+	double fieldOfView;
+	double aspectRatio;
+
+	constexpr PerspectiveProjection(double fieldOfView, double aspectRatio, double near, double far)
+		: CameraProjection(near, far), fieldOfView{fieldOfView}, aspectRatio{aspectRatio}
+	{
+	}
+};
+
+struct OrthographicProjection : public CameraProjection
+{
+	double left;
+	double right;
+	double bottom;
+	double top;
+
+	constexpr OrthographicProjection(double left, double right, double bottom, double top, double near, double far)
+		: CameraProjection(near, far), left{left}, right{right}, bottom{bottom}, top{top}
+	{
+	}
+
+	constexpr OrthographicProjection(double aspectRatio, double near, double far)
+		: OrthographicProjection(-aspectRatio, aspectRatio, -1, 1, near, far)
+	{
+	}
+};
+
+struct CustomProjection : public CameraProjection
+{
+	math::mat4 projectionMatrix;
+
+	constexpr CustomProjection(math::mat4 projectionMatrix, double near, double far)
+		: CameraProjection(near, far), projectionMatrix{std::move(projectionMatrix)}
+	{
+	}
+};
+
 class Camera
 {
   public:
-	enum class ProjectionType {
-		PERSPECTIVE,
-		ORTHOGRAPHIC,
-		CUSTOM
-	};
-
-	using Fov = filament::Camera::Fov;
+	using Projection = std::variant<PerspectiveProjection, OrthographicProjection, CustomProjection>;
 
 	explicit Camera(filament::Engine& engine);
 	Camera(filament::Engine& engine, utils::Entity entity);
@@ -30,76 +75,36 @@ class Camera
 	Camera(const Camera& other) = delete;
 	Camera& operator=(const Camera& other) = delete;
 
-	auto getProjectionType() const noexcept {
-		return mType;
-	}
-
-	float getFieldOfView() const noexcept {
-		return mFieldOfView;
-	}
-
-	void setNear(float near) noexcept;
-
-	float getNear() const noexcept
-	{
-		return mNear;
-	}
-
-	void setAspectRatio(float aspectRatio);
-
-	float getAspectRatio() const noexcept
-	{
-		return mAspectRatio;
-	}
-
-	float getFar() const noexcept
-	{
-		return mFar;
-	}
-
-	void setFar(float far) noexcept;
-
-	void setFieldOfView(float fieldOfView);
-
 	const filament::Camera* getInstance() const noexcept;
 
 	filament::Camera* getInstance() noexcept;
 
-	bool isValid() const noexcept {
+	bool isValid() const noexcept
+	{
 		return !mEntity.isNull();
 	}
 
-	bool isPerspective() const noexcept {
-		return mType == ProjectionType::PERSPECTIVE;
+	void lookAt(const math::float3& eye, const math::float3& center) noexcept;
+
+	void lookAt(const math::float3& eye, const math::float3& center, const math::float3& up) noexcept;
+
+	bool isPerspective() const noexcept;
+
+	bool isOrthographic() const noexcept;
+
+	bool isCustomProjection() const noexcept;
+
+	void setProjection(Projection projection) noexcept;
+
+	const Projection& getProjection() const noexcept
+	{
+		return mProjection;
 	}
-
-	bool isOrthographic() const noexcept {
-		return mType == ProjectionType::ORTHOGRAPHIC;
-	}
-
-	void setPerspectiveProjection(float fieldOfView = defaultFieldOfView, float aspectRatio = defaultAspectRatio, float near = defaultNear, float far = defaultFar) noexcept;
-
-	void setOrthographicProjection(float left, float right, float bottom, float top, float near = defaultNear, float far = defaultFar);
-
-	void setOrthographicProjection(float aspectRatio = defaultAspectRatio, float near = defaultNear, float far = defaultFar);
-
-	void setCustomProjection(const math::mat4& customProjection, float near, float far) noexcept;
 
   private:
-	constexpr static float defaultFieldOfView = 90.0f;
-	constexpr static float defaultAspectRatio = 16.0f/9.0f;
-	constexpr static float defaultNear = .1f;
-	constexpr static float defaultFar = 100000.0f;
-
 	filament::Engine& mEngine;
 	utils::Entity mEntity;
-	ProjectionType mType{ProjectionType::PERSPECTIVE};
-	float mFieldOfView{defaultFieldOfView};
-	float mAspectRatio{defaultAspectRatio};
-	float mNear{defaultNear};
-	float mFar{defaultFar};
-
-	void recalculateProjection();
+	Projection mProjection;
 };
 
 } // namespace spatial

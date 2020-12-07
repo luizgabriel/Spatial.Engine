@@ -19,6 +19,12 @@ class Renderable
 
 	~Renderable();
 
+	Renderable(const Renderable& other) = delete;
+	Renderable& operator=(const Renderable& other) = delete;
+
+	Renderable(Renderable&& other);
+	Renderable& operator=(Renderable&& other);
+
 	void setAxisAlignedBoundingBox(const filament::Box& aabb) noexcept;
 
 	void setLayerMask(uint8_t select, uint8_t values) noexcept;

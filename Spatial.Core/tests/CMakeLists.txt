@@ -9,7 +9,8 @@ add_executable(Spatial.Core.Tests
 	Application.test.cpp
 	Stage.test.cpp
 	DesktopWindowContext.test.cpp
-	PhysicalDirLoader.test.cpp)
+	PhysicalDirLoader.test.cpp
+	RenderingSystem.test.cpp)
 
 target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)
 

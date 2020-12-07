@@ -27,6 +27,8 @@ class RenderingSystem
 
 	void onEndFrame();
 
+	SharedView createView();
+
 	/**
 	 * \brief Registers a view to the renderer
 	 */
@@ -59,6 +61,11 @@ class RenderingSystem
 		return *mEngine.get();
 	}
 
+	size_t getViewsCount() const noexcept;
+
+	bool containsView(const SharedView& view) const noexcept;
+
+	void clearExpiredViews() noexcept;
 
   private:
 	Engine mEngine;
@@ -67,7 +74,5 @@ class RenderingSystem
 	filament::Renderer::ClearOptions mClearOptions;
 
 	std::deque<std::weak_ptr<filament::View>> mViews;
-
-	void clearExpiredViews() noexcept;
 };
 } // namespace spatial

@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <spatial/render/RenderingSystem.h>
+#include <spatial/render/Resources.h>
 
 using namespace spatial;
 namespace fl = filament;
@@ -74,10 +76,28 @@ void RenderingSystem::popBackView()
 
 void RenderingSystem::popView(const SharedView& view)
 {
-	std::erase_if(mViews, [&view](std::weak_ptr<filament::View>& v){
+	std::erase_if(mViews, [&view](std::weak_ptr<filament::View>& v) {
 		const auto vw = v.lock();
 		return vw.get() == view.get();
 	});
+}
+
+SharedView RenderingSystem::createView()
+{
+	return toShared(::createView(*mEngine.get()));
+}
+
+size_t RenderingSystem::getViewsCount() const noexcept
+{
+	return mViews.size();
+}
+
+bool RenderingSystem::containsView(const SharedView& view) const noexcept
+{
+	return std::find_if(mViews.begin(), mViews.end(), [&](auto& v) {
+		const auto vw = v.lock();
+		return vw.get() == view.get();
+	}) != mViews.end();
 }
 
 } // namespace spatial

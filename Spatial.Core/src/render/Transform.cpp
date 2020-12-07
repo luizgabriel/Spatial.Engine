@@ -6,6 +6,7 @@ namespace spatial
 Transform::Transform(filament::Engine& engine, utils::Entity entity)
 	: mManager{engine.getTransformManager()}, mEntity{entity}
 {
+	refreshTransformMatrix();
 }
 
 Transform::~Transform()
@@ -79,9 +80,9 @@ void Transform::refreshTransformMatrix() noexcept
 
 	const auto translation = mat4f::translation(mPosition);
 	const auto scale = mat4f::scaling(mScale);
-	const auto rotateZ = mat4f::rotation(mRotation.z, math::axisZ);
-	const auto rotateX = mat4f::rotation(mRotation.x, math::axisX);
-	const auto rotateY = mat4f::rotation(mRotation.y, math::axisY);
+	const auto rotateZ = mat4f::rotation(toRadians(mRotation.z), math::axisZ);
+	const auto rotateX = mat4f::rotation(toRadians(mRotation.x), math::axisX);
+	const auto rotateY = mat4f::rotation(toRadians(mRotation.y), math::axisY);
 
 	const auto model = translation * (rotateX * rotateY * rotateZ) * scale;
 	set(model);

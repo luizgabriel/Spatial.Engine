@@ -3,14 +3,15 @@
 namespace spatial
 {
 
-Camera::Camera(filament::Engine& engine) : mEngine{engine}, mEntity{}
+Camera::Camera(filament::Engine& engine) : Camera(engine, {})
 {
 }
 
 Camera::Camera(filament::Engine& engine, utils::Entity entity)
-	: mEngine{engine}, mEntity{entity}
+	: mEngine{engine}, mEntity{entity}, mProjection{PerspectiveProjection{45.0, 19.0 / 6.0, .1, 10000.0}}
 {
-	engine.createCamera(entity);
+	if (!entity.isNull())
+		engine.createCamera(entity);
 }
 
 Camera::~Camera()
@@ -20,96 +21,76 @@ Camera::~Camera()
 }
 
 Camera::Camera(Camera&& other) noexcept
-	: mEngine{other.mEngine},
-	  mEntity{std::exchange(other.mEntity, {})}
+	: mEngine{other.mEngine}, mEntity{std::exchange(other.mEntity, {})}, mProjection{std::move(other.mProjection)}
 {
 }
 
 Camera& Camera::operator=(Camera&& other) noexcept
 {
 	mEntity = std::exchange(other.mEntity, {});
+	mProjection = std::move(other.mProjection);
 	return *this;
-}
-
-void Camera::setNear(float near) noexcept
-{
-	mNear = near;
-	recalculateProjection();
-}
-
-void Camera::setAspectRatio(float aspectRatio)
-{
-	mAspectRatio = aspectRatio;
-	recalculateProjection();
 }
 
 const filament::Camera* Camera::getInstance() const noexcept
 {
-	assert(isValid());
 	return mEngine.getCameraComponent(mEntity);
 }
 
 filament::Camera* Camera::getInstance() noexcept
 {
-	assert(isValid());
 	return mEngine.getCameraComponent(mEntity);
 }
 
-void Camera::recalculateProjection()
+void Camera::lookAt(const math::float3& eye, const math::float3& center) noexcept
 {
-	if (isPerspective()) {
-		getInstance()->setProjection(getFieldOfView(), getAspectRatio(), getNear(), getFar());
-	} else if (isOrthographic()) {
-		getInstance()->setProjection(filament::Camera::Projection::ORTHO, -getAspectRatio(), getAspectRatio(), -1, 1, getNear(), getFar());
-	}
+	getInstance()->lookAt(eye, center);
 }
 
-void Camera::setFar(float far) noexcept
+void Camera::lookAt(const math::float3& eye, const math::float3& center, const math::float3& up) noexcept
 {
-	mFar = far;
-	recalculateProjection();
+	getInstance()->lookAt(eye, center, up);
 }
 
-void Camera::setFieldOfView(float fieldOfView)
+void Camera::setProjection(Projection projection) noexcept
 {
-	assert(isPerspective());
-	mFieldOfView = fieldOfView;
-	recalculateProjection();
+	mProjection = std::move(projection);
+
+	std::visit(
+		[this](const auto& projection) {
+			using T = std::decay_t<decltype(projection)>;
+
+			if constexpr (std::is_same_v<T, PerspectiveProjection>)
+			{
+				getInstance()->setProjection(projection.fieldOfView, projection.aspectRatio, projection.near,
+											 projection.far);
+			}
+			else if constexpr (std::is_same_v<T, OrthographicProjection>)
+			{
+				getInstance()->setProjection(filament::Camera::Projection::ORTHO, projection.left, projection.right,
+											 projection.bottom, projection.top, projection.near, projection.far);
+			}
+			else if constexpr (std::is_same_v<T, CustomProjection>)
+			{
+				getInstance()->setCustomProjection(projection.projectionMatrix, projection.near, projection.far);
+			}
+		},
+		mProjection);
 }
 
-void Camera::setCustomProjection(const math::mat4& customProjection, float near, float far) noexcept
+bool Camera::isPerspective() const noexcept
 {
-	mType = ProjectionType::CUSTOM;
-	mNear = near;
-	mFar = far;
-
-	getInstance()->setCustomProjection(customProjection, near, far);
+	return std::holds_alternative<PerspectiveProjection>(mProjection);
 }
 
-void Camera::setPerspectiveProjection(float fieldOfView, float aspectRatio, float near, float far) noexcept
+bool Camera::isOrthographic() const noexcept
 {
-	mType = ProjectionType::PERSPECTIVE;
-	mFieldOfView = fieldOfView;
-	mAspectRatio = aspectRatio;
-	mNear = near;
-	mFar = far;
-
-	getInstance()->setProjection(fieldOfView, aspectRatio, near, far);
+	return std::holds_alternative<OrthographicProjection>(mProjection);
 }
 
-void Camera::setOrthographicProjection(float left, float right, float bottom, float top, float near, float far)
+bool Camera::isCustomProjection() const noexcept
 {
-	mType = ProjectionType::ORTHOGRAPHIC;
-	mNear = near;
-	mFar = far;
-
-	getInstance()->setProjection(filament::Camera::Projection::ORTHO, left, right, bottom, top, near, far);
-}
-
-void Camera::setOrthographicProjection(float aspectRatio, float near, float far)
-{
-	mAspectRatio = aspectRatio;
-	setOrthographicProjection(-aspectRatio, aspectRatio, -1.0f, 1.0f, near, far);
+	return std::holds_alternative<CustomProjection>(mProjection);
 }
 
 } // namespace spatial

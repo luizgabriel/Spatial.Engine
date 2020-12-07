@@ -6,10 +6,135 @@
 namespace spatial::editor
 {
 
+template <typename Vector, size_t N>
+bool vecNInput(const std::string_view label, Vector& v, float resetValue, const std::string_view format,
+			   float columnWidth)
+{
+	bool changed = false;
+	ImGuiIO& io = ImGui::GetIO();
+	auto boldFont = io.Fonts->Fonts[0];
+
+	ImGui::PushID(label.data());
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text("%s", label.data());
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(N, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 5});
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	ImGui::PushFont(boldFont);
+	if (ImGui::Button("X", buttonSize))
+	{
+		changed = true;
+		v.x = resetValue;
+	}
+
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	changed |= ImGui::DragFloat("##X", &v.x, 0.1f, 0.0f, 0.0f, format.data());
+	ImGui::PopItemWidth();
+
+	if constexpr (N >= 2)
+	{
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("Y", buttonSize))
+		{
+			changed = true;
+			v.y = resetValue;
+		}
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		changed |= ImGui::DragFloat("##Y", &v.y, 0.1f, 0.0f, 0.0f, format.data());
+		ImGui::PopItemWidth();
+	}
+
+	if constexpr (N >= 3)
+	{
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.3f, 0.8f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("Z", buttonSize))
+		{
+			changed = true;
+			v.y = resetValue;
+		}
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		changed |= ImGui::DragFloat("##Z", &v.z, 0.1f, 0.0f, 0.0f, format.data());
+		ImGui::PopItemWidth();
+	}
+
+	if constexpr (N >= 4)
+	{
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.8f, 0.3f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("W", buttonSize))
+		{
+			changed = true;
+			v.w = resetValue;
+		}
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		changed |= ImGui::DragFloat("##W", &v.w, 0.1f, 0.0f, 0.0f, format.data());
+		ImGui::PopItemWidth();
+	}
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+
+	return changed;
+}
+
+bool vec2Input(const std::string_view label, math::float2& v, float resetValue, const std::string_view format,
+			   float columnWidth)
+{
+	return vecNInput<math::float2, 2>(label, v, resetValue, format, columnWidth);
+}
+
+bool vec3Input(const std::string_view label, math::float3& v, float resetValue, const std::string_view format,
+			   float columnWidth)
+{
+	return vecNInput<math::float3, 3>(label, v, resetValue, format, columnWidth);
+}
+
+bool vec4Input(const std::string_view label, math::float4& v, float resetValue, const std::string_view format,
+			   float columnWidth)
+{
+	return vecNInput<math::float4, 4>(label, v, resetValue, format, columnWidth);
+}
+
 void transformInput(Transform& transform, const std::string_view format)
 {
 	math::float3 position, rotation, scale;
-	constexpr auto velocity = 20.0f;
+	math::float2 rotation2;
 
 	for (char c : format)
 	{
@@ -17,31 +142,23 @@ void transformInput(Transform& transform, const std::string_view format)
 		{
 		case 'p':
 			position = transform.getPosition();
-			if (ImGui::DragFloat3("Position", &position[0]))
-			{
+			if (vec3Input("Position", position))
 				transform.setPosition(position);
-			}
 			break;
 		case 'r':
 			rotation = transform.getRotation();
-			if (ImGui::DragFloat3("Rotation", &rotation[0], velocity, .0f, .0f))
-			{
-				transform.setRotation(rotation);
-			}
+			if (vec3Input("Rotation", rotation))
+				transform.setRotation(position);
 			break;
 		case 'y':
-			rotation = transform.getRotation();
-			if (ImGui::DragFloat2("Rotation", &rotation[0], velocity, .0f, .0f))
-			{
-				transform.setRotation(rotation);
-			}
+			rotation2 = transform.getRotation().xy;
+			if (vec2Input("Rotation", rotation2))
+				transform.setRotation({rotation2, .0f});
 			break;
 		case 's':
 			scale = transform.getScale();
-			if (ImGui::DragFloat3("Scale", &scale[0], velocity, .0f, .0f))
-			{
+			if (vec3Input("Scale", scale, 1.0f))
 				transform.setScale(scale);
-			}
 			break;
 		}
 	}
@@ -51,9 +168,12 @@ void cameraInput(Camera& camera)
 {
 	constexpr auto projections = std::array<std::string_view, 3>{"Perspective", "Ortographic", "Custom"};
 	size_t selected;
-	if (camera.isPerspective()) selected = 0;
-	else if (camera.isOrthographic()) selected = 1;
-	else selected = 2;
+	if (camera.isPerspective())
+		selected = 0;
+	else if (camera.isOrthographic())
+		selected = 1;
+	else
+		selected = 2;
 
 	if (ImGui::BeginCombo("##projectionsCombo", projections[selected].data()))
 	{
@@ -68,38 +188,51 @@ void cameraInput(Camera& camera)
 		ImGui::EndCombo();
 	}
 
-	auto aspectRatio = camera.getAspectRatio();
-	auto near = camera.getNear();
-	auto far = camera.getFar();
+	const auto& projection = camera.getProjection();
+	std::visit(
+		[&camera](auto projection) {
+			using T = std::decay_t<decltype(projection)>;
+			bool changed = false;
 
-	if (camera.isOrthographic() && selected == 0) {
-		camera.setPerspectiveProjection(90.0f, aspectRatio, near, far);
-	} else if (camera.isPerspective() && selected == 1) {
-		camera.setOrthographicProjection(aspectRatio, near, far);
-	}
+			changed |= ImGui::InputDouble("Near", &projection.near, 0.1, 1.0, "%.2f");
+			changed |= ImGui::InputDouble("Far", &projection.far, 0.1, 1.0,"%.2f");
 
-	if (ImGui::InputFloat("Aspect Ratio", &aspectRatio))
-	{
-		camera.setAspectRatio(aspectRatio);
-	}
+			if constexpr (std::is_same_v<T, PerspectiveProjection>)
+			{
+				double min = 15.0, max = 120.0;
+				changed |=
+					ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &projection.fieldOfView, 1.0f, &min, &max, "%.1f");
+				changed |= ImGui::InputDouble("Aspect Ratio", &projection.aspectRatio);
+			}
+			else if constexpr (std::is_same_v<T, OrthographicProjection>)
+			{
+				changed |= ImGui::InputDouble("Left", &projection.left);
+				changed |= ImGui::InputDouble("Right", &projection.right);
+				changed |= ImGui::InputDouble("Bottom", &projection.bottom);
+				changed |= ImGui::InputDouble("Top", &projection.top);
+			}
+			else if constexpr (std::is_same_v<T, CustomProjection>)
+			{
+				changed |= ImGui::InputScalarN("m0", ImGuiDataType_Double, &projection.projectionMatrix[0], 4);
+				changed |= ImGui::InputScalarN("m1", ImGuiDataType_Double, &projection.projectionMatrix[1], 4);
+				changed |= ImGui::InputScalarN("m2", ImGuiDataType_Double, &projection.projectionMatrix[2], 4);
+				changed |= ImGui::InputScalarN("m3", ImGuiDataType_Double, &projection.projectionMatrix[3], 4);
+			}
 
-	if (ImGui::InputFloat("Near", &near))
-	{
-		camera.setNear(near);
-	}
+			if (changed)
+				camera.setProjection(projection);
+		},
+		projection);
 
-	if (ImGui::InputFloat("Far", &far))
-	{
-		camera.setFar(far);
-	}
-
-	if (selected == 0)
-	{
-		auto fieldOfView = camera.getFieldOfView();
-		if (ImGui::DragFloat("Field Of View", &fieldOfView, 1.0f,15.0f, 120.0f))
-		{
-			camera.setFieldOfView(fieldOfView);
-		}
+	constexpr auto defaultAspectRatio = 19/6.0;
+	constexpr auto defaultNear = .1;
+	constexpr auto defaultFar = 100000.0;
+	if (selected == 0 && !camera.isPerspective()) {
+		camera.setProjection(PerspectiveProjection{45.0, defaultAspectRatio, defaultNear, defaultFar});
+	} else if (selected == 1 && !camera.isOrthographic()) {
+		camera.setProjection(OrthographicProjection{defaultAspectRatio, defaultNear, defaultFar});
+	} else if (selected == 2 && !camera.isCustomProjection()) {
+		camera.setProjection(CustomProjection{math::mat4{}, defaultNear, defaultFar});
 	}
 }
 
@@ -107,18 +240,18 @@ bool sceneHierarchy(spatial::Stage& stage, Actor& selectedActor)
 {
 	bool hasSelectedEntity = false;
 
-	auto view = stage.getRegistry().view<spatial::Name>();
-	for (auto entity : view)
+	auto view = stage.getActorsWith<spatial::Name>();
+	for (auto actor : view)
 	{
-		auto& name = view.get<spatial::Name>(entity);
+		auto& name = actor.getComponent<spatial::Name>();
 
-		ImGuiTreeNodeFlags flags = (selectedActor.getEntity() == entity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
-		flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+		ImGuiTreeNodeFlags flags = (selectedActor == actor) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+		flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(entity), flags, "%s", name.getValue().c_str());
+		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.getValue().c_str());
 		if (ImGui::IsItemClicked())
 		{
-			selectedActor = stage.getActor(entity);
+			selectedActor = actor;
 			hasSelectedEntity = true;
 		}
 
@@ -200,8 +333,8 @@ void initArrowData()
 	float x0, x1, y0, y1, z0, z1, a0, a1, nx, nn;
 	for (int i = 0; i < SUBDIV; ++i)
 	{
-		a0 = 2.0f * math::pi<float> * (float(i)) / SUBDIV;
-		a1 = 2.0f * math::pi<float> * (float(i + 1)) / SUBDIV;
+		a0 = 2.0f * math::pi * (float(i)) / SUBDIV;
+		a1 = 2.0f * math::pi * (float(i + 1)) / SUBDIV;
 		x0 = ARROW_BGN;
 		x1 = ARROW_END - CONE_LENGTH;
 		y0 = cosf(a0);
@@ -355,7 +488,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 			coord.z = 0.0f;
 			float n0 = length(oVec);
 			float n1 = length(pVec);
-			if (n0 > math::epsilon<float> && n1 > math::epsilon<float>)
+			if (n0 > math::epsilon && n1 > math::epsilon)
 			{
 				math::float3 v0 = oVec / n0;
 				math::float3 v1 = pVec / n1;
@@ -372,7 +505,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 				qrot = math::quatf::fromAxisAngle(axis, angle);
 				float nqorig = sqrt(origQuat.x * origQuat.x + origQuat.y * origQuat.y + origQuat.z * origQuat.z +
 									origQuat.w * origQuat.w);
-				if (abs(nqorig) > math::epsilon<float> * math::epsilon<float>)
+				if (abs(nqorig) > math::epsilon * math::epsilon)
 				{
 					qorig = origQuat / nqorig;
 					qres = qrot * qorig;
@@ -459,20 +592,19 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 void lightInput(Light& light)
 {
 	auto color = light.getColor();
-	if (ImGui::ColorEdit3("Color", &color[0])) {
+	if (ImGui::ColorEdit3("Color", &color[0]))
 		light.setColor(color);
-	}
 
 	auto intensity = light.getIntensity();
-	if (ImGui::SliderFloat("Lux", &intensity, 0.0f, 150000.0f)) {
+	if (ImGui::SliderFloat("Lux", &intensity, 0.0f, 150000.0f))
 		light.setIntensity(intensity);
-	}
 
-	if (!light.isPointLight()) {
+	if (!light.isPointLight())
+	{
 		auto direction = light.getDirection();
-		editor::directionWidget("Direction", direction);
+		if (editor::directionWidget("Direction", direction))
+			light.setDirection(direction);
 	}
-
 }
 
-} // namespace spatial::ui
+} // namespace spatial::editor

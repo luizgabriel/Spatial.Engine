@@ -5,18 +5,25 @@
 #include <spatial/common/Math.h>
 #include <spatial/render/Actor.h>
 #include <spatial/render/Light.h>
+#include <spatial/render/Camera.h>
+#include <spatial/render/Entity.h>
+#include <spatial/render/Name.h>
+#include <spatial/render/Resources.h>
+#include <spatial/render/Transform.h>
+#include <spatial/render/Renderable.h>
 
 namespace spatial
 {
 
 class CameraActorBuilder;
 class LightActorBuilder;
+class RenderableActorBuilder;
 
 class ActorBuilder
 {
   protected:
 	filament::Engine& mEngine;
-	spatial::Actor mActor;
+	Actor mActor;
 
   public:
 	ActorBuilder(filament::Engine& engine, entt::registry& registry);
@@ -54,7 +61,9 @@ class ActorBuilder
 
 	CameraActorBuilder asCamera();
 
-	LightActorBuilder asLight(filament::LightManager::Type type = filament::LightManager::Type::POINT);
+	LightActorBuilder asLight(Light::Type type = Light::Type::POINT);
+
+	RenderableActorBuilder asRenderable(size_t primitivesCount);
 };
 
 class CameraActorBuilder : public ActorBuilder
@@ -62,21 +71,31 @@ class CameraActorBuilder : public ActorBuilder
   public:
 	CameraActorBuilder(filament::Engine& engine, spatial::Actor actor);
 
-	CameraActorBuilder& withPerspectiveProjection(float fieldOfView = 45.f, float aspectRatio = 16.0f / 9.0f,
-												  float near = 0.1f, float far = 1000000.0f);
+	CameraActorBuilder& withPerspectiveProjection(double fieldOfView, double aspectRatio, double near, double far);
 
-	CameraActorBuilder& withOrthographicProjection(float aspectRatio = 16.0f / 9.0f, float near = 0.1f,
-												   float far = 1000000.0f);
+	CameraActorBuilder& withOrthographicProjection(double aspectRatio, double near, double far);
+
+	CameraActorBuilder& withOrthographicProjection(double left, double right, double bottom, double top, double near, double far);
+
+	CameraActorBuilder& withCustomProjection(math::mat4 projectionMatrix, double near, double far);
 };
 
 class LightActorBuilder : public ActorBuilder
 {
   public:
-	LightActorBuilder(filament::Engine& engine, const Actor actor, spatial::Light::Type type);
+	LightActorBuilder(filament::Engine& engine, Actor actor, Light::Type type);
 
 	LightActorBuilder& withIntensity(float intensity);
 
 	LightActorBuilder& withDirection(const math::float3& direction);
+};
+
+class RenderableActorBuilder : public ActorBuilder
+{
+  public:
+	RenderableActorBuilder(filament::Engine& engine, Actor actor, size_t primitivesCount);
+
+
 };
 
 } // namespace spatial
