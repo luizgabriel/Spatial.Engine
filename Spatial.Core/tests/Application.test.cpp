@@ -37,7 +37,7 @@ TEST(Application, CreateAndStop)
 	ASSERT_EQ(app.isRunning(), false);
 }
 
-struct MockListener {
+struct ApplicationMockListener {
 	MOCK_METHOD0(onStart, void());
 	MOCK_METHOD1(onStartFrame, void(float));
 	MOCK_METHOD1(onUpdateFrame, void(float));
@@ -46,35 +46,35 @@ struct MockListener {
 TEST(Application, OnStartListener)
 {
 	auto app = spatial::Application{};
-	auto listener = MockListener{};
+	auto listener = ApplicationMockListener{};
 
 	EXPECT_CALL(listener, onStart())
 		.Times(1);
 
-	app.getStartSignal().connect<&MockListener::onStart>(listener);
+	app.getStartSignal().connect<&ApplicationMockListener::onStart>(listener);
 	simulateRuntime(app, 1ms);
 }
 
 TEST(Application, OnStartFrameListener)
 {
 	auto app = spatial::Application{};
-	auto listener = MockListener{};
+	auto listener = ApplicationMockListener{};
 
 	EXPECT_CALL(listener, onStartFrame(_))
 		.Times(AtLeast(1));
 
-	app.getStartFrameSignal().connect<&MockListener::onStartFrame>(listener);
+	app.getStartFrameSignal().connect<&ApplicationMockListener::onStartFrame>(listener);
 	simulateRuntime(app, 1ms);
 }
 
 TEST(Application, OnUpdateFrameListener)
 {
 	auto app = spatial::Application{};
-	auto listener = MockListener{};
+	auto listener = ApplicationMockListener{};
 
 	EXPECT_CALL(listener, onUpdateFrame(_))
 		.Times(AtLeast(2));
 
-	app.getUpdateFrameSignal().connect<&MockListener::onUpdateFrame>(listener);
+	app.getUpdateFrameSignal().connect<&ApplicationMockListener::onUpdateFrame>(listener);
 	simulateRuntime(app, 500ms);
 }

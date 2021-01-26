@@ -7,25 +7,14 @@ UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{e
 {
 }
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering) : UserInterfaceSystem(rendering.getEngine())
+void UserInterfaceSystem::setFontTexture(const SharedTexture& fontTexture)
 {
-	rendering.pushFrontView(getView());
+	mRenderer.setFontTexture(fontTexture);
 }
 
-UserInterfaceSystem::UserInterfaceSystem(RenderingSystem& rendering, const Window& window)
-	: UserInterfaceSystem(rendering)
+void UserInterfaceSystem::setMaterial(const SharedMaterial& material)
 {
-	setViewport(window.getWindowSize(), window.getFrameBufferSize());
-}
-
-void UserInterfaceSystem::setFont(const std::vector<char>& fontData)
-{
-	mRenderer.setFont(fontData);
-}
-
-void UserInterfaceSystem::setMaterial(const std::vector<char>& materialData)
-{
-	mRenderer.setMaterial(materialData);
+	mRenderer.setMaterial(material);
 }
 
 void UserInterfaceSystem::onStart()
@@ -68,6 +57,11 @@ void UserInterfaceSystem::onEndFrame()
 {
 	mRenderGuiSignal();
 	mRenderer.dispatchCommands();
+}
+
+void UserInterfaceSystem::onRender(filament::Renderer& renderer) const
+{
+	renderer.render(&getView());
 }
 
 } // namespace spatial

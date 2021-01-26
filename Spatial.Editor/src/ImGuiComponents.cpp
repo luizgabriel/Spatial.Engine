@@ -1,14 +1,14 @@
 #include "ImGuiComponents.h"
+#include "Components.h"
 #include <array>
-#include <imgui.h>
 #include <imgui_internal.h>
+#include <spatial/render/InstanceHandle.h>
 
 namespace spatial::editor
 {
 
-template <typename Vector, size_t N>
-bool vecNInput(const std::string_view label, Vector& v, float resetValue, const std::string_view format,
-			   float columnWidth)
+bool buttonInput(const std::string_view label, float& value, float resetValue, float speed, float min, float max,
+				 const std::string_view format)
 {
 	bool changed = false;
 	ImGuiIO& io = ImGui::GetIO();
@@ -16,95 +16,57 @@ bool vecNInput(const std::string_view label, Vector& v, float resetValue, const 
 
 	ImGui::PushID(label.data());
 
-	ImGui::Columns(2);
-	ImGui::SetColumnWidth(0, columnWidth);
-	ImGui::Text("%s", label.data());
-	ImGui::NextColumn();
-
-	ImGui::PushMultiItemsWidths(N, ImGui::CalcItemWidth());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 5});
-
 	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 	ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
 
+	ImGui::PushFont(boldFont);
+	if (ImGui::Button(label.data(), buttonSize))
+	{
+		changed = true;
+		value = resetValue;
+	}
+	ImGui::PopFont();
+
+	ImGui::SameLine();
+	changed |= ImGui::DragFloat("##ValueDrag", &value, speed, min, max, format.data());
+
+	ImGui::PopStyleVar();
+
+	ImGui::PopID();
+
+	return changed;
+}
+
+bool vec2Input(const std::string_view label, math::float2& v, float resetValue, float speed, float min, float max,
+			   const std::string_view format)
+{
+	bool changed = false;
+
+	ImGui::PushID(label.data());
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 70.0f);
+	ImGui::Text("%s", label.data());
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+
+	ImGui::SameLine();
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-	ImGui::PushFont(boldFont);
-	if (ImGui::Button("X", buttonSize))
-	{
-		changed = true;
-		v.x = resetValue;
-	}
-
-	ImGui::PopFont();
+	changed |= buttonInput("X", v.x, resetValue, speed, min, max, format);
+	ImGui::PopItemWidth();
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	changed |= ImGui::DragFloat("##X", &v.x, 0.1f, 0.0f, 0.0f, format.data());
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	changed |= buttonInput("Y", v.y, resetValue, speed, min, max, format);
 	ImGui::PopItemWidth();
-
-	if constexpr (N >= 2)
-	{
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Y", buttonSize))
-		{
-			changed = true;
-			v.y = resetValue;
-		}
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		changed |= ImGui::DragFloat("##Y", &v.y, 0.1f, 0.0f, 0.0f, format.data());
-		ImGui::PopItemWidth();
-	}
-
-	if constexpr (N >= 3)
-	{
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.3f, 0.8f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Z", buttonSize))
-		{
-			changed = true;
-			v.y = resetValue;
-		}
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		changed |= ImGui::DragFloat("##Z", &v.z, 0.1f, 0.0f, 0.0f, format.data());
-		ImGui::PopItemWidth();
-	}
-
-	if constexpr (N >= 4)
-	{
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.8f, 0.3f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("W", buttonSize))
-		{
-			changed = true;
-			v.w = resetValue;
-		}
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		changed |= ImGui::DragFloat("##W", &v.w, 0.1f, 0.0f, 0.0f, format.data());
-		ImGui::PopItemWidth();
-	}
-
-	ImGui::PopStyleVar();
+	ImGui::PopStyleColor(3);
 
 	ImGui::Columns(1);
 
@@ -113,53 +75,129 @@ bool vecNInput(const std::string_view label, Vector& v, float resetValue, const 
 	return changed;
 }
 
-bool vec2Input(const std::string_view label, math::float2& v, float resetValue, const std::string_view format,
-			   float columnWidth)
+bool vec3Input(const std::string_view label, math::float3& v, float resetValue, float speed, float min, float max,
+			   const std::string_view format)
 {
-	return vecNInput<math::float2, 2>(label, v, resetValue, format, columnWidth);
+	bool changed = false;
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 70.0f);
+	ImGui::Text("%s", label.data());
+	ImGui::NextColumn();
+
+	ImGui::PushID(label.data());
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	changed |= buttonInput("X", v.x, resetValue, speed, min, max, format);
+	ImGui::PopItemWidth();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	changed |= buttonInput("Y", v.y, resetValue, speed, min, max, format);
+	ImGui::PopItemWidth();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.3f, 0.8f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+	changed |= buttonInput("Z", v.z, resetValue, speed, min, max, format);
+	ImGui::PopItemWidth();
+	ImGui::PopStyleColor(3);
+
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+
+	return changed;
 }
 
-bool vec3Input(const std::string_view label, math::float3& v, float resetValue, const std::string_view format,
-			   float columnWidth)
+bool vec4Input(const std::string_view label, math::float4& v, float resetValue, float speed, float min, float max,
+			   const std::string_view format)
 {
-	return vecNInput<math::float3, 3>(label, v, resetValue, format, columnWidth);
-}
+	bool changed = false;
 
-bool vec4Input(const std::string_view label, math::float4& v, float resetValue, const std::string_view format,
-			   float columnWidth)
-{
-	return vecNInput<math::float4, 4>(label, v, resetValue, format, columnWidth);
+	ImGui::PushID(label.data());
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 70.0f);
+	ImGui::Text("%s", label.data());
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(4, ImGui::CalcItemWidth());
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	changed |= buttonInput("X", v.x, resetValue, speed, min, max, format);
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+	changed |= buttonInput("Y", v.y, resetValue, speed, min, max, format);
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.3f, 0.8f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.2f, 0.7f, 1.0f});
+	changed |= buttonInput("Z", v.z, resetValue, speed, min, max, format);
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.8f, 0.3f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 0.2f, 1.0f});
+	changed |= buttonInput("W", v.w, resetValue, speed, min, max, format);
+	ImGui::PopStyleColor(3);
+
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+
+	return changed;
 }
 
 void transformInput(Transform& transform, const std::string_view format)
 {
-	math::float3 position, rotation, scale;
-	math::float2 rotation2;
-
 	for (char c : format)
 	{
 		switch (c)
 		{
-		case 'p':
-			position = transform.getPosition();
+		case 'p': {
+			auto position = transform.getPosition();
 			if (vec3Input("Position", position))
 				transform.setPosition(position);
 			break;
-		case 'r':
-			rotation = transform.getRotation();
+		}
+		case 'r': {
+			auto rotation = transform.getRotation();
 			if (vec3Input("Rotation", rotation))
-				transform.setRotation(position);
+				transform.setRotation(rotation);
 			break;
-		case 'y':
-			rotation2 = transform.getRotation().xy;
+		}
+		case 'y': {
+			auto rotation2 = transform.getRotation().xy;
 			if (vec2Input("Rotation", rotation2))
 				transform.setRotation({rotation2, .0f});
 			break;
-		case 's':
-			scale = transform.getScale();
+		}
+		case 's': {
+			auto scale = transform.getScale();
 			if (vec3Input("Scale", scale, 1.0f))
 				transform.setScale(scale);
 			break;
+		}
 		}
 	}
 }
@@ -195,13 +233,13 @@ void cameraInput(Camera& camera)
 			bool changed = false;
 
 			changed |= ImGui::InputDouble("Near", &projection.near, 0.1, 1.0, "%.2f");
-			changed |= ImGui::InputDouble("Far", &projection.far, 0.1, 1.0,"%.2f");
+			changed |= ImGui::InputDouble("Far", &projection.far, 0.1, 1.0, "%.2f");
 
 			if constexpr (std::is_same_v<T, PerspectiveProjection>)
 			{
 				double min = 15.0, max = 120.0;
-				changed |=
-					ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &projection.fieldOfView, 1.0f, &min, &max, "%.1f");
+				changed |= ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &projection.fieldOfView, 1.0f, &min,
+											 &max, "%.1f");
 				changed |= ImGui::InputDouble("Aspect Ratio", &projection.aspectRatio);
 			}
 			else if constexpr (std::is_same_v<T, OrthographicProjection>)
@@ -224,42 +262,48 @@ void cameraInput(Camera& camera)
 		},
 		projection);
 
-	constexpr auto defaultAspectRatio = 19/6.0;
+	constexpr auto defaultAspectRatio = 19 / 6.0;
 	constexpr auto defaultNear = .1;
 	constexpr auto defaultFar = 100000.0;
-	if (selected == 0 && !camera.isPerspective()) {
+	if (selected == 0 && !camera.isPerspective())
+	{
 		camera.setProjection(PerspectiveProjection{45.0, defaultAspectRatio, defaultNear, defaultFar});
-	} else if (selected == 1 && !camera.isOrthographic()) {
+	}
+	else if (selected == 1 && !camera.isOrthographic())
+	{
 		camera.setProjection(OrthographicProjection{defaultAspectRatio, defaultNear, defaultFar});
-	} else if (selected == 2 && !camera.isCustomProjection()) {
+	}
+	else if (selected == 2 && !camera.isCustomProjection())
+	{
 		camera.setProjection(CustomProjection{math::mat4{}, defaultNear, defaultFar});
 	}
 }
 
-bool sceneHierarchy(spatial::Stage& stage, Actor& selectedActor)
+void instancesTreeView(spatial::Stage& stage, Instance& selectedInstance)
 {
-	bool hasSelectedEntity = false;
-
-	auto view = stage.getActorsWith<spatial::Name>();
-	for (auto actor : view)
+	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 	{
-		auto& name = actor.getComponent<spatial::Name>();
+		selectedInstance = {};
+	}
 
-		ImGuiTreeNodeFlags flags = (selectedActor == actor) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
-		flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	auto view = stage.getInstances<spatial::SceneNodeName>();
+	for (auto instance : view)
+	{
+		auto& name = handleOf(stage, instance).get<spatial::SceneNodeName>();
 
-		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.getValue().c_str());
+		ImGuiTreeNodeFlags flags =
+			(selectedInstance == instance) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+		flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.value.c_str());
 		if (ImGui::IsItemClicked())
 		{
-			selectedActor = actor;
-			hasSelectedEntity = true;
+			selectedInstance = instance;
 		}
 
 		if (opened)
 			ImGui::TreePop();
 	}
-
-	return hasSelectedEntity;
 }
 
 int inputTextCallback(ImGuiInputTextCallbackData* data)
@@ -605,6 +649,56 @@ void lightInput(Light& light)
 		if (editor::directionWidget("Direction", direction))
 			light.setDirection(direction);
 	}
+}
+
+template <>
+void drawComponentView(InstanceHandle& instance, Transform& component)
+{
+	if (instance.has<Camera>())
+		transformInput(component, "py");
+	else if (instance.has<Light>())
+		transformInput(component, "p");
+	else
+		transformInput(component, "prs");
+
+	component.refreshTransformMatrix();
+}
+
+template <>
+void drawComponentView(InstanceHandle&, Camera& component)
+{
+	editor::cameraInput(component);
+}
+
+template <>
+void drawComponentView(InstanceHandle&, EditorCamera& component)
+{
+	ImGui::DragFloat("Velocity", &component.velocity);
+	ImGui::DragFloat("Sensitivity", &component.sensitivity);
+}
+
+template <>
+void drawComponentView(InstanceHandle&, Light& component)
+{
+	editor::lightInput(component);
+}
+
+template <>
+void drawComponentView(InstanceHandle&, Renderable& component)
+{
+	auto castShadows = component.isShadowCaster();
+	if (ImGui::Checkbox("Cast Shadows", &castShadows))
+	{
+		component.setCastShadows(castShadows);
+	}
+
+	auto receiveShadows = component.isShadowReceiver();
+	if (ImGui::Checkbox("Receive Shadows", &receiveShadows))
+	{
+		component.setReceiveShadows(receiveShadows);
+	}
+
+	ImGui::Text("Primitives Count: %lu", component.getPrimitiveCount());
 }
 
 } // namespace spatial::editor

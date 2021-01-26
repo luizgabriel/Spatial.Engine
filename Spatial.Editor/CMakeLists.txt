@@ -3,7 +3,6 @@ add_subdirectory(assets)
 add_executable(Spatial.Editor
 	src/main.cpp
 	src/SceneEditorSystem.cpp
-	src/Editor.cpp
 	src/Components.h
 	src/ImGuiComponents.h
 	src/ImGuiComponents.cpp

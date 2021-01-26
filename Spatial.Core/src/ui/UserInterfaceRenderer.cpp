@@ -18,14 +18,14 @@ namespace spatial
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	: mEngine{engine},
-	  mView{toShared(createView(mEngine))},
+	  mView{createView(mEngine)},
 	  mScene{createScene(mEngine)},
 	  mCameraEntity{createEntity(mEngine)},
 	  mCamera{createCamera(mEngine, mCameraEntity.get())},
-	  mMaterial{mEngine},
 	  mEntity{createEntity(mEngine)},
 	  mSkybox{createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
-	  mFontTexture{mEngine}
+	  mMaterial{},
+	  mFontTexture{}
 {
 	mView->setCamera(mCamera.getInstance());
 	mView->setScene(mScene.get());
@@ -39,15 +39,14 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	mImguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const std::vector<char>& materialData)
+void UserInterfaceRenderer::setMaterial(const SharedMaterial& material)
 {
-	mMaterial = createMaterial(mEngine, materialData);
+	mMaterial = material;
 }
 
-void UserInterfaceRenderer::setFont(const std::vector<char>& fontData)
+void UserInterfaceRenderer::setFontTexture(const SharedTexture& fontTextureAtlas)
 {
-	mFontTexture = imguiCreateTextureAtlas(mEngine, fontData);
-
+	mFontTexture = fontTextureAtlas;
 	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }

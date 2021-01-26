@@ -98,6 +98,7 @@ int main(int argc, char** argv)
 		outputSource << "\n};" << std::endl;
 
 		// Build header file
+		outputHeader << fmt::format("\n\n// {0}", inputFile.string());
 		outputHeader << fmt::format("\nextern const char {0}[{1}];", variableName, count);
 		outputHeader << fmt::format("\nconstexpr unsigned int {0}_SIZE = {1};", variableName, count);
 

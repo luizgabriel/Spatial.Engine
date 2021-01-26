@@ -2,12 +2,14 @@
 
 #include <imgui.h>
 
+#include "ImGuiSceneWindow.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
-#include <spatial/render/RenderingSystem.h>
+#include <spatial/desktop/PlatformEvent.h>
+#include <spatial/render/FilameshFile.h>
+#include <spatial/render/InstanceHandle.h>
 #include <spatial/render/Stage.h>
-#include "ImGuiSceneWindow.h"
 
 namespace fl = filament;
 
@@ -30,10 +32,13 @@ class SceneEditorSystem
 	Skybox mSkybox;
 
 	ImGuiSceneWindow mImGuiSceneWindow;
-	Actor mSelectedActor;
+	InstanceHandle mSelectedInstance;
+
+	std::array<FilameshFile, 4> mMeshes;
+	std::array<MaterialInstance, 4> mMaterialInstances;
 
   public:
-	SceneEditorSystem(RenderingSystem& rendering);
+	explicit SceneEditorSystem(filament::Engine& engine);
 
 	void setViewport(const std::pair<int, int> windowSize);
 
@@ -46,6 +51,8 @@ class SceneEditorSystem
 	void onUpdateFrame(float delta);
 
 	void onDrawGui();
+
+	void onRender(filament::Renderer& renderer) const;
 
 	void onSceneWindowResized(ImGuiSceneWindow::Size size);
 

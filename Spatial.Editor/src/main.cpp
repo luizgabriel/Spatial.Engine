@@ -1,9 +1,9 @@
-#include "Editor.h"
 #include "SceneEditorSystem.h"
 
 #include <argh.h>
 #include <filesystem>
 
+#include <assets/generated.h>
 #include <spatial/core/Application.h>
 #include <spatial/core/ApplicationUtils.h>
 #include <spatial/desktop/PlatformEventUtils.h>
@@ -11,6 +11,10 @@
 #include <spatial/input/Input.h>
 #include <spatial/input/InputSystem.h>
 #include <spatial/input/InputSystemUtils.h>
+#include <spatial/render/RenderingSystem.h>
+#include <spatial/render/RenderingSystemUtils.h>
+#include <spatial/render/ResourceLoaders.h>
+#include <spatial/ui/ImGuiHelpers.h>
 #include <spatial/ui/UserInterfaceSystem.h>
 #include <spatial/ui/UserInterfaceUtils.h>
 
@@ -29,8 +33,6 @@ int main(int argc, char* argv[])
 	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 	const auto executablePath = fs::path{args[0]}.parent_path();
 
-	editor::initAssets(executablePath);
-
 	auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
 	args({"-w", "--width"}) >> config.windowWidth;
 	args({"-h", "--height"}) >> config.windowHeight;
@@ -44,11 +46,11 @@ int main(int argc, char* argv[])
 
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
-	auto ui = UserInterfaceSystem{rendering, window};
-	ui.setMaterial(editor::load("editor/materials/ui.mat").value());
-	ui.setFont(editor::load("editor/fonts/Roboto_Medium.ttf").value());
+	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
+	ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE})));
+	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE})));
 
-	auto editor = editor::SceneEditorSystem{rendering};
+	auto editor = editor::SceneEditorSystem{rendering.getEngine()};
 
 	// Connect all Systems to the Application Main Loop
 	app >> desktopContext >> input >> rendering >> ui >> editor;
@@ -61,6 +63,9 @@ int main(int argc, char* argv[])
 
 	// Connect Input to Window
 	input >> window;
+
+	// Connect Rendering to Editor and UI
+	rendering >> editor >> ui;
 
 	return app.run();
 }

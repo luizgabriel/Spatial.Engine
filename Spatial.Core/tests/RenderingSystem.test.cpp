@@ -1,16 +1,26 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <spatial/render/RenderingSystem.h>
+#include <spatial/render/RenderingSystemUtils.h>
+
+using ::testing::AtLeast;
+using ::testing::ByRef;
+using ::testing::Invoke;
+using ::testing::_;
 
 using namespace spatial;
 
-TEST(RenderingSystem, PushAndPopView)
+struct RenderingSystemMockListener {
+	MOCK_METHOD1(onRender, void(filament::Renderer&));
+};
+
+TEST(RenderingSystem, TestOnRenderSignal)
 {
 	auto renderingSystem = RenderingSystem{RenderingSystem::Backend::NOOP, nullptr};
-	auto view = renderingSystem.createView();
+	auto listener = RenderingSystemMockListener{};
 
-	ASSERT_EQ(0, renderingSystem.getViewsCount());
+	renderingSystem >> listener;
+	renderingSystem.onEndFrame();
 
-	renderingSystem.pushBackView(view);
-
-	ASSERT_EQ(1, renderingSystem.getViewsCount());
+	EXPECT_CALL(listener, onRender(_)).Times(1);
 }

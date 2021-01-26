@@ -1,8 +1,6 @@
 #pragma once
 
 #include <spatial/common/Key.h>
-
-#include "Window.h"
 #include <utility>
 
 namespace spatial

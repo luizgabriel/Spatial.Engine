@@ -49,7 +49,7 @@ const math::float3& Transform::getPosition() const noexcept
 void Transform::setPosition(const math::float3& position) noexcept
 {
 	mPosition = position;
-	refreshTransformMatrix();
+	//refreshTransformMatrix();
 }
 
 const math::float3& Transform::getScale() const noexcept
@@ -60,7 +60,7 @@ const math::float3& Transform::getScale() const noexcept
 void Transform::setScale(const math::float3& scale) noexcept
 {
 	mScale = scale;
-	refreshTransformMatrix();
+	//refreshTransformMatrix();
 }
 
 const math::float3& Transform::getRotation() const noexcept
@@ -71,7 +71,7 @@ const math::float3& Transform::getRotation() const noexcept
 void Transform::setRotation(const math::float3& rotation) noexcept
 {
 	mRotation = rotation;
-	refreshTransformMatrix();
+	//refreshTransformMatrix();
 }
 
 void Transform::refreshTransformMatrix() noexcept

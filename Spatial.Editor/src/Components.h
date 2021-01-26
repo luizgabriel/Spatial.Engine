@@ -10,7 +10,8 @@
 namespace spatial::editor
 {
 
-struct BasicCameraMovement {
+struct EditorCamera
+{
 	float sensitivity;
 	float velocity;
 	bool enabled{false};

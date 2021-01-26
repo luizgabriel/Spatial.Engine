@@ -1,6 +1,9 @@
 #pragma once
 
+#include <filament/IndexBuffer.h>
+#include <filament/MaterialInstance.h>
 #include <filament/RenderableManager.h>
+#include <filament/VertexBuffer.h>
 #include <spatial/common/Math.h>
 #include <utils/Entity.h>
 
@@ -14,8 +17,9 @@ class Renderable
 	using Instance = Manager::Instance;
 	using PrimitiveType = Manager::PrimitiveType;
 	using Bone = Manager::Bone;
+	using Builder = Manager::Builder;
 
-	Renderable(filament::Engine& engine, utils::Entity entity, std::size_t count);
+	Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount);
 
 	~Renderable();
 
@@ -49,20 +53,20 @@ class Renderable
 
 	void setMorphWeights(math::float4 const& weights) noexcept;
 
+	void setMaterialInstanceAt(size_t primitiveIndex, filament::MaterialInstance const* materialInstance) noexcept;
+
+	filament::MaterialInstance* getMaterialInstanceAt(size_t primitiveIndex) const noexcept;
+
+	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, filament::VertexBuffer* vertices,
+					   filament::IndexBuffer* indices, size_t offset, size_t count) noexcept;
+
+	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, size_t offset, size_t count) noexcept;
+
 	const filament::Box& getAxisAlignedBoundingBox() const noexcept;
 
 	std::uint8_t getLayerMask() const noexcept;
 
 	std::size_t getPrimitiveCount() const noexcept;
-
-	void setMaterialInstanceAt(std::size_t primitiveIndex, filament::MaterialInstance const* materialInstance) noexcept;
-
-	filament::MaterialInstance* getMaterialInstanceAt(std::size_t primitiveIndex) const noexcept;
-
-	void setGeometryAt(std::size_t primitiveIndex, PrimitiveType type, filament::VertexBuffer* vertices,
-					   filament::IndexBuffer* indices, std::size_t offset, std::size_t count) noexcept;
-
-	void setGeometryAt(std::size_t primitiveIndex, PrimitiveType type, std::size_t offset, std::size_t count) noexcept;
 
 	void setBlendOrderAt(std::size_t primitiveIndex, uint16_t order) noexcept;
 
@@ -71,10 +75,14 @@ class Renderable
 	bool isValid() const noexcept;
 
   private:
-	Manager& mManager;
+	filament::Engine& mEngine;
 	utils::Entity mEntity;
 
 	Instance getInstance() const noexcept;
+
+	const Manager& getManager() const noexcept;
+
+	Manager& getManager() noexcept;
 };
 
 } // namespace spatial

@@ -46,6 +46,11 @@ class EngineResource
 		return mEngine;
 	}
 
+	const auto& getEngine() const noexcept
+	{
+		return mEngine;
+	}
+
 	const ResourceType* get() const noexcept
 	{
 		return mResource;

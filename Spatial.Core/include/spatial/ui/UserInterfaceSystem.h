@@ -1,13 +1,10 @@
 #pragma once
 
-#include <spatial/common/EventQueue.h>
+#include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/render/RenderingSystem.h>
-
 #include <spatial/ui/UserInterfaceInput.h>
 #include <spatial/ui/UserInterfaceRenderer.h>
 
-#include <span>
 #include <string_view>
 #include <utility>
 
@@ -21,15 +18,17 @@ class UserInterfaceSystem
 	Signal<> mRenderGuiSignal;
 
   public:
-	UserInterfaceSystem(filament::Engine& engine);
+	explicit UserInterfaceSystem(filament::Engine& engine);
 
-	UserInterfaceSystem(RenderingSystem& rendering);
+	template <typename WindowImpl>
+	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
+	{
+		setViewport(window.getWindowSize(), window.getFrameBufferSize());
+	}
 
-	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
+	void setFontTexture(const SharedTexture& fontTexture);
 
-	void setFont(const std::vector<char>& fontData);
-
-	void setMaterial(const std::vector<char>& materialData);
+	void setMaterial(const SharedMaterial& material);
 
 	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
 
@@ -39,6 +38,8 @@ class UserInterfaceSystem
 
 	void onEndFrame();
 
+	void onRender(filament::Renderer& renderer) const;
+
 	void onEvent(const WindowResizedEvent& event);
 
 	void onEvent(const MouseMovedEvent& event);
@@ -47,7 +48,7 @@ class UserInterfaceSystem
 
 	void onEvent(const TextEvent& event);
 
-	auto getView()
+	const auto& getView() const
 	{
 		return mRenderer.getView();
 	}

@@ -1,20 +1,24 @@
 #include <filament/Engine.h>
 #include <spatial/render/Renderable.h>
-#include <utils/Entity.h>
+
+namespace fl = filament;
 
 namespace spatial
 {
 
-Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t count)
-	: mManager{engine.getRenderableManager()}, mEntity{entity}
+Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
+	: mEngine{engine}, mEntity{entity}
 {
-	filament::RenderableManager::Builder(count).build(engine, entity);
+	if (Builder(primitivesCount).build(engine, entity) != Builder::Result::Success)
+	{
+		throw std::runtime_error("Could not create renderable");
+	}
 }
 
 Renderable::~Renderable()
 {
 	if (isValid())
-		mManager.destroy(mEntity);
+		getManager().destroy(mEntity);
 }
 
 bool Renderable::isValid() const noexcept
@@ -22,126 +26,135 @@ bool Renderable::isValid() const noexcept
 	return getInstance().isValid();
 }
 
-void Renderable::setAxisAlignedBoundingBox(const filament::Box& aabb) noexcept
+void Renderable::setAxisAlignedBoundingBox(const fl::Box& aabb) noexcept
 {
-	mManager.setAxisAlignedBoundingBox(getInstance(), aabb);
+	getManager().setAxisAlignedBoundingBox(getInstance(), aabb);
 }
 
 void Renderable::setLayerMask(uint8_t select, uint8_t values) noexcept
 {
-	mManager.setLayerMask(getInstance(), select, values);
+	getManager().setLayerMask(getInstance(), select, values);
 }
 
 void Renderable::setPriority(uint8_t priority) noexcept
 {
-	mManager.setPriority(getInstance(), priority);
+	getManager().setPriority(getInstance(), priority);
 }
 
 void Renderable::setCulling(bool enable) noexcept
 {
-	mManager.setCulling(getInstance(), enable);
+	getManager().setCulling(getInstance(), enable);
 }
 
 void Renderable::setCastShadows(bool enable) noexcept
 {
-	mManager.setCastShadows(getInstance(), enable);
+	getManager().setCastShadows(getInstance(), enable);
 }
 
 void Renderable::setReceiveShadows(bool enable) noexcept
 {
-	mManager.setReceiveShadows(getInstance(), enable);
+	getManager().setReceiveShadows(getInstance(), enable);
 }
 
 void Renderable::setScreenSpaceContactShadows(bool enable) noexcept
 {
-	mManager.setScreenSpaceContactShadows(getInstance(), enable);
+	getManager().setScreenSpaceContactShadows(getInstance(), enable);
 }
 
 bool Renderable::isShadowCaster() const noexcept
 {
-	return mManager.isShadowCaster(getInstance());
+	return getManager().isShadowCaster(getInstance());
 }
 
 bool Renderable::isShadowReceiver() const noexcept
 {
-	return mManager.isShadowCaster(getInstance());
+	return getManager().isShadowCaster(getInstance());
 }
 
 void Renderable::setBones(const Bone* transforms, size_t boneCount, size_t offset) noexcept
 {
-	mManager.setBones(getInstance(), transforms, boneCount, offset);
+	getManager().setBones(getInstance(), transforms, boneCount, offset);
 }
 
 void Renderable::setBones(const math::mat4f* transforms, size_t boneCount, size_t offset) noexcept
 {
-	mManager.setBones(getInstance(), transforms, boneCount, offset);
+	getManager().setBones(getInstance(), transforms, boneCount, offset);
 }
 
 void Renderable::setMorphWeights(const math::float4& weights) noexcept
 {
-	mManager.setMorphWeights(getInstance(), weights);
+	getManager().setMorphWeights(getInstance(), weights);
 }
 
 const filament::Box& Renderable::getAxisAlignedBoundingBox() const noexcept
 {
-	return mManager.getAxisAlignedBoundingBox(getInstance());
+	return getManager().getAxisAlignedBoundingBox(getInstance());
+}
+
+void Renderable::setMaterialInstanceAt(size_t primitiveIndex, const fl::MaterialInstance* materialInstance) noexcept
+{
+	return getManager().setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance);
+}
+
+fl::MaterialInstance* Renderable::getMaterialInstanceAt(size_t primitiveIndex) const noexcept
+{
+	return getManager().getMaterialInstanceAt(getInstance(), primitiveIndex);
+}
+
+void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type, fl::VertexBuffer* vertices,
+							   fl::IndexBuffer* indices, size_t offset, size_t count) noexcept
+{
+	getManager().setGeometryAt(getInstance(), primitiveIndex, type, vertices, indices, offset, count);
+}
+
+void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type, size_t offset,
+							   size_t count) noexcept
+{
+	getManager().setGeometryAt(getInstance(), primitiveIndex, type, offset, count);
 }
 
 uint8_t Renderable::getLayerMask() const noexcept
 {
-	return mManager.getLayerMask(getInstance());
+	return getManager().getLayerMask(getInstance());
 }
 
 size_t Renderable::getPrimitiveCount() const noexcept
 {
-	return mManager.getPrimitiveCount(getInstance());
-}
-
-void Renderable::setMaterialInstanceAt(size_t primitiveIndex,
-									   const filament::MaterialInstance* materialInstance) noexcept
-{
-	mManager.setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance);
-}
-
-filament::MaterialInstance* Renderable::getMaterialInstanceAt(size_t primitiveIndex) const noexcept
-{
-	return mManager.getMaterialInstanceAt(getInstance(), primitiveIndex);
-}
-
-void Renderable::setGeometryAt(size_t primitiveIndex, PrimitiveType type, filament::VertexBuffer* vertices,
-							   filament::IndexBuffer* indices, size_t offset, size_t count) noexcept
-{
-	mManager.setGeometryAt(getInstance(), primitiveIndex, type, vertices, indices, offset, count);
-}
-
-void Renderable::setGeometryAt(size_t primitiveIndex, PrimitiveType type, size_t offset,
-							   size_t count) noexcept
-{
-	mManager.setGeometryAt(getInstance(), primitiveIndex, type, offset, count);
+	return getManager().getPrimitiveCount(getInstance());
 }
 
 void Renderable::setBlendOrderAt(size_t primitiveIndex, uint16_t order) noexcept
 {
-	mManager.setBlendOrderAt(getInstance(), primitiveIndex, order);
+	getManager().setBlendOrderAt(getInstance(), primitiveIndex, order);
 }
 
 filament::AttributeBitset Renderable::getEnabledAttributesAt(size_t primitiveIndex) const noexcept
 {
-	return mManager.getEnabledAttributesAt(getInstance(), primitiveIndex);
+	return getManager().getEnabledAttributesAt(getInstance(), primitiveIndex);
 }
 
 Renderable::Instance Renderable::getInstance() const noexcept
 {
-	return mManager.getInstance(mEntity);
+	return getManager().getInstance(mEntity);
 }
 
-Renderable::Renderable(Renderable&& other) : mManager{other.mManager}, mEntity(std::exchange(other.mEntity, {}))
+const Renderable::Manager& Renderable::getManager() const noexcept
+{
+	return mEngine.getRenderableManager();
+}
+
+Renderable::Manager& Renderable::getManager() noexcept
+{
+	return mEngine.getRenderableManager();
+}
+
+Renderable::Renderable(Renderable&& other) : mEngine{other.mEngine}, mEntity(std::exchange(other.mEntity, {}))
 {
 }
 
 Renderable& Renderable::operator=(Renderable&& other)
 {
-	assert(&other.mManager == &mManager);
+	assert(&other.mEngine == &mEngine);
 	mEntity = std::exchange(other.mEntity, {});
 
 	return *this;

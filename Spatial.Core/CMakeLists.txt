@@ -1,11 +1,6 @@
 add_library(Spatial.Core
 	
 	## HEADERS
-	include/spatial/assets/AggregatorLoader.h
-	include/spatial/assets/DirMapLoader.h
-	include/spatial/assets/MemoryLoader.h
-	include/spatial/assets/PhysicalDirLoader.h
-	
 	include/spatial/common/EventQueue.h
 	include/spatial/common/Key.h
 	include/spatial/common/Signal.h
@@ -32,13 +27,13 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/render/Mesh.h
+	include/spatial/render/FilameshFile.h
 	include/spatial/render/Light.h
 	include/spatial/render/Stage.h
-	include/spatial/render/Actor.h
-	include/spatial/render/ActorBuilder.h
+	include/spatial/render/InstanceHandle.h
+	include/spatial/render/InstanceBuilder.h
 	include/spatial/render/Transform.h
-	include/spatial/render/Name.h
+	include/spatial/render/SceneNodeName.h
 	include/spatial/render/Renderable.h
 	
 	include/spatial/ui/ImGuiHelpers.h
@@ -53,11 +48,6 @@ add_library(Spatial.Core
 	
 	src/core/Application.cpp
 	src/core/Logger.cpp
-	
-	src/assets/AggregatorLoader.cpp
-	src/assets/DirMapLoader.cpp
-	src/assets/MemoryLoader.cpp
-	src/assets/PhysicalDirLoader.cpp
 	
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
@@ -74,11 +64,9 @@ add_library(Spatial.Core
 	src/render/RenderingSystem.cpp
 	src/render/ResourceLoaders.cpp
 	src/render/SkyboxResources.cpp
-	src/render/Mesh.cpp
 	src/render/Camera.cpp
-	src/render/ActorBuilder.cpp
+	src/render/InstanceBuilder.cpp
 	src/render/Transform.cpp
-	src/render/Name.cpp
 	src/render/Light.cpp
 	src/render/Renderable.cpp
 	

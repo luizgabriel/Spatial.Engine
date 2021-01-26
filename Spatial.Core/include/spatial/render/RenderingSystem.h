@@ -1,12 +1,8 @@
 #pragma once
 
-#include <spatial/common/EventQueue.h>
-#include <spatial/desktop/PlatformEvent.h>
-#include <spatial/desktop/Window.h>
+#include <spatial/common/Signal.h>
 #include <spatial/render/Engine.h>
 #include <spatial/render/Resources.h>
-
-#include <deque>
 
 namespace spatial
 {
@@ -16,42 +12,18 @@ class RenderingSystem
 	using Backend = filament::backend::Backend;
 
 	RenderingSystem(const Backend backend, void* nativeWindowHandle);
-	RenderingSystem(const Backend backend, const Window& window);
+
+	template <typename WindowImpl>
+	RenderingSystem(const Backend backend, WindowImpl& window) : RenderingSystem(backend, window.getNativeHandle())
+	{
+	}
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
 
-	void onStart();
-
-	void onFinish();
-
 	void onEndFrame();
 
-	SharedView createView();
-
-	/**
-	 * \brief Registers a view to the renderer
-	 */
-	void pushFrontView(std::weak_ptr<filament::View> view);
-
-	/**
-	 * \brief Deregisters a view to the renderer
-	 */
-	void popFrontView();
-
-	/**
-	 * \brief Registers a view to the renderer
-	 */
-	void pushBackView(std::weak_ptr<filament::View> view);
-
-	/**
-	 * \brief Pops a view to the renderer
-	 */
-	void popBackView();
-
-    void popView(const SharedView& view);
-
-    [[nodiscard]] const auto& getEngine() const
+    const auto& getEngine() const
 	{
 		return *mEngine.get();
 	}
@@ -61,18 +33,21 @@ class RenderingSystem
 		return *mEngine.get();
 	}
 
-	size_t getViewsCount() const noexcept;
+	auto& getRenderer()
+	{
+		return mRenderer.ref();
+	}
 
-	bool containsView(const SharedView& view) const noexcept;
-
-	void clearExpiredViews() noexcept;
+	auto& getOnRenderSignal()
+	{
+		return mOnRenderSignal;
+	}
 
   private:
 	Engine mEngine;
 	SwapChain mSwapChain;
 	Renderer mRenderer;
-	filament::Renderer::ClearOptions mClearOptions;
-
-	std::deque<std::weak_ptr<filament::View>> mViews;
+	Signal<filament::Renderer&> mOnRenderSignal;
 };
+
 } // namespace spatial

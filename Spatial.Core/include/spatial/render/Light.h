@@ -12,9 +12,10 @@ class Light
 {
   public:
 	using Manager = filament::LightManager;
-	using Instance = filament::LightManager::Instance;
-	using Type = filament::LightManager::Type;
-	using ShadowOptions = filament::LightManager::ShadowOptions;
+	using Instance = Manager::Instance;
+	using Type = Manager::Type;
+	using ShadowOptions = Manager::ShadowOptions;
+	using Builder = Manager::Builder;
 
 	Light(filament::Engine& engine, utils::Entity entity, Type type = Type::POINT);
 
@@ -35,10 +36,6 @@ class Light
 	bool isPointLight() const noexcept;
 
 	bool isSpotLight() const noexcept;
-
-	void setPosition(const math::float3& position) noexcept;
-
-	const math::float3& getPosition() const noexcept;
 
 	void setDirection(const math::float3& direction) noexcept;
 

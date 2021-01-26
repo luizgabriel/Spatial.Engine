@@ -1,58 +1,54 @@
-#include <spatial/render/Name.h>
+#include <spatial/render/InstanceBuilder.h>
+#include <spatial/render/InstanceHandle.h>
+#include <spatial/render/SceneNodeName.h>
 #include <spatial/render/Stage.h>
 
 namespace spatial
 {
 
-Stage::Stage(RenderingSystem& renderingSystem)
-	: mRenderingSystem{renderingSystem},
-	  mScene{createScene(mRenderingSystem.getEngine())},
-	  mView{toShared(createView(mRenderingSystem.getEngine()))},
-	  mEnabled{false},
+Stage::Stage(filament::Engine& engine)
+	: mEngine{engine},
+	  mScene{createScene(mEngine)},
+	  mView{createView(mEngine)},
 	  mRegistry{},
-	  mCameraActor{}
+	  mCameraInstance{}
 {
 	mView->setScene(mScene.get());
 	mView->setBlendMode(fl::View::BlendMode::OPAQUE);
 }
 
-Stage::~Stage()
+Instance Stage::createInstance()
 {
-	if (mEnabled)
-		disable();
+	return getRegistry().create();
 }
 
-void Stage::enable()
+Instance Stage::createInstance(const std::string_view name)
 {
-	mEnabled = true;
-	mRenderingSystem.pushBackView(mView);
+	auto handle = handleOf(*this, createInstance());
+	handle.add<SceneNodeName>(std::string{name});
+
+	return handle;
 }
 
-void Stage::disable()
+void Stage::setMainCamera(Instance instance)
 {
-	mEnabled = false;
-	mRenderingSystem.popView(mView);
-}
+	mCameraInstance = instance;
+	auto handle = handleOf(*this, instance);
 
-ActorBuilder Stage::createActor(std::string name)
-{
-	return ActorBuilder{mRenderingSystem.getEngine(), mRegistry}
-		.add<spatial::Name>(std::move(name));
-}
-
-void Stage::setMainCamera(const Actor& actor)
-{
-	mCameraActor = actor;
-
-	if (mCameraActor.isValid())
+	if (handle.isValid())
 	{
-		auto& component = mCameraActor.getComponent<spatial::Camera>();
+		auto& component = handle.get<spatial::Camera>();
 		mView->setCamera(component.getInstance());
 	}
 	else
 	{
 		mView->setCamera(nullptr);
 	}
+}
+
+void Stage::render(filament::Renderer& renderer) const
+{
+	renderer.render(mView.get());
 }
 
 } // namespace spatial

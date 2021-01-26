@@ -37,6 +37,16 @@ class ImGuiSceneWindow
 		return mRenderTarget.get();
 	}
 
+	const auto& getWindowSize()
+	{
+		return mWindowSize;
+	}
+
+	double getAspectRatio()
+	{
+		return mWindowSize.first / static_cast<double>(mWindowSize.second);
+	}
+
 	auto& getWindowResizedSignal()
 	{
 		return mWindowResizedSignal;
@@ -46,7 +56,7 @@ class ImGuiSceneWindow
 	Texture mRenderColorTexture;
 	Texture mRenderDepthTexture;
 	RenderTarget mRenderTarget;
-	Size mLastWindowSize;
+	Size mWindowSize;
 	Signal<Size> mWindowResizedSignal;
 };
 

@@ -57,7 +57,7 @@ IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::vector<char>& resourceData)
+Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData)
 {
 	auto& io = ImGui::GetIO();
 

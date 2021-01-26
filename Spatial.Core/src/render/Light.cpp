@@ -6,7 +6,9 @@ namespace spatial
 Light::Light(filament::Engine& engine, utils::Entity entity, Light::Type type)
 	: mManager{engine.getLightManager()}, mEntity{entity}
 {
-	Manager::Builder(type).build(engine, entity);
+	if (Builder(type).build(engine, entity) != Builder::Result::Success) {
+		throw std::runtime_error("Could not create light");
+	}
 }
 
 Light::Light(Light&& other) : mManager{other.mManager}, mEntity{std::exchange(other.mEntity, {})}
@@ -48,16 +50,6 @@ bool Light::isPointLight() const noexcept
 bool Light::isSpotLight() const noexcept
 {
 	return mManager.isSpotLight(getInstance());
-}
-
-void Light::setPosition(const math::float3& position) noexcept
-{
-	mManager.setPosition(getInstance(), position);
-}
-
-const math::float3& Light::getPosition() const noexcept
-{
-	return mManager.getPosition(getInstance());
 }
 
 void Light::setDirection(const math::float3& direction) noexcept

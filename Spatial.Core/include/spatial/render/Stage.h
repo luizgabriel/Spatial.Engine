@@ -1,28 +1,30 @@
 #pragma once
 
-#include <spatial/render/ActorBuilder.h>
+#include <entt/entity/registry.hpp>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/Resources.h>
-#include <spatial/render/StageView.h>
-#include <string>
+#include <string_view>
 
 namespace spatial
 {
 
-class ActorBuilder;
+template <typename... Component>
+constexpr auto ExcludeComponents = entt::exclude<Component...>;
+
+constexpr auto NullInstance = entt::null;
+
+using Instance = entt::entity;
 
 class Stage
 {
   public:
-	explicit Stage(RenderingSystem& renderingSystem);
+	explicit Stage(filament::Engine& engine);
 
-	~Stage();
+	Instance createInstance();
 
-	void enable();
+	Instance createInstance(const std::string_view name);
 
-	void disable();
-
-	ActorBuilder createActor(std::string name);
+	void render(filament::Renderer& renderer) const;
 
 	auto& getView() noexcept
 	{
@@ -34,50 +36,89 @@ class Stage
 		return mScene.ref();
 	}
 
-	[[nodiscard]] bool isValid(entt::entity entity) const
+	[[nodiscard]] bool isValid(Instance instance) const
 	{
-		return mRegistry.valid(entity);
+		return mRegistry.valid(instance);
 	}
 
-	void setMainCamera(const Actor& actor);
+	void setMainCamera(Instance entity);
 
-	const Actor& getMainCamera() const noexcept
+	Instance getMainCamera() noexcept
 	{
-		return mCameraActor;
+		return mCameraInstance;
 	}
 
-	Actor& getMainCamera() noexcept
-	{
-		return mCameraActor;
-	}
-
-	size_t size() const noexcept
+	size_t getInstancesCount() const noexcept
 	{
 		return mRegistry.size();
 	}
 
-	template <typename... Component, typename... Exclude>
-	auto getActorsWith(ExcludeComponent<Exclude...> excludes = {})
+	const auto& getEngine() const noexcept
 	{
-		return StageView<ExcludeComponent<Exclude...>, Component...>{&mRegistry, mRegistry.view<Component...>(std::move(excludes))};
+		return mEngine;
+	}
+
+	auto& getEngine() noexcept
+	{
+		return mEngine;
+	}
+
+	const auto& getRegistry() const noexcept
+	{
+		return mRegistry;
+	}
+
+	auto& getRegistry() noexcept
+	{
+		return mRegistry;
 	}
 
 	template <typename... Component, typename... Exclude>
-	auto getFirstActorWith(ExcludeComponent<Exclude...> excludes = {})
+	auto getInstances(entt::exclude_t<Exclude...> excludes = {}) const
 	{
-		auto view = getActorsWith<Component...>(std::move(excludes));
+		return std::as_const(mRegistry).view<Component...>(std::move(excludes));
+	}
+
+	template <typename... Component, typename... Exclude>
+	auto getInstances(entt::exclude_t<Exclude...> excludes = {})
+	{
+		return mRegistry.view<Component...>(std::move(excludes));
+	}
+
+	template <typename... Component, typename... Exclude>
+	Instance getFirstInstance(entt::exclude_t<Exclude...> excludes = {})
+	{
+		auto view = mRegistry.view<Component...>(std::move(excludes));
 		return *view.begin();
 	}
 
+	template<typename Component>
+	const Component& getComponent(Instance instance) const
+	{
+		return mRegistry.get<Component>(instance);
+	}
+
+	template<typename Component>
+	Component& getComponent(Instance instance)
+	{
+		return mRegistry.get<Component>(instance);
+	}
+
+	template<typename Component>
+	Component& removeComponent(Instance instance)
+	{
+		return mRegistry.remove<Component>(instance);
+	}
+
   private:
-	RenderingSystem& mRenderingSystem;
+	using Registry = entt::registry;
+
+	filament::Engine& mEngine;
 	Scene mScene;
-	SharedView mView;
-	bool mEnabled;
+	View mView;
 
-	entt::registry mRegistry;
-
-	Actor mCameraActor;
+	Registry mRegistry;
+	Instance mCameraInstance;
 };
 
 } // namespace spatial

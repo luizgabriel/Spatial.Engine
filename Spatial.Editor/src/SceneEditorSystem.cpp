@@ -1,12 +1,13 @@
 #include "SceneEditorSystem.h"
 
+#include <assets/generated.h>
 #include <spatial/input/Input.h>
+#include <spatial/render/InstanceBuilder.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/render/Transform.h>
 
 #include "Components.h"
-#include "Editor.h"
 #include "ImGuiComponents.h"
 
 namespace fl = filament;
@@ -15,22 +16,33 @@ using namespace filament::math;
 namespace spatial::editor
 {
 
-SceneEditorSystem::SceneEditorSystem(RenderingSystem& renderingSystem)
-	: mEngine{renderingSystem.getEngine()},
+SceneEditorSystem::SceneEditorSystem(filament::Engine& engine)
+	: mEngine{engine},
 	  mViewport{0, 0, 1280, 720},
 
-	  mMainStage{renderingSystem},
-	  mDefaultMaterial{createMaterial(mEngine, editor::load("editor/materials/default.filamat").value())},
+	  mMainStage{mEngine},
+	  mDefaultMaterial{createMaterial(mEngine, {ASSETS_DEFAULT, ASSETS_DEFAULT_SIZE})},
 
-	  mIblTexture{createKtxTexture(mEngine, editor::load("editor/textures/default_skybox/ibl.ktx").value())},
-	  mSkyboxTexture{createKtxTexture(mEngine, editor::load("editor/textures/default_skybox/skybox.ktx").value())},
-	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(),
-										 editor::load("editor/textures/default_skybox/sh.txt").value())},
+	  mIblTexture{createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_IBL, ASSETS_DEFAULT_SKYBOX_IBL_SIZE})},
+	  mSkyboxTexture{createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_SKYBOX, ASSETS_DEFAULT_SKYBOX_SKYBOX_SIZE})},
+	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(), {ASSETS_SH, ASSETS_SH_SIZE})},
 	  mSkybox{createSkybox(mEngine, mSkyboxTexture.ref())},
 
 	  mImGuiSceneWindow{mEngine, {mViewport.width, mViewport.height}},
 
-	  mSelectedActor{}
+	  mSelectedInstance{mMainStage, {}},
+
+	  mMeshes{createFilamesh(mEngine, {ASSETS_CUBE, ASSETS_CUBE_SIZE}),
+			  createFilamesh(mEngine, {ASSETS_PLANE, ASSETS_PLANE_SIZE}),
+			  createFilamesh(mEngine, {ASSETS_CYLINDER, ASSETS_CYLINDER_SIZE}),
+			  createFilamesh(mEngine, {ASSETS_SPHERE, ASSETS_SPHERE_SIZE})},
+
+	  mMaterialInstances{
+		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
+		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
+		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
+		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
+	  }
 {
 	mMainStage.getView()->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mMainStage.getView()->setViewport(mViewport);
@@ -43,49 +55,73 @@ SceneEditorSystem::SceneEditorSystem(RenderingSystem& renderingSystem)
 
 void SceneEditorSystem::onStart()
 {
-	mMainStage.setMainCamera(mMainStage.createActor("Main Camera")
+	mMainStage.setMainCamera(createInstance(mMainStage, "Main Camera")
 								 .withPosition({.6f, .3f, .6f})
 								 .asCamera()
 								 .withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
-								 .add<editor::BasicCameraMovement>(20.0f, 10.0f));
+								 .add<editor::EditorCamera>(20.0f, 10.0f));
 
-	mMainStage.createActor("Main Light").asLight(spatial::Light::Type::DIRECTIONAL).build();
+	createInstance(mMainStage, "Main Light").asLight(spatial::Light::Type::DIRECTIONAL).build();
+	mDefaultMaterial->setDefaultParameter("metallic", .2f);
+	mDefaultMaterial->setDefaultParameter("roughness", 0.3f);
+	mDefaultMaterial->setDefaultParameter("reflectance", .1f);
 
-	/*
-	auto material = createMaterial(mEngine, editor::load("editor/materials/default.filamat").value());
-	material->setDefaultParameter("metallic", .2f);
-	material->setDefaultParameter("roughness", 0.3f);
-	material->setDefaultParameter("reflectance", .1f);
-	*/
+	{
+		mSelectedInstance = createInstance(mMainStage, "Cube")
+								.withPosition({.0f})
+								.asMesh(mMeshes[0])
+								.withShadowOptions(true, true)
+								.withMaterialAt(0, mMaterialInstances[0].get())
+								.build();
 
-	mSelectedActor = mMainStage.createActor("Plane").withPosition({3.0f, -1.0f, .0f}).withScale(10.0f).asRenderable(1);
-	//.asMesh(editor::load("editor/meshes/plane.filamesh").value())
-	//.withMaterial(material, {{"baseColor", {.8f, .8f, .8f, 1.0f}}});
+		mMaterialInstances[0]->setParameter("baseColor", math::float3{.4f, 0.1f, 0.1f});
+	}
 
-	mMainStage.createActor("Cube").withPosition({.0f, .0f, .0f});
-	//.asMesh(editor::load("editor/meshes/cube.filamesh").value())
-	//.withMaterial(material, {{"baseColor", {.4f, 0.1f, 0.1f, 1.0f}}});
+	{
+		createInstance(mMainStage, "Plane")
+			.withPosition({3.0f, -1.0f, .0f})
+			.withScale({10.0f})
+			.asMesh(mMeshes[1])
+			.withShadowOptions(false, true)
+			.withMaterialAt(0, mMaterialInstances[1].get())
+			.build();
 
-	mMainStage.createActor("Cylinder").withPosition({6.0f, .0f, .0f});
-	//.asMesh(editor::load("editor/meshes/cylinder.filamesh").value())
-	//.withMaterial(material, {{"baseColor", {.1f, 0.4f, 0.1f, 1.0f}}});
+		mMaterialInstances[1]->setParameter("baseColor", math::float3{.8f, .8f, .8f});
+	}
 
-	mMainStage.createActor("Sphere").withPosition({3.0f, .0f, .0f});
-	//.asMesh(editor::load("editor/meshes/sphere.filamesh").value())
-	//.withMaterial(material, {{"baseColor", {.1f, 0.1f, 0.4f, 1.0f}}});
+	{
+		createInstance(mMainStage, "Cylinder")
+			.withPosition({6.0f, .0f, .0f})
+			.asMesh(mMeshes[2])
+			.withShadowOptions(true, true)
+			.withMaterialAt(0, mMaterialInstances[2].get())
+			.build();
+
+		mMaterialInstances[2]->setParameter("baseColor", math::float3{.1f, 0.4f, 0.1f});
+	}
+
+	{
+		auto actor = createInstance(mMainStage, "Sphere")
+						 .withPosition({3.0f, .0f, .0f})
+						 .asMesh(mMeshes[3])
+						 .withShadowOptions(true, true)
+						 .withMaterialAt(0, mMaterialInstances[3].get())
+						 .build();
+
+		auto* mi = actor.get<Renderable>().getMaterialInstanceAt(0);
+		mi->setParameter("baseColor", math::float3{.1f, 0.1f, 0.4f});
+	}
 
 	onSceneWindowResized({1280, 720});
-
-	mMainStage.enable();
 }
 
 void SceneEditorSystem::onEvent(const MouseMovedEvent&)
 {
-	auto mainCamera = mMainStage.getFirstActorWith<Transform, const BasicCameraMovement>();
-	if (mainCamera)
+	auto mainCamera = handleOf(mMainStage, mMainStage.getFirstInstance<Transform, const EditorCamera>());
+	if (mMainStage.isValid(mainCamera))
 	{
-		auto& cameraTransform = mainCamera.getComponent<Transform>();
-		auto& basicCameraMovement = mainCamera.getComponent<BasicCameraMovement>();
+		auto& cameraTransform = mainCamera.get<Transform>();
+		const auto& basicCameraMovement = mainCamera.get<EditorCamera>();
 
 		if (basicCameraMovement.enabled)
 		{
@@ -113,12 +149,12 @@ float3 defaultInputAxis()
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	auto mainCamera = mMainStage.getFirstActorWith<Camera, Transform, BasicCameraMovement>();
+	auto mainCamera = handleOf(mMainStage, mMainStage.getFirstInstance<Camera, Transform, EditorCamera>());
 	if (mainCamera)
 	{
-		auto& cameraController = mainCamera.getComponent<Camera>();
-		auto& cameraTransform = mainCamera.getComponent<Transform>();
-		auto& cameraMovement = mainCamera.getComponent<BasicCameraMovement>();
+		auto& cameraController = mainCamera.get<Camera>();
+		auto& cameraTransform = mainCamera.get<Transform>();
+		auto& cameraMovement = mainCamera.get<EditorCamera>();
 
 		const auto keyboardDelta = delta * cameraMovement.velocity * defaultInputAxis();
 		const auto rot = math::toRadians(cameraTransform.getRotation());
@@ -140,6 +176,8 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 void SceneEditorSystem::onDrawGui()
 {
 	static bool showEngineGui = true;
+
+	// ImGui::ShowDemoWindow();
 
 	if (Input::released(Key::G))
 		showEngineGui = !showEngineGui;
@@ -187,76 +225,70 @@ void SceneEditorSystem::onDrawGui()
 
 	ImGui::Begin("Scene Graph");
 
-	editor::sceneHierarchy(mMainStage, mSelectedActor);
+	if (ImGui::BeginPopupContextWindow(0, 1, false))
+	{
+		if (ImGui::MenuItem("Create New Actor"))
+		{
+			mSelectedInstance = createInstance(mMainStage, "New Actor");
+			ImGui::SetWindowFocus("Properties");
+		}
+
+		ImGui::EndPopup();
+	}
+
+	editor::instancesTreeView(mMainStage, mSelectedInstance);
 
 	ImGui::End();
 
-	if (mSelectedActor.isValid())
+	ImGui::Begin("Properties");
+	if (mSelectedInstance.isValid())
 	{
-		ImGui::Begin("Properties");
-
 		{
-			auto& name = mSelectedActor.getComponent<Name>();
-			auto nameValue = name.getValue();
-			if (editor::inputText("Name", nameValue))
-			{
-				name.setValue(nameValue);
-			}
+			auto& name = mSelectedInstance.get<SceneNodeName>();
+			editor::inputText("##Name", name.value);
+
+			ImGui::SameLine();
+			ImGui::PushItemWidth(-1);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
 		}
 
-		{
-			auto& transform = mSelectedActor.getComponent<Transform>();
-			if (ImGui::CollapsingHeader("Transform", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::Indent();
-				if (mSelectedActor.hasComponent<Camera>())
-					editor::transformInput(transform, "py");
-				else if (mSelectedActor.hasComponent<Light>())
-					editor::transformInput(transform, "p");
-				else
-					editor::transformInput(transform, "prs");
+		ImGui::Spacing();
+		ImGui::Spacing();
 
-				ImGui::Unindent();
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			auto builder = InstanceBuilder{mMainStage, mSelectedInstance};
+
+			if (ImGui::MenuItem("Camera"))
+			{
+				builder.asCamera().withPerspectiveProjection(45.0, mImGuiSceneWindow.getAspectRatio(), .1, 10000.0);
+				ImGui::CloseCurrentPopup();
 			}
+
+			if (ImGui::MenuItem("Light"))
+			{
+				builder.asLight(Light::Type::POINT);
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 
-		if (mSelectedActor.hasComponent<Camera>())
-		{
-			if (ImGui::CollapsingHeader("Camera", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::Indent();
+		ImGui::PopItemWidth();
 
-				auto& camera = mSelectedActor.getComponent<Camera>();
-				editor::cameraInput(camera);
-
-				if (mSelectedActor.hasComponent<editor::BasicCameraMovement>())
-				{
-					ImGui::Separator();
-
-					auto& movement = mSelectedActor.getComponent<editor::BasicCameraMovement>();
-					ImGui::DragFloat("Velocity", &movement.velocity);
-					ImGui::DragFloat("Sensitivity", &movement.sensitivity);
-				}
-
-				ImGui::Unindent();
-			}
-		}
-
-		if (mSelectedActor.hasComponent<Light>())
-		{
-			if (ImGui::CollapsingHeader("Light", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::Indent();
-
-				auto& light = mSelectedActor.getComponent<Light>();
-				editor::lightInput(light);
-
-				ImGui::Unindent();
-			}
-		}
-
-		ImGui::End();
+		componentView<Transform>("Transform", mSelectedInstance);
+		componentView<Camera>("Camera", mSelectedInstance);
+		componentView<EditorCamera>("Editor Camera", mSelectedInstance);
+		componentView<Light>("Light", mSelectedInstance);
+		componentView<Renderable>("Renderer", mSelectedInstance);
 	}
+	else
+	{
+		ImGui::Text("No actor selected.");
+	}
+	ImGui::End();
 }
 
 void SceneEditorSystem::onSceneWindowResized(ImGuiSceneWindow::Size size)
@@ -265,7 +297,7 @@ void SceneEditorSystem::onSceneWindowResized(ImGuiSceneWindow::Size size)
 	auto height = static_cast<double>(size.second);
 	auto aspectRatio = width / height;
 
-	auto& camera = mMainStage.getMainCamera().getComponent<Camera>();
+	auto& camera = mMainStage.getComponent<Camera>(mMainStage.getMainCamera());
 	std::visit(
 		[&](auto projection) {
 			using T = std::decay_t<decltype(projection)>;
@@ -293,6 +325,11 @@ void SceneEditorSystem::onEvent(const WindowResizedEvent& e)
 void SceneEditorSystem::setViewport(const std::pair<int, int> windowSize)
 {
 	mViewport = {0, 0, static_cast<uint32_t>(windowSize.first), static_cast<uint32_t>(windowSize.second)};
+}
+
+void SceneEditorSystem::onRender(filament::Renderer& renderer) const
+{
+	mMainStage.render(renderer);
 }
 
 } // namespace spatial::editor
