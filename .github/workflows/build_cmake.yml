@@ -9,7 +9,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-
+  CONAN_SYSREQUIRES_MODE: enabled
 
 jobs:
   build:
