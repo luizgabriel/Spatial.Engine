@@ -12,8 +12,6 @@ on:
 env:
   BUILD_TYPE: Release
   CONAN_SYSREQUIRES_MODE: enabled
-  CC: ${{ matrix.config.cc }}
-  CXX: ${{ matrix.config.cxx }}
 
 jobs:
   build:
@@ -76,6 +74,9 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
+        env:
+          CC: ${{matrix.config.cc}}
+          CXX: ${{matrix.config.cxx}}
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=./install
 
       - name: Build
