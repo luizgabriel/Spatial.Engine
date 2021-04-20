@@ -56,27 +56,30 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine)
 
 void SceneEditorSystem::onStart()
 {
-	mMainStage.setMainCamera(createInstance(mMainStage, "Main Camera")
-								 .withPosition({6.0f, 3.0f, 6.0f})
-								 .asCamera()
-								 .withTarget({.0f})
-								 .withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
-								 .add<editor::EditorCamera>(5.0f, 10.0f));
+	mSelectedInstance = createInstance(mMainStage, "Main Camera")
+							.withPosition({6.0f, 3.0f, 6.0f})
+							.asCamera()
+							.withTarget({.0f})
+							.withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
+							.add<editor::EditorCamera>(5.0f, 10.0f);
+
+	mMainStage.setMainCamera(mSelectedInstance);
 
 	createInstance(mMainStage, "Main Light")
-		.asLight(spatial::Light::Type::DIRECTIONAL);
+		.asLight(spatial::Light::Type::POINT)
+		.withPosition({.0f});
 
 	mDefaultMaterial->setDefaultParameter("metallic", .2f);
 	mDefaultMaterial->setDefaultParameter("roughness", 0.8f);
 	mDefaultMaterial->setDefaultParameter("reflectance", .1f);
 
 	{
-		mSelectedInstance = createInstance(mMainStage, "Cube")
-								.withPosition({.0f})
-								.asMesh(mMeshes[0])
-								.withShadowOptions(true, true)
-								.withMaterialAt(0, mMaterialInstances[0].get())
-								.get();
+		createInstance(mMainStage, "Cube")
+			.withPosition({.0f})
+			.asMesh(mMeshes[0])
+			.withShadowOptions(true, true)
+			.withMaterialAt(0, mMaterialInstances[0].get())
+			.get();
 
 		mMaterialInstances[0]->setParameter("baseColor", math::float3{.4f, 0.1f, 0.1f});
 	}
@@ -183,16 +186,7 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 
 void SceneEditorSystem::onDrawGui()
 {
-	static bool showEngineGui = true;
-
 	// ImGui::ShowDemoWindow();
-
-	if (Input::released(Key::G))
-		showEngineGui = !showEngineGui;
-
-	if (!showEngineGui)
-		return;
-
 	static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_None;
 	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
 										  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |

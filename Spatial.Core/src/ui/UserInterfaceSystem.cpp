@@ -53,7 +53,7 @@ void UserInterfaceSystem::onStartFrame(float delta)
 	mRenderer.beforeRender(delta);
 }
 
-void UserInterfaceSystem::onEndFrame()
+void UserInterfaceSystem::onUpdateFrame(float)
 {
 	mRenderGuiSignal();
 	mRenderer.dispatchCommands();

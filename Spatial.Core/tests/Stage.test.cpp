@@ -18,7 +18,7 @@ TEST(Stage, Create)
 	const auto scale = math::float3{10.0f, 20.0f, 30.0f};
 	const auto rotation = math::float3{30.0f, 45.0f, 90.0f};
 
-	auto instance = createInstance(stage).withPosition(position).withScale(scale).withRotation(rotation).build();
+	auto instance = createInstance(stage).withPosition(position).withScale(scale).withRotation(rotation).get();
 	ASSERT_TRUE(instance.isValid());
 	ASSERT_TRUE(instance.has<Entity>());
 	ASSERT_TRUE(instance.get<Entity>().isValid());
@@ -33,7 +33,7 @@ TEST(Stage, CreatePerspectiveCamera)
 	auto stage = Stage{renderingSystem.getEngine()};
 
 	auto instance =
-		createInstance(stage, "Test Camera").asCamera().withPerspectiveProjection(45.0, 19 / 6.0, .1, 100.0).build();
+		createInstance(stage, "Test Camera").asCamera().withPerspectiveProjection(45.0, 19 / 6.0, .1, 100.0).get();
 	stage.setMainCamera(instance);
 
 	ASSERT_TRUE(instance == stage.getMainCamera());
@@ -50,7 +50,7 @@ TEST(Stage, CreateOrthographicCamera)
 	auto stage = Stage{renderingSystem.getEngine()};
 
 	auto instance =
-		createInstance(stage, "Test Camera").asCamera().withOrthographicProjection(19 / 6, .1, 1000.0).build();
+		createInstance(stage, "Test Camera").asCamera().withOrthographicProjection(19 / 6, .1, 1000.0).get();
 	stage.setMainCamera(instance);
 
 	ASSERT_TRUE(instance == stage.getMainCamera());
@@ -67,7 +67,7 @@ TEST(Stage, CreateCustomCamera)
 	auto stage = Stage{renderingSystem.getEngine()};
 
 	auto instance =
-		createInstance(stage, "Test Camera").asCamera().withCustomProjection(math::mat4{}, .1, 10000.0).build();
+		createInstance(stage, "Test Camera").asCamera().withCustomProjection(math::mat4{}, .1, 10000.0).get();
 
 	stage.setMainCamera(instance);
 
@@ -84,7 +84,7 @@ TEST(Stage, CreatePointLight)
 	auto renderingSystem = RenderingSystem{RenderingSystem::Backend::NOOP, nullptr};
 	auto stage = Stage{renderingSystem.getEngine()};
 
-	auto instance = createInstance(stage, "Test Point Light").asLight().withIntensity(10000.0f).build();
+	auto instance = createInstance(stage, "Test Point Light").asLight().withIntensity(10000.0f).get();
 
 	ASSERT_TRUE(instance.has<Light>());
 
@@ -103,9 +103,9 @@ TEST(Stage, CreateDirectionalLight)
 
 	auto instance = createInstance(stage, "Test Directional Light")
 						.asLight(Light::Type::DIRECTIONAL)
-						.withDirection({100.0f, -100.0f, 100.0f})
+						.withDirection({.0f, -1.0f, .0f})
 						.withIntensity(10000.0f)
-						.build();
+						.get();
 
 	ASSERT_TRUE(instance.has<Light>());
 
@@ -115,7 +115,7 @@ TEST(Stage, CreateDirectionalLight)
 	ASSERT_FALSE(light.isPointLight());
 	ASSERT_FALSE(light.isSpotLight());
 	ASSERT_EQ(light.getIntensity(), 10000.0f);
-	ASSERT_EQ(light.getDirection(), math::float3(100.0f, -100.0f, 100.0f));
+	ASSERT_EQ(light.getDirection(), math::float3(.0f, -1.0f, .0f));
 }
 
 TEST(Stage, CreateRenderable)
