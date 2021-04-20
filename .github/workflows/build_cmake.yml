@@ -8,22 +8,38 @@ on:
       - release/*
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: RelWithDebInfo
-
-  # Conan cache environment variables
-  CONAN_SYSREQUIRES_MODE: enabled
-  CONAN_USER_HOME: "${{ github.workspace }}/conan-cache"
-  CONAN_USER_HOME_SHORT: "${{ github.workspace }}/conan-cache/short"
+  BUILD_TYPE: Release
 
 jobs:
   build:
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.config.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
-        platform: [ x64 ]
+        config:
+          - {
+            name: "Windows Latest MSVC",
+            artifact: "Windows-MSVC.tar.xz",
+            os: windows-latest,
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+          }
+          - {
+            name: "Ubuntu Latest GCC",
+            artifact: "Linux.tar.xz",
+            os: ubuntu-latest,
+            cc: "gcc",
+            cxx: "g++",
+            INSTALL_LOCATION: '${{github.workspace}}/.local',
+          - {
+            name: "macOS Latest Clang",
+            artifact: "macOS.tar.xz",
+            os: macos-latest,
+            cc: "clang",
+            cxx: "clang++",
+          }
 
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +63,7 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=./install
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
