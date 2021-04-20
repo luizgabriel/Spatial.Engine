@@ -18,13 +18,21 @@ using Instance = entt::entity;
 class Stage
 {
   public:
+	using Registry = entt::registry;
+
 	explicit Stage(filament::Engine& engine);
 
 	Instance createInstance();
 
 	Instance createInstance(const std::string_view name);
 
+	void onUpdateFrame(float delta);
+
 	void render(filament::Renderer& renderer) const;
+
+	void onCreateRenderable(Stage::Registry& registry, Instance instance);
+
+	void onDestroyRenderable(Stage::Registry& registry, Instance instance);
 
 	auto& getView() noexcept
 	{
@@ -111,7 +119,7 @@ class Stage
 	}
 
   private:
-	using Registry = entt::registry;
+
 
 	filament::Engine& mEngine;
 	Scene mScene;

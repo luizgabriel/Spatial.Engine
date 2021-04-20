@@ -42,16 +42,6 @@ filament::Camera* Camera::getInstance() noexcept
 	return mEngine.getCameraComponent(mEntity);
 }
 
-void Camera::lookAt(const math::float3& eye, const math::float3& center) noexcept
-{
-	getInstance()->lookAt(eye, center);
-}
-
-void Camera::lookAt(const math::float3& eye, const math::float3& center, const math::float3& up) noexcept
-{
-	getInstance()->lookAt(eye, center, up);
-}
-
 void Camera::setProjection(Projection projection) noexcept
 {
 	mProjection = std::move(projection);

@@ -47,7 +47,7 @@ class InstanceBuilder
 		return *this;
 	}
 
-	InstanceHandle build() noexcept
+	InstanceHandle get() noexcept
 	{
 		return *this;
 	}
@@ -88,6 +88,8 @@ class CameraInstanceBuilder : public InstanceBuilder
 {
   public:
 	CameraInstanceBuilder(Stage& stage, spatial::Instance instance);
+
+	CameraInstanceBuilder& withTarget(const math::float3& target);
 
 	CameraInstanceBuilder& withPerspectiveProjection(double fieldOfView, double aspectRatio, double near, double far);
 

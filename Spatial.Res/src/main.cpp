@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <argh.h>
 #include <filesystem>
 #include <fmt/format.h>
@@ -6,19 +7,19 @@
 #include <iterator>
 #include <locale>
 #include <string>
-#include <algorithm>
 
 namespace fs = std::filesystem;
 
-std::string toVariableName(std::string fileName, char separator, const std::locale& locale)
+std::string toVariableName(const fs::path& filePath, char separator, const std::locale& locale)
 {
-	for (size_t i = 0; i < fileName.size(); i++) {
-		if (std::isalpha(fileName[i], locale)) {
-			fileName[i] = std::toupper(fileName[i], locale);
-		} else {
-			fileName[i] = separator;
-		}
-	}
+	auto fileName = filePath.filename().string();
+
+	std::transform(fileName.begin(), fileName.end(), fileName.begin(), [&](auto c) {
+		if (std::isalpha(c, locale))
+			return std::toupper(c, locale);
+		else
+			return separator;
+	});
 
 	return fileName;
 }
@@ -32,6 +33,7 @@ int main(int argc, char** argv)
 {
 	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 	const auto locale = std::locale{"C"};
+	const auto workingDir = fs::path{args[0]}.parent_path();
 
 	fs::path outputHeaderPath;
 	if (!(args({"-h", "--header"}) >> outputHeaderPath))
@@ -78,7 +80,8 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		auto variableName = prefix + toVariableName(inputFile.stem().string(), '_', locale);
+		const auto relativeInputFile = fs::relative(inputFile, workingDir);
+		const auto variableName = prefix + toVariableName(relativeInputFile, '_', locale);
 		std::cout << fmt::format("Generating {1} and {1}_SIZE\n", inputFile.string(), variableName);
 		size_t count = 0;
 		outputSource << fmt::format("\nextern const char {0}[] = {{\n", variableName);
@@ -98,10 +101,9 @@ int main(int argc, char** argv)
 		outputSource << "\n};" << std::endl;
 
 		// Build header file
-		outputHeader << fmt::format("\n\n// {0}", inputFile.string());
+		outputHeader << fmt::format("\n\n// {0}", relativeInputFile.string());
 		outputHeader << fmt::format("\nextern const char {0}[{1}];", variableName, count);
 		outputHeader << fmt::format("\nconstexpr unsigned int {0}_SIZE = {1};", variableName, count);
-
 	}
 
 	return 0;

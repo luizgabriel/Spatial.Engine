@@ -7,14 +7,23 @@ namespace spatial
 {
 
 Stage::Stage(filament::Engine& engine)
-	: mEngine{engine},
-	  mScene{createScene(mEngine)},
-	  mView{createView(mEngine)},
-	  mRegistry{},
-	  mCameraInstance{}
+	: mEngine{engine}, mScene{createScene(mEngine)}, mView{createView(mEngine)}, mRegistry{}, mCameraInstance{}
 {
 	mView->setScene(mScene.get());
 	mView->setBlendMode(fl::View::BlendMode::OPAQUE);
+
+	mRegistry.on_construct<Renderable>().connect<&Stage::onCreateRenderable>(this);
+	mRegistry.on_destroy<Renderable>().connect<&Stage::onDestroyRenderable>(this);
+}
+
+void Stage::onCreateRenderable(Stage::Registry& registry, Instance instance)
+{
+	mScene->addEntity(getComponent<Entity>(instance).get());
+}
+
+void Stage::onDestroyRenderable(Stage::Registry& registry, Instance instance)
+{
+	mScene->remove(getComponent<Entity>(instance).get());
 }
 
 Instance Stage::createInstance()
@@ -44,6 +53,14 @@ void Stage::setMainCamera(Instance instance)
 	{
 		mView->setCamera(nullptr);
 	}
+}
+
+void Stage::onUpdateFrame(float)
+{
+	getInstances<Transform>().each([](auto& transform) { transform.refresh(); });
+	getInstances<Camera, CameraTarget, const Transform>().each([](auto& cameraCtrl, auto& cameraTarget, const auto& transform) {
+	  cameraCtrl.getInstance()->lookAt(transform.getPosition(), cameraTarget.getTarget(), math::axisY);
+	});
 }
 
 void Stage::render(filament::Renderer& renderer) const

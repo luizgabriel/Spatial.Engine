@@ -41,7 +41,7 @@ class Light
 
 	const math::float3& getDirection() const noexcept;
 
-	void setColor(const math::float3& color) noexcept;
+	void setColor(const filament::LinearColor& color) noexcept;
 
 	const math::float3& getColor() const noexcept;
 

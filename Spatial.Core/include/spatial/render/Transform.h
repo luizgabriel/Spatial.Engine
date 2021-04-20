@@ -26,8 +26,6 @@ class Transform
 
 	bool isValid() const noexcept;
 
-	const math::mat4f& get() const noexcept;
-
 	const math::float3& getPosition() const noexcept;
 
 	void setPosition(const math::float3& mPosition) noexcept;
@@ -44,7 +42,9 @@ class Transform
 
 	void translate(const math::float3 translation) noexcept;
 
-	void refreshTransformMatrix() noexcept;
+	math::mat4f getMatrix() noexcept;
+
+	void refresh() noexcept;
 
   private:
 	Manager& mManager;
@@ -53,8 +53,6 @@ class Transform
 	math::float3 mPosition{.0f};
 	math::float3 mScale{1.0f};
 	math::float3 mRotation{.0f, .0f, .0f};
-
-	void set(const math::mat4f& localTransform) noexcept;
 
 	Instance getInstance() const noexcept;
 };

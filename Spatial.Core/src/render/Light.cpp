@@ -62,7 +62,7 @@ const math::float3& Light::getDirection() const noexcept
 	return mManager.getDirection(getInstance());
 }
 
-void Light::setColor(const math::float3& color) noexcept
+void Light::setColor(const filament::LinearColor& color) noexcept
 {
 	mManager.setColor(getInstance(), color);
 }

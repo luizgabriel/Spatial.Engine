@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
 
 	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
-	ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT, ASSETS_UI_BLIT_SIZE})));
-	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM, ASSETS_ROBOTO_MEDIUM_SIZE})));
+	ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
+	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
 	auto editor = editor::SceneEditorSystem{rendering.getEngine()};
 

@@ -50,7 +50,7 @@ int Application::run()
 
 		mEndFrameSignal();
 
-		std::this_thread::sleep_until(mClock.getLastTime() + Clock<float>::delta_t{mDesiredDelta});
+		std::this_thread::sleep_until(mClock.getLastTime() + Clock<float>::delta_t{mDesiredDelta - delta});
 		mClock.tick();
 	}
 

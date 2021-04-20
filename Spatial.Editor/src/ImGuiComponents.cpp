@@ -52,7 +52,6 @@ bool vec2Input(const std::string_view label, math::float2& v, float resetValue, 
 
 	ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
 
-	ImGui::SameLine();
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
@@ -88,7 +87,6 @@ bool vec3Input(const std::string_view label, math::float3& v, float resetValue, 
 	ImGui::PushID(label.data());
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
-	ImGui::SameLine();
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
@@ -133,7 +131,6 @@ bool vec4Input(const std::string_view label, math::float4& v, float resetValue, 
 
 	ImGui::PushMultiItemsWidths(4, ImGui::CalcItemWidth());
 
-	ImGui::SameLine();
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
@@ -619,7 +616,7 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 	ImGui::BeginGroup();
 
 	// DragFloat3 is nicer than SliderFloat3 because it supports double-clicking for keyboard entry.
-	bool changed = ImGui::DragFloat3(label.data(), &dir[0], 0.01f, -1.0f, 1.0f);
+	bool changed = vec3Input(label.data(), dir, 1.0f, 0.01f, -1.0f, 1.0f);
 
 	auto v = normalize(dir);
 	if (drawArrowWidget(v, size, color) && !changed)
@@ -636,7 +633,7 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 void lightInput(Light& light)
 {
 	auto color = light.getColor();
-	if (ImGui::ColorEdit3("Color", &color[0]))
+	if (ImGui::ColorEdit3("Color", &color.r))
 		light.setColor(color);
 
 	auto intensity = light.getIntensity();
@@ -660,8 +657,6 @@ void drawComponentView(InstanceHandle& instance, Transform& component)
 		transformInput(component, "p");
 	else
 		transformInput(component, "prs");
-
-	component.refreshTransformMatrix();
 }
 
 template <>
@@ -675,6 +670,14 @@ void drawComponentView(InstanceHandle&, EditorCamera& component)
 {
 	ImGui::DragFloat("Velocity", &component.velocity);
 	ImGui::DragFloat("Sensitivity", &component.sensitivity);
+}
+
+template <>
+void drawComponentView(InstanceHandle&, CameraTarget& component)
+{
+	auto target = component.getTarget();
+	vec3Input("Target", target);
+	component.setTarget(target);
 }
 
 template <>

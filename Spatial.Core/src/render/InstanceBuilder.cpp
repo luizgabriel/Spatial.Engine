@@ -9,8 +9,6 @@ InstanceBuilder::InstanceBuilder(Stage& stage, Instance instance) : mStage{stage
 	if (!getInstance().has<Entity>())
 	{
 		auto entity = createEntity(mStage.getEngine());
-		stage.getScene().addEntity(entity.get());
-
 		getInstance().add<Entity>(std::move(entity));
 	}
 
@@ -91,7 +89,17 @@ CameraInstanceBuilder& CameraInstanceBuilder::withPerspectiveProjection(double f
 																		double near, double far)
 {
 	getComponent().setProjection(PerspectiveProjection{fieldOfView, aspectRatio, near, far});
+	return *this;
+}
 
+CameraInstanceBuilder& CameraInstanceBuilder::withTarget(const math::float3& target)
+{
+	if (!getInstance().has<CameraTarget>())
+	{
+		getInstance().add<spatial::CameraTarget>(target);
+	}
+
+	getInstance().get<spatial::CameraTarget>().setTarget(target);
 	return *this;
 }
 
@@ -155,8 +163,6 @@ RenderableInstanceBuilder::RenderableInstanceBuilder(Stage& stage, Instance inst
 		auto& sceneEntity = getInstance().get<spatial::Entity>();
 		getInstance().add<spatial::Renderable>(mStage.getEngine(), sceneEntity.get(), primitivesCount);
 	}
-
-	getTransform().refreshTransformMatrix();
 }
 
 Renderable& RenderableInstanceBuilder::getComponent()
