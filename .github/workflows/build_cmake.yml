@@ -32,7 +32,6 @@ jobs:
             os: ubuntu-latest,
             cc: "gcc",
             cxx: "g++",
-            INSTALL_LOCATION: '${{github.workspace}}/.local'
           - {
             name: "macOS Latest Clang",
             artifact: "macOS.tar.xz",
