@@ -12,6 +12,8 @@ on:
 env:
   BUILD_TYPE: Release
   CONAN_SYSREQUIRES_MODE: enabled
+  CC: ${{ matrix.config.cc }}
+  CXX: ${{ matrix.config.cxx }}
 
 jobs:
   build:
