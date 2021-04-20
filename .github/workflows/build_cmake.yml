@@ -6,6 +6,8 @@ on:
       - master
       - feature/*
       - release/*
+    tags:
+      - 'v*'
 
 env:
   BUILD_TYPE: Release
@@ -22,21 +24,21 @@ jobs:
         config:
           - {
             name: "Windows Latest MSVC",
-            artifact: "Windows-MSVC.tar.xz",
+            artifact: "windows.tar.xz",
             os: windows-latest,
             cc: "cl",
             cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
           - {
-            name: "Ubuntu Latest GCC",
-            artifact: "Linux.tar.xz",
+            name: "Ubuntu Latest CLang",
+            artifact: "linux.tar.xz",
             os: ubuntu-latest,
-            cc: "gcc",
-            cxx: "g++"
+            cc: "clang",
+            cxx: "clang++"
           }
           - {
-            name: "macOS Latest Clang",
+            name: "MacOS Latest Clang",
             artifact: "macOS.tar.xz",
             os: macos-latest,
             cc: "clang",
@@ -76,3 +78,28 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: ctest -C $BUILD_TYPE
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.config.artifact }}
+          path: build/install/*
+
+  release:
+    if: contains(github.ref, 'tags/v')
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+
+      - name: Upload to Release
+        uses: meeDamian/github-release@2.0
+        with:
+          files: >
+            windows.tar.xz
+            linux.tar.xz
+            macOS.tar.xz
+          gzip: folders
+          token: ${{ secrets.GITHUB_TOKEN }}
