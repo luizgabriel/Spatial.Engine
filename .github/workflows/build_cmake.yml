@@ -24,7 +24,7 @@ jobs:
             os: windows-latest,
             cc: "cl",
             cxx: "cl",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
           - {
             name: "Ubuntu Latest GCC",
@@ -32,13 +32,13 @@ jobs:
             os: ubuntu-latest,
             cc: "gcc",
             cxx: "g++",
-            INSTALL_LOCATION: '${{github.workspace}}/.local',
+            INSTALL_LOCATION: '${{github.workspace}}/.local'
           - {
             name: "macOS Latest Clang",
             artifact: "macOS.tar.xz",
             os: macos-latest,
             cc: "clang",
-            cxx: "clang++",
+            cxx: "clang++"
           }
 
     steps:
