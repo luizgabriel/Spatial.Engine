@@ -1,6 +1,15 @@
 name: CMake
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - feature/*
+      - release/*
+
+  pull_request:
+    branches:
+      - master
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -17,40 +26,33 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        platform: [ x64 ]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-conan-modules
+      - name: Setup python
+        uses: actions/setup-python@v1
         with:
-          path: |
-            ${{ env.CONAN_USER_HOME }}
-            ~/.cache/pip
-          key: ${{ runner.os }}-${{ env.BUILD_TYPE }}-${{ hashFiles('CMakeLists.txt') }}-${{ hashFiles('CMake/Conan.cmake') }}
+          python-version: ">= 3.5"
 
-      - name: Create Build Environment
-        run: cmake -E make_directory ${{runner.workspace}}/build
+      - name: Upgrade pip and install conan
+        run: python -m pip install --upgrade pip conan
 
-      - name: Install conan
-        shell: bash
-        run: |
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install conan
-
-      - name: Setup
+      - name: Setup Script
         shell: bash
         run: |
           python3 $GITHUB_WORKSPACE/setup.py
 
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{runner.workspace}}/build
+
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
-        run: |
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
       - name: Build
         working-directory: ${{runner.workspace}}/build
         shell: bash
