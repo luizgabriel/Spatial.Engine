@@ -8,7 +8,7 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+if(CONAN_EXPORTED)
 	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 	conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 else()
