@@ -31,7 +31,7 @@ jobs:
             artifact: "Linux.tar.xz",
             os: ubuntu-latest,
             cc: "gcc",
-            cxx: "g++",
+            cxx: "g++"
           - {
             name: "macOS Latest Clang",
             artifact: "macOS.tar.xz",
