@@ -46,9 +46,8 @@ jobs:
 
       - name: Setup
         shell: bash
-        working-directory: ${{runner.workspace}}
         run: |
-          python3 setup.py
+          python3 $GITHUB_WORKSPACE/setup.py
 
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable
