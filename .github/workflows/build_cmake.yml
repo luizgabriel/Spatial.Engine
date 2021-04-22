@@ -23,7 +23,7 @@ jobs:
       matrix:
         config:
           - {
-            name: "Windows Latest MSVC",
+            name: "Windows MSVC",
             artifact: "windows.tar.xz",
             os: windows-latest,
             cc: "cl",
@@ -31,19 +31,19 @@ jobs:
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
           - {
-            name: "Ubuntu Latest CLang",
+            name: "Ubuntu CLang",
             artifact: "linux.tar.xz",
             os: ubuntu-latest,
             cc: "clang",
             cxx: "clang++"
           }
           - {
-            name: "MacOS Latest",
+            name: "MacOS",
             artifact: "macOS.tar.xz",
             os: macos-latest,
           }
           - {
-            name: "MacOS Latest LLVM",
+            name: "MacOS LLVM",
             artifact: "macOS-llvm.tar.xz",
             os: macos-latest,
             cc: "clang",
