@@ -76,6 +76,11 @@ MeshInstanceBuilder InstanceBuilder::asMesh(const FilameshFile& filameshFile)
 	return MeshInstanceBuilder{mStage, mInstance, filameshFile};
 }
 
+MeshInstanceBuilder InstanceBuilder::asMesh(const FilameshFile& filameshFile, std::size_t primitiveIndex)
+{
+	return MeshInstanceBuilder{mStage, mInstance, filameshFile, primitiveIndex};
+}
+
 CameraInstanceBuilder::CameraInstanceBuilder(Stage& stage, Instance instance) : InstanceBuilder(stage, instance)
 {
 	if (!getInstance().has<Camera>())
@@ -211,6 +216,16 @@ MeshInstanceBuilder::MeshInstanceBuilder(Stage& stage, Instance instance, const 
 		withGeometryAt(idx++, Renderable::PrimitiveType::TRIANGLES, filameshFile.getVertexBuffer().get(),
 					   filameshFile.getIndexBuffer().get(), part.offset, part.count);
 	}
+}
+
+MeshInstanceBuilder::MeshInstanceBuilder(Stage& stage, Instance instance, const FilameshFile& filameshFile, std::size_t primitiveIndex)
+	: RenderableInstanceBuilder(stage, instance, 1)
+{
+	withBoundingBox(filameshFile.getBoundingBox());
+
+	auto part = filameshFile.getParts().at(primitiveIndex);
+	withGeometryAt(primitiveIndex, Renderable::PrimitiveType::TRIANGLES, filameshFile.getVertexBuffer().get(),
+				   filameshFile.getIndexBuffer().get(), part.offset, part.count);
 }
 
 } // namespace spatial

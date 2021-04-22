@@ -97,8 +97,8 @@ jobs:
 
       - name: Publish Docs
         if: github.ref == 'ref/head/master'
-        working-directory: ${{runner.workspace}}/build
         uses: peaceiris/actions-gh-pages@v3
+        working-directory: ${{runner.workspace}}/build
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/html

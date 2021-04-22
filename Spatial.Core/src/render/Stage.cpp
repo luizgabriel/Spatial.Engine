@@ -12,8 +12,8 @@ Stage::Stage(filament::Engine& engine)
 	mView->setScene(mScene.get());
 	mView->setBlendMode(fl::View::BlendMode::OPAQUE);
 
-	mRegistry.on_construct<Renderable>().connect<&Stage::onCreateRenderable>(this);
-	mRegistry.on_destroy<Renderable>().connect<&Stage::onDestroyRenderable>(this);
+	mRegistry.on_construct<Entity>().connect<&Stage::onCreateRenderable>(this);
+	mRegistry.on_destroy<Entity>().connect<&Stage::onDestroyRenderable>(this);
 }
 
 void Stage::onCreateRenderable(Stage::Registry& registry, Instance instance)

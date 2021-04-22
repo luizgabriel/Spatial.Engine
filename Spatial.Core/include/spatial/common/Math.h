@@ -1,15 +1,14 @@
 #pragma once
 
 #include <limits>
+#include <math/scalar.h>
 #include <math/mat2.h>
 #include <math/mat3.h>
 #include <math/mat4.h>
 #include <math/quat.h>
-#include <math/scalar.h>
 #include <math/vec2.h>
 #include <math/vec3.h>
 #include <math/vec4.h>
-#include <numbers>
 
 namespace spatial::math
 {
@@ -78,44 +77,8 @@ constexpr auto epsilon_v = std::numeric_limits<T>::epsilon();
 constexpr auto epsilon = epsilon_v<float>;
 
 template <typename T>
-constexpr auto e_v = std::numbers::e_v<T>;
-
-template <typename T>
-constexpr auto log2e_v = std::numbers::log2e_v<T>;
-
-template <typename T>
-constexpr auto log10e_v = std::numbers::log10e_v<T>;
-
-template <typename T>
-constexpr auto pi_v = std::numbers::pi_v<T>;
+constexpr auto pi_v = static_cast<T>(M_PI);
 constexpr auto pi = pi_v<float>;
-
-template <typename T>
-constexpr auto inv_pi_v = std::numbers::inv_pi_v<T>;
-
-template <typename T>
-constexpr auto inv_sqrtpi_v = std::numbers::inv_sqrtpi_v<T>;
-
-template <typename T>
-constexpr auto ln2_v = std::numbers::ln2_v<T>;
-
-template <typename T>
-constexpr auto ln10_v = std::numbers::ln10_v<T>;
-
-template <typename T>
-constexpr auto sqrt2_v = std::numbers::sqrt2_v<T>;
-
-template <typename T>
-constexpr auto sqrt3_v = std::numbers::sqrt3_v<T>;
-
-template <typename T>
-constexpr auto inv_sqrt3_v = std::numbers::inv_sqrt3_v<T>;
-
-template <typename T>
-constexpr auto egamma_v = std::numbers::egamma_v<T>;
-
-template <typename T>
-constexpr auto phi_v = std::numbers::phi_v<T>;
 
 template <typename T>
 constexpr auto axisX_v = vec3<T>{1.0, .0, .0};

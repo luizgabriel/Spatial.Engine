@@ -1,12 +1,15 @@
 #include <spatial/render/Light.h>
 
+namespace fl = filament;
+
 namespace spatial
 {
 
 Light::Light(filament::Engine& engine, utils::Entity entity, Light::Type type)
 	: mManager{engine.getLightManager()}, mEntity{entity}
 {
-	if (Builder(type).build(engine, entity) != Builder::Result::Success) {
+	if (Builder(type).castShadows(true).build(engine, entity) != Builder::Result::Success)
+	{
 		throw std::runtime_error("Could not create light");
 	}
 }
@@ -64,7 +67,7 @@ const math::float3& Light::getDirection() const noexcept
 
 void Light::setColor(const filament::LinearColor& color) noexcept
 {
-	mManager.setColor(getInstance(), color);
+	mManager.setColor(getInstance(), filament::Color::toLinear<filament::ColorConversion::ACCURATE>(color));
 }
 
 const math::float3& Light::getColor() const noexcept
@@ -166,6 +169,5 @@ Light::Instance Light::getInstance() const noexcept
 {
 	return mManager.getInstance(mEntity);
 }
-
 
 } // namespace spatial

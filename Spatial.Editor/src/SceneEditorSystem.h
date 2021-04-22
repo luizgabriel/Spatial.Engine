@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "ImGuiSceneWindow.h"
+#include "EditorCameraSystem.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
@@ -38,7 +39,7 @@ class SceneEditorSystem
 	std::array<FilameshFile, 4> mMeshes;
 	std::array<MaterialInstance, 4> mMaterialInstances;
 
-	math::float3 getInputAxis();
+	EditorCameraSystem mCameraEditorScript;
 
   public:
 	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window, const desktop::InputState& inputState);

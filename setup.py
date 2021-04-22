@@ -22,7 +22,7 @@ def install(folder):
 
     conan_add_remote("bincrafters", "https://api.bintray.com/conan/bincrafters/public-conan")
 
-    conan_export(os.path.join(vendor_path, "filament.py"), "filament/1.9.9@vendor/stable")
+    conan_export(os.path.join(vendor_path, "filament.py"), "filament/1.9.21@vendor/stable")
     conan_export(os.path.join(vendor_path, "imgui.py"), "imgui/docking@vendor/stable")
 
 

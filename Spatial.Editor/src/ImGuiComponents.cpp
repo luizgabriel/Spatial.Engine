@@ -178,9 +178,9 @@ void transformInput(Transform& transform, const std::string_view format)
 			break;
 		}
 		case 'r': {
-			auto rotation = transform.getRotation();
+			auto rotation = transform.getRotation() * math::rad2deg;
 			if (vec3Input("Rotation", rotation))
-				transform.setRotation(rotation);
+				transform.setRotation(rotation * math::deg2rad);
 			break;
 		}
 		case 's': {
@@ -626,6 +626,10 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 
 void lightInput(Light& light)
 {
+	auto castShadows = light.isShadowCaster();
+	if (ImGui::Checkbox("Cast Shadows", &castShadows))
+		light.setShadowCaster(castShadows);
+
 	auto color = light.getColor();
 	if (ImGui::ColorEdit3("Color", &color.r))
 		light.setColor(color);
@@ -648,7 +652,13 @@ void drawComponentView(InstanceHandle& instance, Transform& component)
 	if (instance.has<Camera>())
 		transformInput(component, "pr");
 	else if (instance.has<Light>())
-		transformInput(component, "p");
+	{
+		const auto& light = instance.get<Light>();
+		if (!light.isDirectional())
+			transformInput(component, "p");
+		else
+			ImGui::Text("Directional lights have no transform properties");
+	}
 	else
 		transformInput(component, "prs");
 }
@@ -657,14 +667,6 @@ template <>
 void drawComponentView(InstanceHandle&, Camera& component)
 {
 	editor::cameraInput(component);
-}
-
-template <>
-void drawComponentView(InstanceHandle&, EditorCamera& component)
-{
-	ImGui::DragFloat("Velocity", &component.velocity);
-	ImGui::DragFloat("Sensitivity", &component.sensitivity);
-	component.startPressed = ImGui::Button("Free Camera Control");
 }
 
 template <>

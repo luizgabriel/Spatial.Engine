@@ -9,7 +9,11 @@ namespace spatial
 Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
 	: mEngine{engine}, mEntity{entity}
 {
-	if (Builder(primitivesCount).build(engine, entity) != Builder::Result::Success)
+	if (Builder(primitivesCount)
+			.castShadows(true)
+			.receiveShadows(true)
+			.build(engine, entity)
+		!= Builder::Result::Success)
 	{
 		throw std::runtime_error("Could not create renderable");
 	}
@@ -68,7 +72,7 @@ bool Renderable::isShadowCaster() const noexcept
 
 bool Renderable::isShadowReceiver() const noexcept
 {
-	return getManager().isShadowCaster(getInstance());
+	return getManager().isShadowReceiver(getInstance());
 }
 
 void Renderable::setBones(const Bone* transforms, size_t boneCount, size_t offset) noexcept

@@ -79,6 +79,8 @@ class InstanceBuilder
 
 	MeshInstanceBuilder asMesh(const FilameshFile& filameshFile);
 
+	MeshInstanceBuilder asMesh(const FilameshFile& filameshFile, std::size_t primitiveIndex);
+
   protected:
 	InstanceHandle getInstance()
 	{
@@ -143,6 +145,7 @@ class MeshInstanceBuilder : public RenderableInstanceBuilder
 {
   public:
 	MeshInstanceBuilder(Stage& stage, Instance instance, const FilameshFile& filameshFile);
+	MeshInstanceBuilder(Stage& stage, Instance instance, const FilameshFile& filameshFile, std::size_t primitiveIndex);
 };
 
 InstanceBuilder createInstance(Stage& stage);

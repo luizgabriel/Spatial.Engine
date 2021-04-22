@@ -16,7 +16,7 @@ struct EditorCamera
 	float velocity;
 	bool enabled{false};
 	int justStarted{0};
-	bool startPressed{false};
+	bool startPressed{true};
 };
 
 } // namespace spatial::ecs

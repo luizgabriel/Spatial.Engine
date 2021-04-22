@@ -6,12 +6,14 @@
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/render/Transform.h>
+#include <filament/LightManager.h>
 
 #include "Components.h"
 #include "ImGuiComponents.h"
 
 namespace fl = filament;
-using namespace filament::math;
+
+using namespace spatial::math;
 
 namespace spatial::editor
 {
@@ -47,7 +49,9 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
 		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
 		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
-	  }
+	  },
+
+	  mCameraEditorScript{mMainStage, mWindow, mInputState}
 {
 	mMainStage.getView()->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 
@@ -62,15 +66,15 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 void SceneEditorSystem::onStart()
 {
-	mSelectedInstance = createInstance(mMainStage, "Main Camera")
-							.withPosition({6.0f, 3.0f, 6.0f})
-							.asCamera()
-							.withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
-							.add<editor::EditorCamera>(.5f, 10.0f);
+	mCameraEditorScript.onStart();
+	mSelectedInstance = mCameraEditorScript.getCameraInstance();
 
 	mMainStage.setMainCamera(mSelectedInstance);
 
-	createInstance(mMainStage, "Main Light").asLight(spatial::Light::Type::POINT).withPosition({.0f});
+	createInstance(mMainStage, "Main Light")
+		.asLight(spatial::Light::Type::DIRECTIONAL)
+		.withIntensity(10000)
+		.withDirection({.34f, -.66f, -.67f});
 
 	mDefaultMaterial->setDefaultParameter("metallic", .2f);
 	mDefaultMaterial->setDefaultParameter("roughness", 0.8f);
@@ -122,61 +126,9 @@ void SceneEditorSystem::onStart()
 	mMainStage.onStart();
 }
 
-float3 SceneEditorSystem::getInputAxis()
-{
-	return {
-		mInputState.axis(Key::W, Key::S),
-		mInputState.axis(Key::D, Key::A),
-		mInputState.axis(Key::Space, Key::LShift),
-	};
-}
-
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	auto mainCamera = handleOf(mMainStage, mMainStage.getFirstInstance<Transform, EditorCamera>());
-	if (mainCamera)
-	{
-		auto& cameraTransform = mainCamera.get<Transform>();
-		auto& cameraMovement = mainCamera.get<EditorCamera>();
-
-		const auto keyboardDelta = delta * cameraMovement.velocity * getInputAxis();
-		const auto forward = math::forwardVector(cameraTransform.getMatrix());
-		const auto right = cross(forward, math::axisY);
-		auto position = cameraTransform.getPosition();
-
-		position += forward * keyboardDelta.x;
-		position += right * keyboardDelta.y;
-		position += math::axisY * keyboardDelta.z;
-		cameraTransform.setPosition(position);
-
-		if (mInputState.released(Key::MouseLeft))
-		{
-			cameraMovement.enabled = false;
-			cameraMovement.justStarted = 0;
-		}
-
-		if (mInputState.combined(Key::LControl, Key::MouseLeft) || cameraMovement.startPressed)
-		{
-			mWindow.warpMouse(mWindow.getSize() * .5f);
-			cameraMovement.enabled = true;
-			cameraMovement.justStarted = 1;
-		}
-
-		if (cameraMovement.enabled && cameraMovement.justStarted <= 10)
-			cameraMovement.justStarted++;
-
-		if (cameraMovement.enabled && cameraMovement.justStarted >= 10)
-		{
-			const auto mouseRotation = mInputState.getMouseOffset() * math::pi * cameraMovement.sensitivity * delta;
-			const auto rotation = cameraTransform.getRotation();
-
-			cameraTransform.setRotation({
-				std::clamp(rotation.x + mouseRotation.y, -math::pi, math::pi), // clamp the pitch
-				rotation.y + mouseRotation.x,
-				.0f // remove the roll
-			});
-		}
-	}
+	mCameraEditorScript.onUpdateFrame(delta);
 }
 
 void SceneEditorSystem::onDrawGui()
@@ -235,7 +187,7 @@ void SceneEditorSystem::onDrawGui()
 
 	editor::instancesTreeView(mMainStage, mSelectedInstance);
 
-	ImGui::End();
+	ImGui::End(); // Scene Graph Window
 
 	ImGui::Begin("Properties");
 	if (mSelectedInstance.isValid())
@@ -285,7 +237,9 @@ void SceneEditorSystem::onDrawGui()
 	{
 		ImGui::Text("No actor selected.");
 	}
-	ImGui::End();
+	ImGui::End(); // Properties Window
+
+	ImGui::End(); // DockSpace
 }
 
 void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
