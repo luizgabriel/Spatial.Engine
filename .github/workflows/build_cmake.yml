@@ -82,7 +82,7 @@ jobs:
       - name: Build
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake --build . --config $BUILD_TYPE --target all
+        run: cmake --build . --config $BUILD_TYPE
 
       - name: Test
         working-directory: ${{runner.workspace}}/build
