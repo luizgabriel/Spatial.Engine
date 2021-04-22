@@ -1,12 +1,12 @@
 #pragma once
 
+#include <spatial/common/Math.h>
 #include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/ui/UserInterfaceInput.h>
 #include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <string_view>
-#include <utility>
 
 namespace spatial
 {
@@ -23,14 +23,14 @@ class UserInterfaceSystem
 	template <typename WindowImpl>
 	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
 	{
-		setViewport(window.getWindowSize(), window.getFrameBufferSize());
+		setViewport(window.getSize(), window.getFrameBufferSize());
 	}
 
 	void setFontTexture(const SharedTexture& fontTexture);
 
 	void setMaterial(const SharedMaterial& material);
 
-	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 
 	void onStart();
 

@@ -11,14 +11,11 @@ add_library(Spatial.Core
 	include/spatial/core/Clock.h
 	include/spatial/core/Logger.h
 	
-	include/spatial/desktop/MessageBox.h
 	include/spatial/desktop/PlatformEvent.h
 	include/spatial/desktop/PlatformEventUtils.h
 	include/spatial/desktop/Window.h
-	
-	include/spatial/input/InputSystem.h
-	include/spatial/input/Input.h
-	include/spatial/input/InputState.h
+	include/spatial/desktop/InputSystem.h
+	include/spatial/desktop/InputState.h
 	
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
@@ -51,11 +48,8 @@ add_library(Spatial.Core
 	
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
-	src/desktop/MessageBox.cpp
-	
-	src/input/InputSystem.cpp
-	src/input/InputState.cpp
-	src/input/Input.cpp
+	src/desktop/InputSystem.cpp
+	src/desktop/InputState.cpp
 	
 	src/render/Stage.cpp
 	src/render/Resources.cpp
@@ -100,12 +94,12 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::spdlog
 	CONAN_PKG::imgui
 	CONAN_PKG::boost_tti
+	CONAN_PKG::boost_locale
 	CONAN_PKG::stb
-	CONAN_PKG::sdl2)
+	CONAN_PKG::glfw)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
-
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
@@ -114,16 +108,12 @@ if (UNIX AND NOT APPLE)
 	
 	find_package(Threads REQUIRED)
 	target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
-	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperLinux.cpp)
-	set_source_files_properties(src/desktop/native/WindowHelperLinux.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (WIN32)
 	message(STATUS "Detected Windows Device")
 	
 	target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_WINDOWS)
 	
 	target_link_libraries(Spatial.Core PRIVATE Shlwapi)
-	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperWindows.cpp)
-	set_source_files_properties(src/desktop/native/WindowHelperWindows.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (APPLE)
 	message(STATUS "Detected Apple Device")
 	target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)

@@ -183,12 +183,6 @@ void transformInput(Transform& transform, const std::string_view format)
 				transform.setRotation(rotation);
 			break;
 		}
-		case 'y': {
-			auto rotation2 = transform.getRotation().xy;
-			if (vec2Input("Rotation", rotation2))
-				transform.setRotation({rotation2, .0f});
-			break;
-		}
 		case 's': {
 			auto scale = transform.getScale();
 			if (vec3Input("Scale", scale, 1.0f))
@@ -544,8 +538,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 
 				math::quatf qrot, qres, qorig;
 				qrot = math::quatf::fromAxisAngle(axis, angle);
-				float nqorig = sqrt(origQuat.x * origQuat.x + origQuat.y * origQuat.y + origQuat.z * origQuat.z +
-									origQuat.w * origQuat.w);
+				float nqorig = sqrt(origQuat.x * origQuat.x + origQuat.y * origQuat.y + origQuat.z * origQuat.z
+									+ origQuat.w * origQuat.w);
 				if (abs(nqorig) > math::epsilon * math::epsilon)
 				{
 					qorig = origQuat / nqorig;
@@ -580,8 +574,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 	for (int k = 0; k < 4; ++k)
 	{
 		int j = (arrowDir.z > 0) ? 3 - k : k;
-		assert(s_ArrowTriProj[j].size() == (s_ArrowTri[j].size()) &&
-			   s_ArrowColLight[j].size() == s_ArrowTri[j].size() && s_ArrowNorm[j].size() == s_ArrowTri[j].size());
+		assert(s_ArrowTriProj[j].size() == (s_ArrowTri[j].size()) && s_ArrowColLight[j].size() == s_ArrowTri[j].size()
+			   && s_ArrowNorm[j].size() == s_ArrowTri[j].size());
 
 		auto ntri = s_ArrowTri[j].size();
 		for (int i = 0; i < ntri; ++i)
@@ -652,7 +646,7 @@ template <>
 void drawComponentView(InstanceHandle& instance, Transform& component)
 {
 	if (instance.has<Camera>())
-		transformInput(component, "py");
+		transformInput(component, "pr");
 	else if (instance.has<Light>())
 		transformInput(component, "p");
 	else
@@ -670,14 +664,7 @@ void drawComponentView(InstanceHandle&, EditorCamera& component)
 {
 	ImGui::DragFloat("Velocity", &component.velocity);
 	ImGui::DragFloat("Sensitivity", &component.sensitivity);
-}
-
-template <>
-void drawComponentView(InstanceHandle&, CameraTarget& component)
-{
-	auto target = component.getTarget();
-	vec3Input("Target", target);
-	component.setTarget(target);
+	component.startPressed = ImGui::Button("Free Camera Control");
 }
 
 template <>

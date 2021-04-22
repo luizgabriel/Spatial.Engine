@@ -13,7 +13,7 @@ void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scale
 
 void imguiRefreshDeltaTime(float delta);
 
-std::pair<int, int> imguiGetFrameSize();
+math::int2 imguiGetFrameSize();
 
 bool imguiIsMinimized();
 

@@ -1,5 +1,7 @@
 #include <spatial/render/Transform.h>
 
+using namespace spatial::math;
+
 namespace spatial
 {
 
@@ -34,57 +36,31 @@ bool Transform::isValid() const noexcept
 	return getInstance().isValid();
 }
 
-const math::float3& Transform::getPosition() const noexcept
-{
-	return mPosition;
-}
-
-void Transform::setPosition(const math::float3& position) noexcept
+void Transform::setPosition(const float3& position) noexcept
 {
 	mPosition = position;
+	refresh();
 }
 
-const math::float3& Transform::getScale() const noexcept
-{
-	return mScale;
-}
-
-void Transform::setScale(const math::float3& scale) noexcept
+void Transform::setScale(const float3& scale) noexcept
 {
 	mScale = scale;
+	refresh();
 }
 
-const math::float3& Transform::getRotation() const noexcept
-{
-	return mRotation;
-}
-
-void Transform::setRotation(const math::float3& rotation) noexcept
+void Transform::setRotation(const float3& rotation) noexcept
 {
 	mRotation = rotation;
+	refresh();
 }
 
-math::mat4f Transform::getMatrix() noexcept
+mat4f Transform::getMatrix() const noexcept
 {
-	using namespace math;
-
 	const auto translation = mat4f::translation(mPosition);
+	const auto rotation = mat4f::eulerZYX(mRotation.z, mRotation.y, mRotation.x);
 	const auto scale = mat4f::scaling(mScale);
-	const auto rotateZ = mat4f::rotation(mRotation.z, math::axisZ);
-	const auto rotateX = mat4f::rotation(mRotation.x, math::axisX);
-	const auto rotateY = mat4f::rotation(mRotation.y, math::axisY);
 
-	return translation * (rotateX * rotateY * rotateZ) * scale;
-}
-
-void Transform::rotate(const math::float3& rotation) noexcept
-{
-	setRotation(getRotation() + rotation);
-}
-
-void Transform::translate(const math::float3 translation) noexcept
-{
-	setPosition(getPosition() + translation);
+	return translation * rotation * scale;
 }
 
 Transform::Instance Transform::getInstance() const noexcept

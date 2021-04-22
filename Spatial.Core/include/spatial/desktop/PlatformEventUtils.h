@@ -7,7 +7,7 @@ namespace spatial
 {
 
 template <typename Listener>
-void connect(DesktopPlatformContext& context, Listener& listener)
+void connect(desktop::PlatformContext& context, Listener& listener)
 {
 	auto& eventQueue = context.getEventQueue();
 	eventQueue.tryConnect<WindowResizedEvent>(listener);
@@ -19,7 +19,7 @@ void connect(DesktopPlatformContext& context, Listener& listener)
 }
 
 template <typename Listener>
-void disconnect(DesktopPlatformContext& context, Listener& listener)
+void disconnect(desktop::PlatformContext& context, Listener& listener)
 {
 	auto& eventQueue = context.getEventQueue();
 	eventQueue.tryDisconnect<WindowResizedEvent>(listener);
@@ -31,7 +31,7 @@ void disconnect(DesktopPlatformContext& context, Listener& listener)
 }
 
 template <typename Listener>
-DesktopPlatformContext& operator>>(DesktopPlatformContext& context, Listener& listener)
+desktop::PlatformContext& operator>>(desktop::PlatformContext& context, Listener& listener)
 {
 	connect(context, listener);
 	return context;

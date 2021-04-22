@@ -2,7 +2,7 @@
 
 #include <spatial/render/Resources.h>
 #include <spatial/common/Signal.h>
-#include <utility>
+#include <spatial/common/Math.h>
 #include <string_view>
 
 namespace spatial::editor
@@ -11,9 +11,7 @@ namespace spatial::editor
 class ImGuiSceneWindow
 {
   public:
-	using Size = std::pair<uint32_t, uint32_t>;
-
-	ImGuiSceneWindow(filament::Engine& engine, Size size);
+	ImGuiSceneWindow(filament::Engine& engine, math::int2 size);
 
 	void draw(const std::string_view windowTitle);
 
@@ -44,7 +42,7 @@ class ImGuiSceneWindow
 
 	double getAspectRatio()
 	{
-		return mWindowSize.first / static_cast<double>(mWindowSize.second);
+		return mWindowSize.x / static_cast<double>(mWindowSize.y);
 	}
 
 	auto& getWindowResizedSignal()
@@ -56,8 +54,8 @@ class ImGuiSceneWindow
 	Texture mRenderColorTexture;
 	Texture mRenderDepthTexture;
 	RenderTarget mRenderTarget;
-	Size mWindowSize;
-	Signal<Size> mWindowResizedSignal;
+	math::int2 mWindowSize;
+	Signal<math::int2> mWindowResizedSignal;
 };
 
 template <typename Listener>

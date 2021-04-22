@@ -11,7 +11,7 @@ add_executable(Spatial.Core.Tests
 	${CMAKE_CURRENT_BINARY_DIR}/assets/plane.filamesh
 	Application.test.cpp
 	Stage.test.cpp
-	StageView.cpp
+	StageView.test.cpp
 	DesktopWindowContext.test.cpp
 	RenderingSystem.test.cpp)
 

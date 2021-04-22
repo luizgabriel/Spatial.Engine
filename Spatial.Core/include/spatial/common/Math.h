@@ -1,14 +1,15 @@
 #pragma once
 
+#include <limits>
 #include <math/mat2.h>
 #include <math/mat3.h>
 #include <math/mat4.h>
 #include <math/quat.h>
+#include <math/scalar.h>
 #include <math/vec2.h>
 #include <math/vec3.h>
 #include <math/vec4.h>
 #include <numbers>
-#include <limits>
 
 namespace spatial::math
 {
@@ -132,9 +133,17 @@ constexpr auto axisY = axisY_v<float>;
 constexpr auto axisZ = axisZ_v<float>;
 
 template <typename T>
+constexpr T rad2deg_v = static_cast<T>(180.0) / pi_v<T>;
+constexpr auto rad2deg = rad2deg_v<float>;
+
+template <typename T>
+constexpr T deg2rad_v = pi_v<T> / static_cast<T>(180.0);
+constexpr auto deg2rad = deg2rad_v<float>;
+
+template <typename T>
 constexpr quat_t<T> directionToQuaternion(const vec3<T>& dir)
 {
-	float dn = length(dir);
+	auto dn = length(dir);
 	auto out = quat_t<T>{};
 
 	if (dn < epsilon_v<T> * epsilon_v<T>)
@@ -150,7 +159,7 @@ constexpr quat_t<T> directionToQuaternion(const vec3<T>& dir)
 			rotAxis.x = rotAxis.y = 0;
 			rotAxis.z = 1;
 		}
-		float rotAngle = acos(std::clamp(dir.x / dn, -1.0f, 1.0f));
+		auto rotAngle = acos(std::clamp(dir.x / dn, -1.0f, 1.0f));
 		out = quat_t<T>::fromAxisAngle(rotAxis, rotAngle);
 	}
 
@@ -158,46 +167,45 @@ constexpr quat_t<T> directionToQuaternion(const vec3<T>& dir)
 }
 
 template <typename T>
-constexpr vec3<T> quaternionToDirection(quat_t<T>& dir)
+constexpr vec3<T> quaternionToDirection(const quat_t<T>& dir)
 {
 	auto d = dir * axisX_v<T>;
 	return d / length(d);
 }
 
 template <typename T>
-constexpr T toDegree(T radians)
+constexpr vec3<T> forwardVector(const mat4_t<T>& mat)
 {
-	return radians * (static_cast<T>(180.0) / pi_v<T>);
+	return normalize(-mat[2].xyz);
 }
 
+/**
+ * See more: http://planning.cs.uiuc.edu/node103.html
+ * @tparam T
+ * @param mat
+ * @return (roll, yaw, pitch)
+ */
 template <typename T>
-constexpr T toRadians(T degrees)
+constexpr vec3<T> eulerZYX(const mat4_t<T>& mat)
 {
-	return degrees * (pi_v<T> / static_cast<T>(180.0));
+	const auto yaw = std::atan2(mat[2][1], mat[1][1]);
+	const auto pitch = std::atan2(-mat[3][1], std::sqrt(mat[3][2] * mat[3][2] + mat[3][3] * mat[3][3]));
+	const auto roll = std::atan2(mat[3][2], mat[3][3]);
+
+	return {roll, yaw, pitch};
 }
 
+/**
+ *
+ * @tparam T
+ * @param mat
+ * @return (pitch, yaw, roll)
+ */
 template <typename T>
-constexpr vec2<T> toRadians(vec2<T> degreesVector)
+constexpr vec3<T> eulerYXZ(const mat4_t<T>& mat)
 {
-	return {toRadians<T>(degreesVector.x), toRadians<T>(degreesVector.y)};
-}
-
-template <typename T>
-constexpr vec3<T> toRadians(vec3<T> degreesVector)
-{
-	return {toRadians<T>(degreesVector.x), toRadians<T>(degreesVector.y), toRadians<T>(degreesVector.z)};
-}
-
-template <typename T>
-constexpr vec2<T> toDegree(vec2<T> radiansVector)
-{
-	return {toDegree<T>(radiansVector.x), toDegree<T>(radiansVector.y)};
-}
-
-template <typename T>
-constexpr vec3<T> toDegree(vec3<T> radiansVector)
-{
-	return {toDegree<T>(radiansVector.x), toDegree<T>(radiansVector.y), toDegree<T>(radiansVector.z)};
+	const auto ryp = eulerZYX(mat);
+	return {ryp.z, ryp.y, ryp.x};
 }
 
 } // namespace spatial::math

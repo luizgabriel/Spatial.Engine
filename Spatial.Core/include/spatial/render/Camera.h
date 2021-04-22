@@ -59,31 +59,6 @@ struct CustomProjection : public CameraProjection
 	}
 };
 
-class CameraTarget
-{
-  public:
-	CameraTarget() : mTarget{.0f}
-	{
-	}
-
-	CameraTarget(math::float3 target) : mTarget{std::move(target)}
-	{
-	}
-
-	const math::float3& getTarget() const noexcept
-	{
-		return mTarget;
-	}
-
-	void setTarget(const math::float3& target) noexcept
-	{
-		mTarget = target;
-	}
-
-  private:
-	math::float3 mTarget{.0f};
-};
-
 class Camera
 {
   public:
@@ -108,6 +83,10 @@ class Camera
 	{
 		return !mEntity.isNull();
 	}
+
+	void lookAt(const math::float3& eye, const math::float3& center) noexcept;
+
+	void lookAt(const math::float3& eye, const math::float3& center, const math::float3& up) noexcept;
 
 	bool isPerspective() const noexcept;
 

@@ -10,7 +10,6 @@
 
 using namespace filament::math;
 using namespace std::string_literals;
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace std
@@ -101,12 +100,12 @@ Material createMaterial(fl::Engine& engine, const std::string& resourceData)
 	return Material{engine, material};
 }
 
-Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,
+Texture createTexture(filament::Engine& engine, math::int2 dimensions,
 					  fl::Texture::InternalFormat format, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	auto texture = fl::Texture::Builder()
-					   .width(dimensions.first)
-					   .height(dimensions.second)
+					   .width(dimensions.x)
+					   .height(dimensions.y)
 					   .levels(1)
 					   .usage(usage)
 					   .sampler(sampler)

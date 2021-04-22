@@ -92,17 +92,6 @@ CameraInstanceBuilder& CameraInstanceBuilder::withPerspectiveProjection(double f
 	return *this;
 }
 
-CameraInstanceBuilder& CameraInstanceBuilder::withTarget(const math::float3& target)
-{
-	if (!getInstance().has<CameraTarget>())
-	{
-		getInstance().add<spatial::CameraTarget>(target);
-	}
-
-	getInstance().get<spatial::CameraTarget>().setTarget(target);
-	return *this;
-}
-
 CameraInstanceBuilder& CameraInstanceBuilder::withOrthographicProjection(double aspectRatio, double near, double far)
 {
 	getComponent().setProjection(OrthographicProjection{aspectRatio, near, far});

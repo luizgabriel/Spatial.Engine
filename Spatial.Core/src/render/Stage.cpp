@@ -55,17 +55,14 @@ void Stage::setMainCamera(Instance instance)
 	}
 }
 
-void Stage::onUpdateFrame(float)
-{
-	getInstances<Transform>().each([](auto& transform) { transform.refresh(); });
-	getInstances<Camera, CameraTarget, const Transform>().each([](auto& cameraCtrl, auto& cameraTarget, const auto& transform) {
-	  cameraCtrl.getInstance()->lookAt(transform.getPosition(), cameraTarget.getTarget(), math::axisY);
-	});
-}
-
 void Stage::render(filament::Renderer& renderer) const
 {
 	renderer.render(mView.get());
+}
+
+void Stage::onStart()
+{
+	getInstances<Transform>().each([](auto& transform) { transform.refresh(); });
 }
 
 } // namespace spatial

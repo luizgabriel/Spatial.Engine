@@ -22,9 +22,14 @@ TEST(Stage, Create)
 	ASSERT_TRUE(instance.isValid());
 	ASSERT_TRUE(instance.has<Entity>());
 	ASSERT_TRUE(instance.get<Entity>().isValid());
-	ASSERT_EQ(instance.get<Transform>().getPosition(), position);
-	ASSERT_EQ(instance.get<Transform>().getScale(), scale);
-	ASSERT_EQ(instance.get<Transform>().getRotation(), rotation);
+
+	ASSERT_NEAR(instance.get<Transform>().getPosition().x, position.x, math::epsilon);
+	ASSERT_NEAR(instance.get<Transform>().getPosition().y, position.y, math::epsilon);
+	ASSERT_NEAR(instance.get<Transform>().getPosition().z, position.z, math::epsilon);
+
+	ASSERT_NEAR(instance.get<Transform>().getScale().x, scale.x, math::epsilon);
+	ASSERT_NEAR(instance.get<Transform>().getScale().y, scale.y, math::epsilon);
+	ASSERT_NEAR(instance.get<Transform>().getScale().z, scale.z, math::epsilon);
 }
 
 TEST(Stage, CreatePerspectiveCamera)

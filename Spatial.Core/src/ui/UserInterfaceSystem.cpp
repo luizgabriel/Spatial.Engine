@@ -43,7 +43,7 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 	mInput.setText(event.text);
 }
 
-void UserInterfaceSystem::setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize)
+void UserInterfaceSystem::setViewport(const math::int2& windowSize, const math::int2& frameBufferSize)
 {
 	mRenderer.setViewport(windowSize, frameBufferSize);
 }

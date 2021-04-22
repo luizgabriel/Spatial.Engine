@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spatial/common/Math.h>
 #include <spatial/common/Key.h>
 #include <utility>
 
@@ -8,10 +9,10 @@ namespace spatial
 
 struct WindowResizedEvent
 {
-	std::pair<int, int> windowSize;
-	std::pair<int, int> frameBufferSize;
+	math::int2 windowSize;
+	math::int2 frameBufferSize;
 
-	WindowResizedEvent(std::pair<int, int> windowSize, std::pair<int, int> frameBufferSize)
+	WindowResizedEvent(math::int2 windowSize, math::int2 frameBufferSize)
 		: windowSize{std::move(windowSize)}, frameBufferSize{std::move(frameBufferSize)}
 	{
 	}
@@ -25,10 +26,9 @@ struct KeyEvent
 {
 	Key key;
 	KeyAction action;
-	int repeat;
 
-	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::None, int repeat = 0)
-		: key{key}, action{action}, repeat{repeat}
+	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::None)
+		: key{key}, action{action}
 	{
 	}
 };

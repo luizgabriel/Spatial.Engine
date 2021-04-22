@@ -1,16 +1,14 @@
 #include "SceneEditorSystem.h"
 
 #include <argh.h>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 
 #include <assets/generated.h>
 #include <spatial/core/Application.h>
 #include <spatial/core/ApplicationUtils.h>
+#include <spatial/desktop/InputSystem.h>
 #include <spatial/desktop/PlatformEventUtils.h>
 #include <spatial/desktop/Window.h>
-#include <spatial/input/Input.h>
-#include <spatial/input/InputSystem.h>
-#include <spatial/input/InputSystemUtils.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
 #include <spatial/render/ResourceLoaders.h>
@@ -19,7 +17,7 @@
 #include <spatial/ui/UserInterfaceUtils.h>
 
 using namespace spatial;
-namespace fs = std::filesystem;
+namespace fs = ghc::filesystem;
 
 struct SetupConfig
 {
@@ -38,31 +36,24 @@ int main(int argc, char* argv[])
 	args({"-h", "--height"}) >> config.windowHeight;
 
 	auto app = Application{};
-	auto desktopContext = DesktopPlatformContext{};
+	auto desktopContext = desktop::PlatformContext{};
 	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
-
-	auto input = InputSystem{};
-	Input::with(input.getState());
-
 	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
-
+	auto input = desktop::InputSystem{window};
 	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
 	ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
 	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine()};
+	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
 
 	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> editor >> ui;
+	app >> desktopContext >> input >> rendering >> ui >> editor;
 
 	// Connect Desktop Events to All Systems
 	desktopContext >> app >> input >> rendering >> ui >> editor;
 
 	// Connect Gui Render to Editor
 	ui >> editor;
-
-	// Connect Input to Window
-	input >> window;
 
 	// Connect Rendering to Editor and UI
 	rendering >> editor >> ui;

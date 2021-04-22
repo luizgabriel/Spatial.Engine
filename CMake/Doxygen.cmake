@@ -11,7 +11,7 @@ if (SPATIAL_ENABLE_DOXYGEN)
 	set(DOXYGEN_HAVE_DOT YES)
 	set(DOXYGEN_CLASS_GRAPH YES)
 	
-	set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs)
+	set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/docs)
 	
 	find_package(Doxygen REQUIRED dot)
 	doxygen_add_docs(Spatial.Core.Docs ${PROJECT_SOURCE_DIR}/Spatial.Core COMMENT "Doxygen has been setup and documentation is now available.")

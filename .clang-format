@@ -5,5 +5,7 @@ PointerAlignment: Left
 TabWidth: 4
 UseTab: Always
 AlwaysBreakTemplateDeclarations: Yes
-
+AlignAfterOpenBracket: Align
+AlignOperands: Align
+BreakBeforeBinaryOperators: NonAssignment
 ...

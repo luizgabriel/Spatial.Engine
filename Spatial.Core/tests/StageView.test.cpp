@@ -1,7 +1,6 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <spatial/render/InstanceBuilder.h>
-#include <spatial/render/InstanceHandle.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/SceneNodeName.h>
 #include <spatial/render/Stage.h>

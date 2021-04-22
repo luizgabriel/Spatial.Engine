@@ -5,7 +5,7 @@
 namespace spatial::editor
 {
 
-ImGuiSceneWindow::ImGuiSceneWindow(filament::Engine& engine, ImGuiSceneWindow::Size size)
+ImGuiSceneWindow::ImGuiSceneWindow(filament::Engine& engine, math::int2 size)
 	: mRenderColorTexture{createTexture(engine, size, filament::backend::TextureFormat::RGBA16F,
 										filament::Texture::Usage::COLOR_ATTACHMENT |
 										filament::Texture::Usage::SAMPLEABLE)},
@@ -22,7 +22,7 @@ void ImGuiSceneWindow::draw(const std::string_view windowTitle)
 	ImGui::Begin(windowTitle.begin());
 	auto size = ImGui::GetWindowSize();
 	size.y -= 25;
-	auto currentSize = Size{size.x, size.y};
+	auto currentSize = math::int2{size.x, size.y};
 
 	if (currentSize != mWindowSize) {
 		mWindowSize = std::move(currentSize);

@@ -1,314 +1,311 @@
-// ReSharper disable CppMemberFunctionMayBeStatic
+#include <boost/locale.hpp>
+#include <sstream>
 #include <spatial/common/Key.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
 
-namespace spatial
+#if defined(SPATIAL_PLATFORM_OSX)
+#define GLFW_EXPOSE_NATIVE_COCOA
+#elif defined(SPATIAL_PLATFORM_WINDOWS)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#elif defined(SPATIAL_PLATFORM_UNIX)
+#define GLFW_EXPOSE_NATIVE_X11
+#endif
+#include <GLFW/glfw3native.h>
+
+
+namespace spatial::desktop
 {
 
-bool DesktopPlatformContext::sValid{false};
-EventQueue DesktopPlatformContext::sEventQueue{};
+bool PlatformContext::sValid{false};
+EventQueue PlatformContext::sEventQueue{};
 
-DesktopPlatformContext::DesktopPlatformContext()
+PlatformContext::PlatformContext()
 {
 	if (!sValid)
-		sValid = SDL_Init(SDL_INIT_EVERYTHING) == 0;
+		sValid = glfwInit() == GLFW_TRUE;
+
+	glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 }
 
-DesktopPlatformContext::~DesktopPlatformContext()
+PlatformContext::~PlatformContext()
 {
 	if (sValid)
-		SDL_Quit();
+		glfwTerminate();
 }
 
-void DesktopPlatformContext::onStartFrame(float)
+void PlatformContext::setupCallbacks(GLFWwindow* window)
 {
 	if (!sValid)
 		return;
 
-	SDL_Event e{};
-	while (SDL_PollEvent(&e))
-	{
-		switch (e.type)
-		{
-		case SDL_QUIT:
-			sEventQueue.enqueue<WindowClosedEvent>();
-			break;
+	glfwSetWindowCloseCallback(window, [](auto* win) { sEventQueue.enqueue<WindowClosedEvent>(); });
 
-		case SDL_TEXTINPUT:
-			sEventQueue.enqueue<TextEvent>(std::string{e.text.text});
-			break;
+	glfwSetCharCallback(window, [](auto* win, unsigned int codepoint) {
+		auto ss = std::wstringstream{};
+	  	ss << static_cast<wchar_t>(codepoint);
 
-		case SDL_KEYDOWN: {
-			auto key = mapKeyFromScancode(e.key.keysym.scancode);
-			sEventQueue.enqueue<KeyEvent>(key, KeyAction::Pressed, e.key.repeat);
+		sEventQueue.enqueue<TextEvent>(boost::locale::conv::utf_to_utf<char>(ss.str()));
+	});
 
-			break;
-		}
+	glfwSetKeyCallback(window, [](auto* win, int key, int scancode, int action, int mods) {
+		const auto spatialKey = mapKeyFromScancode(key);
+		const auto spatialAction = mapActionFromCode(action);
+		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
+	});
 
-		case SDL_KEYUP: {
-			auto key = mapKeyFromScancode(e.key.keysym.scancode);
-			sEventQueue.enqueue<KeyEvent>(key, KeyAction::Released, e.key.repeat);
-			break;
-		}
+	glfwSetMouseButtonCallback(window, [](auto* win, int button, int action, int mods) {
+		const auto spatialKey = mapKeyFromMouseButton(button);
+		const auto spatialAction = mapActionFromCode(action);
+		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
+	});
 
-		case SDL_MOUSEWHEEL:
-			sEventQueue.enqueue<MouseScrolledEvent>(e.wheel.x, e.wheel.y);
-			break;
+	glfwSetScrollCallback(window, [](auto* win, double xOffset, double yOffset) {
+		sEventQueue.enqueue<MouseScrolledEvent>(xOffset, yOffset);
+	});
 
-		case SDL_MOUSEBUTTONDOWN:
-			sEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Pressed, e.button.clicks);
-			break;
+	glfwSetScrollCallback(window, [](auto* win, double xOffset, double yOffset) {
+		sEventQueue.enqueue<MouseScrolledEvent>(xOffset, yOffset);
+	});
 
-		case SDL_MOUSEBUTTONUP:
-			sEventQueue.enqueue<KeyEvent>(mapKeyFromMouseButton(e.button.button), KeyAction::Released, e.button.clicks);
-			break;
+	glfwSetWindowSizeCallback(window, [](auto* win, int width, int height) {
+		int fbw, fbh;
+		glfwGetFramebufferSize(win, &fbw, &fbh);
+		sEventQueue.enqueue<WindowResizedEvent>(math::int2{width, height}, math::int2{fbw, fbh});
+	});
 
-		case SDL_MOUSEMOTION:
-			sEventQueue.enqueue<MouseMovedEvent>(e.motion.x, e.motion.y);
-			break;
+	glfwSetCursorPosCallback(window, [](auto* win, double xPos, double yPos) {
+	  sEventQueue.enqueue<MouseMovedEvent>(xPos, yPos);
+	});
+}
 
-		case SDL_DROPFILE:
-			SDL_free(e.drop.file);
-			break;
+void PlatformContext::onStartFrame(float)
+{
+	if (!sValid)
+		return;
 
-		case SDL_WINDOWEVENT: {
-			std::pair<int, int> windowSize, frameBufferSize;
-			auto* sdlWindow = SDL_GetWindowFromID(e.window.windowID);
-
-			switch (e.window.event)
-			{
-			case SDL_WINDOWEVENT_RESIZED: {
-				SDL_GetWindowSize(sdlWindow, &windowSize.first, &windowSize.second);
-				SDL_GL_GetDrawableSize(sdlWindow, &frameBufferSize.first, &frameBufferSize.second);
-				sEventQueue.enqueue<WindowResizedEvent>(windowSize, frameBufferSize);
-				break;
-			}
-			default:
-				break;
-			}
-
-			break;
-		}
-		default:
-			break;
-		}
-	}
+	glfwPollEvents();
 
 	sEventQueue.update<WindowResizedEvent>();
+	sEventQueue.update<MouseMovedEvent>();
 	sEventQueue.update();
 }
 
-Window DesktopPlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
+Window PlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
 											std::string_view title) const noexcept
 {
-	return Window{SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-								   SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)};
+	auto window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+	setupCallbacks(window);
+	return Window{window};
 }
 
-Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept
+Key mapKeyFromScancode(const int scanCode) noexcept
 {
 	switch (scanCode)
 	{
-	case SDL_SCANCODE_LSHIFT:
+	case GLFW_KEY_LEFT_SHIFT:
 		return Key::LShift;
-	case SDL_SCANCODE_RSHIFT:
+	case GLFW_KEY_RIGHT_SHIFT:
 		return Key::RShift;
-	case SDL_SCANCODE_LCTRL:
+	case GLFW_KEY_LEFT_CONTROL:
 		return Key::LControl;
-	case SDL_SCANCODE_RCTRL:
+	case GLFW_KEY_RIGHT_CONTROL:
 		return Key::RControl;
-	case SDL_SCANCODE_LALT:
+	case GLFW_KEY_LEFT_ALT:
 		return Key::LAlt;
-	case SDL_SCANCODE_RALT:
+	case GLFW_KEY_RIGHT_ALT:
 		return Key::RAlt;
-	case SDL_SCANCODE_APPLICATION:
+	case GLFW_KEY_RIGHT_SUPER:
+	case GLFW_KEY_LEFT_SUPER:
 		return Key::System;
-	case SDL_SCANCODE_MENU:
+	case GLFW_KEY_MENU:
 		return Key::Menu;
-	case SDL_SCANCODE_ESCAPE:
+	case GLFW_KEY_ESCAPE:
 		return Key::Escape;
-	case SDL_SCANCODE_SEMICOLON:
+	case GLFW_KEY_SEMICOLON:
 		return Key::Semicolon;
-	case SDL_SCANCODE_SLASH:
+	case GLFW_KEY_SLASH:
 		return Key::Slash;
-	case SDL_SCANCODE_EQUALS:
+	case GLFW_KEY_EQUAL:
 		return Key::Equal;
-	case SDL_SCANCODE_MINUS:
+	case GLFW_KEY_MINUS:
 		return Key::Hyphen;
-	case SDL_SCANCODE_LEFTBRACKET:
+	case GLFW_KEY_LEFT_BRACKET:
 		return Key::LBracket;
-	case SDL_SCANCODE_RIGHTBRACKET:
+	case GLFW_KEY_RIGHT_BRACKET:
 		return Key::RBracket;
-	case SDL_SCANCODE_COMMA:
+	case GLFW_KEY_COMMA:
 		return Key::Comma;
-	case SDL_SCANCODE_PERIOD:
+	case GLFW_KEY_PERIOD:
 		return Key::Period;
-	case SDL_SCANCODE_APOSTROPHE:
+	case GLFW_KEY_APOSTROPHE:
 		return Key::Quote;
-	case SDL_SCANCODE_BACKSLASH:
+	case GLFW_KEY_BACKSLASH:
 		return Key::Backslash;
-	case SDL_SCANCODE_NONUSBACKSLASH:
+	case GLFW_KEY_GRAVE_ACCENT:
 		return Key::Tilde;
-	case SDL_SCANCODE_SPACE:
+	case GLFW_KEY_SPACE:
 		return Key::Space;
-	case SDL_SCANCODE_RETURN:
+	case GLFW_KEY_ENTER:
 		return Key::Enter;
-	case SDL_SCANCODE_BACKSPACE:
+	case GLFW_KEY_BACKSPACE:
 		return Key::Backspace;
-	case SDL_SCANCODE_TAB:
+	case GLFW_KEY_TAB:
 		return Key::Tab;
-	case SDL_SCANCODE_PAGEUP:
+	case GLFW_KEY_PAGE_UP:
 		return Key::PageUp;
-	case SDL_SCANCODE_PAGEDOWN:
+	case GLFW_KEY_PAGE_DOWN:
 		return Key::PageDown;
-	case SDL_SCANCODE_END:
+	case GLFW_KEY_END:
 		return Key::End;
-	case SDL_SCANCODE_HOME:
+	case GLFW_KEY_HOME:
 		return Key::Home;
-	case SDL_SCANCODE_INSERT:
+	case GLFW_KEY_INSERT:
 		return Key::Insert;
-	case SDL_SCANCODE_DELETE:
+	case GLFW_KEY_DELETE:
 		return Key::Delete;
-	case SDL_SCANCODE_KP_PLUS:
+	case GLFW_KEY_KP_ADD:
 		return Key::Add;
-	case SDL_SCANCODE_KP_MINUS:
+	case GLFW_KEY_KP_SUBTRACT:
 		return Key::Subtract;
-	case SDL_SCANCODE_KP_MULTIPLY:
+	case GLFW_KEY_KP_MULTIPLY:
 		return Key::Multiply;
-	case SDL_SCANCODE_KP_DIVIDE:
+	case GLFW_KEY_KP_DIVIDE:
 		return Key::Divide;
-	case SDL_SCANCODE_PAUSE:
+	case GLFW_KEY_PAUSE:
 		return Key::Pause;
-	case SDL_SCANCODE_F1:
+	case GLFW_KEY_F1:
 		return Key::F1;
-	case SDL_SCANCODE_F2:
+	case GLFW_KEY_F2:
 		return Key::F2;
-	case SDL_SCANCODE_F3:
+	case GLFW_KEY_F3:
 		return Key::F3;
-	case SDL_SCANCODE_F4:
+	case GLFW_KEY_F4:
 		return Key::F4;
-	case SDL_SCANCODE_F5:
+	case GLFW_KEY_F5:
 		return Key::F5;
-	case SDL_SCANCODE_F6:
+	case GLFW_KEY_F6:
 		return Key::F6;
-	case SDL_SCANCODE_F7:
+	case GLFW_KEY_F7:
 		return Key::F7;
-	case SDL_SCANCODE_F8:
+	case GLFW_KEY_F8:
 		return Key::F8;
-	case SDL_SCANCODE_F9:
+	case GLFW_KEY_F9:
 		return Key::F9;
-	case SDL_SCANCODE_F10:
+	case GLFW_KEY_F10:
 		return Key::F10;
-	case SDL_SCANCODE_F11:
+	case GLFW_KEY_F11:
 		return Key::F11;
-	case SDL_SCANCODE_F12:
+	case GLFW_KEY_F12:
 		return Key::F12;
-	case SDL_SCANCODE_F13:
+	case GLFW_KEY_F13:
 		return Key::F13;
-	case SDL_SCANCODE_F14:
+	case GLFW_KEY_F14:
 		return Key::F14;
-	case SDL_SCANCODE_F15:
+	case GLFW_KEY_F15:
 		return Key::F15;
-	case SDL_SCANCODE_LEFT:
+	case GLFW_KEY_LEFT:
 		return Key::Left;
-	case SDL_SCANCODE_RIGHT:
+	case GLFW_KEY_RIGHT:
 		return Key::Right;
-	case SDL_SCANCODE_UP:
+	case GLFW_KEY_UP:
 		return Key::Up;
-	case SDL_SCANCODE_DOWN:
+	case GLFW_KEY_DOWN:
 		return Key::Down;
-	case SDL_SCANCODE_KP_0:
+	case GLFW_KEY_KP_0:
 		return Key::Numpad0;
-	case SDL_SCANCODE_KP_1:
+	case GLFW_KEY_KP_1:
 		return Key::Numpad1;
-	case SDL_SCANCODE_KP_2:
+	case GLFW_KEY_KP_2:
 		return Key::Numpad2;
-	case SDL_SCANCODE_KP_3:
+	case GLFW_KEY_KP_3:
 		return Key::Numpad3;
-	case SDL_SCANCODE_KP_4:
+	case GLFW_KEY_KP_4:
 		return Key::Numpad4;
-	case SDL_SCANCODE_KP_5:
+	case GLFW_KEY_KP_5:
 		return Key::Numpad5;
-	case SDL_SCANCODE_KP_6:
+	case GLFW_KEY_KP_6:
 		return Key::Numpad6;
-	case SDL_SCANCODE_KP_7:
+	case GLFW_KEY_KP_7:
 		return Key::Numpad7;
-	case SDL_SCANCODE_KP_8:
+	case GLFW_KEY_KP_8:
 		return Key::Numpad8;
-	case SDL_SCANCODE_KP_9:
+	case GLFW_KEY_KP_9:
 		return Key::Numpad9;
-	case SDL_SCANCODE_A:
+	case GLFW_KEY_A:
 		return Key::A;
-	case SDL_SCANCODE_B:
+	case GLFW_KEY_B:
 		return Key::B;
-	case SDL_SCANCODE_C:
+	case GLFW_KEY_C:
 		return Key::C;
-	case SDL_SCANCODE_D:
+	case GLFW_KEY_D:
 		return Key::D;
-	case SDL_SCANCODE_E:
+	case GLFW_KEY_E:
 		return Key::E;
-	case SDL_SCANCODE_F:
+	case GLFW_KEY_F:
 		return Key::F;
-	case SDL_SCANCODE_G:
+	case GLFW_KEY_G:
 		return Key::G;
-	case SDL_SCANCODE_H:
+	case GLFW_KEY_H:
 		return Key::H;
-	case SDL_SCANCODE_I:
+	case GLFW_KEY_I:
 		return Key::I;
-	case SDL_SCANCODE_J:
+	case GLFW_KEY_J:
 		return Key::J;
-	case SDL_SCANCODE_K:
+	case GLFW_KEY_K:
 		return Key::K;
-	case SDL_SCANCODE_L:
+	case GLFW_KEY_L:
 		return Key::L;
-	case SDL_SCANCODE_M:
+	case GLFW_KEY_M:
 		return Key::M;
-	case SDL_SCANCODE_N:
+	case GLFW_KEY_N:
 		return Key::N;
-	case SDL_SCANCODE_O:
+	case GLFW_KEY_O:
 		return Key::O;
-	case SDL_SCANCODE_P:
+	case GLFW_KEY_P:
 		return Key::P;
-	case SDL_SCANCODE_Q:
+	case GLFW_KEY_Q:
 		return Key::Q;
-	case SDL_SCANCODE_R:
+	case GLFW_KEY_R:
 		return Key::R;
-	case SDL_SCANCODE_S:
+	case GLFW_KEY_S:
 		return Key::S;
-	case SDL_SCANCODE_T:
+	case GLFW_KEY_T:
 		return Key::T;
-	case SDL_SCANCODE_U:
+	case GLFW_KEY_U:
 		return Key::U;
-	case SDL_SCANCODE_V:
+	case GLFW_KEY_V:
 		return Key::V;
-	case SDL_SCANCODE_W:
+	case GLFW_KEY_W:
 		return Key::W;
-	case SDL_SCANCODE_X:
+	case GLFW_KEY_X:
 		return Key::X;
-	case SDL_SCANCODE_Y:
+	case GLFW_KEY_Y:
 		return Key::Y;
-	case SDL_SCANCODE_Z:
+	case GLFW_KEY_Z:
 		return Key::Z;
-	case SDL_SCANCODE_0:
+	case GLFW_KEY_0:
 		return Key::Num0;
-	case SDL_SCANCODE_1:
+	case GLFW_KEY_1:
 		return Key::Num1;
-	case SDL_SCANCODE_2:
+	case GLFW_KEY_2:
 		return Key::Num2;
-	case SDL_SCANCODE_3:
+	case GLFW_KEY_3:
 		return Key::Num3;
-	case SDL_SCANCODE_4:
+	case GLFW_KEY_4:
 		return Key::Num4;
-	case SDL_SCANCODE_5:
+	case GLFW_KEY_5:
 		return Key::Num5;
-	case SDL_SCANCODE_6:
+	case GLFW_KEY_6:
 		return Key::Num6;
-	case SDL_SCANCODE_7:
+	case GLFW_KEY_7:
 		return Key::Num7;
-	case SDL_SCANCODE_8:
+	case GLFW_KEY_8:
 		return Key::Num8;
-	case SDL_SCANCODE_9:
+	case GLFW_KEY_9:
 		return Key::Num9;
 	default:
 		return Key::UnknownKey;
@@ -319,14 +316,27 @@ Key mapKeyFromMouseButton(int mouseButton) noexcept
 {
 	switch (mouseButton)
 	{
-	case SDL_BUTTON_LEFT:
+	case GLFW_MOUSE_BUTTON_LEFT:
 		return Key::MouseLeft;
-	case SDL_BUTTON_RIGHT:
+	case GLFW_MOUSE_BUTTON_RIGHT:
 		return Key::MouseRight;
-	case SDL_BUTTON_MIDDLE:
+	case GLFW_MOUSE_BUTTON_MIDDLE:
 		return Key::MouseMiddle;
 	default:
 		return Key::UnknownKey;
+	}
+}
+
+KeyAction mapActionFromCode(int action) noexcept
+{
+	switch (action)
+	{
+	case GLFW_PRESS:
+		return KeyAction::Pressed;
+	case GLFW_RELEASE:
+		return KeyAction::Released;
+	default:
+		return KeyAction::None;
 	}
 }
 

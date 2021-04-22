@@ -1,3 +1,5 @@
+#include <spatial/common/Math.h>
+
 #include <spatial/ui/ImGuiHelpers.h>
 #include <spatial/ui/UserInterfaceRenderer.h>
 
@@ -9,7 +11,6 @@
 #include <filament/TextureSampler.h>
 #include <filament/VertexBuffer.h>
 #include <filament/Viewport.h>
-#include <unordered_map>
 
 namespace fl = filament;
 
@@ -139,21 +140,18 @@ UserInterfaceRenderer::~UserInterfaceRenderer()
 	ImGui::DestroyContext(mImguiContext);
 }
 
-void UserInterfaceRenderer::setViewport(const std::pair<int, int>& windowSize,
-										const std::pair<int, int>& frameBufferSize)
+void UserInterfaceRenderer::setViewport(const math::int2& windowSize,
+										const math::int2& frameBufferSize)
 {
-	const auto [w, h] = windowSize;
-	const auto [fw, fh] = frameBufferSize;
+	const auto dpiScaleX = static_cast<float>(frameBufferSize.x) / windowSize.x;
+	const auto dpiScaleY = static_cast<float>(frameBufferSize.y) / windowSize.y;
 
-	const auto dpiScaleX = static_cast<float>(fw) / w;
-	const auto dpiScaleY = static_cast<float>(fh) / h;
+	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
+	mCamera.setProjection(OrthographicProjection{0.0, frameBufferSize.x / dpiScaleX, frameBufferSize.y / dpiScaleY, 0.0, 0.0, 1.0});
 
-	mView->setViewport({0, 0, static_cast<uint32_t>(fw), static_cast<uint32_t>(fh)});
-	mCamera.setProjection(OrthographicProjection{0.0, fw / dpiScaleX, fh / dpiScaleY, 0.0, 0.0, 1.0});
-
-	const auto scaleX = w > 0 ? static_cast<float>(fw) / w : 0;
-	const auto scaleY = h > 0 ? static_cast<float>(fh) / h : 0;
-	imguiRefreshViewport(w, h, scaleX, scaleY);
+	const auto scaleX = windowSize.x > 0 ? static_cast<float>(frameBufferSize.x) / windowSize.x : 0;
+	const auto scaleY = windowSize.y > 0 ? static_cast<float>(frameBufferSize.y) / windowSize.y : 0;
+	imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);
 }
 
 void UserInterfaceRenderer::beforeRender(float delta) const
@@ -179,9 +177,9 @@ void UserInterfaceRenderer::renderDrawData()
 	auto imguiData = ImGui::GetDrawData();
 	auto& rcm = mEngine.getRenderableManager();
 	auto& io = ImGui::GetIO();
-	auto [fbWidth, fbHeight] = imguiGetFrameSize();
+	auto fbSize = imguiGetFrameSize();
 
-	if (fbWidth == 0 || fbHeight == 0)
+	if (fbSize.x == 0 || fbSize.y == 0)
 		return;
 
 	imguiData->ScaleClipRects(io.DisplayFramebufferScale);
@@ -221,7 +219,7 @@ void UserInterfaceRenderer::renderDrawData()
 			else
 			{
 				auto& mi = mMaterialInstances[primIndex];
-				mi->setScissor( pcmd.ClipRect.x, fbHeight - pcmd.ClipRect.w,
+				mi->setScissor( pcmd.ClipRect.x, fbSize.y - pcmd.ClipRect.w,
 											  (uint16_t) (pcmd.ClipRect.z - pcmd.ClipRect.x),
 											  (uint16_t) (pcmd.ClipRect.w - pcmd.ClipRect.y));
 

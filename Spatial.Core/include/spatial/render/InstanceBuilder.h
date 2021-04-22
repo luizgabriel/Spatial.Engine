@@ -36,6 +36,10 @@ class InstanceBuilder
 
 	InstanceBuilder& withPosition(const math::float3& position);
 
+	/**
+	 * @param rotation (pitch, yaw, roll)
+	 * @return
+	 */
 	InstanceBuilder& withRotation(const math::float3& rotation);
 
 	InstanceBuilder& withScale(const math::float3& scale);
@@ -88,8 +92,6 @@ class CameraInstanceBuilder : public InstanceBuilder
 {
   public:
 	CameraInstanceBuilder(Stage& stage, spatial::Instance instance);
-
-	CameraInstanceBuilder& withTarget(const math::float3& target);
 
 	CameraInstanceBuilder& withPerspectiveProjection(double fieldOfView, double aspectRatio, double near, double far);
 

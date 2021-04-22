@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imgui.h>
+#include <spatial/common/Math.h>
 #include <spatial/render/Resources.h>
 #include <vector>
 
@@ -42,7 +43,7 @@ class UserInterfaceRenderer
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
 	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
 
-	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 
 	void setMaterial(const SharedMaterial& material);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spatial/common/Math.h>
 #include <spatial/render/Resources.h>
 
 #include <cstdint>
@@ -11,7 +12,7 @@ namespace spatial
 
 Material createMaterial(filament::Engine& engine, const std::string& resourceData);
 
-Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,
+Texture createTexture(filament::Engine& engine, math::int2 dimensions,
 					  fl::Texture::InternalFormat format, fl::Texture::Usage usage = fl::Texture::Usage::DEFAULT,
 					  fl::Texture::Sampler sampler = fl::Texture::Sampler::SAMPLER_2D);
 

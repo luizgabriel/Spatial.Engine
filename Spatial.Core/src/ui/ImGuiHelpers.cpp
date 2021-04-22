@@ -1,6 +1,5 @@
 #include <spatial/ui/ImGuiHelpers.h>
 
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial
@@ -20,7 +19,7 @@ void imguiRefreshDeltaTime(float delta)
 	io.DeltaTime = delta;
 }
 
-std::pair<int, int> imguiGetFrameSize()
+math::int2 imguiGetFrameSize()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	int fw = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
@@ -31,8 +30,8 @@ std::pair<int, int> imguiGetFrameSize()
 
 bool imguiIsMinimized()
 {
-	auto [width, height] = imguiGetFrameSize();
-	return width == 0 && height == 0;
+	auto fs = imguiGetFrameSize();
+	return fs.x == 0 && fs.y == 0;
 }
 
 VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)

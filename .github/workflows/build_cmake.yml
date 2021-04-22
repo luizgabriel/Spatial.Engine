@@ -71,35 +71,13 @@ jobs:
       - name: Create Build Directory
         run: cmake -E make_directory ${{runner.workspace}}/build
 
-      - name: Build Dependencies (MacOS)
-        if: matrix.config.os == 'macos-latest'
-        working-directory: ${{runner.workspace}}/build
-        env:
-          CC: ${{matrix.config.cc}}
-          CXX: ${{matrix.config.cxx}}
-        run: |
-          conan install .. --build=missing -s sdl2:os_version="10.14"
-
-      - name: Build Dependencies (Ubuntu)
-        working-directory: ${{runner.workspace}}/build
-        env:
-          CC: ${{matrix.config.cc}}
-          CXX: ${{matrix.config.cxx}}
-        run: |
-          conan install .. --build=missing
-
-      - name: Build Windows (Ubuntu)
-        working-directory: ${{runner.workspace}}/build
-        run: |
-          conan install .. --build=missing -s sdl2:compiler.toolset=v140 -s compiler.runtime=MTd
-
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
         env:
           CC: ${{matrix.config.cc}}
           CXX: ${{matrix.config.cxx}}
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCONAN_EXPORTED=ON -DCMAKE_INSTALL_PREFIX=./install
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=./install
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -116,6 +94,14 @@ jobs:
         with:
           name: ${{ matrix.config.artifact }}
           path: build/install/*
+
+      - name: Publish Docs
+        if: github.ref == 'ref/head/master'
+        working-directory: ${{runner.workspace}}/build
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/html
 
   release:
     if: contains(github.ref, 'tags/v')

@@ -26,13 +26,13 @@ class Stage
 
 	Instance createInstance(const std::string_view name);
 
-	void onUpdateFrame(float delta);
-
 	void render(filament::Renderer& renderer) const;
 
 	void onCreateRenderable(Stage::Registry& registry, Instance instance);
 
 	void onDestroyRenderable(Stage::Registry& registry, Instance instance);
+
+	void onStart();
 
 	auto& getView() noexcept
 	{
@@ -44,7 +44,7 @@ class Stage
 		return mScene.ref();
 	}
 
-	[[nodiscard]] bool isValid(Instance instance) const
+	bool isValid(Instance instance) const
 	{
 		return mRegistry.valid(instance);
 	}

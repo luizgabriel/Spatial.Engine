@@ -4,7 +4,6 @@
 #include <image/KtxUtility.h>
 #include <sstream>
 
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial

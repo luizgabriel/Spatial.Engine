@@ -17,8 +17,10 @@ class SpatialEngineConan(ConanFile):
     exports_sources = "*"
     requires = [
         "boost_tti/1.67.0@bincrafters/stable",
-        "sdl2/2.0.14@bincrafters/stable",
+        "boost_locale/1.67.0@bincrafters/stable",
         "argh/1.2.1@adishavit/stable",
+        "glfw/3.3.4",
+        "ghc-filesystem/1.4.0",
         "gtest/1.10.0",
         "fmt/7.1.2",
         "spdlog/1.8.0",

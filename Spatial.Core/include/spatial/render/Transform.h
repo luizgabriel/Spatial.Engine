@@ -2,8 +2,8 @@
 
 #include <filament/Engine.h>
 #include <filament/TransformManager.h>
-#include <utils/Entity.h>
 #include <spatial/common/Math.h>
+#include <utils/Entity.h>
 
 namespace spatial
 {
@@ -26,23 +26,36 @@ class Transform
 
 	bool isValid() const noexcept;
 
-	const math::float3& getPosition() const noexcept;
+	void setPosition(const math::float3& position) noexcept;
 
-	void setPosition(const math::float3& mPosition) noexcept;
+	void setScale(const math::float3& scale) noexcept;
 
-	const math::float3& getScale() const noexcept;
-
-	void setScale(const math::float3& mScale) noexcept;
-
-	const math::float3& getRotation() const noexcept;
-
+	/**
+	 * @param rotation (pitch, yaw, roll)
+	 */
 	void setRotation(const math::float3& rotation) noexcept;
 
-	void rotate(const math::float3& rotation) noexcept;
+	auto getForward() const noexcept
+	{
+		return math::forwardVector(getMatrix());
+	}
 
-	void translate(const math::float3 translation) noexcept;
+	const auto& getPosition() const noexcept
+	{
+		return mPosition;
+	}
 
-	math::mat4f getMatrix() noexcept;
+	const auto& getScale() const noexcept
+	{
+		return mScale;
+	}
+
+	const auto& getRotation() const noexcept
+	{
+		return mRotation;
+	}
+
+	math::mat4f getMatrix() const noexcept;
 
 	void refresh() noexcept;
 
@@ -52,7 +65,7 @@ class Transform
 
 	math::float3 mPosition{.0f};
 	math::float3 mScale{1.0f};
-	math::float3 mRotation{.0f, .0f, .0f};
+	math::float3 mRotation{.0f};
 
 	Instance getInstance() const noexcept;
 };
