@@ -38,8 +38,13 @@ jobs:
             cxx: "clang++"
           }
           - {
-            name: "MacOS Latest Clang",
+            name: "MacOS Latest",
             artifact: "macOS.tar.xz",
+            os: macos-latest,
+          }
+          - {
+            name: "MacOS Latest LLVM",
+            artifact: "macOS-llvm.tar.xz",
             os: macos-latest,
             cc: "clang",
             cxx: "clang++"
@@ -98,10 +103,9 @@ jobs:
       - name: Publish Docs
         if: github.ref == 'ref/head/master'
         uses: peaceiris/actions-gh-pages@v3
-        working-directory: ${{runner.workspace}}/build
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html
+          publish_dir: ${{runner.workspace}}/build/docs/html
 
   release:
     if: contains(github.ref, 'tags/v')
