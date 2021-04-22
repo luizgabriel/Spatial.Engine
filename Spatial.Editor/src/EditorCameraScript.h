@@ -7,10 +7,10 @@
 namespace spatial::editor
 {
 
-class EditorCameraSystem
+class EditorCameraScript
 {
   public:
-	EditorCameraSystem(Stage& stage, desktop::Window& window, const desktop::InputState& inputState);
+	EditorCameraScript(Stage& stage, desktop::Window& window, const desktop::InputState& inputState);
 
 	void onStart();
 

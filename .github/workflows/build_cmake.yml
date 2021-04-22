@@ -41,13 +41,8 @@ jobs:
             name: "MacOS",
             artifact: "macOS.tar.xz",
             os: macos-latest,
-          }
-          - {
-            name: "MacOS LLVM",
-            artifact: "macOS-llvm.tar.xz",
-            os: macos-latest,
-            cc: "clang",
-            cxx: "clang++"
+            cc: "cc",
+            cxx: "c++"
           }
 
     steps:
