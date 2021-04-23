@@ -10,7 +10,6 @@ on:
       - 'v*'
 
 env:
-  BUILD_TYPE: Release
   CONAN_SYSREQUIRES_MODE: enabled
 
 jobs:
@@ -71,36 +70,41 @@ jobs:
       - name: Create Build Directory
         run: cmake -E make_directory ${{runner.workspace}}/build
 
+      - name: Cache Conan Data
+        uses: actions/cache@v2
+        with:
+          path: ~/.conan/
+          key: ${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
         env:
           CC: ${{matrix.config.cc}}
           CXX: ${{matrix.config.cxx}}
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSPATIAL_BUILD_TESTS=ON -DSPATIAL_ENABLE_DOXYGEN=ON -DCMAKE_INSTALL_PREFIX=../install
+          DOXYGEN:
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release -DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=../install
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake --build . --config $BUILD_TYPE
+        run: cmake --build . --config Release -- -j 3
 
       - name: Test
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: ctest -C $BUILD_TYPE
+        run: ctest -C
+
+      - name: Install
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: cmake --build . --config Release --target install -- -j 3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.config.artifact }}
-          path: install/*
-
-      - name: Publish Docs
-        if: github.ref == 'ref/head/master'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{runner.workspace}}/build/docs/html
+          path: ${{runner.workspace}}/install/*
 
   release:
     if: contains(github.ref, 'tags/v')
