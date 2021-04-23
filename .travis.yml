@@ -10,14 +10,12 @@ matrix:
       addons:
         update: true
         apt:
-          sources: *all_sources
-          packages: ['valgrind', 'lcov', 'g++-7']
-        sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-trusty
-        packages:
-          - python3-pip
-          - python3-setuptools
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty
+          packages:
+            - python3-pip
+            - python3-setuptools
       
     - os: osx
       osx_image: xcode12.2
