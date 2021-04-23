@@ -1,4 +1,7 @@
-os: osx
+os: 
+  - osx
+  - linux
+  - windows
 language: cpp
 env:
   - CONAN_SYSREQUIRES_MODE=enabled
@@ -9,7 +12,7 @@ python:
 install:
   - pip install conan
   - conan user
-  - python setup.py
+  - python3 setup.py
 
 script:
   - conan install .
