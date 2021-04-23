@@ -9,6 +9,7 @@ addons:
     update: true
     packages:
       - python3-pip
+      - python3-setuptools
 
 install:
   - pip3 install conan
