@@ -6,10 +6,9 @@ env:
 
 addons:
   apt:
-    sources:
-      - deadsnakes
+    update: true
     packages:
-      - python3.5
+      - python3-pip
 
 install:
   - pip3 install conan
