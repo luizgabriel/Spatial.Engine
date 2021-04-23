@@ -1,11 +1,14 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <limits>
-#include <math/scalar.h>
 #include <math/mat2.h>
 #include <math/mat3.h>
 #include <math/mat4.h>
 #include <math/quat.h>
+#include <math/scalar.h>
 #include <math/vec2.h>
 #include <math/vec3.h>
 #include <math/vec4.h>
