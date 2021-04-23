@@ -25,7 +25,7 @@ class SpatialEngineConan(ConanFile):
         "spdlog/1.8.5",
         "stb/20200203",
         "entt/3.5.2",
-        "cereal/1.3.0",
+        # "cereal/1.3.0",
 
         "imgui/docking@vendor/stable",  # Installed with vendor/imgui.py
         "filament/1.9.21@vendor/stable",  # Installed with vendor/filament.py

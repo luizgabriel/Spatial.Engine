@@ -4,16 +4,15 @@ env:
 
 cache:
   directories:
-  - $HOME/.conan
-  - $HOME/AppData/Local/Temp/chocolatey
+    - $HOME/.conan/data
 
-matrix:
+jobs:
   include:
 
     - os: linux
+      dist: xenial
       compiler: clang
       addons:
-        update: true
         apt:
           sources:
             - ubuntu-toolchain-r-test
@@ -38,6 +37,9 @@ matrix:
       env:
         - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
         - PATH=/c/Python38:/c/Python38/Scripts:$MSBUILD_PATH:$PATH
+      cache:
+        directories:
+          - $HOME/AppData/Local/Temp/chocolatey
 
 install:
   - pip3 install conan
