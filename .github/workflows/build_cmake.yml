@@ -1,4 +1,4 @@
-name: CMake
+name: build
 
 on:
   push:
@@ -77,7 +77,7 @@ jobs:
         env:
           CC: ${{matrix.config.cc}}
           CXX: ${{matrix.config.cxx}}
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=./install
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSPATIAL_BUILD_TESTS=ON -DSPATIAL_ENABLE_DOXYGEN=ON -DCMAKE_INSTALL_PREFIX=../install
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.config.artifact }}
-          path: build/install/*
+          path: install/*
 
       - name: Publish Docs
         if: github.ref == 'ref/head/master'

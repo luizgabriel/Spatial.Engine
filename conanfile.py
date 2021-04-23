@@ -16,7 +16,8 @@ class SpatialEngineConan(ConanFile):
     build_requires = "cmake/3.16.3"
     exports_sources = "*"
     requires = [
-        "boost/1.75.0",
+        "boost_locale/1.69.0@bincrafters/stable",
+        "boost_tti/1.69.0@bincrafters/stable",
         "argh/1.2.1@adishavit/stable",
         "glfw/3.3.4",
         "ghc-filesystem/1.4.0",

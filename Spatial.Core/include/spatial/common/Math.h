@@ -1,8 +1,5 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 #include <limits>
 #include <math/mat2.h>
 #include <math/mat3.h>
@@ -80,7 +77,7 @@ constexpr auto epsilon_v = std::numeric_limits<T>::epsilon();
 constexpr auto epsilon = epsilon_v<float>;
 
 template <typename T>
-constexpr auto pi_v = static_cast<T>(M_PI);
+constexpr auto pi_v = static_cast<T>(3.14159265358979323846);
 constexpr auto pi = pi_v<float>;
 
 template <typename T>

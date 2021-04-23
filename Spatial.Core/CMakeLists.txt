@@ -93,7 +93,8 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
 	CONAN_PKG::imgui
-	CONAN_PKG::boost
+	CONAN_PKG::boost_tti
+	CONAN_PKG::boost_locale
 	CONAN_PKG::stb
 	CONAN_PKG::glfw)
 
