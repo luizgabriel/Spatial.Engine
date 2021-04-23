@@ -76,9 +76,9 @@ void* Window::getNativeHandle() const
 #if defined(SPATIAL_PLATFORM_OSX)
 	return ::cocoaGetContentViewFromWindow(glfwGetCocoaWindow(mWindowHandle));
 #elif defined(SPATIAL_PLATFORM_WINDOWS)
-	return glfwGetWin32Window(mWindowHandle);
+	return (void*)glfwGetWin32Window(mWindowHandle);
 #elif defined(SPATIAL_PLATFORM_UNIX)
-	return glfwGetX11Window(mWindowHandle);
+	return (void*)glfwGetX11Window(mWindowHandle);
 #else
 	return nullptr;
 #endif
