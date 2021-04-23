@@ -3,6 +3,9 @@ language: cpp
 env:
   - CONAN_SYSREQUIRES_MODE=enabled
 
+python:
+  - "3.4"
+
 install:
   - pip install conan
   - conan user
@@ -11,5 +14,5 @@ install:
 script:
   - conan install .
   - cmake . -DSPATIAL_BUILD_TESTS=ON
-  - cmake --build . --config Release -- -j2
+  - cmake --build . -- -j2
   - ctest .
