@@ -48,10 +48,6 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
 * Beautiful Code and Modern C++
   - Do you like reading beautiful code? I do too.
 
-## Support
-
-<a href="https://www.buymeacoffee.com/luizgabriel" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
 ## Inspiration
 
 This project was heavly inspired by the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and I encourage you to take a look at his amazing YouTube channel.
@@ -61,6 +57,10 @@ This project was heavly inspired by the [Game Engine Series - by The Cherno](htt
 - [Game Engine Architecture, by Jason Gregory](https://www.amazon.com.br/Engine-Architecture-Third-Jason-Gregory/dp/1138035459)
 - [A Tour of C++](https://www.amazon.com/Tour-2nd-Depth-Bjarne-Stroustrup/dp/0134997832/ref=sr_1_1?dchild=1&keywords=A+Tour+of+C%2B%2B&qid=1619192527&s=books&sr=1-1)
 - [Game Programming Patterns](https://www.amazon.com/dp/0990582906)
+
+## Support
+
+<a href="https://www.buymeacoffee.com/luizgabriel" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ## License
 
