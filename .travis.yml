@@ -31,13 +31,12 @@ matrix:
       compiler: clang
 
     - os: windows
-      env:
-        - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
       before_install:
         - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
         - choco install python --version=3.8.0
         - export PATH=/c/Python38:/c/Python38/Scripts::$PATH;
       env:
+        - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
         - PATH=/c/Python38:/c/Python38/Scripts:$MSBUILD_PATH:$PATH
 
 install:
