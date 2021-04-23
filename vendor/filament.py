@@ -66,7 +66,7 @@ conan_basic_setup()
         cmake.install()
 
     def package_info(self):
-        lib_dir = f"lib/{self.settings.arch}"
+        lib_dir = "lib/" + str(self.settings.arch)
 
         self.cpp_info.libdirs = [lib_dir]
         self.cpp_info.libs = [
