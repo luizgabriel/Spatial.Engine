@@ -12,9 +12,9 @@ addons:
       - python3.5
 
 install:
-  - pip install conan
+  - pip3 install conan
   - conan user
-  - python setup.py
+  - python3 setup.py
 
 script:
   - conan install .
