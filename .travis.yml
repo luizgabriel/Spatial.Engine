@@ -2,6 +2,10 @@ language: cpp
 env:
   - CONAN_SYSREQUIRES_MODE=enabled
 
+cache:
+  directories:
+  - $HOME/.conan
+
 matrix:
   include:
 
