@@ -1,0 +1,15 @@
+os: osx
+language: cpp
+env:
+  - CONAN_SYSREQUIRES_MODE=enabled
+
+install:
+  - pip install conan
+  - conan user
+  - python setup.py
+
+script:
+  - conan install .
+  - cmake . -DSPATIAL_BUILD_TESTS=ON
+  - cmake --build . --config Release -- -j2
+  - ctest .
