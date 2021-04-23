@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/hiMjXdB.png" alt="Spatial Engine" width="500"></a>
+  <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/tkJzpLU.png" alt="Spatial Engine" width="500"></a>
 </h1>
 
 <h4 align="center">
@@ -31,7 +31,7 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   <a href="https://github.com/luizgabriel/Spatial.Engine/blob/master/LICENSE">License</a>
 </p>
 
-![screenshot](https://i.imgur.com/2XbkMxT.png)
+![screenshot](https://i.imgur.com/hiMjXdB.png)
 
 ## Key Features
 
