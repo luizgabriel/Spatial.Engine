@@ -5,6 +5,7 @@ env:
 cache:
   directories:
   - $HOME/.conan
+  - $HOME/AppData/Local/Temp/chocolatey
 
 matrix:
   include:
@@ -29,18 +30,14 @@ matrix:
       compiler: clang
       env:
         - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
-
-before_install:
-- |-
-    case $TRAVIS_OS_NAME in
-      windows)
-        choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
-        choco install python3
-        ;;
-    esac
+      before_install:
+        - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        - choco install python3
+        - export PATH=/c/Python38:/c/Python38/Scripts::$PATH;
+      env:
+        - PATH=/c/Python38:/c/Python38/Scripts:$MSBUILD_PATH:$PATH
 
 install:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH=$MSBUILD_PATH:$PATH; fi
   - pip3 install conan
   - conan user
   - python3 setup.py
