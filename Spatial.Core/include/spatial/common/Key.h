@@ -124,7 +124,7 @@ std::string nameOf(const Key key);
 
 enum class KeyAction
 {
-	None,
+	UnknownAction,
 	Pressed,
 	Released,
 };

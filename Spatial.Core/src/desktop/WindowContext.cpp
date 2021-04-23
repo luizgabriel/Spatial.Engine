@@ -336,7 +336,7 @@ KeyAction mapActionFromCode(int action) noexcept
 	case GLFW_RELEASE:
 		return KeyAction::Released;
 	default:
-		return KeyAction::None;
+		return KeyAction::UnknownAction;
 	}
 }
 
