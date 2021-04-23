@@ -88,12 +88,12 @@ jobs:
       - name: Build
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake --build . --config Spatial.Editor -- -j3
+        run: cmake --build . --config Spatial.Editor
 
       - name: Install
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake --build . --config Release --target install -- -j3
+        run: cmake --build . --config Release --target install
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
