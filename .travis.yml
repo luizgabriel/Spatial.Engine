@@ -17,7 +17,6 @@ install:
   - python3 setup.py
 
 script:
-  - conan install .
   - cmake . -DSPATIAL_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
   - cmake --build . --config Release -- -j2
   - ctest .
