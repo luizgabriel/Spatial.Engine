@@ -4,7 +4,6 @@
 #include <spatial/common/Signal.h>
 #include <spatial/core/Clock.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/desktop/Window.h>
 
 namespace spatial
 {

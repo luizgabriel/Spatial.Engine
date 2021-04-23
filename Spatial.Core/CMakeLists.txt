@@ -1,11 +1,6 @@
 add_library(Spatial.Core
 	
 	## HEADERS
-	include/spatial/assets/AggregatorLoader.h
-	include/spatial/assets/DirMapLoader.h
-	include/spatial/assets/MemoryLoader.h
-	include/spatial/assets/PhysicalDirLoader.h
-	
 	include/spatial/common/EventQueue.h
 	include/spatial/common/Key.h
 	include/spatial/common/Signal.h
@@ -16,14 +11,11 @@ add_library(Spatial.Core
 	include/spatial/core/Clock.h
 	include/spatial/core/Logger.h
 	
-	include/spatial/desktop/MessageBox.h
 	include/spatial/desktop/PlatformEvent.h
 	include/spatial/desktop/PlatformEventUtils.h
 	include/spatial/desktop/Window.h
-	
-	include/spatial/input/InputSystem.h
-	include/spatial/input/Input.h
-	include/spatial/input/InputState.h
+	include/spatial/desktop/InputSystem.h
+	include/spatial/desktop/InputState.h
 	
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
@@ -32,22 +24,20 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/ecs/RegistryUtils.h
-	include/spatial/render/Mesh.h
+	include/spatial/render/FilameshFile.h
+	include/spatial/render/Light.h
+	include/spatial/render/Stage.h
+	include/spatial/render/InstanceHandle.h
+	include/spatial/render/InstanceBuilder.h
+	include/spatial/render/Transform.h
+	include/spatial/render/SceneNodeName.h
+	include/spatial/render/Renderable.h
 	
 	include/spatial/ui/ImGuiHelpers.h
 	include/spatial/ui/UserInterfaceInput.h
 	include/spatial/ui/UserInterfaceRenderer.h
 	include/spatial/ui/UserInterfaceSystem.h
 	include/spatial/ui/UserInterfaceUtils.h
-	include/spatial/ui/ImGuiSceneWindow.h
-	
-	include/spatial/ecs/Components.h
-	include/spatial/ecs/SceneManagerSystem.h
-	include/spatial/ecs/TransformSystem.h
-	include/spatial/ecs/MaterialRegistry.h
-	include/spatial/ecs/MeshRegistry.h
-	include/spatial/ecs/LightSystem.h
 	
 	## SOURCES
 	src/common/Key.cpp
@@ -56,42 +46,28 @@ add_library(Spatial.Core
 	src/core/Application.cpp
 	src/core/Logger.cpp
 	
-	src/assets/AggregatorLoader.cpp
-	src/assets/DirMapLoader.cpp
-	src/assets/MemoryLoader.cpp
-	src/assets/PhysicalDirLoader.cpp
-	
 	src/desktop/Window.cpp
 	src/desktop/WindowContext.cpp
-	src/desktop/MessageBox.cpp
+	src/desktop/InputSystem.cpp
+	src/desktop/InputState.cpp
 	
-	src/input/InputSystem.cpp
-	src/input/InputState.cpp
-	src/input/Input.cpp
-	
+	src/render/Stage.cpp
 	src/render/Resources.cpp
 	src/render/Engine.cpp
 	src/render/Entity.cpp
 	src/render/RenderingSystem.cpp
 	src/render/ResourceLoaders.cpp
 	src/render/SkyboxResources.cpp
-	src/render/Mesh.cpp
 	src/render/Camera.cpp
+	src/render/InstanceBuilder.cpp
+	src/render/Transform.cpp
+	src/render/Light.cpp
+	src/render/Renderable.cpp
 	
 	src/ui/ImGuiHelpers.cpp
 	src/ui/UserInterfaceSystem.cpp
 	src/ui/UserInterfaceRenderer.cpp
-	src/ui/UserInterfaceInput.cpp
-	src/ui/ImGuiSceneWindow.cpp
-	src/ui/ImGuiComponents.cpp
-	
-	src/ecs/SceneManagerSystem.cpp
-	src/ecs/TransformSystem.cpp
-	src/ecs/CameraSystem.cpp
-	src/ecs/LightSystem.cpp
-	src/ecs/MaterialRegistry.cpp
-	src/ecs/MeshRegistry.cpp
-	src/ecs/RenderableSystem.cpp)
+	src/ui/UserInterfaceInput.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
@@ -117,13 +93,12 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
 	CONAN_PKG::imgui
-	CONAN_PKG::boost_tti
+	CONAN_PKG::boost
 	CONAN_PKG::stb
-	CONAN_PKG::sdl2)
+	CONAN_PKG::glfw)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)
-
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
@@ -132,16 +107,12 @@ if (UNIX AND NOT APPLE)
 	
 	find_package(Threads REQUIRED)
 	target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
-	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperLinux.cpp)
-	set_source_files_properties(src/desktop/native/WindowHelperLinux.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (WIN32)
 	message(STATUS "Detected Windows Device")
 	
 	target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_WINDOWS)
 	
 	target_link_libraries(Spatial.Core PRIVATE Shlwapi)
-	target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperWindows.cpp)
-	set_source_files_properties(src/desktop/native/WindowHelperWindows.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 elseif (APPLE)
 	message(STATUS "Detected Apple Device")
 	target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)

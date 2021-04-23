@@ -1,34 +1,25 @@
 #pragma once
 
+#include <spatial/common/Math.h>
 #include <spatial/render/Resources.h>
 
 #include <cstdint>
-#include <filesystem>
-#include <unordered_map>
-
-#include <filament/Box.h>
-#include <math/vec2.h>
-#include <math/vec3.h>
-#include <math/vec4.h>
-#include <spatial/render/Mesh.h>
-#include <string_view>
-#include <utility>
+#include <string>
+#include <spatial/render/FilameshFile.h>
 
 namespace spatial
 {
 
-using materials_map_t = std::unordered_map<std::string, filament::MaterialInstance*>;
+Material createMaterial(filament::Engine& engine, const std::string& resourceData);
 
-Material createMaterial(filament::Engine& engine, const std::vector<char>& resourceData);
-
-Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,
+Texture createTexture(filament::Engine& engine, math::int2 dimensions,
 					  fl::Texture::InternalFormat format, fl::Texture::Usage usage = fl::Texture::Usage::DEFAULT,
 					  fl::Texture::Sampler sampler = fl::Texture::Sampler::SAMPLER_2D);
 
-Texture createTexture(filament::Engine& engine, const std::vector<char>& resourceData,
+Texture createTexture(filament::Engine& engine, const std::string& resourceData,
 					  fl::Texture::Usage usage = fl::Texture::Usage::DEFAULT,
 					  fl::Texture::Sampler sampler = fl::Texture::Sampler::SAMPLER_2D);
 
-Mesh createMesh(filament::Engine& engine, const std::vector<char>& resourceData);
+FilameshFile createFilamesh(filament::Engine& engine, const std::string& resourceData);
 
 } // namespace spatial

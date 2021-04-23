@@ -1,42 +1,45 @@
 #pragma once
 
-#include <SDL.h>
-#include <math/vec2.h>
+#include <GLFW/glfw3.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/common/Key.h>
 #include <spatial/common/Signal.h>
+#include <spatial/common/Math.h>
 #include <string_view>
 #include <type_traits>
 
-namespace spatial
+namespace spatial::desktop
 {
 
-Key mapKeyFromScancode(const SDL_Scancode scanCode) noexcept;
+Key mapKeyFromScancode(const int scanCode) noexcept;
 
 Key mapKeyFromMouseButton(int mouseButton) noexcept;
 
-class DesktopPlatformContext;
+KeyAction mapActionFromCode(int action) noexcept;
+
+class PlatformContext;
 
 class Window
 {
   private:
-	SDL_Window* mWindowHandle;
+	GLFWwindow* mWindowHandle;
 
-	Window(int width, int height, std::string_view title);
+	explicit Window(GLFWwindow* windowHandle);
 
-	friend class DesktopPlatformContext;
+	friend class PlatformContext;
 
   public:
 	~Window();
 
 	void* getNativeHandle() const;
-	SDL_Window* getHandle() const
+	GLFWwindow* getHandle() const
 	{
 		return mWindowHandle;
 	}
 
-	std::pair<int, int> getFrameBufferSize() const;
-	std::pair<int, int> getWindowSize() const;
+	math::int2 getFrameBufferSize() const;
+	math::int2 getSize() const;
+	math::double2 getMousePosition() const;
 
 	bool hasFocus() const;
 
@@ -45,33 +48,36 @@ class Window
 
 	Window& operator=(Window&& other) noexcept;
 	Window& operator=(const Window& w) = delete;
-	void warpMouse(filament::math::float2 position);
+
+	void warpMouse(const math::float2& position);
 };
 
-class DesktopPlatformContext
+class PlatformContext
 {
-  private:
-	static bool sValid;
-	static EventQueue sEventQueue;
-
   public:
-	DesktopPlatformContext();
-	~DesktopPlatformContext();
+	PlatformContext();
+	~PlatformContext();
 
 	void onStartFrame(float);
 
 	[[nodiscard]] Window createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept;
 
-	DesktopPlatformContext(const DesktopPlatformContext& c) = delete;
-	DesktopPlatformContext& operator=(const DesktopPlatformContext& w) = delete;
+	PlatformContext(const PlatformContext& c) = delete;
+	PlatformContext& operator=(const PlatformContext& w) = delete;
 
-	DesktopPlatformContext(DesktopPlatformContext&& c) noexcept = delete;
-	DesktopPlatformContext& operator=(DesktopPlatformContext&& other) noexcept = delete;
+	PlatformContext(PlatformContext&& c) noexcept = delete;
+	PlatformContext& operator=(PlatformContext&& other) noexcept = delete;
 
 	auto& getEventQueue()
 	{
 		return sEventQueue;
 	}
+
+  private:
+	static bool sValid;
+	static EventQueue sEventQueue;
+
+	static void setupCallbacks(GLFWwindow* window);
 };
 
 } // namespace spatial

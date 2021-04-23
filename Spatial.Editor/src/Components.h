@@ -7,12 +7,16 @@
 #include <unordered_map>
 #include <variant>
 
-namespace spatial::ecs
+namespace spatial::editor
 {
 
-struct DefaultMaterial {
-	filament::math::float4 baseColor;
-
+struct EditorCamera
+{
+	float sensitivity;
+	float velocity;
+	bool enabled{false};
+	int justStarted{0};
+	bool startPressed{true};
 };
 
 } // namespace spatial::ecs

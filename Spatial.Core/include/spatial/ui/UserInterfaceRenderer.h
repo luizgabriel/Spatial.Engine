@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imgui.h>
+#include <spatial/common/Math.h>
 #include <spatial/render/Resources.h>
 #include <vector>
 
@@ -15,14 +16,14 @@ class UserInterfaceRenderer
   private:
 	filament::Engine& mEngine;
 
-	SharedView mView;
+	View mView;
 	Scene mScene;
 	Entity mCameraEntity;
 	Camera mCamera;
-	Material mMaterial;
 	Entity mEntity;
 	Skybox mSkybox;
-	Texture mFontTexture;
+	SharedMaterial mMaterial;
+	SharedTexture mFontTexture;
 
 	std::vector<VertexBuffer> mVertexBuffers;
 	std::vector<IndexBuffer> mIndexBuffers;
@@ -42,11 +43,11 @@ class UserInterfaceRenderer
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
 	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
 
-	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 
-	void setMaterial(const std::vector<char>& materialData);
+	void setMaterial(const SharedMaterial& material);
 
-	void setFont(const std::vector<char>& fontData);
+	void setFontTexture(const SharedTexture& fontTextureAtlas);
 
 	void setupEngineTheme();
 
@@ -62,9 +63,9 @@ class UserInterfaceRenderer
 	void dispatchCommands();
 
 	// region Getters
-	auto& getView()
+	const auto& getView() const
 	{
-		return mView;
+		return mView.ref();
 	}
 	// endregion
 };

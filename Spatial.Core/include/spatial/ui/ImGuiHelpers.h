@@ -1,8 +1,8 @@
 #pragma once
 
-#include <imgui.h>
 #include <filament/IndexBuffer.h>
 #include <filament/VertexBuffer.h>
+#include <imgui.h>
 #include <spatial/render/Resources.h>
 #include <string_view>
 
@@ -13,7 +13,7 @@ void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scale
 
 void imguiRefreshDeltaTime(float delta);
 
-std::pair<int, int> imguiGetFrameSize();
+math::int2 imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
@@ -21,11 +21,9 @@ VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
 
 IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
 
-uint64_t imguiMakeScissorKey(int frameBufferHeight, const ImVec4& clipRect);
+Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData);
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::vector<char>& resourceData);
-
-template <typename FilamentType, typename ImGuiType>
+template <typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)
 {
 	auto nVec = imVector.Size;
@@ -34,7 +32,7 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 
 	std::copy(imVector.begin(), imVector.end(), data);
 
-	auto callback = [](void* buffer, size_t size, void* user) {
+	auto callback = [](void* buffer, size_t size, void*) {
 		auto alloc = std::allocator<ImGuiType>();
 		auto nVec = size / sizeof(ImGuiType);
 		alloc.deallocate(reinterpret_cast<ImGuiType*>(buffer), nVec);

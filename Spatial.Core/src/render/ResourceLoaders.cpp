@@ -4,15 +4,12 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include <filesystem>
-#include <fstream>
 #include <sstream>
-#include <string>
+#include <math/vec2.h>
+#include <math/vec3.h>
 
 using namespace filament::math;
 using namespace std::string_literals;
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace std
@@ -42,10 +39,10 @@ istream& operator>>(istream& stream, filament::Box& box)
 	return stream >> box.center >> box.halfExtent;
 }
 
-istream& operator>>(istream& stream, spatial::MeshPart& part)
+istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
 {
 	stream.read(reinterpret_cast<char*>(&part.offset), 4);
-	stream.read(reinterpret_cast<char*>(&part.indexCount), 4);
+	stream.read(reinterpret_cast<char*>(&part.count), 4);
 	stream.read(reinterpret_cast<char*>(&part.minIndex), 4);
 	stream.read(reinterpret_cast<char*>(&part.maxIndex), 4);
 	stream.read(reinterpret_cast<char*>(&part.materialID), 4);
@@ -68,7 +65,7 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 	}
 
 	stream.read(reinterpret_cast<char*>(&header.version), 4);
-	stream.read(reinterpret_cast<char*>(&header.parts), 4);
+	stream.read(reinterpret_cast<char*>(&header.partsCount), 4);
 
 	stream >> header.aabb;
 
@@ -97,19 +94,18 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 namespace spatial
 {
 
-Material createMaterial(fl::Engine& engine, const std::vector<char>& resourceData)
+Material createMaterial(fl::Engine& engine, const std::string& resourceData)
 {
 	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
-
 	return Material{engine, material};
 }
 
-Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::uint32_t> dimensions,
+Texture createTexture(filament::Engine& engine, math::int2 dimensions,
 					  fl::Texture::InternalFormat format, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	auto texture = fl::Texture::Builder()
-					   .width(dimensions.first)
-					   .height(dimensions.second)
+					   .width(dimensions.x)
+					   .height(dimensions.y)
 					   .levels(1)
 					   .usage(usage)
 					   .sampler(sampler)
@@ -119,7 +115,7 @@ Texture createTexture(filament::Engine& engine, std::pair<std::uint32_t, std::ui
 	return Texture{engine, texture};
 }
 
-Texture createTexture(fl::Engine& engine, const std::vector<char>& resourceData, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
+Texture createTexture(fl::Engine& engine, const std::string& resourceData, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	int width, height, n;
 	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(),
@@ -195,42 +191,39 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-Mesh createMesh(fl::Engine& engine, const std::vector<char>& resourceData)
+FilameshFile createFilamesh(fl::Engine& engine, const std::string& resourceData)
 {
-	auto stream = std::stringstream{};
-	stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	std::copy(resourceData.begin(), resourceData.end(), std::ostreambuf_iterator(stream));
-
-	FilameshFileHeader header{};
+	auto stream = std::istringstream{resourceData};
+	auto header = FilameshFileHeader{};
 	stream >> header;
+
+	auto mesh = FilameshFile{std::move(header)};
 
 	auto vertices = std::vector<char>(header.vertexSize);
 	stream.read(&vertices[0], header.vertexSize);
-	VertexBuffer vb = createVertexBuffer(engine, header, vertices);
+	mesh.setVertexBuffer(toShared(createVertexBuffer(engine, header, vertices)));
 
 	auto indices = std::vector<char>(header.indexSize);
 	stream.read(&indices[0], header.indexSize);
-	IndexBuffer ib = createIndexBuffer(engine, header, indices);
+	mesh.setIndexBuffer(toShared(createIndexBuffer(engine, header, indices)));
 
-	auto mesh = Mesh{engine, std::move(vb), std::move(ib), header.aabb, header.parts};
-	for (size_t i = 0; i < header.parts; i++)
+	for (size_t i = 0; i < mesh.getPartsCount(); i++)
 	{
-		stream >> mesh[i];
+		stream >> mesh.getParts().at(i);
 	}
 
 	uint32_t materialCount;
 	stream.read(reinterpret_cast<char*>(&materialCount), 4);
 
-	for (size_t i = 0; i < header.parts; i++)
+	for (size_t i = 0; i < header.partsCount; i++)
 	{
 		uint32_t nameLength;
 		stream.read(reinterpret_cast<char*>(&nameLength), 4);
 
-		std::getline(stream, mesh[i].materialName, '\0');
+		std::getline(stream, mesh.getParts().at(i).materialName, '\0');
 	}
 
-	return mesh;
+	return std::move(mesh);
 }
 
 } // namespace spatial

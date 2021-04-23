@@ -1,10 +1,9 @@
-#include <spatial/desktop/native/WindowHelper.h>
-
+#include <spatial/desktop/native/CocoaHelper.h>
 #include <Cocoa/Cocoa.h>
 
-void* getNativeWindow(const SDL_SysWMinfo& wmi)
+void* cocoaGetContentViewFromWindow(void* id)
 {
-	NSWindow* win = wmi.info.cocoa.window;
+	NSWindow* win = (NSWindow*)id;
 	NSView* view = [win contentView];
 	return view;
 }

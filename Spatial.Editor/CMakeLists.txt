@@ -2,9 +2,14 @@ add_subdirectory(assets)
 
 add_executable(Spatial.Editor
 	src/main.cpp
-	src/EditorSystem.cpp
-	src/Resources.cpp
+	src/SceneEditorSystem.cpp
+	src/EditorCameraScript.h
+	src/EditorCameraScript.cpp
 	src/Components.h
+	src/ImGuiComponents.h
+	src/ImGuiComponents.cpp
+	src/ImGuiSceneWindow.h
+	src/ImGuiSceneWindow.cpp
 )
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
@@ -12,7 +17,8 @@ target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)
 target_link_libraries(Spatial.Editor PUBLIC
 	Spatial.Core
 	CONAN_PKG::fmt
-	CONAN_PKG::argh)
+	CONAN_PKG::argh
+	CONAN_PKG::ghc-filesystem)
 
 target_link_libraries(Spatial.Editor PRIVATE Spatial.Editor.Resources)
 

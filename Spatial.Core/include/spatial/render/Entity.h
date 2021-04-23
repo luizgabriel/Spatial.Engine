@@ -9,8 +9,8 @@ namespace spatial
 class Entity
 {
   private:
-	filament::Engine& m_engine;
-	utils::Entity m_entity;
+	filament::Engine& mEngine;
+	utils::Entity mEntity;
 
   public:
 	explicit Entity(filament::Engine& engine);
@@ -25,13 +25,15 @@ class Entity
 	Entity(const Entity& other) = delete;
 	Entity& operator=(const Entity& w) = delete;
 
-	[[nodiscard]] utils::Entity release();
+	[[nodiscard]] utils::Entity release() noexcept;
 
 	void reset();
 
-	utils::Entity get()
+	bool isValid() const noexcept;
+
+	utils::Entity get() noexcept
 	{
-		return m_entity;
+		return mEntity;
 	}
 };
 

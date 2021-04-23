@@ -1,15 +1,12 @@
 #pragma once
 
-#include <spatial/common/EventQueue.h>
+#include <spatial/common/Math.h>
+#include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/render/RenderingSystem.h>
-
 #include <spatial/ui/UserInterfaceInput.h>
 #include <spatial/ui/UserInterfaceRenderer.h>
 
-#include <span>
 #include <string_view>
-#include <utility>
 
 namespace spatial
 {
@@ -21,23 +18,27 @@ class UserInterfaceSystem
 	Signal<> mRenderGuiSignal;
 
   public:
-	UserInterfaceSystem(filament::Engine& engine);
+	explicit UserInterfaceSystem(filament::Engine& engine);
 
-	UserInterfaceSystem(RenderingSystem& rendering);
+	template <typename WindowImpl>
+	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
+	{
+		setViewport(window.getSize(), window.getFrameBufferSize());
+	}
 
-	UserInterfaceSystem(RenderingSystem& rendering, const Window& window);
+	void setFontTexture(const SharedTexture& fontTexture);
 
-	void setFont(const std::vector<char>& fontData);
+	void setMaterial(const SharedMaterial& material);
 
-	void setMaterial(const std::vector<char>& materialData);
-
-	void setViewport(const std::pair<int, int>& windowSize, const std::pair<int, int>& frameBufferSize);
+	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 
 	void onStart();
 
 	void onStartFrame(float delta);
 
-	void onEndFrame();
+	void onUpdateFrame(float delta);
+
+	void onRender(filament::Renderer& renderer) const;
 
 	void onEvent(const WindowResizedEvent& event);
 
@@ -47,7 +48,7 @@ class UserInterfaceSystem
 
 	void onEvent(const TextEvent& event);
 
-	auto getView()
+	const auto& getView() const
 	{
 		return mRenderer.getView();
 	}

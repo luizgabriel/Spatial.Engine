@@ -1,20 +1,25 @@
-#include <spatial/desktop/Window.h>
-#include <spatial/desktop/native/WindowHelper.h>
-
 #include <cassert>
+#include <spatial/desktop/Window.h>
 #include <utility>
+
+#if defined(SPATIAL_PLATFORM_OSX)
+#include <spatial/desktop/native/CocoaHelper.h>
+#define GLFW_EXPOSE_NATIVE_COCOA
+#elif defined(SPATIAL_PLATFORM_WINDOWS)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#elif defined(SPATIAL_PLATFORM_UNIX)
+#define GLFW_EXPOSE_NATIVE_X11
+#endif
+#include <GLFW/glfw3native.h>
 
 using namespace filament::math;
 
-namespace spatial
+namespace spatial::desktop
 {
 
-Window::Window(int width, int height, std::string_view title)
-	: mWindowHandle{SDL_CreateWindow(title.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-									 SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE)}
+Window::Window(GLFWwindow* windowHandle) : mWindowHandle{windowHandle}
 {
 	assert(mWindowHandle != nullptr);
-	// SDL_SetWindowBordered(mWindowHandle, SDL_FALSE);
 }
 
 Window::Window(Window&& other) noexcept : mWindowHandle(std::exchange(other.mWindowHandle, nullptr))
@@ -24,7 +29,7 @@ Window::Window(Window&& other) noexcept : mWindowHandle(std::exchange(other.mWin
 Window& Window::operator=(Window&& other) noexcept
 {
 	if (mWindowHandle)
-		SDL_DestroyWindow(mWindowHandle);
+		glfwDestroyWindow(mWindowHandle);
 
 	mWindowHandle = std::exchange(other.mWindowHandle, nullptr);
 
@@ -34,41 +39,54 @@ Window& Window::operator=(Window&& other) noexcept
 Window::~Window()
 {
 	if (mWindowHandle)
-		SDL_DestroyWindow(mWindowHandle);
+		glfwDestroyWindow(mWindowHandle);
 }
 
-std::pair<int, int> Window::getFrameBufferSize() const
+math::int2 Window::getFrameBufferSize() const
 {
 	int dsw, dsh;
-	SDL_GL_GetDrawableSize(mWindowHandle, &dsw, &dsh);
+	glfwGetFramebufferSize(mWindowHandle, &dsw, &dsh);
 
 	return {dsw, dsh};
 }
 
-std::pair<int, int> Window::getWindowSize() const
+math::int2 Window::getSize() const
 {
 	int w, h;
-	SDL_GetWindowSize(mWindowHandle, &w, &h);
+	glfwGetWindowSize(mWindowHandle, &w, &h);
 
 	return {w, h};
 }
 
+math::double2 Window::getMousePosition() const
+{
+	double xPos, yPos;
+	glfwGetCursorPos(mWindowHandle, &xPos, &yPos);
+
+	return {xPos, yPos};
+}
+
 bool Window::hasFocus() const
 {
-	return (SDL_GetWindowFlags(mWindowHandle) & SDL_WINDOW_INPUT_FOCUS) != 0;
+	return glfwGetWindowAttrib(mWindowHandle, GLFW_FOCUSED) == GLFW_TRUE;
 }
 
 void* Window::getNativeHandle() const
 {
-	SDL_SysWMinfo wmi;
-	SDL_VERSION(&wmi.version);
-	SDL_GetWindowWMInfo(mWindowHandle, &wmi);
-	return ::getNativeWindow(wmi);
+#if defined(SPATIAL_PLATFORM_OSX)
+	return ::cocoaGetContentViewFromWindow(glfwGetCocoaWindow(mWindowHandle));
+#elif defined(SPATIAL_PLATFORM_WINDOWS)
+	return glfwGetWin32Window(mWindowHandle);
+#elif defined(SPATIAL_PLATFORM_UNIX)
+	return glfwGetX11Window(mWindowHandle);
+#else
+	return nullptr;
+#endif
 }
 
-void Window::warpMouse(filament::math::float2 position)
+void Window::warpMouse(const math::float2& position)
 {
-	SDL_WarpMouseInWindow(mWindowHandle, position.x, position.y);
+	glfwSetCursorPos(mWindowHandle, position.x, position.y);
 }
 
 } // namespace spatial

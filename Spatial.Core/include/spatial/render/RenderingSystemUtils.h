@@ -1,0 +1,27 @@
+#pragma once
+
+#include <spatial/render/RenderingSystem.h>
+
+namespace spatial
+{
+
+template <typename Listener>
+void connect(RenderingSystem& render, Listener& listener)
+{
+	render.getOnRenderSignal().connect<&Listener::onRender>(listener);
+}
+
+template <typename Listener>
+void disconnect(RenderingSystem& render, Listener& listener)
+{
+	render.getOnRenderSignal().disconnect<&Listener::onRender>(listener);
+}
+
+template <typename Listener>
+RenderingSystem& operator>>(RenderingSystem& render, Listener& listener)
+{
+	connect(render, listener);
+	return render;
+}
+
+}

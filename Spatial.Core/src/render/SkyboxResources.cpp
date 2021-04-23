@@ -4,13 +4,12 @@
 #include <image/KtxUtility.h>
 #include <sstream>
 
-namespace fs = std::filesystem;
 namespace fl = filament;
 
 namespace spatial
 {
 
-Texture createKtxTexture(fl::Engine& engine, const std::vector<char>& resourceData)
+Texture createKtxTexture(fl::Engine& engine, const std::string_view resourceData)
 {
 	using namespace std;
 
@@ -21,7 +20,7 @@ Texture createKtxTexture(fl::Engine& engine, const std::vector<char>& resourceDa
 	return Texture{engine, image::ktx::createTexture(&engine, ktxBundle, false)};
 }
 
-bands_t parseShFile(const std::vector<char>& resourceData)
+bands_t parseShFile(const std::string_view resourceData)
 {
 	auto bands = bands_t{};
 	auto stream = std::stringstream{};
@@ -80,7 +79,7 @@ IndirectLight createImageBasedLight(fl::Engine& engine, fl::Texture& cubemap, fl
 }
 
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,
-									const std::vector<char>& shResourceData, float intensity)
+									const std::string_view shResourceData, float intensity)
 {
 	auto bands = parseShFile(shResourceData);
 	return createImageBasedLight(engine, cubemap, bands, intensity);

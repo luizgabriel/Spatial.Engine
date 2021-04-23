@@ -16,12 +16,12 @@ template <typename ResourceType>
 class EngineResource
 {
   private:
-	filament::Engine& m_engine;
-	ResourceType* m_resource;
+	filament::Engine& mEngine;
+	ResourceType* mResource;
 
   public:
 	explicit EngineResource(fl::Engine& engine, ResourceType* resource = nullptr) noexcept
-		: m_engine{engine}, m_resource{resource}
+		: mEngine{engine}, mResource{resource}
 	{
 	}
 
@@ -29,53 +29,61 @@ class EngineResource
 	EngineResource& operator=(const EngineResource&) = delete;
 
 	EngineResource(EngineResource&& other) noexcept
-		: m_engine{other.m_engine}, m_resource{std::exchange(other.m_resource, nullptr)}
+		: mEngine{other.mEngine}, mResource{std::exchange(other.mResource, nullptr)}
 	{
 	}
 
 	EngineResource& operator=(EngineResource&& other) noexcept
 	{
 		reset();
-		m_resource = other.release();
+		mResource = other.release();
 
 		return *this;
 	}
 
-	auto& getEngine()
+	auto& getEngine() noexcept
 	{
-		return m_engine;
+		return mEngine;
 	}
 
-	ResourceType* get()
+	const auto& getEngine() const noexcept
 	{
-		return m_resource;
+		return mEngine;
+	}
+
+	const ResourceType* get() const noexcept
+	{
+		return mResource;
+	}
+
+	ResourceType* get() noexcept
+	{
+		return mResource;
 	}
 
 	ResourceType& ref()
 	{
-		return *m_resource;
+		assert(isValid());
+		return *mResource;
 	}
 
-    const ResourceType& ref() const
-    {
-        return *m_resource;
-    }
-
-	const ResourceType* get() const
+	const ResourceType& ref() const
 	{
-		return m_resource;
+		assert(isValid());
+		return *mResource;
 	}
 
 	void reset()
 	{
-		if (m_resource)
-			m_engine.destroy(m_resource);
-		m_resource = nullptr;
+		if (isValid())
+			mEngine.destroy(mResource);
+
+		mResource = nullptr;
 	}
 
 	ResourceType* release()
 	{
-		return std::exchange(m_resource, nullptr);
+		return std::exchange(mResource, nullptr);
 	}
 
 	~EngineResource()
@@ -83,14 +91,19 @@ class EngineResource
 		reset();
 	}
 
-	ResourceType* operator->()
+	ResourceType* operator->() noexcept
 	{
-		return m_resource;
+		return mResource;
 	}
 
-	const ResourceType* operator->() const
+	const ResourceType* operator->() const noexcept
 	{
-		return m_resource;
+		return mResource;
+	}
+
+	bool isValid() const noexcept
+	{
+		return mResource != nullptr;
 	}
 };
 
