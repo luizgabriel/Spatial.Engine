@@ -21,6 +21,9 @@ matrix:
           packages:
             - python3-pip
             - python3-setuptools
+            - mesa-common-dev
+            - libxi-dev
+            - libxxf86vm-dev 
       
     - os: osx
       osx_image: xcode12.2
