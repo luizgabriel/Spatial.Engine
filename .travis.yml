@@ -42,7 +42,7 @@ matrix:
 install:
   - pip3 install conan
   - conan user
-  - python3 setup.py
+  - python setup.py
 
 script:
   - cmake . -DSPATIAL_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
