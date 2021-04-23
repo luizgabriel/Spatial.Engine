@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/tkJzpLU.png" alt="Spatial Engine" width="500"></a>
+  <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/hiMjXdB.png" alt="Spatial Engine" width="500"></a>
 </h1>
 
 <h4 align="center">
