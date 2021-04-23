@@ -55,8 +55,9 @@ This project was heavly inspired by the [Game Engine Series - by The Cherno](htt
 ## Bibliography
 
 - [Game Engine Architecture, by Jason Gregory](https://www.amazon.com.br/Engine-Architecture-Third-Jason-Gregory/dp/1138035459)
-- [A Tour of C++](https://www.amazon.com/Tour-2nd-Depth-Bjarne-Stroustrup/dp/0134997832/ref=sr_1_1?dchild=1&keywords=A+Tour+of+C%2B%2B&qid=1619192527&s=books&sr=1-1)
-- [Game Programming Patterns](https://www.amazon.com/dp/0990582906)
+- [A Tour of C++, by Bjarne Stroustrup](https://www.amazon.com/Tour-2nd-Depth-Bjarne-Stroustrup/dp/0134997832)
+- [Game Programming Patterns, by Robert Nystrom](https://www.amazon.com/dp/0990582906)
+- [🇧🇷 Computação Gráfica, por Eduardo Azevedo](https://www.amazon.com.br/Computa%C3%A7%C3%A3o-Gr%C3%A1fica-Pr%C3%A1tica-Gera%C3%A7%C3%A3o-Imagens/dp/8535287795)
 
 ## Support
 
