@@ -13,21 +13,10 @@ env:
   CONAN_SYSREQUIRES_MODE: enabled
 
 jobs:
-  build:
-    name: ${{ matrix.config.name }}
+  build-macos:
+    name: Build MacOS
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - {
-            name: "MacOS",
-            artifact: "macOS.tar.xz",
-            os: macos-latest,
-            cc: "cc",
-            cxx: "c++"
-          }
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -86,8 +75,6 @@ jobs:
         uses: meeDamian/github-release@2.0
         with:
           files: >
-            windows.tar.xz
-            linux.tar.xz
             macOS.tar.xz
           gzip: folders
           token: ${{ secrets.GITHUB_TOKEN }}
