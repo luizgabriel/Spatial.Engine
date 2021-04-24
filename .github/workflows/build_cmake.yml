@@ -88,7 +88,17 @@ jobs:
       - name: Build
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake --build . --config Spatial.Editor
+        run: cmake --build . --config Release --target Spatial.Editor
+
+      - name: Build Tests
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: cmake --build . --config Release --target Spatial.Core.Tests
+
+      - name: Run Tests
+        working-directory: ${{runner.workspace}}/build/Spatial.Core/tests
+        shell: bash
+        run: ./Spatial.Core.Tests
 
       - name: Install
         working-directory: ${{runner.workspace}}/build

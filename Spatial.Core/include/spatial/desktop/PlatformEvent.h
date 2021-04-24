@@ -27,7 +27,7 @@ struct KeyEvent
 	Key key;
 	KeyAction action;
 
-	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::None)
+	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::UnknownAction)
 		: key{key}, action{action}
 	{
 	}

@@ -17,7 +17,7 @@ std::string nameOf(const KeyAction action)
 	switch (action)
 	{
 	default:
-	case KeyAction::None:
+	case KeyAction::UnknownAction:
 		return "TYPED";
 	case KeyAction::Pressed:
 		return "PRESSED";

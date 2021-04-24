@@ -23,7 +23,7 @@ void InputState::set(const Key key, const KeyAction action)
 		setReleased(key);
 		break;
 
-	case KeyAction::None:
+	case KeyAction::UnknownAction:
 		break;
 	}
 }
