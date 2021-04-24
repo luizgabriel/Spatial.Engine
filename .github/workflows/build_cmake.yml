@@ -22,14 +22,6 @@ jobs:
       matrix:
         config:
           - {
-            name: "Windows MSVC",
-            artifact: "windows.tar.xz",
-            os: windows-latest,
-            cc: "cl",
-            cxx: "cl",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-          - {
             name: "Ubuntu CLang",
             artifact: "linux.tar.xz",
             os: ubuntu-latest,
