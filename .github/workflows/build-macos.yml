@@ -41,9 +41,6 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
-        env:
-          CC: ${{matrix.config.cc}}
-          CXX: ${{matrix.config.cxx}}
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release -DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=../install
 
       - name: Build
