@@ -39,6 +39,10 @@ add_library(Spatial.Core
 	include/spatial/ui/UserInterfaceSystem.h
 	include/spatial/ui/UserInterfaceUtils.h
 	
+	include/spatial/serialization/Archives.h
+	include/spatial/serialization/Math.h
+	include/spatial/serialization/Components.h
+	
 	## SOURCES
 	src/common/Key.cpp
 	src/common/StringHelpers.cpp
@@ -60,7 +64,7 @@ add_library(Spatial.Core
 	src/render/SkyboxResources.cpp
 	src/render/Camera.cpp
 	src/render/InstanceBuilder.cpp
-	src/render/Transform.cpp
+	src/render/Components.cpp
 	src/render/Light.cpp
 	src/render/Renderable.cpp
 	
@@ -96,7 +100,8 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::boost_tti
 	CONAN_PKG::boost_locale
 	CONAN_PKG::stb
-	CONAN_PKG::glfw)
+	CONAN_PKG::glfw
+	CONAN_PKG::cereal)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

@@ -72,7 +72,7 @@ class InstanceHandleBase
 	bool has() const
 	{
 		assert(isValid());
-		return mStage.getRegistry().template has<Component>(mInstance);
+		return mStage.getRegistry().template all_of<Component>(mInstance);
 	}
 
 	template <typename Component>

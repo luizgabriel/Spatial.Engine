@@ -5,7 +5,6 @@
 #include <spatial/render/Renderable.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/render/SceneNodeName.h>
 #include <spatial/render/Stage.h>
 
 using namespace spatial;

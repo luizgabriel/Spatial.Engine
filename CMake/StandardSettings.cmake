@@ -1,5 +1,5 @@
-# Setup C++20 Standard
-set(CMAKE_CXX_STANDARD 20)
+# Setup C++17 Standard
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Generate compile_commands.json for clang based tools

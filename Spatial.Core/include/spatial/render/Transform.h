@@ -3,6 +3,7 @@
 #include <filament/Engine.h>
 #include <filament/TransformManager.h>
 #include <spatial/common/Math.h>
+#include <spatial/ecs/Components.h>
 #include <utils/Entity.h>
 
 namespace spatial
@@ -69,5 +70,9 @@ class Transform
 
 	Instance getInstance() const noexcept;
 };
+
+TransformComponent toComponent(const Transform& transform);
+
+Transform fromComponent(const TransformComponent& component, filament::Engine& engine, utils::Entity entity);
 
 } // namespace spatial

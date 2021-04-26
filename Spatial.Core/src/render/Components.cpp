@@ -74,4 +74,23 @@ void Transform::refresh() noexcept
 	mManager.setTransform(getInstance(), localTransform);
 }
 
+TransformComponent toComponent(const Transform& transform)
+{
+	return {
+		transform.getRotation(),
+		transform.getScale(),
+		transform.getRotation()
+	};
+}
+
+Transform fromComponent(const TransformComponent& component, filament::Engine& engine, utils::Entity entity)
+{
+	auto transform = Transform{engine, entity};
+	transform.setPosition(component.position);
+	transform.setScale(component.scale);
+	transform.setRotation(component.rotation);
+
+	return transform;
+}
+
 } // namespace spatial

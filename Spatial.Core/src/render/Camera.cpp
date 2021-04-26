@@ -93,4 +93,14 @@ bool Camera::isCustomProjection() const noexcept
 	return std::holds_alternative<CustomProjection>(mProjection);
 }
 
+CameraComponent toComponent(const Camera& camera)
+{
+	return CameraComponent();
+}
+
+Camera fromComponent(const CameraComponent& component, filament::Engine& engine, utils::Entity entity)
+{
+	return Camera(filament::Engine());
+}
+
 } // namespace spatial

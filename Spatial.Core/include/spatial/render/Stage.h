@@ -119,8 +119,6 @@ class Stage
 	}
 
   private:
-
-
 	filament::Engine& mEngine;
 	Scene mScene;
 	View mView;

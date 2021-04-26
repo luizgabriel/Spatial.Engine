@@ -12,6 +12,7 @@ add_executable(Spatial.Core.Tests
 	Application.test.cpp
 	Stage.test.cpp
 	StageView.test.cpp
+	StageSerialization.test.cpp
 	DesktopWindowContext.test.cpp
 	RenderingSystem.test.cpp)
 
