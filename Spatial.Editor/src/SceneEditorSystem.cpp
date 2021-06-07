@@ -211,6 +211,7 @@ void SceneEditorSystem::onDrawGui()
 		componentGroup<ecs::SpotLight>("Spot Light", selectedEntity);
 		componentGroup<ecs::PointLight>("Point Light", selectedEntity);
 		componentGroup<ecs::Mesh>("Mesh", selectedEntity);
+		componentGroup<ecs::MeshRenderer>("Mesh Renderer", selectedEntity);
 	}
 	else
 	{
