@@ -562,7 +562,7 @@ void componentInput(ecs::DirectionalLight& light)
 {
     ImGui::Checkbox("Cast Shadows", &light.castShadows);
     ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
 
     directionInput("Direction", light.direction);
 }
@@ -572,7 +572,7 @@ void componentInput(ecs::PointLight& light)
 {
     ImGui::Checkbox("Cast Shadows", &light.castShadows);
     ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
     ImGui::InputFloat("Falloff", &light.falloff);
 }
 
@@ -580,7 +580,7 @@ void componentInput(ecs::SpotLight& light)
 {
     ImGui::Checkbox("Cast Shadows", &light.castShadows);
     ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
     ImGui::InputFloat("Falloff", &light.falloff);
     ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
     ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
@@ -592,7 +592,7 @@ void componentInput(ecs::SunLight& light)
 {
     ImGui::Checkbox("Cast Shadows", &light.castShadows);
     ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
     ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
     ImGui::InputFloat("Halo size", &light.haloSize);
 

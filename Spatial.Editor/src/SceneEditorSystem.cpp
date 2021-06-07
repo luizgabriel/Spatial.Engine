@@ -123,8 +123,6 @@ void SceneEditorSystem::onStart()
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	mCameraEditorScript.onUpdateFrame(delta);
-
 	mSceneControllerSystem.synchronize(mMainStageRegistry);
 	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
 	mTransformSystem.synchronize(mMainStageRegistry);
@@ -135,6 +133,8 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	auto cameraEntity = mMainStageRegistry.getFirstEntity<EditorCamera, render::Camera>();
 	auto& camera = mMainStageRegistry.getComponent<render::Camera>(cameraEntity);
 	mEditorView->setCamera(camera.getInstance());
+
+	mCameraEditorScript.onUpdateFrame(delta);
 }
 
 void SceneEditorSystem::onDrawGui()
