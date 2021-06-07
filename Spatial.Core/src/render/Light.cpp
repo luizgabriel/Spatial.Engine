@@ -2,7 +2,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 Light::Light(filament::Engine& engine, utils::Entity entity, Light::Type type)
@@ -170,4 +170,4 @@ Light::Instance Light::getInstance() const noexcept
 	return mManager.getInstance(mEntity);
 }
 
-} // namespace spatial
+} // namespace spatial::render

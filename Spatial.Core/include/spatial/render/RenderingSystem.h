@@ -6,6 +6,7 @@
 
 namespace spatial
 {
+
 class RenderingSystem
 {
   public:
@@ -44,10 +45,10 @@ class RenderingSystem
 	}
 
   private:
-	Engine mEngine;
-	SwapChain mSwapChain;
-	Renderer mRenderer;
+	render::Engine mEngine;
+	render::SwapChain mSwapChain;
+	render::Renderer mRenderer;
 	Signal<filament::Renderer&> mOnRenderSignal;
 };
 
-} // namespace spatial
+} // namespace spatial::render

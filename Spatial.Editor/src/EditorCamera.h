@@ -19,4 +19,4 @@ struct EditorCamera
 	bool startPressed{true};
 };
 
-} // namespace spatial::ecs
+} // namespace spatial::editor

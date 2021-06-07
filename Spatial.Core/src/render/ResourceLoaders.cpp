@@ -39,7 +39,7 @@ istream& operator>>(istream& stream, filament::Box& box)
 	return stream >> box.center >> box.halfExtent;
 }
 
-istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
+istream& operator>>(istream& stream, spatial::render::FilameshFilePart& part)
 {
 	stream.read(reinterpret_cast<char*>(&part.offset), 4);
 	stream.read(reinterpret_cast<char*>(&part.count), 4);
@@ -52,7 +52,7 @@ istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
 	return stream;
 }
 
-istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
+istream& operator>>(istream& stream, spatial::render::FilameshFileHeader& header)
 {
 	char magic[9];
 	stream.read(magic, 8);
@@ -91,7 +91,7 @@ istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 
 } // namespace std
 
-namespace spatial
+namespace spatial::render
 {
 
 Material createMaterial(fl::Engine& engine, const std::string& resourceData)
@@ -226,4 +226,4 @@ FilameshFile createFilamesh(fl::Engine& engine, const std::string& resourceData)
 	return std::move(mesh);
 }
 
-} // namespace spatial
+} // namespace spatial::render

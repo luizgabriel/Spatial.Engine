@@ -16,18 +16,18 @@ class UserInterfaceRenderer
   private:
 	filament::Engine& mEngine;
 
-	View mView;
-	Scene mScene;
-	Entity mCameraEntity;
-	Camera mCamera;
-	Entity mEntity;
-	Skybox mSkybox;
-	SharedMaterial mMaterial;
-	SharedTexture mFontTexture;
+	render::View mView;
+	render::Scene mScene;
+	render::Entity mCameraEntity;
+	render::Camera mCamera;
+	render::Entity mEntity;
+	render::Skybox mSkybox;
+	render::SharedMaterial mMaterial;
+	render::SharedTexture mFontTexture;
 
-	std::vector<VertexBuffer> mVertexBuffers;
-	std::vector<IndexBuffer> mIndexBuffers;
-	std::vector<MaterialInstance> mMaterialInstances;
+	std::vector<render::VertexBuffer> mVertexBuffers;
+	std::vector<render::IndexBuffer> mIndexBuffers;
+	std::vector<render::MaterialInstance> mMaterialInstances;
 
 	ImGuiContext* mImguiContext;
 
@@ -45,9 +45,9 @@ class UserInterfaceRenderer
 
 	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 
-	void setMaterial(const SharedMaterial& material);
+	void setMaterial(const render::SharedMaterial& material);
 
-	void setFontTexture(const SharedTexture& fontTextureAtlas);
+	void setFontTexture(const render::SharedTexture& fontTextureAtlas);
 
 	void setupEngineTheme();
 

@@ -5,7 +5,9 @@ add_executable(Spatial.Editor
 	src/SceneEditorSystem.cpp
 	src/EditorCameraScript.h
 	src/EditorCameraScript.cpp
-	src/Components.h
+	src/EditorCamera.h
+	src/DefaultMaterial.h
+	src/DefaultMaterial.cpp
 	src/ImGuiComponents.h
 	src/ImGuiComponents.cpp
 	src/ImGuiSceneWindow.h

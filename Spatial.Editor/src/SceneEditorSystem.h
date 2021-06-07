@@ -2,17 +2,22 @@
 
 #include <imgui.h>
 
-#include "ImGuiSceneWindow.h"
 #include "EditorCameraScript.h"
+#include "ImGuiSceneWindow.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
-#include <spatial/desktop/Window.h>
-#include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/InputState.h>
+#include <spatial/desktop/PlatformEvent.h>
+#include <spatial/desktop/Window.h>
+#include <spatial/ecs/EntityHandle.h>
+#include <spatial/render/CameraSystem.h>
 #include <spatial/render/FilameshFile.h>
-#include <spatial/render/InstanceHandle.h>
-#include <spatial/render/Stage.h>
+#include <spatial/render/LightSystem.h>
+#include <spatial/render/MaterialInstancesSystem.h>
+#include <spatial/render/RenderableMeshSystem.h>
+#include <spatial/render/SceneControllerSystem.h>
+#include <spatial/render/TransformSystem.h>
 
 namespace fl = filament;
 
@@ -25,19 +30,29 @@ class SceneEditorSystem
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
-	Stage mMainStage;
 
-	Material mDefaultMaterial;
-	Texture mIblTexture;
-	Texture mSkyboxTexture;
-	IndirectLight mSkyboxLight;
-	Skybox mSkybox;
+	ecs::Registry mMainStageRegistry;
+
+	render::View mEditorView;
+	render::Scene mEditorScene;
+
+	render::SceneControllerSystem mSceneControllerSystem;
+	render::MaterialInstancesSystem mMaterialInstancesSystem;
+	render::TransformSystem mTransformSystem;
+	render::CameraSystem mCameraSystem;
+	render::LightSystem mLightSystem;
+	render::RenderableMeshSystem mRenderableMeshSystem;
+
+	render::Material mDefaultMaterial;
+	render::Texture mIblTexture;
+	render::Texture mSkyboxTexture;
+	render::IndirectLight mSkyboxLight;
+	render::Skybox mSkybox;
 
 	ImGuiSceneWindow mImGuiSceneWindow;
-	InstanceHandle mSelectedInstance;
+	ecs::Entity mSelectedEntity;
 
-	std::array<FilameshFile, 4> mMeshes;
-	std::array<MaterialInstance, 4> mMaterialInstances;
+	std::array<render::FilameshFile, 4> mMeshes;
 
 	EditorCameraScript mCameraEditorScript;
 

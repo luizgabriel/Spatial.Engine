@@ -1,8 +1,9 @@
 #pragma once
 
-#include <spatial/desktop/Window.h>
+#include "EditorCamera.h"
 #include <spatial/desktop/InputState.h>
-#include <spatial/render/InstanceHandle.h>
+#include <spatial/desktop/Window.h>
+#include <spatial/ecs/Registry.h>
 
 namespace spatial::editor
 {
@@ -10,24 +11,28 @@ namespace spatial::editor
 class EditorCameraScript
 {
   public:
-	EditorCameraScript(Stage& stage, desktop::Window& window, const desktop::InputState& inputState);
+	EditorCameraScript(ecs::Registry& stage, const desktop::Window& window, const desktop::InputState& inputState);
 
 	void onStart();
 
 	void onUpdateFrame(float delta);
 
-	auto getCameraInstance()
+	void onEditorViewResized(double aspectRatio);
+
+	ecs::Entity getCameraInstance()
 	{
 		return mCamera;
 	}
 
   private:
-	Stage& mStage;
-	desktop::Window& mWindow;
+	ecs::Registry& mRegistry;
+	const desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
-	InstanceHandle mCamera;
+	ecs::Entity mCamera;
 
 	math::float3 getInputAxis();
 };
+
+void componentInput(EditorCamera& component);
 
 } // namespace spatial::editor

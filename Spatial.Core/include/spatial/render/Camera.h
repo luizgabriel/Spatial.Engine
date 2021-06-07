@@ -4,13 +4,12 @@
 #include <filament/Engine.h>
 #include <filament/Frustum.h>
 #include <spatial/common/Math.h>
-#include <spatial/ecs/Components.h>
+#include <spatial/ecs/Transform.h>
 #include <utils/Entity.h>
 #include <variant>
 
-namespace spatial
+namespace spatial::render
 {
-
 
 class Camera
 {
@@ -39,27 +38,25 @@ class Camera
 
 	void lookAt(const math::float3& eye, const math::float3& center, const math::float3& up) noexcept;
 
-	bool isPerspective() const noexcept;
+	void setPerspectiveProjection(double fovInDegrees, double aspect, double near, double far) noexcept;
 
-	bool isOrthographic() const noexcept;
+	void setOrtographicProjection(
+					   double left, double right,
+					   double bottom, double top,
+					   double near, double far) noexcept;
 
-	bool isCustomProjection() const noexcept;
+	void setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept;
 
-	void setProjection(CameraProjection projection) noexcept;
+	void setCustomProjection(math::mat4 const& projection, double near, double far) noexcept;
 
-	const CameraProjection& getProjection() const noexcept
-	{
-		return mProjection;
-	}
+	void setCustomProjection(math::mat4 const& projection, math::mat4 const& projectionForCulling,
+							 double near, double far) noexcept;
+
+	void setScaling(math::double2 scaling) noexcept;
 
   private:
 	filament::Engine& mEngine;
 	utils::Entity mEntity;
-	CameraProjection mProjection;
 };
 
-CameraComponent toComponent(const Camera& camera);
-
-Camera fromComponent(const CameraComponent& component, filament::Engine& engine, utils::Entity entity);
-
-} // namespace spatial
+} // namespace spatial::render

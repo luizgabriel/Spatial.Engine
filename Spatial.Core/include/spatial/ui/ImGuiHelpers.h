@@ -17,11 +17,11 @@ math::int2 imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
+render::VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
 
-IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
+render::IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData);
+render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData);
 
 template <typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)

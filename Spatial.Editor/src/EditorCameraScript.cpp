@@ -1,7 +1,8 @@
 #include "EditorCameraScript.h"
-#include "Components.h"
+#include "EditorCamera.h"
 #include "ImGuiComponents.h"
-#include <spatial/render/InstanceBuilder.h>
+#include <spatial/ecs/Camera.h>
+#include <spatial/ecs/RegistryUtils.h>
 
 using namespace spatial::math;
 
@@ -10,11 +11,11 @@ namespace spatial::editor
 
 void EditorCameraScript::onStart()
 {
-	mCamera = createInstance(mStage, "Main Camera")
-				  .withPosition({3.0f, 3.0f, 20.0f})
-				  .asCamera()
-				  .withPerspectiveProjection(45.0, 19 / 6.0, .1, 1000.0)
-				  .add<EditorCamera>(.5f, 10.0f);
+	auto camera = ecs::createEntity(mRegistry, "Main Camera");
+	camera.add(ecs::Transform{math::float3 {3.0f, 3.0f, 20.0f}});
+	camera.add(ecs::PerspectiveCamera{45.0, 19 / 6.0, .1, 1000.0});
+	camera.add(EditorCamera{.5f, 10.0f});
+	mCamera = camera;
 }
 
 float3 EditorCameraScript::getInputAxis()
@@ -28,18 +29,19 @@ float3 EditorCameraScript::getInputAxis()
 
 void EditorCameraScript::onUpdateFrame(float delta)
 {
-	auto& transform = mCamera.get<Transform>();
-	auto& options = mCamera.get<EditorCamera>();
+	if (mRegistry.isValid(mCamera))
+		return;
+
+	auto& transform = mRegistry.getComponent<ecs::Transform>(mCamera);
+	auto& options = mRegistry.getComponent<EditorCamera>(mCamera);
 
 	const auto keyboardDelta = delta * options.velocity * getInputAxis();
-	const auto forward = transform.getForward();
+	const auto forward = math::forwardVector(transform.getMatrix());
 	const auto right = cross(forward, math::axisY);
-	auto position = transform.getPosition();
 
-	position += forward * keyboardDelta.x;
-	position += right * keyboardDelta.y;
-	position += math::axisY * keyboardDelta.z;
-	transform.setPosition(position);
+	transform.position += forward * keyboardDelta.x;
+	transform.position += right * keyboardDelta.y;
+	transform.position += math::axisY * keyboardDelta.z;
 
 	if (mInputState.released(Key::MouseLeft))
 	{
@@ -60,21 +62,19 @@ void EditorCameraScript::onUpdateFrame(float delta)
 	if (options.enabled && options.justStarted >= 10)
 	{
 		const auto mouseRotation = mInputState.getMouseOffset() * math::pi * options.sensitivity * delta;
-		const auto rotation = transform.getRotation();
-
-		transform.setRotation({
-			std::clamp(rotation.x + mouseRotation.y, -math::pi, math::pi), // clamp the pitch
-			rotation.y + mouseRotation.x,
+		transform.rotation = math::float3{
+			std::clamp(transform.rotation.x + mouseRotation.y, -math::pi, math::pi), // clamp the pitch
+			transform.rotation.y + mouseRotation.x,
 			.0f // remove the roll
-		});
+		};
 	}
 }
 
-template <>
-void drawComponentView(InstanceHandle&, EditorCamera& component)
+void componentInput(EditorCamera& component)
 {
 	ImGui::DragFloat("Velocity", &component.velocity);
 	ImGui::DragFloat("Sensitivity", &component.sensitivity);
+
 	component.startPressed = ImGui::Button("Free Camera Control");
 	if (ImGui::IsItemHovered())
 	{
@@ -84,9 +84,25 @@ void drawComponentView(InstanceHandle&, EditorCamera& component)
 	}
 }
 
-EditorCameraScript::EditorCameraScript(Stage& stage, desktop::Window& window, const desktop::InputState& inputState)
-	: mStage{stage}, mWindow{window}, mInputState{inputState}, mCamera{mStage, NullInstance}
+EditorCameraScript::EditorCameraScript(ecs::Registry& stage, const desktop::Window& window, const desktop::InputState& inputState)
+	: mRegistry{stage}, mWindow{window}, mInputState{inputState}, mCamera{ecs::NullEntity}
 {
+}
+
+void EditorCameraScript::onEditorViewResized(double aspectRatio)
+{
+	if (mRegistry.hasAllComponents<ecs::PerspectiveCamera>(mCamera))
+	{
+		auto& camera = mRegistry.getComponent<ecs::PerspectiveCamera>(mCamera);
+		camera.aspectRatio = aspectRatio;
+	}
+
+	if (mRegistry.hasAllComponents<ecs::OrthographicCamera>(mCamera))
+	{
+		auto& camera = mRegistry.getComponent<ecs::OrthographicCamera>(mCamera);
+		camera.left = -aspectRatio;
+		camera.right = aspectRatio;
+	}
 }
 
 } // namespace spatial::editor

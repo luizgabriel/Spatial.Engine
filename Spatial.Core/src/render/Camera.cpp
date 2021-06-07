@@ -1,6 +1,6 @@
 #include <spatial/render/Camera.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 Camera::Camera(filament::Engine& engine) : Camera(engine, {})
@@ -8,7 +8,7 @@ Camera::Camera(filament::Engine& engine) : Camera(engine, {})
 }
 
 Camera::Camera(filament::Engine& engine, utils::Entity entity)
-	: mEngine{engine}, mEntity{entity}, mProjection{PerspectiveProjection{45.0, 19.0 / 6.0, .1, 10000.0}}
+	: mEngine{engine}, mEntity{entity}
 {
 	if (!entity.isNull())
 		engine.createCamera(entity);
@@ -21,14 +21,13 @@ Camera::~Camera()
 }
 
 Camera::Camera(Camera&& other) noexcept
-	: mEngine{other.mEngine}, mEntity{std::exchange(other.mEntity, {})}, mProjection{std::move(other.mProjection)}
+	: mEngine{other.mEngine}, mEntity{other.mEntity}
 {
 }
 
 Camera& Camera::operator=(Camera&& other) noexcept
 {
 	mEntity = std::exchange(other.mEntity, {});
-	mProjection = std::move(other.mProjection);
 	return *this;
 }
 
@@ -52,55 +51,36 @@ void Camera::lookAt(const math::float3& eye, const math::float3& center, const m
 	getInstance()->lookAt(eye, center, up);
 }
 
-void Camera::setProjection(Projection projection) noexcept
+void Camera::setPerspectiveProjection(double fovInDegrees, double aspect, double near, double far) noexcept
 {
-	mProjection = std::move(projection);
-
-	std::visit(
-		[this](const auto& projection) {
-			using T = std::decay_t<decltype(projection)>;
-
-			if constexpr (std::is_same_v<T, PerspectiveProjection>)
-			{
-				getInstance()->setProjection(projection.fieldOfView, projection.aspectRatio, projection.near,
-											 projection.far);
-			}
-			else if constexpr (std::is_same_v<T, OrthographicProjection>)
-			{
-				getInstance()->setProjection(filament::Camera::Projection::ORTHO, projection.left, projection.right,
-											 projection.bottom, projection.top, projection.near, projection.far);
-			}
-			else if constexpr (std::is_same_v<T, CustomProjection>)
-			{
-				getInstance()->setCustomProjection(projection.projectionMatrix, projection.near, projection.far);
-			}
-		},
-		mProjection);
+	getInstance()->setProjection(fovInDegrees, aspect, near, far);
 }
 
-bool Camera::isPerspective() const noexcept
+void Camera::setOrtographicProjection(double left, double right, double bottom, double top, double near,
+									  double far) noexcept
 {
-	return std::holds_alternative<PerspectiveProjection>(mProjection);
+	getInstance()->setProjection(filament::Camera::Projection::ORTHO, left,right, bottom, top, near, far);
 }
 
-bool Camera::isOrthographic() const noexcept
+void Camera::setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept
 {
-	return std::holds_alternative<OrthographicProjection>(mProjection);
+	getInstance()->setLensProjection(focalLengthInMillimeters, aspect, near, far);
 }
 
-bool Camera::isCustomProjection() const noexcept
+void Camera::setCustomProjection(const math::mat4& projection, double near, double far) noexcept
 {
-	return std::holds_alternative<CustomProjection>(mProjection);
+	getInstance()->setCustomProjection(projection, near, far);
 }
 
-CameraComponent toComponent(const Camera& camera)
+void Camera::setCustomProjection(const math::mat4& projection, const math::mat4& projectionForCulling, double near,
+								 double far) noexcept
 {
-	return CameraComponent();
+	getInstance()->setCustomProjection(projection, projectionForCulling, near, far);
 }
 
-Camera fromComponent(const CameraComponent& component, filament::Engine& engine, utils::Entity entity)
+void Camera::setScaling(math::double2 scaling) noexcept
 {
-	return Camera(filament::Engine());
+	getInstance()->setScaling(scaling);
 }
 
 } // namespace spatial

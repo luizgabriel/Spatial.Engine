@@ -10,9 +10,7 @@ add_custom_command(
 add_executable(Spatial.Core.Tests
 	${CMAKE_CURRENT_BINARY_DIR}/assets/plane.filamesh
 	Application.test.cpp
-	Stage.test.cpp
-	StageView.test.cpp
-	StageSerialization.test.cpp
+	RegistrySerialization.test.cpp
 	DesktopWindowContext.test.cpp
 	RenderingSystem.test.cpp)
 

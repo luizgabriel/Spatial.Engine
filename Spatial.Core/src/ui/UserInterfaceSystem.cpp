@@ -7,12 +7,12 @@ UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{e
 {
 }
 
-void UserInterfaceSystem::setFontTexture(const SharedTexture& fontTexture)
+void UserInterfaceSystem::setFontTexture(const render::SharedTexture& fontTexture)
 {
 	mRenderer.setFontTexture(fontTexture);
 }
 
-void UserInterfaceSystem::setMaterial(const SharedMaterial& material)
+void UserInterfaceSystem::setMaterial(const render::SharedMaterial& material)
 {
 	mRenderer.setMaterial(material);
 }

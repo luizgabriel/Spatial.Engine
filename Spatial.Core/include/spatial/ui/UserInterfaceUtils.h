@@ -18,7 +18,7 @@ void disconnect(UserInterfaceSystem& ui, Listener& listener)
 }
 
 template <typename Listener>
-UserInterfaceSystem& operator>>(UserInterfaceSystem& ui, Listener& listener)
+auto& operator>>(UserInterfaceSystem& ui, Listener& listener)
 {
 	connect(ui, listener);
 	return ui;

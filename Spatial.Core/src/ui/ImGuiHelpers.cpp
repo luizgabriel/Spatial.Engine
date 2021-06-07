@@ -34,9 +34,9 @@ bool imguiIsMinimized()
 	return fs.x == 0 && fs.y == 0;
 }
 
-VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
+render::VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
 {
-	return VertexBuffer{engine, fl::VertexBuffer::Builder()
+	return render::VertexBuffer{engine, fl::VertexBuffer::Builder()
 									.vertexCount(capacity)
 									.bufferCount(1)
 									.attribute(fl::VertexAttribute::POSITION, 0,
@@ -49,14 +49,14 @@ VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, size_t capacity)
 									.build(engine)};
 }
 
-IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
+render::IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, size_t capacity)
 {
-	return IndexBuffer{
+	return render::IndexBuffer{
 		engine,
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData)
+render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData)
 {
 	auto& io = ImGui::GetIO();
 
@@ -81,7 +81,7 @@ Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceD
 
 	texture->setImage(engine, 0, std::move(pb));
 
-	return createResource(engine, texture);
+	return render::createResource(engine, texture);
 }
 
 } // namespace spatial

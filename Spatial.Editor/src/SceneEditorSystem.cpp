@@ -1,14 +1,16 @@
 #include "SceneEditorSystem.h"
 
 #include <assets/generated.h>
+#include <filament/LightManager.h>
 #include <spatial/core/Logger.h>
-#include <spatial/render/InstanceBuilder.h>
+#include <spatial/ecs/RegistryUtils.h>
+#include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/render/Transform.h>
-#include <filament/LightManager.h>
 
-#include "Components.h"
+#include "DefaultMaterial.h"
+#include "EditorCamera.h"
 #include "ImGuiComponents.h"
 
 namespace fl = filament;
@@ -26,109 +28,113 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mWindow{window},
 	  mInputState{inputState},
 
-	  mMainStage{mEngine},
-	  mDefaultMaterial{createMaterial(mEngine, {ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE})},
+	  mMainStageRegistry{},
 
-	  mIblTexture{createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE})},
+	  mEditorView{render::createView(mEngine)},
+	  mEditorScene{render::createScene(mEngine)},
+
+	  mSceneControllerSystem{mEngine, mEditorScene.ref()},
+	  mMaterialInstancesSystem{mEngine},
+	  mTransformSystem{mEngine},
+	  mCameraSystem{mEngine},
+	  mLightSystem{mEngine},
+	  mRenderableMeshSystem{mEngine},
+
+	  mDefaultMaterial{render::createMaterial(mEngine, {ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE})},
+
+	  mIblTexture{
+		  render::createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE})},
 	  mSkyboxTexture{
-		  createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE})},
-	  mSkyboxLight{createImageBasedLight(mEngine, mIblTexture.ref(), {ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE})},
-	  mSkybox{createSkybox(mEngine, mSkyboxTexture.ref())},
+		  render::createKtxTexture(mEngine, {ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE})},
+	  mSkyboxLight{render::createImageBasedLight(mEngine, mIblTexture.ref(), {ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE})},
+	  mSkybox{render::createSkybox(mEngine, mSkyboxTexture.ref())},
 
 	  mImGuiSceneWindow{mEngine, mWindow.getSize()},
 
-	  mSelectedInstance{mMainStage, {}},
+	  mSelectedEntity{ecs::NullEntity},
 
-	  mMeshes{createFilamesh(mEngine, {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE}),
-			  createFilamesh(mEngine, {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE}),
-			  createFilamesh(mEngine, {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE}),
-			  createFilamesh(mEngine, {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE})},
+	  mMeshes{render::createFilamesh(mEngine, {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE}),
+			  render::createFilamesh(mEngine, {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE}),
+			  render::createFilamesh(mEngine, {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE}),
+			  render::createFilamesh(mEngine, {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE})},
 
-	  mMaterialInstances{
-		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
-		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
-		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
-		  createMaterialInstance(mEngine, mDefaultMaterial.ref()),
-	  },
-
-	  mCameraEditorScript{mMainStage, mWindow, mInputState}
+	  mCameraEditorScript{mMainStageRegistry, mWindow, mInputState}
 {
-	mMainStage.getView()->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
-
-	const auto windowSize = mWindow.getSize();
-	mMainStage.getView()->setViewport({0, 0, static_cast<uint32_t>(windowSize.x), static_cast<uint32_t>(windowSize.y)});
-
-	mMainStage.getScene().setIndirectLight(mSkyboxLight.get());
-	mMainStage.getScene().setSkybox(mSkybox.get());
-
 	mImGuiSceneWindow >> *this; // register imgui window resize events
 }
 
 void SceneEditorSystem::onStart()
 {
+	mEditorScene->setIndirectLight(mSkyboxLight.get());
+	mEditorScene->setSkybox(mSkybox.get());
+
 	mCameraEditorScript.onStart();
-	mSelectedInstance = mCameraEditorScript.getCameraInstance();
 
-	mMainStage.setMainCamera(mSelectedInstance);
-
-	createInstance(mMainStage, "Main Light")
-		.asLight(spatial::Light::Type::DIRECTIONAL)
-		.withIntensity(10000)
-		.withDirection({.34f, -.66f, -.67f});
-
-	mDefaultMaterial->setDefaultParameter("metallic", .2f);
-	mDefaultMaterial->setDefaultParameter("roughness", 0.8f);
-	mDefaultMaterial->setDefaultParameter("reflectance", .1f);
+	const auto windowSize = mWindow.getSize();
+	mEditorView->setViewport({0, 0, static_cast<uint32_t>(windowSize.x), static_cast<uint32_t>(windowSize.y)});
+	mEditorView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
+	mEditorView->setScene(mEditorScene.get());
 
 	{
-		createInstance(mMainStage, "Cube")
-			.withPosition({.0f})
-			.asMesh(mMeshes[0])
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, mMaterialInstances[0].get())
-			.get();
-
-		mMaterialInstances[0]->setParameter("baseColor", math::float3{.4f, 0.1f, 0.1f});
+		auto light = ecs::createEntity(mMainStageRegistry, "Main Light");
+		light.add(ecs::DirectionalLight{10000, math::float3{.34f, -.66f, -.67f}});
 	}
 
 	{
-		createInstance(mMainStage, "Plane")
-			.withPosition({3.0f, -1.0f, .0f})
-			.withScale({10.0f})
-			.asMesh(mMeshes[1])
-			.withShadowOptions(false, true)
-			.withMaterialAt(0, mMaterialInstances[1].get());
+		auto m1 = ecs::createEntity(mMainStageRegistry);
+		m1.add(DefaultMaterial{math::float3{.4f, 0.1f, 0.1f}});
 
-		mMaterialInstances[1]->setParameter("baseColor", math::float3{.8f, .8f, .8f});
+		auto cube = ecs::createEntity(mMainStageRegistry, "Cube");
+		cube.add(ecs::Transform{math::float3{.0f}});
+		cube.add(ecs::MeshRenderer{true, true, {m1}, 1});
 	}
 
 	{
-		createInstance(mMainStage, "Cylinder")
-			.withPosition({6.0f, .0f, .0f})
-			.asMesh(mMeshes[2])
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, mMaterialInstances[2].get());
+		auto m2 = ecs::createEntity(mMainStageRegistry);
+		m2.add(DefaultMaterial{math::float3{.8f, .8f, .8f}});
 
-		mMaterialInstances[2]->setParameter("baseColor", math::float3{.1f, 0.4f, 0.1f});
+		auto plane = ecs::createEntity(mMainStageRegistry, "Plane");
+		plane.add(ecs::Transform{math::float3{3.0f, -1.0f, .0f}, math::float3{10.0f}});
+		plane.add(ecs::MeshRenderer{false, true, {m2}, 1});
 	}
 
 	{
-		createInstance(mMainStage, "Sphere")
-			.withPosition({3.0f, .0f, .0f})
-			.asMesh(mMeshes[3])
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, mMaterialInstances[3].get());
+		auto m3 = ecs::createEntity(mMainStageRegistry);
+		m3.add(DefaultMaterial{math::float3{.1f, 0.4f, 0.1f}});
 
-		mMaterialInstances[3]->setParameter("baseColor", math::float3{.1f, 0.1f, 0.4f});
+		auto cylinder = ecs::createEntity(mMainStageRegistry, "Cylinder");
+		cylinder.add(ecs::Transform{math::float3{6.0f, .0f, .0f}});
+		cylinder.add(ecs::MeshRenderer{true, true, {m3}, 1});
 	}
+
+	{
+		auto m4 = ecs::createEntity(mMainStageRegistry);
+		m4.add(DefaultMaterial{math::float3{.1f, 0.1f, 0.4f}});
+
+		auto sphere = ecs::createEntity(mMainStageRegistry, "Sphere");
+		sphere.add(ecs::Transform{math::float3{3.0f, .0f, .0f}});
+		sphere.add(ecs::MeshRenderer{true, true, {m4}, 1});
+	}
+
+	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
 
 	onSceneWindowResized({1280, 720});
-	mMainStage.onStart();
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
 	mCameraEditorScript.onUpdateFrame(delta);
+
+	mSceneControllerSystem.synchronize(mMainStageRegistry);
+	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
+	mTransformSystem.synchronize(mMainStageRegistry);
+	mCameraSystem.synchronize(mMainStageRegistry);
+	mLightSystem.synchronize(mMainStageRegistry);
+	mRenderableMeshSystem.synchronize(mMainStageRegistry);
+
+	auto cameraEntity = mMainStageRegistry.getFirstEntity<EditorCamera, render::Camera>();
+	auto& camera = mMainStageRegistry.getComponent<render::Camera>(cameraEntity);
+	mEditorView->setCamera(camera.getInstance());
 }
 
 void SceneEditorSystem::onDrawGui()
@@ -174,64 +180,37 @@ void SceneEditorSystem::onDrawGui()
 
 	ImGui::Begin("Scene Graph");
 
-	if (ImGui::BeginPopupContextWindow(0, 1, false))
-	{
-		if (ImGui::MenuItem("Create New Actor"))
-		{
-			mSelectedInstance = createInstance(mMainStage, "New Actor");
-			ImGui::SetWindowFocus("Properties");
-		}
-
-		ImGui::EndPopup();
-	}
-
-	editor::instancesTreeView(mMainStage, mSelectedInstance);
+	editor::instancesTreeView(mMainStageRegistry, mSelectedEntity);
 
 	ImGui::End(); // Scene Graph Window
 
+	auto selectedEntity = handleOf(mMainStageRegistry, mSelectedEntity);
+
 	ImGui::Begin("Properties");
-	if (mSelectedInstance.isValid())
+	if (selectedEntity.isValid())
 	{
 		{
-			auto& name = mSelectedInstance.get<SceneNodeName>();
-			editor::inputText("##Name", name.value);
+			auto& node = selectedEntity.get<ecs::SceneNode>();
+			editor::inputText("##Name", node.name);
 
 			ImGui::SameLine();
 			ImGui::PushItemWidth(-1);
-
-			if (ImGui::Button("Add Component"))
-				ImGui::OpenPopup("AddComponent");
 		}
 
 		ImGui::Spacing();
 		ImGui::Spacing();
-
-		if (ImGui::BeginPopup("AddComponent"))
-		{
-			auto builder = InstanceBuilder{mMainStage, mSelectedInstance};
-
-			if (ImGui::MenuItem("Camera"))
-			{
-				builder.asCamera().withPerspectiveProjection(45.0, mImGuiSceneWindow.getAspectRatio(), .1, 10000.0);
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (ImGui::MenuItem("Light"))
-			{
-				builder.asLight(Light::Type::POINT);
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
 
 		ImGui::PopItemWidth();
 
-		componentView<Transform>("Transform", mSelectedInstance);
-		componentView<Camera>("Camera", mSelectedInstance);
-		componentView<EditorCamera>("Editor Camera", mSelectedInstance);
-		componentView<Light>("Light", mSelectedInstance);
-		componentView<Renderable>("Renderer", mSelectedInstance);
+		componentGroup<ecs::Transform>("Transform", selectedEntity);
+		componentGroup<ecs::PerspectiveCamera>("Perspective Camera", selectedEntity);
+		componentGroup<ecs::OrthographicCamera>("Orthographic Camera", selectedEntity);
+		componentGroup<ecs::CustomCamera>("Custom Camera", selectedEntity);
+		componentGroup<editor::EditorCamera>("Editor Camera", selectedEntity);
+		componentGroup<ecs::DirectionalLight>("Directional Light", selectedEntity);
+		componentGroup<ecs::SpotLight>("Spot Light", selectedEntity);
+		componentGroup<ecs::PointLight>("Point Light", selectedEntity);
+		componentGroup<ecs::Mesh>("Mesh", selectedEntity);
 	}
 	else
 	{
@@ -246,31 +225,12 @@ void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 {
 	auto width = static_cast<double>(size.x);
 	auto height = static_cast<double>(size.y);
-	auto aspectRatio = width / height;
-
-	auto& camera = mMainStage.getComponent<Camera>(mMainStage.getMainCamera());
-	std::visit(
-		[&](auto projection) {
-			using T = std::decay_t<decltype(projection)>;
-
-			if constexpr (std::is_same_v<T, PerspectiveProjection>)
-			{
-				projection.aspectRatio = aspectRatio;
-			}
-			else if constexpr (std::is_same_v<T, OrthographicProjection>)
-			{
-				projection.left = -aspectRatio;
-				projection.right = aspectRatio;
-			}
-
-			camera.setProjection(projection);
-		},
-		camera.getProjection());
+	mCameraEditorScript.onEditorViewResized(width / height);
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
-	mMainStage.render(renderer);
+	renderer.render(mEditorView.get());
 }
 
 } // namespace spatial::editor

@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace spatial
+namespace spatial::render
 {
 
 struct FilameshFileHeader
@@ -106,4 +106,6 @@ class FilameshFile
 
 };
 
-} // namespace spatial
+using SharedFilameshFile = std::shared_ptr<FilameshFile>;
+
+} // namespace spatial::render

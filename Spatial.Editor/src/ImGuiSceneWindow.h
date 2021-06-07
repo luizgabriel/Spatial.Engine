@@ -51,9 +51,9 @@ class ImGuiSceneWindow
 	}
 
   private:
-	Texture mRenderColorTexture;
-	Texture mRenderDepthTexture;
-	RenderTarget mRenderTarget;
+	render::Texture mRenderColorTexture;
+	render::Texture mRenderDepthTexture;
+	render::RenderTarget mRenderTarget;
 	math::int2 mWindowSize;
 	Signal<math::int2> mWindowResizedSignal;
 };

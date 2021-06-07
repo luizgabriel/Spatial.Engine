@@ -19,12 +19,12 @@ namespace spatial
 
 UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	: mEngine{engine},
-	  mView{createView(mEngine)},
-	  mScene{createScene(mEngine)},
-	  mCameraEntity{createEntity(mEngine)},
-	  mCamera{createCamera(mEngine, mCameraEntity.get())},
-	  mEntity{createEntity(mEngine)},
-	  mSkybox{createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
+	  mView{render::createView(mEngine)},
+	  mScene{render::createScene(mEngine)},
+	  mCameraEntity{render::createEntity(mEngine)},
+	  mCamera{render::createCamera(mEngine, mCameraEntity.get())},
+	  mEntity{render::createEntity(mEngine)},
+	  mSkybox{render::createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
 	  mMaterial{},
 	  mFontTexture{}
 {
@@ -40,12 +40,12 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	mImguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const SharedMaterial& material)
+void UserInterfaceRenderer::setMaterial(const render::SharedMaterial& material)
 {
 	mMaterial = material;
 }
 
-void UserInterfaceRenderer::setFontTexture(const SharedTexture& fontTextureAtlas)
+void UserInterfaceRenderer::setFontTexture(const render::SharedTexture& fontTextureAtlas)
 {
 	mFontTexture = fontTextureAtlas;
 	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
@@ -147,7 +147,7 @@ void UserInterfaceRenderer::setViewport(const math::int2& windowSize,
 	const auto dpiScaleY = static_cast<float>(frameBufferSize.y) / windowSize.y;
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
-	mCamera.setProjection(OrthographicProjection{0.0, frameBufferSize.x / dpiScaleX, frameBufferSize.y / dpiScaleY, 0.0, 0.0, 1.0});
+	mCamera.setOrtographicProjection(0.0, frameBufferSize.x / dpiScaleX, frameBufferSize.y / dpiScaleY, 0.0, 0.0, 1.0);
 
 	const auto scaleX = windowSize.x > 0 ? static_cast<float>(frameBufferSize.x) / windowSize.x : 0;
 	const auto scaleY = windowSize.y > 0 ? static_cast<float>(frameBufferSize.y) / windowSize.y : 0;

@@ -1,8 +1,8 @@
 #include "ImGuiComponents.h"
-#include "Components.h"
+#include "EditorCamera.h"
 #include <array>
 #include <imgui_internal.h>
-#include <spatial/render/InstanceHandle.h>
+#include <spatial/ecs/EntityHandle.h>
 
 namespace spatial::editor
 {
@@ -165,128 +165,62 @@ bool vec4Input(const std::string_view label, math::float4& v, float resetValue, 
 	return changed;
 }
 
-void transformInput(Transform& transform, const std::string_view format)
+void componentInput(ecs::Transform& transform)
 {
-	for (char c : format)
-	{
-		switch (c)
-		{
-		case 'p': {
-			auto position = transform.getPosition();
-			if (vec3Input("Position", position))
-				transform.setPosition(position);
-			break;
-		}
-		case 'r': {
-			auto rotation = transform.getRotation() * math::rad2deg;
-			if (vec3Input("Rotation", rotation))
-				transform.setRotation(rotation * math::deg2rad);
-			break;
-		}
-		case 's': {
-			auto scale = transform.getScale();
-			if (vec3Input("Scale", scale, 1.0f))
-				transform.setScale(scale);
-			break;
-		}
-		}
-	}
+    vec3Input("Position", transform.position);
+    vec3Input("Rotation", transform.rotation);
+    vec3Input("Scale", transform.scale);
 }
 
-void cameraInput(Camera& camera)
+void componentInput(ecs::PerspectiveCamera& camera)
 {
-	constexpr auto projections = std::array<std::string_view, 3>{"Perspective", "Ortographic", "Custom"};
-	size_t selected;
-	if (camera.isPerspective())
-		selected = 0;
-	else if (camera.isOrthographic())
-		selected = 1;
-	else
-		selected = 2;
+	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
 
-	if (ImGui::BeginCombo("##projectionsCombo", projections[selected].data()))
-	{
-		for (size_t i = 0; i < projections.size(); i++)
-		{
-			if (ImGui::Selectable(projections[i].data()))
-			{
-				selected = i;
-			}
-		}
-
-		ImGui::EndCombo();
-	}
-
-	const auto& projection = camera.getProjection();
-	std::visit(
-		[&camera](auto projection) {
-			using T = std::decay_t<decltype(projection)>;
-			bool changed = false;
-
-			changed |= ImGui::InputDouble("Near", &projection.near, 0.1, 1.0, "%.2f");
-			changed |= ImGui::InputDouble("Far", &projection.far, 0.1, 1.0, "%.2f");
-
-			if constexpr (std::is_same_v<T, PerspectiveProjection>)
-			{
-				double min = 15.0, max = 120.0;
-				changed |= ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &projection.fieldOfView, 1.0f, &min,
-											 &max, "%.1f");
-				changed |= ImGui::InputDouble("Aspect Ratio", &projection.aspectRatio);
-			}
-			else if constexpr (std::is_same_v<T, OrthographicProjection>)
-			{
-				changed |= ImGui::InputDouble("Left", &projection.left);
-				changed |= ImGui::InputDouble("Right", &projection.right);
-				changed |= ImGui::InputDouble("Bottom", &projection.bottom);
-				changed |= ImGui::InputDouble("Top", &projection.top);
-			}
-			else if constexpr (std::is_same_v<T, CustomProjection>)
-			{
-				changed |= ImGui::InputScalarN("m0", ImGuiDataType_Double, &projection.projectionMatrix[0], 4);
-				changed |= ImGui::InputScalarN("m1", ImGuiDataType_Double, &projection.projectionMatrix[1], 4);
-				changed |= ImGui::InputScalarN("m2", ImGuiDataType_Double, &projection.projectionMatrix[2], 4);
-				changed |= ImGui::InputScalarN("m3", ImGuiDataType_Double, &projection.projectionMatrix[3], 4);
-			}
-
-			if (changed)
-				camera.setProjection(projection);
-		},
-		projection);
-
-	constexpr auto defaultAspectRatio = 19 / 6.0;
-	constexpr auto defaultNear = .1;
-	constexpr auto defaultFar = 100000.0;
-	if (selected == 0 && !camera.isPerspective())
-	{
-		camera.setProjection(PerspectiveProjection{45.0, defaultAspectRatio, defaultNear, defaultFar});
-	}
-	else if (selected == 1 && !camera.isOrthographic())
-	{
-		camera.setProjection(OrthographicProjection{defaultAspectRatio, defaultNear, defaultFar});
-	}
-	else if (selected == 2 && !camera.isCustomProjection())
-	{
-		camera.setProjection(CustomProjection{math::mat4{}, defaultNear, defaultFar});
-	}
+	double min = 15.0, max = 120.0;
+	ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
+	ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
 }
 
-void instancesTreeView(spatial::Stage& stage, Instance& selectedInstance)
+void componentInput(ecs::OrthographicCamera& camera)
+{
+	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+
+	ImGui::InputDouble("Left", &camera.left);
+	ImGui::InputDouble("Right", &camera.right);
+	ImGui::InputDouble("Bottom", &camera.bottom);
+	ImGui::InputDouble("Top", &camera.top);
+}
+
+void componentInput(ecs::CustomCamera& camera)
+{
+    ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+    ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+
+    ImGui::InputScalarN("m0", ImGuiDataType_Double, &camera.projectionMatrix[0], 4);
+    ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
+    ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
+    ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+}
+
+void instancesTreeView(ecs::Registry& stage, ecs::Entity& selectedInstance)
 {
 	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 	{
 		selectedInstance = {};
 	}
 
-	auto view = stage.getInstances<spatial::SceneNodeName>();
+	auto view = stage.getEntities<ecs::SceneNode>();
 	for (auto instance : view)
 	{
-		auto& name = handleOf(stage, instance).get<spatial::SceneNodeName>();
+		auto& name = handleOf(stage, instance).get<ecs::SceneNode>();
 
 		ImGuiTreeNodeFlags flags =
 			(selectedInstance == instance) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
 		flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.value.c_str());
+		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.name.c_str());
 		if (ImGui::IsItemClicked())
 		{
 			selectedInstance = instance;
@@ -604,7 +538,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 	return value_changed;
 }
 
-bool directionWidget(const std::string_view label, math::float3& dir, float size, std::uint32_t color)
+bool directionInput(const std::string_view label, math::float3& dir, float size, std::uint32_t color)
 {
 	ImGui::PushID(label.data());
 	ImGui::BeginGroup();
@@ -624,73 +558,76 @@ bool directionWidget(const std::string_view label, math::float3& dir, float size
 	return changed;
 }
 
-void lightInput(Light& light)
+void componentInput(ecs::DirectionalLight& light)
 {
-	auto castShadows = light.isShadowCaster();
-	if (ImGui::Checkbox("Cast Shadows", &castShadows))
-		light.setShadowCaster(castShadows);
+    ImGui::Checkbox("Cast Shadows", &light.castShadows);
+    ImGui::ColorEdit3("Color", &light.color.r);
+    ImGui::ColorEdit3("Intensity", &light.intensity);
 
-	auto color = light.getColor();
-	if (ImGui::ColorEdit3("Color", &color.r))
-		light.setColor(color);
+    directionInput("Direction", light.direction);
+}
 
-	auto intensity = light.getIntensity();
-	if (ImGui::SliderFloat("Lux", &intensity, 0.0f, 150000.0f))
-		light.setIntensity(intensity);
 
-	if (!light.isPointLight())
-	{
-		auto direction = light.getDirection();
-		if (editor::directionWidget("Direction", direction))
-			light.setDirection(direction);
+void componentInput(ecs::PointLight& light)
+{
+    ImGui::Checkbox("Cast Shadows", &light.castShadows);
+    ImGui::ColorEdit3("Color", &light.color.r);
+    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::InputFloat("Falloff", &light.falloff);
+}
+
+void componentInput(ecs::SpotLight& light)
+{
+    ImGui::Checkbox("Cast Shadows", &light.castShadows);
+    ImGui::ColorEdit3("Color", &light.color.r);
+    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::InputFloat("Falloff", &light.falloff);
+    ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
+    ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
+
+    directionInput("Direction", light.direction);
+}
+
+void componentInput(ecs::SunLight& light)
+{
+    ImGui::Checkbox("Cast Shadows", &light.castShadows);
+    ImGui::ColorEdit3("Color", &light.color.r);
+    ImGui::ColorEdit3("Intensity", &light.intensity);
+    ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
+    ImGui::InputFloat("Halo size", &light.haloSize);
+
+    directionInput("Direction", light.direction);
+}
+
+void componentInput(ecs::Mesh& mesh)
+{
+    ImGui::Text("Geometries: %u", mesh.geometriesCount);
+	if (ImGui::BeginTable("Geometries", 2)) {
+        ImGui::TableSetupColumn("Offset", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
+        ImGui::TableSetupColumn("Count", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
+		ImGui::TableHeadersRow();
+
+		for (std::uint8_t i = 0; i < mesh.geometriesCount; i++) {
+			auto& geometry = mesh.geometries[i];
+
+		    ImGui::Text("%ul", geometry.offset);
+			ImGui::TableNextColumn();
+
+            ImGui::Text("%ul", geometry.count);
+            ImGui::TableNextColumn();
+
+			ImGui::TableNextRow();
+        }
+
+		ImGui::EndTable();
 	}
 }
 
-template <>
-void drawComponentView(InstanceHandle& instance, Transform& component)
+void componentInput(ecs::MeshRenderer& mesh)
 {
-	if (instance.has<Camera>())
-		transformInput(component, "pr");
-	else if (instance.has<Light>())
-	{
-		const auto& light = instance.get<Light>();
-		if (!light.isDirectional())
-			transformInput(component, "p");
-		else
-			ImGui::Text("Directional lights have no transform properties");
-	}
-	else
-		transformInput(component, "prs");
-}
-
-template <>
-void drawComponentView(InstanceHandle&, Camera& component)
-{
-	editor::cameraInput(component);
-}
-
-template <>
-void drawComponentView(InstanceHandle&, Light& component)
-{
-	editor::lightInput(component);
-}
-
-template <>
-void drawComponentView(InstanceHandle&, Renderable& component)
-{
-	auto castShadows = component.isShadowCaster();
-	if (ImGui::Checkbox("Cast Shadows", &castShadows))
-	{
-		component.setCastShadows(castShadows);
-	}
-
-	auto receiveShadows = component.isShadowReceiver();
-	if (ImGui::Checkbox("Receive Shadows", &receiveShadows))
-	{
-		component.setReceiveShadows(receiveShadows);
-	}
-
-	ImGui::Text("Primitives Count: %lu", component.getPrimitiveCount());
+	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
+	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	ImGui::Text("Materials: %u", mesh.materialsCount);
 }
 
 } // namespace spatial::editor

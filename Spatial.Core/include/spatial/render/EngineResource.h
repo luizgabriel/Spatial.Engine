@@ -5,7 +5,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 /**
@@ -128,4 +128,4 @@ SharedEngineResource<ResourceType> toShared(EngineResource<ResourceType>&& resou
 	return createSharedResource(resource.getEngine(), resource.release());
 }
 
-} // namespace spatial
+} // namespace spatial::render

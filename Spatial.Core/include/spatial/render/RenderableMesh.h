@@ -7,10 +7,10 @@
 #include <spatial/common/Math.h>
 #include <utils/Entity.h>
 
-namespace spatial
+namespace spatial::render
 {
 
-class Renderable
+class RenderableMesh
 {
   public:
 	using Manager = filament::RenderableManager;
@@ -19,15 +19,15 @@ class Renderable
 	using Bone = Manager::Bone;
 	using Builder = Manager::Builder;
 
-	Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount);
+	RenderableMesh(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount);
 
-	~Renderable();
+	~RenderableMesh();
 
-	Renderable(const Renderable& other) = delete;
-	Renderable& operator=(const Renderable& other) = delete;
+	RenderableMesh(const RenderableMesh& other) = delete;
+	RenderableMesh& operator=(const RenderableMesh& other) = delete;
 
-	Renderable(Renderable&& other);
-	Renderable& operator=(Renderable&& other);
+	RenderableMesh(RenderableMesh&& other);
+	RenderableMesh& operator=(RenderableMesh&& other);
 
 	void setAxisAlignedBoundingBox(const filament::Box& aabb) noexcept;
 
@@ -85,4 +85,4 @@ class Renderable
 	Manager& getManager() noexcept;
 };
 
-} // namespace spatial
+} // namespace spatial::render

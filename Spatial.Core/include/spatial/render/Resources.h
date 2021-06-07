@@ -20,7 +20,7 @@
 
 #include <memory>
 
-namespace spatial
+namespace spatial::render
 {
 
 // Scoped Pointers
@@ -82,4 +82,4 @@ MaterialInstance createMaterialInstance(filament::Engine& engine, const filament
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
 
-} // namespace spatial
+} // namespace spatial::render

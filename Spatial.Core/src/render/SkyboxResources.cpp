@@ -6,7 +6,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 Texture createKtxTexture(fl::Engine& engine, const std::string_view resourceData)
@@ -85,4 +85,4 @@ IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture&
 	return createImageBasedLight(engine, cubemap, bands, intensity);
 }
 
-} // namespace spatial
+} // namespace spatial::render

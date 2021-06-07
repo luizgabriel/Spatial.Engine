@@ -31,7 +31,7 @@ void disconnect(desktop::PlatformContext& context, Listener& listener)
 }
 
 template <typename Listener>
-desktop::PlatformContext& operator>>(desktop::PlatformContext& context, Listener& listener)
+auto& operator>>(desktop::PlatformContext& context, Listener& listener)
 {
 	connect(context, listener);
 	return context;

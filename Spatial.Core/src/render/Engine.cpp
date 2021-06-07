@@ -2,7 +2,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 Engine createEngine(fl::backend::Backend backend)
@@ -15,4 +15,4 @@ void FilamentEngineDeleter::operator()(fl::Engine* engine)
 	fl::Engine::destroy(engine);
 }
 
-} // namespace spatial
+} // namespace spatial::render

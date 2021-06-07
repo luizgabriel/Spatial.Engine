@@ -5,7 +5,7 @@
 #include <filament/Engine.h>
 #include <filament/LightManager.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 class Light
@@ -88,4 +88,4 @@ class Light
 	Instance getInstance() const noexcept;
 };
 
-} // namespace spatial
+} // namespace spatial::render

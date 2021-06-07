@@ -26,9 +26,9 @@ class UserInterfaceSystem
 		setViewport(window.getSize(), window.getFrameBufferSize());
 	}
 
-	void setFontTexture(const SharedTexture& fontTexture);
+	void setFontTexture(const render::SharedTexture& fontTexture);
 
-	void setMaterial(const SharedMaterial& material);
+	void setMaterial(const render::SharedMaterial& material);
 
 	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
 

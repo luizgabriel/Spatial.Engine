@@ -80,7 +80,7 @@ void disconnect(Application& app, Listener& listener)
 }
 
 template <typename Listener>
-Application& operator>>(Application& app, Listener& listener)
+auto& operator>>(Application& app, Listener& listener)
 {
 	connect(app, listener);
 	return app;

@@ -7,7 +7,7 @@
 #include <string>
 #include <spatial/render/FilameshFile.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 Material createMaterial(filament::Engine& engine, const std::string& resourceData);
@@ -22,4 +22,4 @@ Texture createTexture(filament::Engine& engine, const std::string& resourceData,
 
 FilameshFile createFilamesh(filament::Engine& engine, const std::string& resourceData);
 
-} // namespace spatial
+} // namespace spatial::render
