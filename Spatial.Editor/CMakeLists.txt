@@ -12,6 +12,10 @@ add_executable(Spatial.Editor
 	src/ImGuiComponents.cpp
 	src/ImGuiSceneWindow.h
 	src/ImGuiSceneWindow.cpp
+	src/ImGuiDockSpace.h
+	src/ImGuiDockSpace.cpp
+	src/ImGuiWindow.h
+	src/ImGuiWindow.cpp
 )
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)

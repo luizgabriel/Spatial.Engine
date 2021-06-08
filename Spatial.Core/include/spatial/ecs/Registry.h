@@ -96,16 +96,40 @@ class Registry
 		mRegistry.remove<Component>(entity);
 	}
 
+	template <typename Tag>
+	void addTag(Entity entity)
+	{
+		mRegistry.emplace<Tag>(entity);
+	}
+
+	template <typename Component>
+	Component& addComponent(Entity entity, Component&& component)
+	{
+		return mRegistry.emplace<Component>(entity, std::move(component));
+	}
+
 	template <typename Component, typename... Args>
 	Component& addComponent(Entity entity, Args&&... args)
 	{
 		return mRegistry.emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
+	template <typename Component>
+	Component& addOrReplaceComponent(Entity entity, Component&& component)
+	{
+		return mRegistry.emplace_or_replace<Component>(entity, std::move(component));
+	}
+
 	template <typename Component, typename... Args>
 	Component& addOrReplaceComponent(Entity entity, Args&&... args)
 	{
 		return mRegistry.emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component>
+	Component& getOrAddComponent(Entity entity, Component&& component)
+	{
+		return mRegistry.get_or_emplace<Component>(entity, std::move(component));
 	}
 
 	template <typename Component, typename... Args>

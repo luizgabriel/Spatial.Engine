@@ -1,8 +1,10 @@
 #include "ImGuiComponents.h"
+#include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include <array>
 #include <imgui_internal.h>
 #include <spatial/ecs/EntityHandle.h>
+#include <spatial/ecs/Tags.h>
 
 namespace spatial::editor
 {
@@ -165,66 +167,22 @@ bool vec4Input(const std::string_view label, math::float4& v, float resetValue, 
 	return changed;
 }
 
-void componentInput(ecs::Transform& transform)
-{
-    vec3Input("Position", transform.position);
-    vec3Input("Rotation", transform.rotation);
-    vec3Input("Scale", transform.scale);
-}
-
-void componentInput(ecs::PerspectiveCamera& camera)
-{
-	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
-
-	double min = 15.0, max = 120.0;
-	ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
-	ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
-}
-
-void componentInput(ecs::OrthographicCamera& camera)
-{
-	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
-
-	ImGui::InputDouble("Left", &camera.left);
-	ImGui::InputDouble("Right", &camera.right);
-	ImGui::InputDouble("Bottom", &camera.bottom);
-	ImGui::InputDouble("Top", &camera.top);
-}
-
-void componentInput(ecs::CustomCamera& camera)
-{
-    ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-    ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
-
-    ImGui::InputScalarN("m0", ImGuiDataType_Double, &camera.projectionMatrix[0], 4);
-    ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
-    ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
-    ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
-}
-
-void instancesTreeView(ecs::Registry& stage, ecs::Entity& selectedInstance)
+void entitiesTreeView(ecs::Registry& stage, ecs::Entity& selectedInstance)
 {
 	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-	{
 		selectedInstance = {};
-	}
 
-	auto view = stage.getEntities<ecs::SceneNode>();
-	for (auto instance : view)
+	const auto view = stage.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMeshMaterial>);
+	for (auto entity : view)
 	{
-		auto& name = handleOf(stage, instance).get<ecs::SceneNode>();
+		const auto& name = stage.getComponent<const ecs::EntityName>(entity);
 
-		ImGuiTreeNodeFlags flags =
-			(selectedInstance == instance) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+		ImGuiTreeNodeFlags flags = (selectedInstance == entity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
 		flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.name.c_str());
 		if (ImGui::IsItemClicked())
-		{
-			selectedInstance = instance;
-		}
+			selectedInstance = entity;
 
 		if (opened)
 			ImGui::TreePop();
@@ -558,76 +516,184 @@ bool directionInput(const std::string_view label, math::float3& dir, float size,
 	return changed;
 }
 
-void componentInput(ecs::DirectionalLight& light)
+template <>
+void componentInput<ecs::DirectionalLight>(ecs::Registry& registry, ecs::Entity entity)
 {
-    ImGui::Checkbox("Cast Shadows", &light.castShadows);
-    ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	auto& light = registry.getComponent<ecs::DirectionalLight>(entity);
 
-    directionInput("Direction", light.direction);
+	ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	ImGui::ColorEdit3("Color", &light.color.r);
+	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+
+	directionInput("Direction", light.direction);
 }
 
-
-void componentInput(ecs::PointLight& light)
+template <>
+void componentInput<ecs::PointLight>(ecs::Registry& registry, ecs::Entity entity)
 {
-    ImGui::Checkbox("Cast Shadows", &light.castShadows);
-    ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-    ImGui::InputFloat("Falloff", &light.falloff);
+	auto& light = registry.getComponent<ecs::PointLight>(entity);
+
+	ImGui::ColorEdit3("Color", &light.color.r);
+	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	ImGui::InputFloat("Falloff", &light.falloff);
 }
 
-void componentInput(ecs::SpotLight& light)
+template <>
+void componentInput<ecs::SpotLight>(ecs::Registry& registry, ecs::Entity entity)
 {
-    ImGui::Checkbox("Cast Shadows", &light.castShadows);
-    ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-    ImGui::InputFloat("Falloff", &light.falloff);
-    ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
-    ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
+	auto& light = registry.getComponent<ecs::SpotLight>(entity);
 
-    directionInput("Direction", light.direction);
+	ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	ImGui::ColorEdit3("Color", &light.color.r);
+	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	ImGui::InputFloat("Falloff", &light.falloff);
+	ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
+	ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
+
+	directionInput("Direction", light.direction);
 }
 
-void componentInput(ecs::SunLight& light)
+template <>
+void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
 {
-    ImGui::Checkbox("Cast Shadows", &light.castShadows);
-    ImGui::ColorEdit3("Color", &light.color.r);
-    ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-    ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
-    ImGui::InputFloat("Halo size", &light.haloSize);
+	auto& light = registry.getComponent<ecs::SunLight>(entity);
 
-    directionInput("Direction", light.direction);
+	ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	ImGui::ColorEdit3("Color", &light.color.r);
+	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
+	ImGui::InputFloat("Halo size", &light.haloSize);
 }
 
-void componentInput(ecs::Mesh& mesh)
+template <>
+void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
-    ImGui::Text("Geometries: %u", mesh.geometriesCount);
-	if (ImGui::BeginTable("Geometries", 2)) {
-        ImGui::TableSetupColumn("Offset", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
-        ImGui::TableSetupColumn("Count", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
+	const auto& mesh = registry.getComponent<const ecs::Mesh>(entity);
+
+	ImGui::Text("Geometries: %u", mesh.geometriesCount);
+	if (ImGui::BeginTable("Geometries", 2))
+	{
+		ImGui::TableSetupColumn("Offset", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
+		ImGui::TableSetupColumn("Count", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
 		ImGui::TableHeadersRow();
 
-		for (std::uint8_t i = 0; i < mesh.geometriesCount; i++) {
+		for (std::uint8_t i = 0; i < mesh.geometriesCount; i++)
+		{
 			auto& geometry = mesh.geometries[i];
 
-		    ImGui::Text("%ul", geometry.offset);
+			ImGui::Text("%ul", geometry.offset);
 			ImGui::TableNextColumn();
 
-            ImGui::Text("%ul", geometry.count);
-            ImGui::TableNextColumn();
+			ImGui::Text("%ul", geometry.count);
+			ImGui::TableNextColumn();
 
 			ImGui::TableNextRow();
-        }
+		}
 
 		ImGui::EndTable();
 	}
 }
 
-void componentInput(ecs::MeshRenderer& mesh)
+template <>
+void componentInput<ecs::MeshRenderer>(ecs::Registry& registry, ecs::Entity entity)
 {
+	auto& mesh = registry.getComponent<ecs::MeshRenderer>(entity);
+
 	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
 	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
-	ImGui::Text("Materials: %u", mesh.materialsCount);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	ImGui::Spacing();
+
+	if (ImGui::BeginTable("Materials", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)) {
+		ImGui::TableSetupColumn("Geometry Index");
+		ImGui::TableSetupColumn("Material");
+		ImGui::TableHeadersRow();
+
+		for (std::uint8_t i = 0; i < mesh.materialsCount; i++)
+		{
+			ImGui::TableNextRow();
+
+			auto& material = mesh.materials[i];
+
+			ImGui::TableNextColumn();
+			ImGui::Text("Index: %u", i);
+
+			ImGui::TableNextColumn();
+
+			ImGui::PushID(i);
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+			selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, material);
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
+	}
+}
+
+template <>
+void componentInput<ecs::Transform>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& transform = registry.getComponent<ecs::Transform>(entity);
+
+	vec3Input("Position", transform.position);
+	vec3Input("Rotation", transform.rotation);
+	vec3Input("Scale", transform.scale);
+}
+
+template <>
+void componentInput<ecs::PerspectiveCamera>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& camera = registry.getComponent<ecs::PerspectiveCamera>(entity);
+
+	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+
+	double min = 15.0, max = 120.0;
+	ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
+	ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
+}
+
+template <>
+void componentInput<ecs::OrthographicCamera>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& camera = registry.getComponent<ecs::OrthographicCamera>(entity);
+
+	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+
+	ImGui::InputDouble("Left", &camera.left);
+	ImGui::InputDouble("Right", &camera.right);
+	ImGui::InputDouble("Bottom", &camera.bottom);
+	ImGui::InputDouble("Top", &camera.top);
+}
+
+template <>
+void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& camera = registry.getComponent<ecs::CustomCamera>(entity);
+
+	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+
+	ImGui::InputScalarN("m0", ImGuiDataType_Double, &camera.projectionMatrix[0], 4);
+	ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
+	ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
+	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+}
+
+template <>
+void componentInput<DefaultMaterial>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& material = registry.getComponent<DefaultMaterial>(entity);
+
+	ImGui::ColorEdit3("Color", &material.baseColor.r);
+	ImGui::DragFloat("Metallic", &material.metallic, 0.01f, .0f, 1.0f, "%.2f");
+	ImGui::DragFloat("Reflectance", &material.reflectance, 0.01f, .0f, 1.0f, "%.2f");
+	ImGui::DragFloat("Roughness", &material.roughness, 0.01f, .0f, 1.0f, "%.2f");
 }
 
 } // namespace spatial::editor

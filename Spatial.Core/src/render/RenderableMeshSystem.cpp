@@ -11,7 +11,7 @@ RenderableMeshSystem::RenderableMeshSystem(filament::Engine& engine) : mEngine{e
 {
 }
 
-void RenderableMeshSystem::synchronize(ecs::Registry& registry)
+void RenderableMeshSystem::synchronize(ecs::Registry& registry) const
 {
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
@@ -70,5 +70,6 @@ void RenderableMeshSystem::createRenderableMeshes(ecs::Registry& registry) const
 		registry.addComponent<RenderableMesh>(entity, mEngine, renderable.get(), data.geometriesCount);
 	}
 }
+
 
 } // namespace spatial::render

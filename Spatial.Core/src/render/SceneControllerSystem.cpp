@@ -1,4 +1,5 @@
-#include <spatial/ecs/SceneNode.h>
+#include <spatial/ecs/EntityName.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Resources.h>
 #include <spatial/render/SceneControllerSystem.h>
@@ -13,7 +14,7 @@ SceneControllerSystem::SceneControllerSystem(filament::Engine& engine, filament:
 
 void SceneControllerSystem::synchronize(ecs::Registry& registry) const
 {
-	auto view = registry.getEntities<ecs::SceneNode>(ecs::ExcludeComponents<Entity>);
+	auto view = registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>);
 
 	for (auto entity : view)
 	{

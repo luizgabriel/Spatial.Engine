@@ -9,6 +9,11 @@
 namespace spatial::ecs
 {
 
+struct MeshResource
+{
+	std::string resourceName;
+};
+
 struct Mesh
 {
 	Entity vertexBufferId;

@@ -40,7 +40,6 @@ void LightSystem::updateSunLights(ecs::Registry& registry) const
         light.setSunHaloFalloff(data.haloFalloff);
         light.setSunHaloSize(data.haloSize);
         light.setSunAngularRadius(data.angularRadius);
-        light.setDirection(data.direction);
         light.setIntensity(data.intensity);
         light.setColor(data.color);
     }
@@ -108,7 +107,6 @@ void LightSystem::updatePointLights(ecs::Registry& registry) const
 		light.setFalloff(data.falloff);
 		light.setIntensity(data.intensity);
 		light.setColor(data.color);
-		light.setShadowCaster(data.castShadows);
 	}
 }
 

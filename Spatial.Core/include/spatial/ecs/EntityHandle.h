@@ -37,13 +37,19 @@ class EntityHandle
 		return mRegistry.isValid(mEntity);
 	}
 
+	template <typename Tag>
+	void tag()
+	{
+		assert(isValid());
+		mRegistry.addTag<Tag>(mEntity);
+	}
+
 	template <typename Component>
 	Component& add(Component&& component)
 	{
 		assert(isValid());
 		return mRegistry.addComponent<Component>(mEntity, std::move(component));
 	}
-
 
 	template <typename Component, typename... Args>
 	Component& add(Args&&... args)

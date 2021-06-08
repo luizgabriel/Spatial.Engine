@@ -6,6 +6,7 @@
 #include <spatial/serialization/Light.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/Mesh.h>
+#include <spatial/serialization/Tags.h>
 
 namespace spatial::ecs {
 
@@ -13,7 +14,7 @@ template <typename... CustomComponent, typename Archive>
 void serialize(Archive& ar, Registry& registry)
 {
 	auto snapshot = entt::snapshot{registry};
-	snapshot.component<ecs::SceneNode>(ar);
+	snapshot.component<ecs::EntityName>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
 	snapshot.component<ecs::OrthographicCamera>(ar);
@@ -24,6 +25,9 @@ void serialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
 	snapshot.component<ecs::MeshRenderer>(ar);
+
+	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
+	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
 }

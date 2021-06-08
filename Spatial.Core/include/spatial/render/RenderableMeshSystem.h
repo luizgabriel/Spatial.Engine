@@ -2,6 +2,7 @@
 
 #include <filament/Engine.h>
 #include <spatial/ecs/Registry.h>
+#include <unordered_map>
 
 namespace spatial::render
 {
@@ -9,9 +10,15 @@ namespace spatial::render
 class RenderableMeshSystem
 {
   public:
+	struct VertexIndexBufferPair
+	{
+		ecs::Entity vertexBufferId;
+		ecs::Entity indexBufferId;
+	};
+
 	RenderableMeshSystem(filament::Engine& engine);
 
-	void synchronize(ecs::Registry& registry);
+	void synchronize(ecs::Registry& registry) const;
 
   private:
 	filament::Engine& mEngine;
@@ -21,4 +28,4 @@ class RenderableMeshSystem
 	void updateMeshMaterials(ecs::Registry& registry) const;
 };
 
-}
+} // namespace spatial::render

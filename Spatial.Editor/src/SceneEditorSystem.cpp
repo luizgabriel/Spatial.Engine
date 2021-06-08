@@ -4,6 +4,7 @@
 #include <filament/LightManager.h>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
@@ -12,6 +13,8 @@
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include "ImGuiComponents.h"
+#include "ImGuiDockSpace.h"
+#include "ImGuiWindow.h"
 
 namespace fl = filament;
 
@@ -77,41 +80,54 @@ void SceneEditorSystem::onStart()
 
 	{
 		auto light = ecs::createEntity(mMainStageRegistry, "Main Light");
+		light.tag<ecs::tags::IsRenderable>();
 		light.add(ecs::DirectionalLight{10000, math::float3{.34f, -.66f, -.67f}});
 	}
 
 	{
-		auto m1 = ecs::createEntity(mMainStageRegistry);
+		auto m1 = ecs::createEntity(mMainStageRegistry, "Red Material");
+		m1.tag<ecs::tags::IsMeshMaterial>();
 		m1.add(DefaultMaterial{math::float3{.4f, 0.1f, 0.1f}});
 
 		auto cube = ecs::createEntity(mMainStageRegistry, "Cube");
+		cube.tag<ecs::tags::IsRenderable>();
+		cube.add(ecs::MeshResource{"editor://meshes/cube"});
 		cube.add(ecs::Transform{math::float3{.0f}});
 		cube.add(ecs::MeshRenderer{true, true, {m1}, 1});
 	}
 
 	{
-		auto m2 = ecs::createEntity(mMainStageRegistry);
+		auto m2 = ecs::createEntity(mMainStageRegistry, "White Material");
+		m2.tag<ecs::tags::IsMeshMaterial>();
 		m2.add(DefaultMaterial{math::float3{.8f, .8f, .8f}});
 
 		auto plane = ecs::createEntity(mMainStageRegistry, "Plane");
+		plane.tag<ecs::tags::IsRenderable>();
+		plane.add(ecs::MeshResource{"editor://meshes/plane"});
 		plane.add(ecs::Transform{math::float3{3.0f, -1.0f, .0f}, math::float3{10.0f}});
 		plane.add(ecs::MeshRenderer{false, true, {m2}, 1});
 	}
 
 	{
-		auto m3 = ecs::createEntity(mMainStageRegistry);
+		auto m3 = ecs::createEntity(mMainStageRegistry, "Green Material");
+		m3.tag<ecs::tags::IsMeshMaterial>();
 		m3.add(DefaultMaterial{math::float3{.1f, 0.4f, 0.1f}});
 
 		auto cylinder = ecs::createEntity(mMainStageRegistry, "Cylinder");
+		cylinder.tag<ecs::tags::IsRenderable>();
+		cylinder.add(ecs::MeshResource{"editor://meshes/cylinder"});
 		cylinder.add(ecs::Transform{math::float3{6.0f, .0f, .0f}});
 		cylinder.add(ecs::MeshRenderer{true, true, {m3}, 1});
 	}
 
 	{
-		auto m4 = ecs::createEntity(mMainStageRegistry);
+		auto m4 = ecs::createEntity(mMainStageRegistry, "Blue Material");
+		m4.tag<ecs::tags::IsMeshMaterial>();
 		m4.add(DefaultMaterial{math::float3{.1f, 0.1f, 0.4f}});
 
 		auto sphere = ecs::createEntity(mMainStageRegistry, "Sphere");
+		sphere.tag<ecs::tags::IsRenderable>();
+		sphere.add(ecs::MeshResource{"editor://meshes/sphere"});
 		sphere.add(ecs::Transform{math::float3{3.0f, .0f, .0f}});
 		sphere.add(ecs::MeshRenderer{true, true, {m4}, 1});
 	}
@@ -140,29 +156,7 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 void SceneEditorSystem::onDrawGui()
 {
 	// ImGui::ShowDemoWindow();
-	static ImGuiDockNodeFlags dockFlags = ImGuiDockNodeFlags_None;
-	static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar
-										  | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-										  | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus
-										  | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
-
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
-	ImGui::SetNextWindowViewport(viewport->ID);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace", nullptr, windowFlags);
-	ImGui::PopStyleVar();
-
-	ImGui::PopStyleVar(2);
-
-	// DockSpace
-	static ImGuiID dockSpaceId = ImGui::GetID("SpatialDockSpace");
-	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockFlags);
+	auto dockSpace = ImGuiDockSpace{};
 
 	ImGui::BeginMainMenuBar();
 	ImGui::Text("Spatial Engine");
@@ -178,48 +172,67 @@ void SceneEditorSystem::onDrawGui()
 
 	mImGuiSceneWindow.draw("Scene View");
 
-	ImGui::Begin("Scene Graph");
-
-	editor::instancesTreeView(mMainStageRegistry, mSelectedEntity);
-
-	ImGui::End(); // Scene Graph Window
-
-	auto selectedEntity = handleOf(mMainStageRegistry, mSelectedEntity);
-
-	ImGui::Begin("Properties");
-	if (selectedEntity.isValid())
 	{
+		auto window = ImGuiWindow{"Scene Graph"};
+		editor::entitiesTreeView(mMainStageRegistry, mSelectedEntity);
+	}
+
+	{
+		auto window = ImGuiWindow{"Properties"};
+		if (mMainStageRegistry.isValid(mSelectedEntity))
 		{
-			auto& node = selectedEntity.get<ecs::SceneNode>();
-			editor::inputText("##Name", node.name);
+			{
+				auto& node = mMainStageRegistry.getComponent<ecs::EntityName>(mSelectedEntity);
+				editor::inputText("##Name", node.name);
 
-			ImGui::SameLine();
-			ImGui::PushItemWidth(-1);
+				ImGui::SameLine();
+				ImGui::PushItemWidth(-1);
+			}
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			ImGui::PopItemWidth();
+
+			componentGroup<ecs::Transform>("Transform", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::PerspectiveCamera>("Perspective Camera", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::OrthographicCamera>("Orthographic Camera", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::CustomCamera>("Custom Camera", mMainStageRegistry, mSelectedEntity);
+			componentGroup<editor::EditorCamera>("Editor Camera", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::DirectionalLight>("Directional Light", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::SpotLight>("Spot Light", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::PointLight>("Point Light", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::Mesh>("Mesh", mMainStageRegistry, mSelectedEntity);
+			componentGroup<ecs::MeshRenderer>("Mesh Renderer", mMainStageRegistry, mSelectedEntity);
 		}
-
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		ImGui::PopItemWidth();
-
-		componentGroup<ecs::Transform>("Transform", selectedEntity);
-		componentGroup<ecs::PerspectiveCamera>("Perspective Camera", selectedEntity);
-		componentGroup<ecs::OrthographicCamera>("Orthographic Camera", selectedEntity);
-		componentGroup<ecs::CustomCamera>("Custom Camera", selectedEntity);
-		componentGroup<editor::EditorCamera>("Editor Camera", selectedEntity);
-		componentGroup<ecs::DirectionalLight>("Directional Light", selectedEntity);
-		componentGroup<ecs::SpotLight>("Spot Light", selectedEntity);
-		componentGroup<ecs::PointLight>("Point Light", selectedEntity);
-		componentGroup<ecs::Mesh>("Mesh", selectedEntity);
-		componentGroup<ecs::MeshRenderer>("Mesh Renderer", selectedEntity);
+		else
+		{
+			ImGui::Text("No entity selected.");
+		}
 	}
-	else
+
 	{
-		ImGui::Text("No actor selected.");
-	}
-	ImGui::End(); // Properties Window
+		auto window = ImGuiWindow{"Materials"};
+		static ecs::Entity selectedMaterialEntity{mMainStageRegistry.getFirstEntity<ecs::tags::IsMeshMaterial>()};
 
-	ImGui::End(); // DockSpace
+		ImGui::Text("Material");
+		ImGui::SameLine();
+		selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", mMainStageRegistry, selectedMaterialEntity);
+
+		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		if (mMainStageRegistry.isValid(selectedMaterialEntity))
+		{
+			conditionalComponentInput<DefaultMaterial>(mMainStageRegistry, selectedMaterialEntity);
+		}
+		else
+		{
+			ImGui::Text("No material selected.");
+		}
+	}
 }
 
 void SceneEditorSystem::onSceneWindowResized(const math::int2& size)

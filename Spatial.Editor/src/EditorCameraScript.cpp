@@ -3,6 +3,7 @@
 #include "ImGuiComponents.h"
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/Tags.h>
 
 using namespace spatial::math;
 
@@ -12,6 +13,7 @@ namespace spatial::editor
 void EditorCameraScript::onStart()
 {
 	auto camera = ecs::createEntity(mRegistry, "Main Camera");
+	camera.tag<ecs::tags::IsRenderable>();
 	camera.add(ecs::Transform{math::float3 {3.0f, 3.0f, 20.0f}});
 	camera.add(ecs::PerspectiveCamera{45.0, 19 / 6.0, .1, 1000.0});
 	camera.add(EditorCamera{.5f, 10.0f});
@@ -70,12 +72,15 @@ void EditorCameraScript::onUpdateFrame(float delta)
 	}
 }
 
-void componentInput(EditorCamera& component)
+template <>
+void componentInput<EditorCamera>(ecs::Registry& registry, ecs::Entity entity)
 {
-	ImGui::DragFloat("Velocity", &component.velocity);
-	ImGui::DragFloat("Sensitivity", &component.sensitivity);
+	auto& data = registry.getComponent<EditorCamera>(entity);
 
-	component.startPressed = ImGui::Button("Free Camera Control");
+	ImGui::DragFloat("Velocity", &data.velocity);
+	ImGui::DragFloat("Sensitivity", &data.sensitivity);
+
+	data.startPressed = ImGui::Button("Free Camera Control");
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::BeginTooltip();

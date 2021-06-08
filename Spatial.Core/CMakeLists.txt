@@ -23,8 +23,10 @@ add_library(Spatial.Core
 	include/spatial/ecs/Registry.h
 	include/spatial/ecs/RegistryUtils.h
 	include/spatial/ecs/EntityHandle.h
-	include/spatial/ecs/SceneNode.h
+	include/spatial/ecs/EntityName.h
 	include/spatial/ecs/Mesh.h
+	include/spatial/ecs/Tags.h
+	include/spatial/ecs/EntityBuilder.h
 	
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
@@ -58,6 +60,7 @@ add_library(Spatial.Core
 	include/spatial/serialization/SceneNode.h
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
+	include/spatial/serialization/Tags.h
 	
 	## SOURCES
 	src/common/Key.cpp
@@ -74,6 +77,7 @@ add_library(Spatial.Core
 	src/ecs/EditorCamera.cpp
 	src/ecs/Registry.cpp
 	src/ecs/RegistryUtils.cpp
+	src/ecs/EntityBuilder.cpp
 	
 	src/render/Resources.cpp
 	src/render/Engine.cpp

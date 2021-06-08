@@ -33,6 +33,4 @@ class EditorCameraScript
 	math::float3 getInputAxis();
 };
 
-void componentInput(EditorCamera& component);
-
 } // namespace spatial::editor

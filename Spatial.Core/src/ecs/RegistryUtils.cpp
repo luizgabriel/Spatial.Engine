@@ -1,3 +1,4 @@
+#include <spatial/ecs/EntityName.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/SceneNode.h>
 
@@ -12,7 +13,7 @@ EntityHandle createEntity(Registry& registry)
 EntityHandle createEntity(Registry& registry, std::string name)
 {
 	auto handle = handleOf(registry, registry.createEntity());
-	handle.add<SceneNode>(std::move(name));
+	handle.add<EntityName>(std::move(name));
 
 	return handle;
 }

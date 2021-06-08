@@ -9,7 +9,6 @@ struct PointLight
 {
 	float intensity{10.000f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
-	bool castShadows{true};
 	float falloff{1.0f};
 };
 
@@ -35,7 +34,6 @@ struct DirectionalLight
 struct SunLight
 {
 	float intensity{10.000f};
-	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	float angularRadius{0.545f};
 	float haloFalloff{80.0f};
