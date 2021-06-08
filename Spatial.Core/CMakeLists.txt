@@ -35,10 +35,10 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/render/FilameshFile.h
+	include/spatial/resources/FilameshFile.h
 	include/spatial/render/Light.h
 	include/spatial/render/Transform.h
-	include/spatial/render/RenderableMesh.h
+	include/spatial/render/Renderable.h
 	include/spatial/render/SceneControllerSystem.h
 	include/spatial/render/TransformSystem.h
 	include/spatial/render/LightSystem.h
@@ -57,7 +57,7 @@ add_library(Spatial.Core
 	include/spatial/serialization/Light.h
 	include/spatial/serialization/Transform.h
 	include/spatial/serialization/Mesh.h
-	include/spatial/serialization/SceneNode.h
+	include/spatial/serialization/EntityName.h
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
 	include/spatial/serialization/Tags.h
@@ -88,12 +88,15 @@ add_library(Spatial.Core
 	src/render/Camera.cpp
 	src/render/Transform.cpp
 	src/render/Light.cpp
-	src/render/RenderableMesh.cpp
+	src/render/Renderable.cpp
 	src/render/TransformSystem.cpp
 	src/render/LightSystem.cpp
 	src/render/CameraSystem.cpp
 	src/render/RenderableMeshSystem.cpp
 	src/render/SceneControllerSystem.cpp
+	
+	src/resources/Common.cpp
+	src/resources/FilameshFile.cpp
 	
 	src/ui/ImGuiHelpers.cpp
 	src/ui/UserInterfaceSystem.cpp

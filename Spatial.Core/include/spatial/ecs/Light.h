@@ -7,14 +7,14 @@ namespace spatial::ecs
 
 struct PointLight
 {
-	float intensity{10.000f};
+	float intensity{10000.0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	float falloff{1.0f};
 };
 
 struct SpotLight
 {
-	float intensity{10.000f};
+	float intensity{10000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	bool castShadows{true};
@@ -25,7 +25,7 @@ struct SpotLight
 
 struct DirectionalLight
 {
-	float intensity{10.000f};
+	float intensity{10000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	bool castShadows{true};
@@ -33,7 +33,7 @@ struct DirectionalLight
 
 struct SunLight
 {
-	float intensity{10.000f};
+	float intensity{10000.0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	float angularRadius{0.545f};
 	float haloFalloff{80.0f};

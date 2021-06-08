@@ -37,11 +37,11 @@ class EntityHandle
 		return mRegistry.isValid(mEntity);
 	}
 
-	template <typename Tag>
-	void tag()
+	template <typename Component>
+	void add()
 	{
 		assert(isValid());
-		mRegistry.addTag<Tag>(mEntity);
+		mRegistry.addComponent<Component>(mEntity);
 	}
 
 	template <typename Component>

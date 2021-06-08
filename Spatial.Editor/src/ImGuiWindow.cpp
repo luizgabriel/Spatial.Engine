@@ -4,6 +4,7 @@ namespace spatial::editor {
 
 ImGuiWindow::ImGuiWindow(const std::string_view name)
 {
+	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin(name.data());
 }
 

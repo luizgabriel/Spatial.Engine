@@ -12,7 +12,6 @@ void serialize(Archive& ar, spatial::ecs::PointLight& light)
 {
 	ar(make_nvp("intensity", light.intensity));
 	ar(make_nvp("color", light.color));
-	ar(make_nvp("castShadows", light.castShadows));
 	ar(make_nvp("falloff", light.falloff));
 }
 
@@ -40,10 +39,10 @@ template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::SunLight& light)
 {
 	ar(make_nvp("intensity", light.intensity));
-	ar(make_nvp("direction", light.direction));
 	ar(make_nvp("color", light.color));
 	ar(make_nvp("angularRadius", light.angularRadius));
 	ar(make_nvp("haloSize", light.haloSize));
+	ar(make_nvp("haloFalloff", light.haloFalloff));
 	ar(make_nvp("castShadows", light.castShadows));
 }
 

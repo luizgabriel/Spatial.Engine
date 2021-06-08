@@ -96,10 +96,10 @@ class Registry
 		mRegistry.remove<Component>(entity);
 	}
 
-	template <typename Tag>
-	void addTag(Entity entity)
+	template <typename Component>
+	void addComponent(Entity entity)
 	{
-		mRegistry.emplace<Tag>(entity);
+		mRegistry.emplace<Component>(entity);
 	}
 
 	template <typename Component>

@@ -12,12 +12,12 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/render/CameraSystem.h>
-#include <spatial/render/FilameshFile.h>
 #include <spatial/render/LightSystem.h>
 #include <spatial/render/MaterialInstancesSystem.h>
 #include <spatial/render/RenderableMeshSystem.h>
 #include <spatial/render/SceneControllerSystem.h>
 #include <spatial/render/TransformSystem.h>
+#include <spatial/resources/FilameshFile.h>
 
 namespace fl = filament;
 
@@ -51,8 +51,6 @@ class SceneEditorSystem
 
 	ImGuiSceneWindow mImGuiSceneWindow;
 	ecs::Entity mSelectedEntity;
-
-	std::array<render::FilameshFile, 4> mMeshes;
 
 	EditorCameraScript mCameraEditorScript;
 

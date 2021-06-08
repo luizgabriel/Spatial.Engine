@@ -4,39 +4,24 @@
 #include <filament/Box.h>
 #include <string>
 
+#include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Registry.h>
 
 namespace spatial::ecs
 {
 
-struct MeshResource
-{
-	std::string resourceName;
-};
-
 struct Mesh
 {
-	Entity vertexBufferId;
-	Entity indexBufferId;
+	constexpr static std::uint8_t MAX_GEOMETRIES = 32;
 
-	filament::Box boundingBox;
+	std::string resourceName;
 
-	struct Geometry {
-		std::uint32_t offset;
-		std::uint32_t count;
-	};
+	bool castShadows{true};
+	bool receiveShadows{true};
 
-	std::array<Geometry, 32> geometries;
-	std::uint8_t geometriesCount;
-};
-
-struct MeshRenderer
-{
-	bool castShadows;
-	bool receiveShadows;
-
-	std::array<Entity, 32> materials;
-	std::uint8_t materialsCount;
+	std::size_t partsCount{1};
+	std::size_t partsOffset{0};
+	std::array<Entity, Mesh::MAX_GEOMETRIES> materials{};
 };
 
 }

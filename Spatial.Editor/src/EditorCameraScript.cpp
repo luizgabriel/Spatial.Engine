@@ -3,7 +3,6 @@
 #include "ImGuiComponents.h"
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/RegistryUtils.h>
-#include <spatial/ecs/Tags.h>
 
 using namespace spatial::math;
 
@@ -12,12 +11,14 @@ namespace spatial::editor
 
 void EditorCameraScript::onStart()
 {
-	auto camera = ecs::createEntity(mRegistry, "Main Camera");
-	camera.tag<ecs::tags::IsRenderable>();
-	camera.add(ecs::Transform{math::float3 {3.0f, 3.0f, 20.0f}});
-	camera.add(ecs::PerspectiveCamera{45.0, 19 / 6.0, .1, 1000.0});
-	camera.add(EditorCamera{.5f, 10.0f});
-	mCamera = camera;
+	mCamera = ecs::build(mRegistry)
+				  .withName("Main Camera")
+				  .with(EditorCamera{.5f, 10.0f})
+				  .asTransform()
+				  .withPosition({3.0f, 3.0f, 20.0f})
+				  .asPerspectiveCamera()
+				  .withFieldOfView(60.0)
+				  .withAspectRatio(19.0 / 6.0);
 }
 
 float3 EditorCameraScript::getInputAxis()
@@ -31,7 +32,7 @@ float3 EditorCameraScript::getInputAxis()
 
 void EditorCameraScript::onUpdateFrame(float delta)
 {
-	if (mRegistry.isValid(mCamera))
+	if (!mRegistry.isValid(mCamera))
 		return;
 
 	auto& transform = mRegistry.getComponent<ecs::Transform>(mCamera);
@@ -55,6 +56,7 @@ void EditorCameraScript::onUpdateFrame(float delta)
 	{
 		mWindow.warpMouse(mWindow.getSize() * .5f);
 		options.enabled = true;
+		options.startPressed = false;
 		options.justStarted = 1;
 	}
 
@@ -89,7 +91,8 @@ void componentInput<EditorCamera>(ecs::Registry& registry, ecs::Entity entity)
 	}
 }
 
-EditorCameraScript::EditorCameraScript(ecs::Registry& stage, const desktop::Window& window, const desktop::InputState& inputState)
+EditorCameraScript::EditorCameraScript(ecs::Registry& stage, const desktop::Window& window,
+									   const desktop::InputState& inputState)
 	: mRegistry{stage}, mWindow{window}, mInputState{inputState}, mCamera{ecs::NullEntity}
 {
 }

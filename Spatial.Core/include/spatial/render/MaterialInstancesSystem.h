@@ -23,7 +23,7 @@ class MaterialInstancesSystem
 			registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material));
 		}
 
-		registry.getEntities<const MaterialComponent, render::MaterialInstance>().each(
+		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
 			[](const auto& data, auto& materialInstance) { data.setParameters(materialInstance.ref()); });
 	}
 

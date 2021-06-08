@@ -18,4 +18,9 @@ EntityHandle createEntity(Registry& registry, std::string name)
 	return handle;
 }
 
+EntityBuilder build(Registry& registry)
+{
+	return {registry};
+}
+
 } // namespace spatial::ecs

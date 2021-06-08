@@ -1,12 +1,12 @@
 #pragma once
 
 #include <entt/entity/snapshot.hpp>
-#include <spatial/serialization/SceneNode.h>
-#include <spatial/serialization/Transform.h>
-#include <spatial/serialization/Light.h>
 #include <spatial/serialization/Camera.h>
+#include <spatial/serialization/EntityName.h>
+#include <spatial/serialization/Light.h>
 #include <spatial/serialization/Mesh.h>
 #include <spatial/serialization/Tags.h>
+#include <spatial/serialization/Transform.h>
 
 namespace spatial::ecs {
 
@@ -24,7 +24,6 @@ void serialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
-	snapshot.component<ecs::MeshRenderer>(ar);
 
 	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);

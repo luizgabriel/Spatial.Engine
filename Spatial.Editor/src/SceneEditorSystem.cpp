@@ -2,6 +2,7 @@
 
 #include <assets/generated.h>
 #include <filament/LightManager.h>
+#include <spatial/common/StringHelpers.h>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Tags.h>
@@ -9,12 +10,17 @@
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/render/Transform.h>
+#include <spatial/resources/Common.h>
+#include <spatial/resources/FilameshFile.h>
+#include <spatial/serialization/Archives.h>
+#include <spatial/serialization/Registry.h>
 
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include "ImGuiComponents.h"
 #include "ImGuiDockSpace.h"
 #include "ImGuiWindow.h"
+#include "Serialization.h"
 
 namespace fl = filament;
 
@@ -56,14 +62,16 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mSelectedEntity{ecs::NullEntity},
 
-	  mMeshes{render::createFilamesh(mEngine, {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE}),
-			  render::createFilamesh(mEngine, {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE}),
-			  render::createFilamesh(mEngine, {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE}),
-			  render::createFilamesh(mEngine, {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE})},
-
 	  mCameraEditorScript{mMainStageRegistry, mWindow, mInputState}
 {
 	mImGuiSceneWindow >> *this; // register imgui window resize events
+
+	mRenderableMeshSystem.define("editor://meshes/cube", fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
+	mRenderableMeshSystem.define("editor://meshes/sphere",
+								 fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
+	mRenderableMeshSystem.define("editor://meshes/plane", fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
+	mRenderableMeshSystem.define("editor://meshes/cylinder",
+								 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 }
 
 void SceneEditorSystem::onStart()
@@ -78,58 +86,63 @@ void SceneEditorSystem::onStart()
 	mEditorView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mEditorView->setScene(mEditorScene.get());
 
+	ecs::build(mMainStageRegistry).withName("Main Light").asDirectionalLight().withDirection({.34f, -.66f, -.67f});
+
 	{
-		auto light = ecs::createEntity(mMainStageRegistry, "Main Light");
-		light.tag<ecs::tags::IsRenderable>();
-		light.add(ecs::DirectionalLight{10000, math::float3{.34f, -.66f, -.67f}});
+		auto m1 = ecs::build(mMainStageRegistry)
+					  .withName("Red Material")
+					  .asMaterial(DefaultMaterial{math::float3{.4f, 0.1f, 0.1f}});
+
+		ecs::build(mMainStageRegistry)
+			.withName("Cube")
+			.asTransform()
+			.withPosition({.0f})
+			.asMesh("editor://meshes/cube")
+			.withShadowOptions(true, true)
+			.withMaterialAt(0, m1);
 	}
 
 	{
-		auto m1 = ecs::createEntity(mMainStageRegistry, "Red Material");
-		m1.tag<ecs::tags::IsMeshMaterial>();
-		m1.add(DefaultMaterial{math::float3{.4f, 0.1f, 0.1f}});
+		auto m2 = ecs::build(mMainStageRegistry)
+					  .withName("White Material")
+					  .asMaterial(DefaultMaterial{math::float3{.8f, .8f, .8f}});
 
-		auto cube = ecs::createEntity(mMainStageRegistry, "Cube");
-		cube.tag<ecs::tags::IsRenderable>();
-		cube.add(ecs::MeshResource{"editor://meshes/cube"});
-		cube.add(ecs::Transform{math::float3{.0f}});
-		cube.add(ecs::MeshRenderer{true, true, {m1}, 1});
+		ecs::build(mMainStageRegistry)
+			.withName("Plane")
+			.asTransform()
+			.withPosition({3.0f, -1.0f, .0f})
+			.withScale({10.0f})
+			.asMesh("editor://meshes/plane")
+			.withShadowOptions(false, true)
+			.withMaterialAt(0, m2);
 	}
 
 	{
-		auto m2 = ecs::createEntity(mMainStageRegistry, "White Material");
-		m2.tag<ecs::tags::IsMeshMaterial>();
-		m2.add(DefaultMaterial{math::float3{.8f, .8f, .8f}});
+		auto m3 = ecs::build(mMainStageRegistry)
+					  .withName("Green Material")
+					  .asMaterial(DefaultMaterial{math::float3{.1f, 0.4f, 0.1f}});
 
-		auto plane = ecs::createEntity(mMainStageRegistry, "Plane");
-		plane.tag<ecs::tags::IsRenderable>();
-		plane.add(ecs::MeshResource{"editor://meshes/plane"});
-		plane.add(ecs::Transform{math::float3{3.0f, -1.0f, .0f}, math::float3{10.0f}});
-		plane.add(ecs::MeshRenderer{false, true, {m2}, 1});
+		ecs::build(mMainStageRegistry)
+			.withName("Cylinder")
+			.asTransform()
+			.withPosition({6.0f, .0f, .0f})
+			.asMesh("editor://meshes/cylinder")
+			.withShadowOptions(true, true)
+			.withMaterialAt(0, m3);
 	}
 
 	{
-		auto m3 = ecs::createEntity(mMainStageRegistry, "Green Material");
-		m3.tag<ecs::tags::IsMeshMaterial>();
-		m3.add(DefaultMaterial{math::float3{.1f, 0.4f, 0.1f}});
+		auto m4 = ecs::build(mMainStageRegistry)
+					  .withName("Blue Material")
+					  .asMaterial(DefaultMaterial{math::float3{.1f, 0.1f, 0.4}});
 
-		auto cylinder = ecs::createEntity(mMainStageRegistry, "Cylinder");
-		cylinder.tag<ecs::tags::IsRenderable>();
-		cylinder.add(ecs::MeshResource{"editor://meshes/cylinder"});
-		cylinder.add(ecs::Transform{math::float3{6.0f, .0f, .0f}});
-		cylinder.add(ecs::MeshRenderer{true, true, {m3}, 1});
-	}
-
-	{
-		auto m4 = ecs::createEntity(mMainStageRegistry, "Blue Material");
-		m4.tag<ecs::tags::IsMeshMaterial>();
-		m4.add(DefaultMaterial{math::float3{.1f, 0.1f, 0.4f}});
-
-		auto sphere = ecs::createEntity(mMainStageRegistry, "Sphere");
-		sphere.tag<ecs::tags::IsRenderable>();
-		sphere.add(ecs::MeshResource{"editor://meshes/sphere"});
-		sphere.add(ecs::Transform{math::float3{3.0f, .0f, .0f}});
-		sphere.add(ecs::MeshRenderer{true, true, {m4}, 1});
+		ecs::build(mMainStageRegistry)
+			.withName("Sphere")
+			.asTransform()
+			.withPosition({3.0f, .0f, .0f})
+			.asMesh("editor://meshes/sphere")
+			.withShadowOptions(true, true)
+			.withMaterialAt(0, m4);
 	}
 
 	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
@@ -203,7 +216,6 @@ void SceneEditorSystem::onDrawGui()
 			componentGroup<ecs::SpotLight>("Spot Light", mMainStageRegistry, mSelectedEntity);
 			componentGroup<ecs::PointLight>("Point Light", mMainStageRegistry, mSelectedEntity);
 			componentGroup<ecs::Mesh>("Mesh", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::MeshRenderer>("Mesh Renderer", mMainStageRegistry, mSelectedEntity);
 		}
 		else
 		{
@@ -232,6 +244,18 @@ void SceneEditorSystem::onDrawGui()
 		{
 			ImGui::Text("No material selected.");
 		}
+	}
+
+	{
+		auto window = ImGuiWindow{"Serialization Test"};
+		auto ss = std::stringstream {};
+		{
+			auto xml = XMLOutputArchive{ ss };
+			ecs::serialize<DefaultMaterial>(xml, mMainStageRegistry);
+		}
+
+		auto data = ss.str();
+		ImGui::TextUnformatted(data.data());
 	}
 }
 

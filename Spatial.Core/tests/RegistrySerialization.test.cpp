@@ -15,8 +15,7 @@ TEST(Registry, EmptySerialization)
 
 	{
 		auto archive = XMLOutputArchive { ss };
-		entt::snapshot{registry}
-			.component<>(archive);
+		ecs::serialize(archive, registry);
 	}
 
 	auto output = ss.str();

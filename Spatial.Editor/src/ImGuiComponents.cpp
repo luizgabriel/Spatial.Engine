@@ -5,6 +5,7 @@
 #include <imgui_internal.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Tags.h>
+#include <set>
 
 namespace spatial::editor
 {
@@ -568,39 +569,14 @@ void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
 template <>
 void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
-	const auto& mesh = registry.getComponent<const ecs::Mesh>(entity);
+	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
 
-	ImGui::Text("Geometries: %u", mesh.geometriesCount);
-	if (ImGui::BeginTable("Geometries", 2))
-	{
-		ImGui::TableSetupColumn("Offset", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
-		ImGui::TableSetupColumn("Count", ImGuiColumnsFlags_NoResize | ImGuiColumnsFlags_GrowParentContentsSize);
-		ImGui::TableHeadersRow();
-
-		for (std::uint8_t i = 0; i < mesh.geometriesCount; i++)
-		{
-			auto& geometry = mesh.geometries[i];
-
-			ImGui::Text("%ul", geometry.offset);
-			ImGui::TableNextColumn();
-
-			ImGui::Text("%ul", geometry.count);
-			ImGui::TableNextColumn();
-
-			ImGui::TableNextRow();
-		}
-
-		ImGui::EndTable();
-	}
-}
-
-template <>
-void componentInput<ecs::MeshRenderer>(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& mesh = registry.getComponent<ecs::MeshRenderer>(entity);
+	inputText("Resource", mesh.resourceName);
 
 	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
 	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	ImGui::Text("Parts Count: %lu", mesh.partsCount);
+	ImGui::Text("Parts Offset: %lu", mesh.partsOffset);
 
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -613,7 +589,7 @@ void componentInput<ecs::MeshRenderer>(ecs::Registry& registry, ecs::Entity enti
 		ImGui::TableSetupColumn("Material");
 		ImGui::TableHeadersRow();
 
-		for (std::uint8_t i = 0; i < mesh.materialsCount; i++)
+		for (std::uint8_t i = 0; i < mesh.partsCount; i++)
 		{
 			ImGui::TableNextRow();
 

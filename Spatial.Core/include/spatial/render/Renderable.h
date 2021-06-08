@@ -10,7 +10,7 @@
 namespace spatial::render
 {
 
-class RenderableMesh
+class Renderable
 {
   public:
 	using Manager = filament::RenderableManager;
@@ -19,15 +19,15 @@ class RenderableMesh
 	using Bone = Manager::Bone;
 	using Builder = Manager::Builder;
 
-	RenderableMesh(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount);
+	Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount);
 
-	~RenderableMesh();
+	~Renderable();
 
-	RenderableMesh(const RenderableMesh& other) = delete;
-	RenderableMesh& operator=(const RenderableMesh& other) = delete;
+	Renderable(const Renderable& other) = delete;
+	Renderable& operator=(const Renderable& other) = delete;
 
-	RenderableMesh(RenderableMesh&& other);
-	RenderableMesh& operator=(RenderableMesh&& other);
+	Renderable(Renderable&& other);
+	Renderable& operator=(Renderable&& other);
 
 	void setAxisAlignedBoundingBox(const filament::Box& aabb) noexcept;
 
