@@ -185,66 +185,9 @@ void SceneEditorSystem::onDrawGui()
 
 	mImGuiSceneWindow.draw("Scene View");
 
-	{
-		auto window = ImGuiWindow{"Scene Graph"};
-		editor::entitiesTreeView(mMainStageRegistry, mSelectedEntity);
-	}
-
-	{
-		auto window = ImGuiWindow{"Properties"};
-		if (mMainStageRegistry.isValid(mSelectedEntity))
-		{
-			{
-				auto& node = mMainStageRegistry.getComponent<ecs::EntityName>(mSelectedEntity);
-				editor::inputText("##Name", node.name);
-
-				ImGui::SameLine();
-				ImGui::PushItemWidth(-1);
-			}
-
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			ImGui::PopItemWidth();
-
-			componentGroup<ecs::Transform>("Transform", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::PerspectiveCamera>("Perspective Camera", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::OrthographicCamera>("Orthographic Camera", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::CustomCamera>("Custom Camera", mMainStageRegistry, mSelectedEntity);
-			componentGroup<editor::EditorCamera>("Editor Camera", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::DirectionalLight>("Directional Light", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::SpotLight>("Spot Light", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::PointLight>("Point Light", mMainStageRegistry, mSelectedEntity);
-			componentGroup<ecs::Mesh>("Mesh", mMainStageRegistry, mSelectedEntity);
-		}
-		else
-		{
-			ImGui::Text("No entity selected.");
-		}
-	}
-
-	{
-		auto window = ImGuiWindow{"Materials"};
-		static ecs::Entity selectedMaterialEntity{mMainStageRegistry.getFirstEntity<ecs::tags::IsMeshMaterial>()};
-
-		ImGui::Text("Material");
-		ImGui::SameLine();
-		selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", mMainStageRegistry, selectedMaterialEntity);
-
-		ImGui::Separator();
-		ImGui::Spacing();
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		if (mMainStageRegistry.isValid(selectedMaterialEntity))
-		{
-			conditionalComponentInput<DefaultMaterial>(mMainStageRegistry, selectedMaterialEntity);
-		}
-		else
-		{
-			ImGui::Text("No material selected.");
-		}
-	}
+	editor::sceneGraphPanel(mMainStageRegistry, mSelectedEntity);
+	editor::propertiesPanel(mMainStageRegistry, mSelectedEntity);
+	editor::materialsPanel(mMainStageRegistry);
 
 	{
 		auto window = ImGuiWindow{"Serialization Test"};

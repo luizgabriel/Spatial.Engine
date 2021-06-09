@@ -52,7 +52,7 @@ void LightSystem::createSunLights(ecs::Registry& registry) const
     for (auto entity : view)
     {
         const auto& renderable = registry.getComponent<const Entity>(entity);
-        registry.addComponent<Light>(entity, mEngine, renderable.get());
+        registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::SUN);
     }
 }
 
@@ -63,7 +63,7 @@ void LightSystem::createSpotLights(ecs::Registry& registry) const
 	for (auto entity : view)
 	{
 		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get());
+		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::SPOT);
 	}
 }
 
@@ -91,7 +91,7 @@ void LightSystem::createPointLights(ecs::Registry& registry) const
 	for (auto entity : view)
 	{
 		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get());
+		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::POINT);
 	}
 }
 
@@ -117,7 +117,7 @@ void LightSystem::createDirectionalLights(ecs::Registry& registry) const
 	for (auto entity : view)
 	{
 		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get());
+		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::DIRECTIONAL);
 	}
 }
 

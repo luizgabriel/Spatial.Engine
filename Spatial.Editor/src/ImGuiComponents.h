@@ -13,8 +13,6 @@
 namespace spatial::editor
 {
 
-void entitiesTreeView(ecs::Registry& registry, ecs::Entity& selectedActor);
-
 bool inputText(const std::string_view label, std::string& value);
 
 bool directionInput(const std::string_view label, math::float3& v, float size = 100.0f,
@@ -104,5 +102,11 @@ void componentGroup(const std::string_view componentName, ecs::Registry& registr
 			registry.removeComponent<Component>(entity);
 	}
 }
+
+void propertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity);
+
+void sceneGraphPanel(const ecs::Registry& registry, ecs::Entity& selectedEntity);
+
+void materialsPanel(ecs::Registry& registry);
 
 } // namespace spatial::editor
