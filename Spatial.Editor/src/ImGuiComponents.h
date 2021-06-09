@@ -66,13 +66,6 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 }
 
 template <typename Component>
-void conditionalComponentInput(ecs::Registry& registry, ecs::Entity entity)
-{
-	if (registry.hasAllComponents<Component>(entity))
-		componentInput<Component>(registry, entity);
-}
-
-template <typename Component>
 void componentGroup(const std::string_view componentName, ecs::Registry& registry, ecs::Entity entity, bool defaultOpen = true)
 {
 	if (registry.hasAllComponents<Component>(entity))
