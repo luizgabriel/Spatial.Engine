@@ -3,7 +3,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
@@ -164,4 +164,4 @@ Renderable& Renderable::operator=(Renderable&& other)
 	return *this;
 }
 
-} // namespace spatial
+} // namespace spatial::render

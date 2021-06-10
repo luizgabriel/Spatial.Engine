@@ -18,7 +18,7 @@ void disconnect(RenderingSystem& render, Listener& listener)
 }
 
 template <typename Listener>
-RenderingSystem& operator>>(RenderingSystem& render, Listener& listener)
+auto& operator>>(RenderingSystem& render, Listener& listener)
 {
 	connect(render, listener);
 	return render;

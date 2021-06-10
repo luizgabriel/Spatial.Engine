@@ -31,7 +31,7 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   <a href="https://github.com/luizgabriel/Spatial.Engine/blob/master/LICENSE">License</a>
 </p>
 
-![screenshot](https://i.imgur.com/hiMjXdB.png)
+![screenshot](https://i.imgur.com/2WMBo2H.png)
 
 ## Key Features
 
@@ -43,6 +43,8 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   - This engines makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
 * Full Entity-Component-System
   - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
+* Serialization System
+  - Open and Save  XML/JSON/binary scene files built in the editor.
 * Docking UI
   - Integrated [ImGui](https://github.com/ocornut/imgui) interface
 * Beautiful Code and Modern C++

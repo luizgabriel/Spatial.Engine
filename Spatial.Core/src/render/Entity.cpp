@@ -1,6 +1,6 @@
 #include <spatial/render/Entity.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 Entity::Entity(filament::Engine& engine) : mEngine{engine}, mEntity{}
@@ -43,7 +43,6 @@ void Entity::reset()
 		return;
 
 	utils::EntityManager::get().destroy(mEntity);
-	mEngine.destroy(mEntity);
 	mEntity.clear();
 }
 
@@ -52,4 +51,4 @@ bool Entity::isValid() const noexcept
 	return !mEntity.isNull();
 }
 
-} // namespace spatial
+} // namespace spatial::render

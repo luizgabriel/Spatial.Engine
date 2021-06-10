@@ -84,7 +84,7 @@ void* Window::getNativeHandle() const
 #endif
 }
 
-void Window::warpMouse(const math::float2& position)
+void Window::warpMouse(const math::float2& position) const
 {
 	glfwSetCursorPos(mWindowHandle, position.x, position.y);
 }

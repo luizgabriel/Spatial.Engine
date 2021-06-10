@@ -6,7 +6,7 @@
 #include <span>
 #include <string_view>
 
-namespace spatial
+namespace spatial::render
 {
 
 Texture createKtxTexture(filament::Engine& engine, const std::string_view resourceData);
@@ -28,4 +28,4 @@ IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture&
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,
 									filament::Texture& irradianceCubemap, float intensity = 30000.0f);
 
-} // namespace spatial
+} // namespace spatial::render

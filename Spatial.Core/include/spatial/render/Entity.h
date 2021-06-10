@@ -3,7 +3,7 @@
 #include <filament/Engine.h>
 #include <utils/EntityManager.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 class Entity
@@ -31,10 +31,10 @@ class Entity
 
 	bool isValid() const noexcept;
 
-	utils::Entity get() noexcept
+	utils::Entity get() const noexcept
 	{
 		return mEntity;
 	}
 };
 
-} // namespace spatial
+} // namespace spatial::render

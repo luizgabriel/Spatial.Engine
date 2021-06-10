@@ -12,86 +12,7 @@ using namespace filament::math;
 using namespace std::string_literals;
 namespace fl = filament;
 
-namespace std
-{
-
-template <typename ValueType>
-istream& operator>>(istream& stream, filament::math::details::TVec2<ValueType>& vector)
-{
-	stream.read(reinterpret_cast<char*>(&vector[0]), sizeof(ValueType));
-	stream.read(reinterpret_cast<char*>(&vector[1]), sizeof(ValueType));
-
-	return stream;
-}
-
-template <typename ValueType>
-istream& operator>>(istream& stream, filament::math::details::TVec3<ValueType>& vector)
-{
-	stream.read(reinterpret_cast<char*>(&vector[0]), sizeof(ValueType));
-	stream.read(reinterpret_cast<char*>(&vector[1]), sizeof(ValueType));
-	stream.read(reinterpret_cast<char*>(&vector[2]), sizeof(ValueType));
-
-	return stream;
-}
-
-istream& operator>>(istream& stream, filament::Box& box)
-{
-	return stream >> box.center >> box.halfExtent;
-}
-
-istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
-{
-	stream.read(reinterpret_cast<char*>(&part.offset), 4);
-	stream.read(reinterpret_cast<char*>(&part.count), 4);
-	stream.read(reinterpret_cast<char*>(&part.minIndex), 4);
-	stream.read(reinterpret_cast<char*>(&part.maxIndex), 4);
-	stream.read(reinterpret_cast<char*>(&part.materialID), 4);
-
-	stream >> part.boundingBox;
-
-	return stream;
-}
-
-istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
-{
-	char magic[9];
-	stream.read(magic, 8);
-	magic[8] = '\0';
-
-	if (strcmp(magic, "FILAMESH") != 0)
-	{
-		stream.setstate(ios_base::failbit);
-		return stream;
-	}
-
-	stream.read(reinterpret_cast<char*>(&header.version), 4);
-	stream.read(reinterpret_cast<char*>(&header.partsCount), 4);
-
-	stream >> header.aabb;
-
-	stream.read(reinterpret_cast<char*>(&header.flags), 4);
-	stream.read(reinterpret_cast<char*>(&header.offsetPosition), 4);
-	stream.read(reinterpret_cast<char*>(&header.stridePosition), 4);
-	stream.read(reinterpret_cast<char*>(&header.offsetTangents), 4);
-	stream.read(reinterpret_cast<char*>(&header.strideTangents), 4);
-	stream.read(reinterpret_cast<char*>(&header.offsetColor), 4);
-	stream.read(reinterpret_cast<char*>(&header.strideColor), 4);
-	stream.read(reinterpret_cast<char*>(&header.offsetUV0), 4);
-	stream.read(reinterpret_cast<char*>(&header.strideUV0), 4);
-	stream.read(reinterpret_cast<char*>(&header.offsetUV1), 4);
-	stream.read(reinterpret_cast<char*>(&header.strideUV1), 4);
-	stream.read(reinterpret_cast<char*>(&header.vertexCount), 4);
-	stream.read(reinterpret_cast<char*>(&header.vertexSize), 4);
-	stream.read(reinterpret_cast<char*>(&header.indexType), 4);
-	stream.read(reinterpret_cast<char*>(&header.indexCount), 4);
-	stream.read(reinterpret_cast<char*>(&header.indexSize), 4);
-
-	return stream;
-}
-
-} // namespace std
-
-namespace spatial
+namespace spatial::render
 {
 
 Material createMaterial(fl::Engine& engine, const std::string& resourceData)
@@ -191,39 +112,4 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 	return ib;
 }
 
-FilameshFile createFilamesh(fl::Engine& engine, const std::string& resourceData)
-{
-	auto stream = std::istringstream{resourceData};
-	auto header = FilameshFileHeader{};
-	stream >> header;
-
-	auto mesh = FilameshFile{std::move(header)};
-
-	auto vertices = std::vector<char>(header.vertexSize);
-	stream.read(&vertices[0], header.vertexSize);
-	mesh.setVertexBuffer(toShared(createVertexBuffer(engine, header, vertices)));
-
-	auto indices = std::vector<char>(header.indexSize);
-	stream.read(&indices[0], header.indexSize);
-	mesh.setIndexBuffer(toShared(createIndexBuffer(engine, header, indices)));
-
-	for (size_t i = 0; i < mesh.getPartsCount(); i++)
-	{
-		stream >> mesh.getParts().at(i);
-	}
-
-	uint32_t materialCount;
-	stream.read(reinterpret_cast<char*>(&materialCount), 4);
-
-	for (size_t i = 0; i < header.partsCount; i++)
-	{
-		uint32_t nameLength;
-		stream.read(reinterpret_cast<char*>(&nameLength), 4);
-
-		std::getline(stream, mesh.getParts().at(i).materialName, '\0');
-	}
-
-	return std::move(mesh);
-}
-
-} // namespace spatial
+} // namespace spatial::render

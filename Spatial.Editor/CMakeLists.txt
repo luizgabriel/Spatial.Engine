@@ -5,17 +5,17 @@ add_executable(Spatial.Editor
 	src/SceneEditorSystem.cpp
 	src/EditorCameraScript.h
 	src/EditorCameraScript.cpp
-	src/Components.h
-	src/ImGuiComponents.h
-	src/ImGuiComponents.cpp
-	src/ImGuiSceneWindow.h
-	src/ImGuiSceneWindow.cpp
+	src/EditorCamera.h
+	src/DefaultMaterial.h
+	src/DefaultMaterial.cpp
+	src/Serialization.h
 )
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
 target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)
 target_link_libraries(Spatial.Editor PUBLIC
 	Spatial.Core
+	Spatial.UI
 	CONAN_PKG::fmt
 	CONAN_PKG::argh
 	CONAN_PKG::ghc-filesystem)

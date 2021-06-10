@@ -49,7 +49,7 @@ class Window
 	Window& operator=(Window&& other) noexcept;
 	Window& operator=(const Window& w) = delete;
 
-	void warpMouse(const math::float2& position);
+	void warpMouse(const math::float2& position) const;
 };
 
 class PlatformContext

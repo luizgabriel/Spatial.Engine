@@ -7,7 +7,7 @@ material {
         },
         {
             type : bool,
-            name : is_texture
+            name : isTexture
         }
     ],
     requires : [
@@ -23,7 +23,7 @@ material {
 fragment {
     void material(inout MaterialInputs material) {
         prepareMaterial(material);
-        if (materialParams.is_texture) {
+        if (materialParams.isTexture) {
             material.baseColor = texture(materialParams_albedo, getUV0());
         } else {
             vec2 uv = getUV0();

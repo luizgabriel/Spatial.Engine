@@ -7,7 +7,7 @@
 #include <spatial/common/Math.h>
 #include <utils/Entity.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 class Renderable
@@ -85,4 +85,4 @@ class Renderable
 	Manager& getManager() noexcept;
 };
 
-} // namespace spatial
+} // namespace spatial::render

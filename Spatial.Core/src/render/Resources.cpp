@@ -2,7 +2,7 @@
 
 namespace fl = filament;
 
-namespace spatial
+namespace spatial::render
 {
 
 SwapChain createSwapChain(fl::Engine& engine, void* nativeWindowHandle) noexcept
@@ -50,4 +50,4 @@ RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& col
 	return RenderTarget{engine, target};
 }
 
-} // namespace spatial
+} // namespace spatial::render

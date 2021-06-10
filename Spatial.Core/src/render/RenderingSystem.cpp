@@ -1,7 +1,6 @@
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/Resources.h>
 
-using namespace spatial;
 namespace fl = filament;
 namespace bk = filament::backend;
 
@@ -9,9 +8,9 @@ namespace spatial
 {
 
 RenderingSystem::RenderingSystem(const RenderingSystem::Backend backend, void* nativeWindowHandle)
-	: mEngine{createEngine(backend)},
-	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
-	  mRenderer{createRenderer(getEngine())},
+	: mEngine{render::createEngine(backend)},
+	  mSwapChain{render::createSwapChain(getEngine(), nativeWindowHandle)},
+	  mRenderer{render::createRenderer(getEngine())},
 	  mOnRenderSignal{}
 {
 	mRenderer->setClearOptions({{.0f, .0f, .0f, 1.0f}, true, false});
@@ -26,4 +25,4 @@ void RenderingSystem::onEndFrame()
 	}
 }
 
-} // namespace spatial
+} // namespace spatial::render

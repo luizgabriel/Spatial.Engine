@@ -3,7 +3,7 @@
 #include <filament/Engine.h>
 #include <memory>
 
-namespace spatial
+namespace spatial::render
 {
 
 struct FilamentEngineDeleter
@@ -15,4 +15,4 @@ using Engine = std::unique_ptr<filament::Engine, FilamentEngineDeleter>;
 
 Engine createEngine(filament::backend::Backend backend);
 
-} // namespace spatial
+} // namespace spatial::render

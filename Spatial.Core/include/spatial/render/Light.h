@@ -1,11 +1,11 @@
 #pragma once
 
-#include <spatial/common/Math.h>
 #include <filament/Color.h>
 #include <filament/Engine.h>
 #include <filament/LightManager.h>
+#include <spatial/common/Math.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 class Light
@@ -88,4 +88,4 @@ class Light
 	Instance getInstance() const noexcept;
 };
 
-} // namespace spatial
+} // namespace spatial::render

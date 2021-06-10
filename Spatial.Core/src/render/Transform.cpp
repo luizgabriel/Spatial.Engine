@@ -2,7 +2,7 @@
 
 using namespace spatial::math;
 
-namespace spatial
+namespace spatial::render
 {
 
 Transform::Transform(filament::Engine& engine, utils::Entity entity)
@@ -18,10 +18,7 @@ Transform::~Transform()
 
 Transform::Transform(Transform&& other) noexcept
 	: mManager{other.mManager},
-	  mEntity{std::exchange(other.mEntity, {})},
-	  mPosition{std::move(other.mPosition)},
-	  mScale{std::move(other.mScale)},
-	  mRotation{std::move(other.mRotation)}
+	  mEntity{std::exchange(other.mEntity, {})}
 {
 }
 
@@ -36,42 +33,24 @@ bool Transform::isValid() const noexcept
 	return getInstance().isValid();
 }
 
-void Transform::setPosition(const float3& position) noexcept
+void Transform::setParent(const Transform& transform) noexcept
 {
-	mPosition = position;
-	refresh();
+	mManager.setParent(getInstance(), transform.getInstance());
 }
 
-void Transform::setScale(const float3& scale) noexcept
+void Transform::setMatrix(const math::mat4f& matrix) noexcept
 {
-	mScale = scale;
-	refresh();
-}
-
-void Transform::setRotation(const float3& rotation) noexcept
-{
-	mRotation = rotation;
-	refresh();
+	mManager.setTransform(getInstance(), matrix);
 }
 
 mat4f Transform::getMatrix() const noexcept
 {
-	const auto translation = mat4f::translation(mPosition);
-	const auto rotation = mat4f::eulerZYX(mRotation.z, mRotation.y, mRotation.x);
-	const auto scale = mat4f::scaling(mScale);
-
-	return translation * rotation * scale;
+	return mManager.getTransform(getInstance());
 }
 
 Transform::Instance Transform::getInstance() const noexcept
 {
 	return mManager.getInstance(mEntity);
-}
-
-void Transform::refresh() noexcept
-{
-	const auto localTransform = getMatrix();
-	mManager.setTransform(getInstance(), localTransform);
 }
 
 } // namespace spatial

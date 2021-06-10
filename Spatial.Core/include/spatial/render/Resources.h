@@ -19,8 +19,9 @@
 #include <spatial/render/Entity.h>
 
 #include <memory>
+#include <string_view>
 
-namespace spatial
+namespace spatial::render
 {
 
 // Scoped Pointers
@@ -82,4 +83,4 @@ MaterialInstance createMaterialInstance(filament::Engine& engine, const filament
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
 
-} // namespace spatial
+} // namespace spatial::render

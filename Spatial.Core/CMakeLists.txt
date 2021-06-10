@@ -17,6 +17,17 @@ add_library(Spatial.Core
 	include/spatial/desktop/InputSystem.h
 	include/spatial/desktop/InputState.h
 	
+	include/spatial/ecs/Transform.h
+	include/spatial/ecs/Camera.h
+	include/spatial/ecs/Light.h
+	include/spatial/ecs/Registry.h
+	include/spatial/ecs/RegistryUtils.h
+	include/spatial/ecs/EntityHandle.h
+	include/spatial/ecs/EntityName.h
+	include/spatial/ecs/Mesh.h
+	include/spatial/ecs/Tags.h
+	include/spatial/ecs/EntityBuilder.h
+	
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
 	include/spatial/render/Entity.h
@@ -24,20 +35,26 @@ add_library(Spatial.Core
 	include/spatial/render/ResourceLoaders.h
 	include/spatial/render/Resources.h
 	include/spatial/render/SkyboxResources.h
-	include/spatial/render/FilameshFile.h
+	include/spatial/resources/FilameshFile.h
 	include/spatial/render/Light.h
-	include/spatial/render/Stage.h
-	include/spatial/render/InstanceHandle.h
-	include/spatial/render/InstanceBuilder.h
 	include/spatial/render/Transform.h
-	include/spatial/render/SceneNodeName.h
 	include/spatial/render/Renderable.h
+	include/spatial/render/SceneControllerSystem.h
+	include/spatial/render/TransformSystem.h
+	include/spatial/render/LightSystem.h
+	include/spatial/render/CameraSystem.h
+	include/spatial/render/RenderableMeshSystem.h
+	include/spatial/render/TextureView.h
 	
-	include/spatial/ui/ImGuiHelpers.h
-	include/spatial/ui/UserInterfaceInput.h
-	include/spatial/ui/UserInterfaceRenderer.h
-	include/spatial/ui/UserInterfaceSystem.h
-	include/spatial/ui/UserInterfaceUtils.h
+	include/spatial/serialization/Archives.h
+	include/spatial/serialization/Math.h
+	include/spatial/serialization/Camera.h
+	include/spatial/serialization/Light.h
+	include/spatial/serialization/Transform.h
+	include/spatial/serialization/Mesh.h
+	include/spatial/serialization/EntityName.h
+	include/spatial/serialization/BoundingBox.h
+	include/spatial/serialization/Registry.h
 	
 	## SOURCES
 	src/common/Key.cpp
@@ -51,7 +68,11 @@ add_library(Spatial.Core
 	src/desktop/InputSystem.cpp
 	src/desktop/InputState.cpp
 	
-	src/render/Stage.cpp
+	src/ecs/EditorCamera.cpp
+	src/ecs/Registry.cpp
+	src/ecs/RegistryUtils.cpp
+	src/ecs/EntityBuilder.cpp
+	
 	src/render/Resources.cpp
 	src/render/Engine.cpp
 	src/render/Entity.cpp
@@ -59,15 +80,18 @@ add_library(Spatial.Core
 	src/render/ResourceLoaders.cpp
 	src/render/SkyboxResources.cpp
 	src/render/Camera.cpp
-	src/render/InstanceBuilder.cpp
 	src/render/Transform.cpp
 	src/render/Light.cpp
 	src/render/Renderable.cpp
+	src/render/TransformSystem.cpp
+	src/render/LightSystem.cpp
+	src/render/CameraSystem.cpp
+	src/render/RenderableMeshSystem.cpp
+	src/render/SceneControllerSystem.cpp
+	src/render/TextureView.cpp
 	
-	src/ui/ImGuiHelpers.cpp
-	src/ui/UserInterfaceSystem.cpp
-	src/ui/UserInterfaceRenderer.cpp
-	src/ui/UserInterfaceInput.cpp)
+	src/resources/Common.cpp
+	src/resources/FilameshFile.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
@@ -92,11 +116,11 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::entt
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
-	CONAN_PKG::imgui
 	CONAN_PKG::boost_tti
 	CONAN_PKG::boost_locale
 	CONAN_PKG::stb
-	CONAN_PKG::glfw)
+	CONAN_PKG::glfw
+	CONAN_PKG::cereal)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

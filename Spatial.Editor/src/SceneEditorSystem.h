@@ -2,17 +2,24 @@
 
 #include <imgui.h>
 
-#include "ImGuiSceneWindow.h"
 #include "EditorCameraScript.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
-#include <spatial/desktop/Window.h>
-#include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/InputState.h>
-#include <spatial/render/FilameshFile.h>
-#include <spatial/render/InstanceHandle.h>
-#include <spatial/render/Stage.h>
+#include <spatial/desktop/PlatformEvent.h>
+#include <spatial/desktop/Window.h>
+#include <spatial/ecs/EntityHandle.h>
+#include <spatial/render/CameraSystem.h>
+#include <spatial/render/LightSystem.h>
+#include <spatial/render/MaterialInstancesSystem.h>
+#include <spatial/render/RenderableMeshSystem.h>
+#include <spatial/render/SceneControllerSystem.h>
+#include <spatial/render/TransformSystem.h>
+#include <spatial/render/TextureView.h>
+#include <spatial/resources/FilameshFile.h>
+
+#include <ghc/filesystem.hpp>
 
 namespace fl = filament;
 
@@ -25,24 +32,32 @@ class SceneEditorSystem
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
-	Stage mMainStage;
 
-	Material mDefaultMaterial;
-	Texture mIblTexture;
-	Texture mSkyboxTexture;
-	IndirectLight mSkyboxLight;
-	Skybox mSkybox;
+	render::TextureView mEditorView;
+	render::Scene mEditorScene;
 
-	ImGuiSceneWindow mImGuiSceneWindow;
-	InstanceHandle mSelectedInstance;
+	render::Material mDefaultMaterial;
+	render::Texture mIblTexture;
+	render::Texture mSkyboxTexture;
+	render::IndirectLight mSkyboxLight;
+	render::Skybox mSkybox;
 
-	std::array<FilameshFile, 4> mMeshes;
-	std::array<MaterialInstance, 4> mMaterialInstances;
+	ecs::Entity mSelectedEntity;
+
+	ecs::Registry mRegistry;
 
 	EditorCameraScript mCameraEditorScript;
 
+	render::SceneControllerSystem mSceneControllerSystem;
+	render::MaterialInstancesSystem mMaterialInstancesSystem;
+	render::TransformSystem mTransformSystem;
+	render::CameraSystem mCameraSystem;
+	render::LightSystem mLightSystem;
+	render::RenderableMeshSystem mRenderableMeshSystem;
+
   public:
-	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window, const desktop::InputState& inputState);
+	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window,
+							   const desktop::InputState& inputState);
 
 	void onStart();
 
@@ -53,6 +68,14 @@ class SceneEditorSystem
 	void onRender(filament::Renderer& renderer) const;
 
 	void onSceneWindowResized(const math::int2& size);
+
+	void saveScene(const ghc::filesystem::path& outputPath);
+
+	void loadScene(const ghc::filesystem::path& inputPath);
+
+	void newScene();
 };
 
-} // namespace spatial
+ecs::Entity createDefaultScene(ecs::Registry& registry);
+
+} // namespace spatial::editor
