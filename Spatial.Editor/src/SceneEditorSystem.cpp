@@ -78,6 +78,9 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 								 fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
 	mRenderableMeshSystem.define("editor://meshes/cylinder",
 								 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
+
+	createDefaultScene(mRegistry);
+	onSceneWindowResized()
 }
 
 void SceneEditorSystem::onStart()

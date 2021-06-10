@@ -99,7 +99,6 @@ void EditorCameraScript::onEditorViewResized(double aspectRatio)
 void EditorCameraScript::toggleControl()
 {
 	mRegistry.getEntities<EditorCamera>().each([](auto& options) {
-
 		if (options.enabled) {
 			options.justStarted = 0;
 			options.enabled = false;

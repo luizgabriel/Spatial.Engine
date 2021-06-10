@@ -76,4 +76,6 @@ class SceneEditorSystem
 	void newScene();
 };
 
+ecs::Entity createDefaultScene(ecs::Registry& registry);
+
 } // namespace spatial::editor
