@@ -10,7 +10,6 @@ OutputType fromEmbed(const char* data, std::size_t size);
 
 }
 
-
 namespace std
 {
 

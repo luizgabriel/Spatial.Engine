@@ -1,14 +1,14 @@
 #include <imgui.h>
-#include <spatial/ui/components/ImGuiListPanel.h>
+#include <spatial/ui/components/ListPanel.h>
 
 namespace spatial::ui
 {
 
-ImGuiListPanel::ImGuiListPanel(const std::string_view name) : mWindow{name}
+ListPanel::ListPanel(const std::string_view name) : mWindow{name}
 {
 }
 
-bool ImGuiListPanel::addItem(const std::string_view name, bool active)
+bool ListPanel::item(const std::string_view name, bool active)
 {
 	ImGuiTreeNodeFlags flags = active ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
 	flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -22,7 +22,7 @@ bool ImGuiListPanel::addItem(const std::string_view name, bool active)
 	return clicked;
 }
 
-bool ImGuiListPanel::selectedNone()
+bool ListPanel::selectedNone()
 {
 	return ImGui::IsMouseDown(0) && ImGui::IsWindowHovered();
 }

@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ui/components/ImGuiComponents.h>
+#include <spatial/ui/components/Components.h>
 
 namespace spatial::editor
 {

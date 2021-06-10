@@ -5,11 +5,11 @@
 namespace spatial::ui
 {
 
-class ImGuiCollapse
+class Collapse
 {
   public:
-	ImGuiCollapse(const std::string_view name, bool defaultOpen = true);
-	~ImGuiCollapse();
+	Collapse(const std::string_view name, bool defaultOpen = true);
+	~Collapse();
 
 	bool onClose() const;
 

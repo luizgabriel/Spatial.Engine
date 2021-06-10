@@ -13,6 +13,8 @@ class EditorCameraScript
   public:
 	EditorCameraScript(ecs::Registry& stage, const desktop::Window& window, const desktop::InputState& inputState);
 
+	void toggleControl();
+
 	void onUpdateFrame(float delta);
 
 	void onEditorViewResized(double aspectRatio);

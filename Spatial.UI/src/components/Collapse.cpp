@@ -1,10 +1,10 @@
-#include <spatial/ui/components/ImGuiCollapse.h>
 #include <imgui.h>
+#include <spatial/ui/components/Collapse.h>
 
 namespace spatial::ui
 {
 
-ImGuiCollapse::ImGuiCollapse(const std::string_view name, bool defaultOpen)
+Collapse::Collapse(const std::string_view name, bool defaultOpen)
 {
 	mRendered = ImGui::CollapsingHeader(name.data(), &mOpened,
 									   defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
@@ -20,7 +20,7 @@ ImGuiCollapse::ImGuiCollapse(const std::string_view name, bool defaultOpen)
 	}
 }
 
-ImGuiCollapse::~ImGuiCollapse()
+Collapse::~Collapse()
 {
 	if (mRendered) {
 		ImGui::PopID();
@@ -33,7 +33,7 @@ ImGuiCollapse::~ImGuiCollapse()
 	}
 }
 
-bool ImGuiCollapse::onClose() const
+bool Collapse::onClose() const
 {
 	return !mOpened;
 }

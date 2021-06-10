@@ -1,9 +1,10 @@
 #pragma once
 
-#include "ImGuiCollapse.h"
-#include "ImGuiListPanel.h"
+#include "Collapse.h"
+#include "ListPanel.h"
 #include <fmt/format.h>
 #include <imgui.h>
+#include <filament/Texture.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
@@ -77,7 +78,7 @@ void collapseComponentInput(const std::string_view name, ecs::Registry& registry
 {
 	if (registry.hasAllComponents<Component>(entity))
 	{
-		auto collapse = ImGuiCollapse{name};
+		auto collapse = Collapse{name};
 
 		if (registry.hasAllComponents<Component>(entity))
 			componentInput<Component>(registry, entity);
@@ -90,7 +91,7 @@ void collapseComponentInput(const std::string_view name, ecs::Registry& registry
 template <typename... FilterComponents, typename... ExcludeComponents>
 void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity, ecs::ExcludeComponentsType<ExcludeComponents...> exclude = {})
 {
-	auto panel = ImGuiListPanel{name};
+	auto panel = ListPanel{name};
 
 	if (panel.selectedNone())
 		selectedEntity = ecs::NullEntity;
@@ -99,11 +100,12 @@ void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs
 
 	for (auto entity : view) {
 		auto& component = registry.getComponent<ecs::EntityName>(entity);
-		if (panel.addItem(component.name, selectedEntity == entity)) {
+		if (panel.item(component.name, selectedEntity == entity)) {
 			selectedEntity = entity;
 		}
 	}
 }
 
+void image(filament::Texture* texture, const math::float2& size);
 
 } // namespace spatial::ui

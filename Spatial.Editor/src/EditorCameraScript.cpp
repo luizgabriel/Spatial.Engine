@@ -3,7 +3,7 @@
 #include "Tags.h"
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/RegistryUtils.h>
-#include <spatial/ui/components/ImGuiComponents.h>
+#include <spatial/ui/components/Components.h>
 
 using namespace spatial::math;
 
@@ -32,7 +32,7 @@ void EditorCameraScript::onUpdateFrame(float delta)
 		transform.position += right * keyboardDelta.y;
 		transform.position += math::axisY * keyboardDelta.z;
 
-		if (mInputState.released(Key::MouseLeft))
+		if (mInputState.released(Key::Escape))
 		{
 			options.enabled = false;
 			options.justStarted = 0;
@@ -93,6 +93,19 @@ void EditorCameraScript::onEditorViewResized(double aspectRatio)
 	mRegistry.getEntities<ecs::OrthographicCamera, EditorCamera>().each([=](auto& camera, auto&) {
 		camera.left = -aspectRatio;
 		camera.right = aspectRatio;
+	});
+}
+
+void EditorCameraScript::toggleControl()
+{
+	mRegistry.getEntities<EditorCamera>().each([](auto& options) {
+
+		if (options.enabled) {
+			options.justStarted = 0;
+			options.enabled = false;
+		} else {
+			options.startPressed = true;
+		}
 	});
 }
 

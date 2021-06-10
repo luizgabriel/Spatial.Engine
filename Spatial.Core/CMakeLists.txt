@@ -44,12 +44,7 @@ add_library(Spatial.Core
 	include/spatial/render/LightSystem.h
 	include/spatial/render/CameraSystem.h
 	include/spatial/render/RenderableMeshSystem.h
-	
-	../Spatial.UI/include/spatial/ui/system/ImGuiHelpers.h
-	../Spatial.UI/include/spatial/ui/system/UserInterfaceInput.h
-	../Spatial.UI/include/spatial/ui/system/UserInterfaceRenderer.h
-	../Spatial.UI/include/spatial/ui/system/UserInterfaceSystem.h
-	../Spatial.UI/include/spatial/ui/system/UserInterfaceUtils.h
+	include/spatial/render/TextureView.h
 	
 	include/spatial/serialization/Archives.h
 	include/spatial/serialization/Math.h
@@ -93,6 +88,7 @@ add_library(Spatial.Core
 	src/render/CameraSystem.cpp
 	src/render/RenderableMeshSystem.cpp
 	src/render/SceneControllerSystem.cpp
+	src/render/TextureView.cpp
 	
 	src/resources/Common.cpp
 	src/resources/FilameshFile.cpp)

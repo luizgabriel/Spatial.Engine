@@ -1,10 +1,10 @@
-#include <spatial/ui/components/ImGuiComponents.h>
-#include <spatial/ui/components/ImGuiWindow.h>
 #include <array>
+#include <imgui.h>
 #include <imgui_internal.h>
-#include <set>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Tags.h>
+#include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/Window.h>
 
 namespace spatial::ui
 {
@@ -578,10 +578,8 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 			ImGui::TableNextColumn();
 
-			ImGui::PushID(i);
 			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 			selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, material);
-			ImGui::PopID();
 		}
 
 		ImGui::EndTable();
@@ -637,6 +635,11 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 	ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
 	ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
 	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+}
+
+void image(filament::Texture* texture, const math::float2& size)
+{
+	ImGui::Image(reinterpret_cast<ImTextureID>(texture), ImVec2(size.x, size.y));
 }
 
 } // namespace spatial::ui

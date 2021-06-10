@@ -6,13 +6,15 @@ add_library(Spatial.UI
 	include/spatial/ui/system/UserInterfaceRenderer.h
 	include/spatial/ui/system/UserInterfaceInput.h
 	
-	include/spatial/ui/components/ImGuiWindow.h
-	include/spatial/ui/components/ImGuiPropertiesPanel.h
-	include/spatial/ui/components/ImGuiCollapse.h
-	include/spatial/ui/components/ImGuiSceneWindow.h
-	include/spatial/ui/components/ImGuiDockSpace.h
-	include/spatial/ui/components/ImGuiComponents.h
-	include/spatial/ui/components/ImGuiListPanel.h
+	include/spatial/ui/components/Window.h
+	include/spatial/ui/components/PropertiesPanel.h
+	include/spatial/ui/components/Collapse.h
+	include/spatial/ui/components/DockSpace.h
+	include/spatial/ui/components/Components.h
+	include/spatial/ui/components/ListPanel.h
+	
+	include/spatial/ui/components/styles/BorderlessWindowStyle.h
+	include/spatial/ui/components/styles/NoPaddingWindow.h
 	
 	## SOURCES
 	src/system/ImGuiHelpers.cpp
@@ -20,13 +22,15 @@ add_library(Spatial.UI
 	src/system/UserInterfaceRenderer.cpp
 	src/system/UserInterfaceInput.cpp
 	
-	src/components/ImGuiWindow.cpp
-	src/components/ImGuiPropertiesPanel.cpp
-	src/components/ImGuiCollapse.cpp
-	src/components/ImGuiSceneWindow.cpp
-	src/components/ImGuiDockSpace.cpp
-	src/components/ImGuiListPanel.cpp
-	src/components/ImGuiComponents.cpp)
+	src/components/Window.cpp
+	src/components/PropertiesPanel.cpp
+	src/components/Collapse.cpp
+	src/components/DockSpace.cpp
+	src/components/ListPanel.cpp
+	src/components/Components.cpp
+	
+	src/components/styles/BorderlessWindowStyle.cpp
+	src/components/styles/NoPaddingWindow.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

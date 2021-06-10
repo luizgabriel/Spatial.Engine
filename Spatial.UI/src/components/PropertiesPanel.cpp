@@ -1,11 +1,11 @@
-#include <spatial/ui/components/ImGuiPropertiesPanel.h>
-#include <spatial/ui/components/ImGuiComponents.h>
 #include <spatial/ecs/EntityName.h>
+#include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/PropertiesPanel.h>
 
 namespace spatial::ui
 {
 
-ImGuiPropertiesPanel::ImGuiPropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity) : mWindow{"Properties"}
+PropertiesPanel::PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity) : mWindow{"Properties"}
 {
 	bool opened = registry.isValid(selectedEntity);
 	if (!opened)

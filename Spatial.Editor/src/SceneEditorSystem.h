@@ -16,8 +16,8 @@
 #include <spatial/render/RenderableMeshSystem.h>
 #include <spatial/render/SceneControllerSystem.h>
 #include <spatial/render/TransformSystem.h>
+#include <spatial/render/TextureView.h>
 #include <spatial/resources/FilameshFile.h>
-#include <spatial/ui/components/ImGuiSceneWindow.h>
 
 #include <ghc/filesystem.hpp>
 
@@ -35,7 +35,7 @@ class SceneEditorSystem
 
 	ecs::Registry mRegistry;
 
-	render::View mEditorView;
+	render::TextureView mEditorView;
 	render::Scene mEditorScene;
 
 	render::SceneControllerSystem mSceneControllerSystem;
@@ -51,7 +51,6 @@ class SceneEditorSystem
 	render::IndirectLight mSkyboxLight;
 	render::Skybox mSkybox;
 
-	ui::ImGuiSceneWindow mImGuiSceneWindow;
 	ecs::Entity mSelectedEntity;
 
 	EditorCameraScript mCameraEditorScript;
