@@ -5,7 +5,7 @@
 #include <spatial/common/Math.h>
 #include <string_view>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 class ImGuiSceneWindow

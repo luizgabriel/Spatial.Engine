@@ -4,7 +4,7 @@
 #include <string_view>
 #include <spatial/common/Math.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 class ImGuiWindow
@@ -16,4 +16,4 @@ class ImGuiWindow
 	math::float2 getSize();
 };
 
-} // namespace spatial::editor
+} // namespace spatial::ui

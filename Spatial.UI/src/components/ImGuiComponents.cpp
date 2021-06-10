@@ -1,14 +1,12 @@
-#include "ImGuiComponents.h"
-#include "DefaultMaterial.h"
-#include "EditorCamera.h"
-#include "ImGuiWindow.h"
+#include <spatial/ui/components/ImGuiComponents.h>
+#include <spatial/ui/components/ImGuiWindow.h>
 #include <array>
 #include <imgui_internal.h>
 #include <set>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Tags.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 bool buttonInput(const std::string_view label, float& value, float resetValue, float speed, float min, float max,
@@ -563,7 +561,8 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	ImGui::Spacing();
 
-	if (ImGui::BeginTable("Materials", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)) {
+	if (ImGui::BeginTable("Materials", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
+	{
 		ImGui::TableSetupColumn("Geometry Index");
 		ImGui::TableSetupColumn("Material");
 		ImGui::TableHeadersRow();
@@ -640,100 +639,4 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
 }
 
-template <>
-void componentInput<DefaultMaterial>(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& material = registry.getComponent<DefaultMaterial>(entity);
-
-	ImGui::ColorEdit3("Color", &material.baseColor.r);
-	ImGui::DragFloat("Metallic", &material.metallic, 0.01f, .0f, 1.0f, "%.2f");
-	ImGui::DragFloat("Reflectance", &material.reflectance, 0.01f, .0f, 1.0f, "%.2f");
-	ImGui::DragFloat("Roughness", &material.roughness, 0.01f, .0f, 1.0f, "%.2f");
-}
-
-
-void propertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity)
-{
-	auto window = editor::ImGuiWindow{"Properties"};
-
-	if (registry.isValid(selectedEntity))
-	{
-		{
-			auto& node = registry.getComponent<ecs::EntityName>(selectedEntity);
-			editor::inputText("##Name", node.name);
-
-			ImGui::SameLine();
-			ImGui::PushItemWidth(-1);
-		}
-
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		ImGui::PopItemWidth();
-
-		componentGroup<ecs::Transform>("Transform", registry, selectedEntity);
-		componentGroup<ecs::PerspectiveCamera>("Perspective Camera", registry, selectedEntity);
-		componentGroup<ecs::OrthographicCamera>("Orthographic Camera", registry, selectedEntity);
-		componentGroup<ecs::CustomCamera>("Custom Camera", registry, selectedEntity);
-		componentGroup<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
-		componentGroup<ecs::DirectionalLight>("Directional Light", registry, selectedEntity);
-		componentGroup<ecs::SpotLight>("Spot Light", registry, selectedEntity);
-		componentGroup<ecs::PointLight>("Point Light", registry, selectedEntity);
-		componentGroup<ecs::Mesh>("Mesh", registry, selectedEntity);
-	}
-	else
-	{
-		ImGui::Text("No entity selected.");
-	}
-}
-
-void sceneGraphPanel(const ecs::Registry& registry, ecs::Entity& selectedEntity)
-{
-	auto window = editor::ImGuiWindow{"Scene Graph"};
-
-	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-		selectedEntity = ecs::NullEntity;
-
-	const auto view = registry.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMeshMaterial>);
-	for (auto entity : view)
-	{
-		const auto& name = registry.getComponent<const ecs::EntityName>(entity);
-
-		ImGuiTreeNodeFlags flags = (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
-		flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-		bool opened = ImGui::TreeNodeEx("##", flags, "%s", name.name.c_str());
-		if (ImGui::IsItemClicked())
-			selectedEntity = entity;
-
-		if (opened)
-			ImGui::TreePop();
-	}
-}
-
-void materialsPanel(ecs::Registry& registry)
-{
-	auto window = ImGuiWindow{"Materials"};
-
-	static ecs::Entity selectedMaterialEntity{registry.getFirstEntity<ecs::tags::IsMeshMaterial>()};
-
-	ImGui::Text("Material");
-	ImGui::SameLine();
-	selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, selectedMaterialEntity);
-
-	ImGui::Separator();
-	ImGui::Spacing();
-	ImGui::Spacing();
-	ImGui::Spacing();
-
-	if (registry.isValid(selectedMaterialEntity) && registry.hasAllComponents<DefaultMaterial>(selectedMaterialEntity))
-	{
-		componentInput<DefaultMaterial>(registry, selectedMaterialEntity);
-	}
-	else
-	{
-		ImGui::Text("No material selected.");
-	}
-}
-
-} // namespace spatial::editor
+} // namespace spatial::ui

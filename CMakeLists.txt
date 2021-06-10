@@ -14,6 +14,7 @@ option(SPATIAL_BUILD_TESTS "Build Spatial Resource Compiler" OFF)
 
 add_subdirectory(Spatial.Core)
 add_subdirectory(Spatial.Res)
+add_subdirectory(Spatial.UI)
 add_subdirectory(Spatial.Editor)
 
 install(EXPORT Spatial.Export NAMESPACE Spatial:: FILE SpatialEngineConfig.cmake DESTINATION .)

@@ -23,6 +23,7 @@ Camera::~Camera()
 Camera::Camera(Camera&& other) noexcept
 	: mEngine{other.mEngine}, mEntity{other.mEntity}
 {
+	//getInstance()->
 }
 
 Camera& Camera::operator=(Camera&& other) noexcept
@@ -31,13 +32,15 @@ Camera& Camera::operator=(Camera&& other) noexcept
 	return *this;
 }
 
-const filament::Camera* Camera::getInstance() const noexcept
+const filament::Camera* Camera::getInstance() const
 {
+	assert(isValid());
 	return mEngine.getCameraComponent(mEntity);
 }
 
-filament::Camera* Camera::getInstance() noexcept
+filament::Camera* Camera::getInstance()
 {
+	assert(isValid());
 	return mEngine.getCameraComponent(mEntity);
 }
 

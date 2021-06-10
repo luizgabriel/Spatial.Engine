@@ -25,9 +25,9 @@ class Camera
 	Camera(const Camera& other) = delete;
 	Camera& operator=(const Camera& other) = delete;
 
-	const filament::Camera* getInstance() const noexcept;
+	const filament::Camera* getInstance() const;
 
-	filament::Camera* getInstance() noexcept;
+	filament::Camera* getInstance();
 
 	bool isValid() const noexcept
 	{

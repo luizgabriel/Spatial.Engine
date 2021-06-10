@@ -29,11 +29,13 @@ class RenderableMeshSystem
 	std::unordered_map<HashedString::hash_type, VertexBuffer> mVertexBuffers;
 	std::unordered_map<HashedString::hash_type, IndexBuffer> mIndexBuffers;
 	std::unordered_map<HashedString::hash_type, std::vector<MeshGeometry>> mMeshGeometries;
+	std::unordered_map<HashedString::hash_type, filament::Box> mBoundingBoxes;
 
 	void createRenderableMeshes(ecs::Registry& registry) const;
 	void updateMeshGeometries(ecs::Registry& registry);
 	void updateMeshMaterials(ecs::Registry& registry) const;
 	bool hasMeshData(HashedString::hash_type resourceId) const;
+	void clearDeletedMeshes(ecs::Registry& registry);
 };
 
 } // namespace spatial::render

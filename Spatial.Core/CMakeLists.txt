@@ -45,11 +45,11 @@ add_library(Spatial.Core
 	include/spatial/render/CameraSystem.h
 	include/spatial/render/RenderableMeshSystem.h
 	
-	include/spatial/ui/ImGuiHelpers.h
-	include/spatial/ui/UserInterfaceInput.h
-	include/spatial/ui/UserInterfaceRenderer.h
-	include/spatial/ui/UserInterfaceSystem.h
-	include/spatial/ui/UserInterfaceUtils.h
+	../Spatial.UI/include/spatial/ui/system/ImGuiHelpers.h
+	../Spatial.UI/include/spatial/ui/system/UserInterfaceInput.h
+	../Spatial.UI/include/spatial/ui/system/UserInterfaceRenderer.h
+	../Spatial.UI/include/spatial/ui/system/UserInterfaceSystem.h
+	../Spatial.UI/include/spatial/ui/system/UserInterfaceUtils.h
 	
 	include/spatial/serialization/Archives.h
 	include/spatial/serialization/Math.h
@@ -60,7 +60,6 @@ add_library(Spatial.Core
 	include/spatial/serialization/EntityName.h
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
-	include/spatial/serialization/Tags.h
 	
 	## SOURCES
 	src/common/Key.cpp
@@ -96,12 +95,7 @@ add_library(Spatial.Core
 	src/render/SceneControllerSystem.cpp
 	
 	src/resources/Common.cpp
-	src/resources/FilameshFile.cpp
-	
-	src/ui/ImGuiHelpers.cpp
-	src/ui/UserInterfaceSystem.cpp
-	src/ui/UserInterfaceRenderer.cpp
-	src/ui/UserInterfaceInput.cpp)
+	src/resources/FilameshFile.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
@@ -126,7 +120,6 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::entt
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
-	CONAN_PKG::imgui
 	CONAN_PKG::boost_tti
 	CONAN_PKG::boost_locale
 	CONAN_PKG::stb

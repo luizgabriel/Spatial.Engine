@@ -19,6 +19,7 @@
 #include <spatial/render/Entity.h>
 
 #include <memory>
+#include <string_view>
 
 namespace spatial::render
 {

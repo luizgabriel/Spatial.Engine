@@ -2,7 +2,6 @@
 
 #include <assets/generated.h>
 #include <filament/LightManager.h>
-#include <spatial/common/StringHelpers.h>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Tags.h>
@@ -17,12 +16,19 @@
 
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
-#include "ImGuiComponents.h"
-#include "ImGuiDockSpace.h"
-#include "ImGuiWindow.h"
 #include "Serialization.h"
+#include "Tags.h"
+#include <spatial/ui/components/ImGuiCollapse.h>
+#include <spatial/ui/components/ImGuiComponents.h>
+#include <spatial/ui/components/ImGuiDockSpace.h>
+#include <spatial/ui/components/ImGuiPropertiesPanel.h>
+#include <spatial/ui/components/ImGuiWindow.h>
+
+#include <fstream>
+#include <thread>
 
 namespace fl = filament;
+namespace fs = ghc::filesystem;
 
 using namespace spatial::math;
 
@@ -37,7 +43,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mWindow{window},
 	  mInputState{inputState},
 
-	  mMainStageRegistry{},
+	  mRegistry{},
 
 	  mEditorView{render::createView(mEngine)},
 	  mEditorScene{render::createScene(mEngine)},
@@ -62,14 +68,17 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mSelectedEntity{ecs::NullEntity},
 
-	  mCameraEditorScript{mMainStageRegistry, mWindow, mInputState}
+	  mCameraEditorScript{mRegistry, mWindow, mInputState}
+
 {
 	mImGuiSceneWindow >> *this; // register imgui window resize events
 
-	mRenderableMeshSystem.define("editor://meshes/cube", fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
+	mRenderableMeshSystem.define("editor://meshes/cube",
+								 fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
 	mRenderableMeshSystem.define("editor://meshes/sphere",
 								 fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
-	mRenderableMeshSystem.define("editor://meshes/plane", fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
+	mRenderableMeshSystem.define("editor://meshes/plane",
+								 fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
 	mRenderableMeshSystem.define("editor://meshes/cylinder",
 								 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 }
@@ -79,21 +88,22 @@ void SceneEditorSystem::onStart()
 	mEditorScene->setIndirectLight(mSkyboxLight.get());
 	mEditorScene->setSkybox(mSkybox.get());
 
-	mCameraEditorScript.onStart();
-
 	const auto windowSize = mWindow.getSize();
 	mEditorView->setViewport({0, 0, static_cast<uint32_t>(windowSize.x), static_cast<uint32_t>(windowSize.y)});
 	mEditorView->setRenderTarget(mImGuiSceneWindow.getRenderTarget());
 	mEditorView->setScene(mEditorScene.get());
 
-	ecs::build(mMainStageRegistry).withName("Main Light").asDirectionalLight().withDirection({.34f, -.66f, -.67f});
+	onSceneWindowResized({1280, 720});
+}
+
+ecs::Entity createDefaultScene(ecs::Registry& registry)
+{
+	ecs::build(registry).withName("Main Light").asDirectionalLight().withDirection({.34f, -.66f, -.67f});
 
 	{
-		auto m1 = ecs::build(mMainStageRegistry)
-					  .withName("Red Material")
-					  .asMaterial(DefaultMaterial{math::float3{.4f, 0.1f, 0.1f}});
+		auto m1 = ecs::build(registry).withName("Red Material").asMaterial(DefaultMaterial{float3{.4f, 0.1f, 0.1f}});
 
-		ecs::build(mMainStageRegistry)
+		ecs::build(registry)
 			.withName("Cube")
 			.asTransform()
 			.withPosition({.0f})
@@ -103,11 +113,9 @@ void SceneEditorSystem::onStart()
 	}
 
 	{
-		auto m2 = ecs::build(mMainStageRegistry)
-					  .withName("White Material")
-					  .asMaterial(DefaultMaterial{math::float3{.8f, .8f, .8f}});
+		auto m2 = ecs::build(registry).withName("White Material").asMaterial(DefaultMaterial{float3{.8f, .8f, .8f}});
 
-		ecs::build(mMainStageRegistry)
+		ecs::build(registry)
 			.withName("Plane")
 			.asTransform()
 			.withPosition({3.0f, -1.0f, .0f})
@@ -118,11 +126,9 @@ void SceneEditorSystem::onStart()
 	}
 
 	{
-		auto m3 = ecs::build(mMainStageRegistry)
-					  .withName("Green Material")
-					  .asMaterial(DefaultMaterial{math::float3{.1f, 0.4f, 0.1f}});
+		auto m3 = ecs::build(registry).withName("Green Material").asMaterial(DefaultMaterial{float3{.1f, 0.4f, 0.1f}});
 
-		ecs::build(mMainStageRegistry)
+		ecs::build(registry)
 			.withName("Cylinder")
 			.asTransform()
 			.withPosition({6.0f, .0f, .0f})
@@ -132,11 +138,9 @@ void SceneEditorSystem::onStart()
 	}
 
 	{
-		auto m4 = ecs::build(mMainStageRegistry)
-					  .withName("Blue Material")
-					  .asMaterial(DefaultMaterial{math::float3{.1f, 0.1f, 0.4}});
+		auto m4 = ecs::build(registry).withName("Blue Material").asMaterial(DefaultMaterial{float3{.1f, 0.1f, 0.4}});
 
-		ecs::build(mMainStageRegistry)
+		return ecs::build(registry)
 			.withName("Sphere")
 			.asTransform()
 			.withPosition({3.0f, .0f, .0f})
@@ -144,62 +148,157 @@ void SceneEditorSystem::onStart()
 			.withShadowOptions(true, true)
 			.withMaterialAt(0, m4);
 	}
-
-	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
-
-	onSceneWindowResized({1280, 720});
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	mSceneControllerSystem.synchronize(mMainStageRegistry);
-	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mMainStageRegistry, mDefaultMaterial.ref());
-	mTransformSystem.synchronize(mMainStageRegistry);
-	mCameraSystem.synchronize(mMainStageRegistry);
-	mLightSystem.synchronize(mMainStageRegistry);
-	mRenderableMeshSystem.synchronize(mMainStageRegistry);
-
-	auto cameraEntity = mMainStageRegistry.getFirstEntity<EditorCamera, render::Camera>();
-	auto& camera = mMainStageRegistry.getComponent<render::Camera>(cameraEntity);
-	mEditorView->setCamera(camera.getInstance());
-
 	mCameraEditorScript.onUpdateFrame(delta);
+
+	mSceneControllerSystem.synchronize(mRegistry);
+	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
+	mTransformSystem.synchronize(mRegistry);
+	mCameraSystem.synchronize(mRegistry);
+	mLightSystem.synchronize(mRegistry);
+	mRenderableMeshSystem.synchronize(mRegistry);
+
+	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
+	if (mRegistry.isValid(cameraEntity))
+	{
+		auto& camera = mRegistry.getComponent<render::Camera>(cameraEntity);
+		mEditorView->setCamera(camera.getInstance());
+	}
 }
 
 void SceneEditorSystem::onDrawGui()
 {
-	// ImGui::ShowDemoWindow();
-	auto dockSpace = ImGuiDockSpace{};
+	auto dockSpace = ui::ImGuiDockSpace{};
+	std::string_view menuPopup{};
 
 	ImGui::BeginMainMenuBar();
-	ImGui::Text("Spatial Engine");
-	ImGui::Separator();
-
-	if (ImGui::BeginMenu("Options"))
+	if (ImGui::BeginMenu("File"))
 	{
-		// ImGui::MenuItem("Properties", NULL, openedPropertiesPtr);
-		// ImGui::MenuItem("Console", NULL, &gOpenedLogging);
+		if (ImGui::MenuItem("New", "CTRL+N"))
+			menuPopup = "New Scene";
+		if (ImGui::MenuItem("Open", "CTRL+O"))
+			menuPopup = "Open Scene";
+		if (ImGui::MenuItem("Save", "CTRL+S"))
+			menuPopup = "Save Scene";
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Scene"))
+	{
+		if (ImGui::MenuItem("Create Default", "CTRL+N"))
+			createDefaultScene(mRegistry);
 		ImGui::EndMenu();
 	}
 	ImGui::EndMainMenuBar();
 
 	mImGuiSceneWindow.draw("Scene View");
 
-	editor::sceneGraphPanel(mMainStageRegistry, mSelectedEntity);
-	editor::propertiesPanel(mMainStageRegistry, mSelectedEntity);
-	editor::materialsPanel(mMainStageRegistry);
+	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
+	ui::entitiesListPanel<ecs::tags::IsMeshMaterial>("Materials", mRegistry, mSelectedEntity);
+	ui::entitiesListPanel("Scene Graph", mRegistry, mSelectedEntity, ecs::ExcludeComponents<ecs::tags::IsMeshMaterial, tags::IsEditorEntity>);
 
 	{
-		auto window = ImGuiWindow{"Serialization Test"};
-		auto ss = std::stringstream {};
+		auto panel = ui::ImGuiPropertiesPanel{mRegistry, mSelectedEntity};
+		if (mRegistry.isValid(mSelectedEntity))
 		{
-			auto xml = XMLOutputArchive{ ss };
-			ecs::serialize<DefaultMaterial>(xml, mMainStageRegistry);
+			ui::collapseComponentInput<EditorCamera>("Editor Camera", mRegistry, mSelectedEntity);
+			ui::collapseComponentInput<DefaultMaterial>("Default Material", mRegistry, mSelectedEntity);
+		}
+	}
+
+	if (menuPopup.data())
+		ImGui::OpenPopup(menuPopup.data());
+
+	static std::string scenePath{"scene.xml"};
+	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("New Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Are you sure? If you continue, all unsaved changes will be discarded.");
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Discard unsaved changes and create a new scene."))
+		{
+			newScene();
+			ImGui::CloseCurrentPopup();
 		}
 
-		auto data = ss.str();
-		ImGui::TextUnformatted(data.data());
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
 	}
+
+	if (ImGui::BeginPopupModal("Save Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ui::inputText("Scene File Path", scenePath);
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Save"))
+		{
+			saveScene(fs::path{scenePath});
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("Open Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ui::inputText("Scene File Path", scenePath);
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Open"))
+		{
+			loadScene(fs::path{scenePath});
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
+	}
+}
+
+void SceneEditorSystem::saveScene(const fs::path& outputPath)
+{
+	auto ss = std::fstream{outputPath, std::ios_base::out | std::ios_base::trunc};
+	if (!ss)
+		return;
+
+	auto xml = XMLOutputArchive{ss};
+	ecs::serialize<DefaultMaterial, EditorCamera>(xml, mRegistry);
+}
+
+void SceneEditorSystem::loadScene(const fs::path& inputPath)
+{
+	auto ss = std::fstream{inputPath, std::ios_base::in};
+	if (!ss)
+		return;
+
+	mRegistry = ecs::Registry{};
+	auto xml = XMLInputArchive{ss};
+	ecs::deserialize<DefaultMaterial, EditorCamera>(xml, mRegistry);
 }
 
 void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
@@ -212,6 +311,11 @@ void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
 	renderer.render(mEditorView.get());
+}
+
+void SceneEditorSystem::newScene()
+{
+	mRegistry = ecs::Registry{};
 }
 
 } // namespace spatial::editor

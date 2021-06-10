@@ -43,7 +43,7 @@ class UserInterfaceRenderer
 	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
 	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
 
-	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
+	void setViewport(const math::float2& windowSize, const math::float2& frameBufferSize);
 
 	void setMaterial(const render::SharedMaterial& material);
 

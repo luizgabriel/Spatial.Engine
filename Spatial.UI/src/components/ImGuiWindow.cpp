@@ -1,6 +1,6 @@
-#include "ImGuiWindow.h"
+#include <spatial/ui/components/ImGuiWindow.h>
 
-namespace spatial::editor {
+namespace spatial::ui {
 
 ImGuiWindow::ImGuiWindow(const std::string_view name)
 {

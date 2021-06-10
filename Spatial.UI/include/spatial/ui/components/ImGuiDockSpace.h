@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 class ImGuiDockSpace
@@ -16,4 +16,4 @@ class ImGuiDockSpace
 	~ImGuiDockSpace();
 };
 
-} // namespace spatial::editor
+} // namespace spatial::ui

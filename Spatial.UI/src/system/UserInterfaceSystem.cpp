@@ -1,4 +1,4 @@
-#include <spatial/ui/UserInterfaceSystem.h>
+#include <spatial/ui/system/UserInterfaceSystem.h>
 
 namespace spatial
 {

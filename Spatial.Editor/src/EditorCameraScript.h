@@ -13,24 +13,17 @@ class EditorCameraScript
   public:
 	EditorCameraScript(ecs::Registry& stage, const desktop::Window& window, const desktop::InputState& inputState);
 
-	void onStart();
-
 	void onUpdateFrame(float delta);
 
 	void onEditorViewResized(double aspectRatio);
-
-	ecs::Entity getCameraInstance()
-	{
-		return mCamera;
-	}
 
   private:
 	ecs::Registry& mRegistry;
 	const desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
-	ecs::Entity mCamera;
 
 	math::float3 getInputAxis();
+	void createCamera();
 };
 
 } // namespace spatial::editor

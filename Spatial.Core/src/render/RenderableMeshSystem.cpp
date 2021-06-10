@@ -8,7 +8,7 @@
 namespace spatial::render
 {
 
-RenderableMeshSystem::RenderableMeshSystem(filament::Engine& engine) : mEngine{engine}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}
+RenderableMeshSystem::RenderableMeshSystem(filament::Engine& engine) : mEngine{engine}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
 {
 }
 
@@ -17,6 +17,7 @@ void RenderableMeshSystem::define(const HashedString& resourceName, const Filame
 	auto resourceId = resourceName.value();
 	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh.header, filamesh.vertexData));
 	mIndexBuffers.emplace(resourceId, createIndexBuffer(mEngine, filamesh.header, filamesh.indexData));
+	mBoundingBoxes.emplace(resourceId, filamesh.header.aabb);
 
 	auto geometries = std::vector<MeshGeometry>(filamesh.parts.size());
 
@@ -36,6 +37,7 @@ void RenderableMeshSystem::synchronize(ecs::Registry& registry)
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
 	updateMeshMaterials(registry);
+	clearDeletedMeshes(registry);
 }
 
 void RenderableMeshSystem::updateMeshMaterials(ecs::Registry& registry) const
@@ -96,8 +98,12 @@ void RenderableMeshSystem::updateMeshGeometries(ecs::Registry& registry)
 		const auto& parts = mMeshGeometries.at(resourceId);
 		auto& vertexBuffer = mVertexBuffers.at(resourceId);
 		auto& indexBuffer = mIndexBuffers.at(resourceId);
+		auto& boundingBox = mBoundingBoxes.at(resourceId);
 
 		auto& renderableMesh = registry.getComponent<Renderable>(entity);
+
+		renderableMesh.setAxisAlignedBoundingBox(boundingBox);
+
 		for (auto i = 0; i < data.partsCount; i++)
 		{
 			const auto& geometry = parts[data.partsOffset + i];
@@ -110,6 +116,12 @@ void RenderableMeshSystem::updateMeshGeometries(ecs::Registry& registry)
 bool RenderableMeshSystem::hasMeshData(HashedString::hash_type resourceId) const
 {
 	return mMeshGeometries.find(resourceId) != mMeshGeometries.end();
+}
+
+void RenderableMeshSystem::clearDeletedMeshes(ecs::Registry& registry)
+{
+	auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
+	registry.removeComponent<Renderable>(view.begin(), view.end());
 }
 
 } // namespace spatial::render

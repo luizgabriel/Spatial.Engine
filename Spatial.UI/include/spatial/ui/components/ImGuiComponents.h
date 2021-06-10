@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ImGuiCollapse.h"
+#include "ImGuiListPanel.h"
 #include <fmt/format.h>
 #include <imgui.h>
 #include <spatial/common/Math.h>
@@ -10,16 +12,16 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Transform.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 bool inputText(const std::string_view label, std::string& value);
 
 bool directionInput(const std::string_view label, math::float3& v, float size = 100.0f,
-					 std::uint32_t color = 0x22ff2200);
+					std::uint32_t color = 0x22ff2200);
 
-bool buttonInput(const std::string_view label, float& value, float resetValue = .0f, float speed = .1f,
-				 float min = .0f, float max = .0f, const std::string_view format = "%.2f");
+bool buttonInput(const std::string_view label, float& value, float resetValue = .0f, float speed = .1f, float min = .0f,
+				 float max = .0f, const std::string_view format = "%.2f");
 
 bool vec2Input(const std::string_view label, math::float2& v, float resetValue = .0f, float speed = .1f,
 			   float min = .0f, float max = .0f, const std::string_view format = "%.2f");
@@ -38,19 +40,24 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 {
 	std::string selectedItemName = "";
 
-	if (registry.isValid(selectedEntity) && registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity)) {
+	if (registry.isValid(selectedEntity)
+		&& registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity))
+	{
 		const auto& entityName = registry.getComponent<const ecs::EntityName>(selectedEntity);
 		selectedItemName = entityName;
-	} else {
+	}
+	else
+	{
 		selectedEntity = ecs::NullEntity;
 	}
 
-	if (ImGui::BeginCombo(name.data(), selectedItemName.data())) {
+	if (ImGui::BeginCombo(name.data(), selectedItemName.data()))
+	{
 
 		auto view = registry.getEntities<ecs::EntityName, FilterComponents...>();
 
-		for (auto entity : view) {
-
+		for (auto entity : view)
+		{
 			auto& entityName = registry.getComponent<ecs::EntityName>(entity);
 
 			auto selected = selectedEntity == entity;
@@ -66,40 +73,37 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 }
 
 template <typename Component>
-void componentGroup(const std::string_view componentName, ecs::Registry& registry, ecs::Entity entity, bool defaultOpen = true)
+void collapseComponentInput(const std::string_view name, ecs::Registry& registry, ecs::Entity entity)
 {
 	if (registry.hasAllComponents<Component>(entity))
 	{
-		bool openedHeader = true;
-		if (ImGui::CollapsingHeader(componentName.data(), &openedHeader,
-									defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
-		{
-			ImGui::Indent();
+		auto collapse = ImGuiCollapse{name};
 
-			ImGui::Spacing();
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			ImGui::PushID(componentName.data());
+		if (registry.hasAllComponents<Component>(entity))
 			componentInput<Component>(registry, entity);
-			ImGui::PopID();
 
-			ImGui::Spacing();
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			ImGui::Unindent();
-		}
-
-		if (!openedHeader)
+		if (collapse.onClose())
 			registry.removeComponent<Component>(entity);
 	}
 }
 
-void propertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity);
+template <typename... FilterComponents, typename... ExcludeComponents>
+void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity, ecs::ExcludeComponentsType<ExcludeComponents...> exclude = {})
+{
+	auto panel = ImGuiListPanel{name};
 
-void sceneGraphPanel(const ecs::Registry& registry, ecs::Entity& selectedEntity);
+	if (panel.selectedNone())
+		selectedEntity = ecs::NullEntity;
 
-void materialsPanel(ecs::Registry& registry);
+	auto view = registry.getEntities<ecs::EntityName, FilterComponents...>(std::move(exclude));
 
-} // namespace spatial::editor
+	for (auto entity : view) {
+		auto& component = registry.getComponent<ecs::EntityName>(entity);
+		if (panel.addItem(component.name, selectedEntity == entity)) {
+			selectedEntity = entity;
+		}
+	}
+}
+
+
+} // namespace spatial::ui

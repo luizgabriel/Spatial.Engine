@@ -1,10 +1,10 @@
 #pragma once
 
+#include <spatial/ui/system/UserInterfaceInput.h>
+#include <spatial/ui/system/UserInterfaceRenderer.h>
 #include <spatial/common/Math.h>
 #include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/ui/UserInterfaceInput.h>
-#include <spatial/ui/UserInterfaceRenderer.h>
 
 #include <string_view>
 

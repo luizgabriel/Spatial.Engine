@@ -3,7 +3,6 @@
 #include <imgui.h>
 
 #include "EditorCameraScript.h"
-#include "ImGuiSceneWindow.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
@@ -18,6 +17,9 @@
 #include <spatial/render/SceneControllerSystem.h>
 #include <spatial/render/TransformSystem.h>
 #include <spatial/resources/FilameshFile.h>
+#include <spatial/ui/components/ImGuiSceneWindow.h>
+
+#include <ghc/filesystem.hpp>
 
 namespace fl = filament;
 
@@ -31,7 +33,7 @@ class SceneEditorSystem
 	desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
 
-	ecs::Registry mMainStageRegistry;
+	ecs::Registry mRegistry;
 
 	render::View mEditorView;
 	render::Scene mEditorScene;
@@ -49,13 +51,14 @@ class SceneEditorSystem
 	render::IndirectLight mSkyboxLight;
 	render::Skybox mSkybox;
 
-	ImGuiSceneWindow mImGuiSceneWindow;
+	ui::ImGuiSceneWindow mImGuiSceneWindow;
 	ecs::Entity mSelectedEntity;
 
 	EditorCameraScript mCameraEditorScript;
 
   public:
-	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window, const desktop::InputState& inputState);
+	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window,
+							   const desktop::InputState& inputState);
 
 	void onStart();
 
@@ -66,6 +69,12 @@ class SceneEditorSystem
 	void onRender(filament::Renderer& renderer) const;
 
 	void onSceneWindowResized(const math::int2& size);
+
+	void saveScene(const ghc::filesystem::path& outputPath);
+
+	void loadScene(const ghc::filesystem::path& inputPath);
+
+	void newScene();
 };
 
-} // namespace spatial
+} // namespace spatial::editor

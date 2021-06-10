@@ -1,6 +1,6 @@
-#include "ImGuiDockSpace.h"
+#include <spatial/ui/components/ImGuiDockSpace.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 ImGuiDockSpace::ImGuiDockSpace() : mDockFlags{ImGuiDockNodeFlags_None}, mWindowFlags{ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar

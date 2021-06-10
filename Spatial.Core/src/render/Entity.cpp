@@ -43,7 +43,6 @@ void Entity::reset()
 		return;
 
 	utils::EntityManager::get().destroy(mEntity);
-	mEngine.destroy(mEntity);
 	mEntity.clear();
 }
 

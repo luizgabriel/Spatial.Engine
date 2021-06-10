@@ -23,8 +23,6 @@ class Registry
 
 	Registry();
 
-	Registry(Registry&& registry) = default;
-
 	Entity createEntity();
 
 	bool isValid(Entity entity) const;
@@ -96,6 +94,12 @@ class Registry
 		mRegistry.remove<Component>(entity);
 	}
 
+	template <typename Component, typename It>
+	void removeComponent(It begin, It end)
+	{
+		mRegistry.remove<Component>(begin, end);
+	}
+
 	template <typename Component>
 	void addComponent(Entity entity)
 	{
@@ -153,6 +157,11 @@ class Registry
 	VersionType getVersion(Entity entity) const;
 
 	void destroy(Entity entity);
+
+	operator const entt::registry&() const
+	{
+		return mRegistry;
+	}
 
 	operator entt::registry&()
 	{

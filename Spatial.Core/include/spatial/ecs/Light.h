@@ -25,7 +25,7 @@ struct SpotLight
 
 struct DirectionalLight
 {
-	float intensity{10000.0f};
+	float intensity{100000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	bool castShadows{true};

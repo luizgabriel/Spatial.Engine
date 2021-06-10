@@ -1,9 +1,14 @@
 #pragma once
 
-namespace spatial::ecs::tags {
+namespace spatial::ecs::tags
+{
 
-struct IsMeshMaterial {};
+struct IsMeshMaterial
+{
+};
 
-struct IsRenderable {};
+struct IsRenderable
+{
+};
 
-}
+} // namespace spatial::ecs::tags

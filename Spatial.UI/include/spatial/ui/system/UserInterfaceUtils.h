@@ -1,7 +1,5 @@
 #pragma once
 
-#include <spatial/ui/UserInterfaceUtils.h>
-
 namespace spatial
 {
 

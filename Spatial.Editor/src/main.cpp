@@ -12,9 +12,10 @@
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/ui/ImGuiHelpers.h>
-#include <spatial/ui/UserInterfaceSystem.h>
-#include <spatial/ui/UserInterfaceUtils.h>
+
+#include <spatial/ui/system/ImGuiHelpers.h>
+#include <spatial/ui/system/UserInterfaceSystem.h>
+#include <spatial/ui/system/UserInterfaceUtils.h>
 
 using namespace spatial;
 namespace fs = ghc::filesystem;
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
 	auto input = desktop::InputSystem{window};
 	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
 	ui.setMaterial(toShared(render::createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
-	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
+	ui.setFontTexture(toShared(ui::imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
 	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
 

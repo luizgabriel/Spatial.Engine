@@ -1,5 +1,3 @@
-#pragma once
-
 #include <spatial/resources/Common.h>
 
 namespace std

@@ -2,31 +2,32 @@
 
 #include <filament/IndexBuffer.h>
 #include <filament/VertexBuffer.h>
-#include <imgui.h>
 #include <spatial/render/Resources.h>
 #include <string_view>
+#include <string>
+#include <imgui.h>
 
-namespace spatial
+namespace spatial::ui
 {
 
-void imguiRefreshViewport(std::uint32_t width, std::uint32_t height, float scaleX, float scaleY);
+void imguiRefreshViewport(float width, float height, float scaleX, float scaleY);
 
 void imguiRefreshDeltaTime(float delta);
 
-math::int2 imguiGetFrameSize();
+math::float2 imguiGetFrameSize();
 
 bool imguiIsMinimized();
 
-render::VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, size_t capacity);
+render::VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, uint32_t capacity);
 
-render::IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, size_t capacity);
+render::IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, uint32_t capacity);
 
-render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string& resourceData);
+render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string_view resourceData);
 
 template <typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)
 {
-	auto nVec = imVector.Size;
+	auto nVec = static_cast<size_t>(imVector.Size);
 	auto alloc = std::allocator<ImGuiType>();
 	auto data = alloc.allocate(nVec);
 

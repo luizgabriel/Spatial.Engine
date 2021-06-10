@@ -1,9 +1,9 @@
-#include "ImGuiSceneWindow.h"
-#include "ImGuiWindow.h"
+#include <spatial/ui/components/ImGuiSceneWindow.h>
+#include <spatial/ui/components/ImGuiWindow.h>
 #include <imgui.h>
 #include <spatial/render/ResourceLoaders.h>
 
-namespace spatial::editor
+namespace spatial::ui
 {
 
 ImGuiSceneWindow::ImGuiSceneWindow(filament::Engine& engine, math::int2 size)
