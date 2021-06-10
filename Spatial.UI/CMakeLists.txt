@@ -12,9 +12,11 @@ add_library(Spatial.UI
 	include/spatial/ui/components/DockSpace.h
 	include/spatial/ui/components/Components.h
 	include/spatial/ui/components/ListPanel.h
+	include/spatial/ui/components/MenuBar.h
+	include/spatial/ui/components/Menu.h
 	
 	include/spatial/ui/components/styles/BorderlessWindowStyle.h
-	include/spatial/ui/components/styles/NoPaddingWindow.h
+	include/spatial/ui/components/styles/WindowPaddingStyle.h
 	
 	## SOURCES
 	src/system/ImGuiHelpers.cpp
@@ -28,9 +30,11 @@ add_library(Spatial.UI
 	src/components/DockSpace.cpp
 	src/components/ListPanel.cpp
 	src/components/Components.cpp
+	src/components/MenuBar.cpp
+	src/components/Menu.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/NoPaddingWindow.cpp)
+	src/components/styles/WindowPaddingStyle.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

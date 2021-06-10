@@ -54,7 +54,6 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 
 	if (ImGui::BeginCombo(name.data(), selectedItemName.data()))
 	{
-
 		auto view = registry.getEntities<ecs::EntityName, FilterComponents...>();
 
 		for (auto entity : view)
@@ -80,7 +79,7 @@ void collapseComponentInput(const std::string_view name, ecs::Registry& registry
 	{
 		auto collapse = Collapse{name};
 
-		if (registry.hasAllComponents<Component>(entity))
+		if (registry.hasAllComponents<Component>(entity) && collapse.isOpen())
 			componentInput<Component>(registry, entity);
 
 		if (collapse.onClose())

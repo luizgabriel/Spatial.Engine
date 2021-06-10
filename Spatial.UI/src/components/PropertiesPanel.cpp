@@ -1,5 +1,6 @@
 #include <spatial/ecs/EntityName.h>
 #include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/PropertiesPanel.h>
 
 namespace spatial::ui
@@ -8,6 +9,7 @@ namespace spatial::ui
 PropertiesPanel::PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity) : mWindow{"Properties"}
 {
 	bool opened = registry.isValid(selectedEntity);
+
 	if (!opened)
 	{
 		ImGui::Text("No entity selected.");
@@ -17,6 +19,8 @@ PropertiesPanel::PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEn
 	if (registry.hasAllComponents<ecs::EntityName>(selectedEntity))
 	{
 		auto& node = registry.getComponent<ecs::EntityName>(selectedEntity);
+
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 		inputText("##Name", node.name);
 	}
 

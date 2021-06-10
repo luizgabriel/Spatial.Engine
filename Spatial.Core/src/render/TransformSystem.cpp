@@ -12,11 +12,12 @@ TransformSystem::TransformSystem(filament::Engine& engine)
 {
 }
 
-void TransformSystem::synchronize(ecs::Registry& registry)
+void TransformSystem::synchronize(ecs::Registry& registry) const
 {
 	createTransforms(registry);
 	updateTransformsParents(registry);
 	updateTransforms(registry);
+	//clearRemovedTransforms(registry);
 }
 
 void TransformSystem::createTransforms(ecs::Registry& registry) const
@@ -31,7 +32,7 @@ void TransformSystem::createTransforms(ecs::Registry& registry) const
 	}
 }
 
-void TransformSystem::updateTransformsParents(ecs::Registry& registry)
+void TransformSystem::updateTransformsParents(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Transform, Transform>();
 
@@ -51,7 +52,7 @@ void TransformSystem::updateTransformsParents(ecs::Registry& registry)
 	}
 }
 
-void TransformSystem::updateTransforms(ecs::Registry& registry)
+void TransformSystem::updateTransforms(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Transform, Transform>();
 
@@ -64,5 +65,14 @@ void TransformSystem::updateTransforms(ecs::Registry& registry)
 	}
 }
 
+void TransformSystem::clearRemovedTransforms(ecs::Registry& registry) const
+{
+	auto view = registry.getEntities<Transform>(ecs::ExcludeComponents<ecs::Transform>);
+
+	for (auto entity : view)
+	{
+		registry.removeComponent<Transform>(entity);
+	}
+}
 
 } // namespace spatial::render

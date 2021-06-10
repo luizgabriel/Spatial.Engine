@@ -12,7 +12,7 @@ RenderableMeshSystem::RenderableMeshSystem(filament::Engine& engine) : mEngine{e
 {
 }
 
-void RenderableMeshSystem::define(const HashedString& resourceName, const FilameshFile& filamesh)
+void RenderableMeshSystem::load(const HashedString& resourceName, const FilameshFile& filamesh)
 {
 	auto resourceId = resourceName.value();
 	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh.header, filamesh.vertexData));
@@ -30,6 +30,15 @@ void RenderableMeshSystem::define(const HashedString& resourceName, const Filame
 	}
 
 	mMeshGeometries.emplace(resourceId, std::move(geometries));
+}
+
+void RenderableMeshSystem::unload(const HashedString& resourceName)
+{
+	auto resourceId = resourceName.value();
+	mVertexBuffers.erase(resourceId);
+	mIndexBuffers.erase(resourceId);
+	mBoundingBoxes.erase(resourceId);
+	mMeshGeometries.erase(resourceId);
 }
 
 void RenderableMeshSystem::synchronize(ecs::Registry& registry)

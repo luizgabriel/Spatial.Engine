@@ -12,129 +12,54 @@ LightSystem::LightSystem(filament::Engine& engine) : mEngine{engine}
 {
 }
 
+void LightSystem::update(const ecs::PointLight& data, Light& light) const
+{
+	light.setFalloff(data.falloff);
+	light.setIntensity(data.intensity);
+	light.setColor(data.color);
+}
+
+void LightSystem::update(const ecs::DirectionalLight& data, Light& light) const
+{
+	light.setIntensity(data.intensity);
+	light.setDirection(data.direction);
+	light.setColor(data.color);
+	light.setShadowCaster(data.castShadows);
+}
+
+void LightSystem::update(const ecs::SunLight& data, Light& light) const
+{
+	light.setSunHaloFalloff(data.haloFalloff);
+	light.setSunHaloSize(data.haloSize);
+	light.setSunAngularRadius(data.angularRadius);
+	light.setIntensity(data.intensity);
+	light.setColor(data.color);
+}
+
+void LightSystem::update(const ecs::SpotLight& data, Light& light) const
+{
+	light.setFalloff(data.falloff);
+	light.setDirection(data.direction);
+	light.setIntensity(data.intensity);
+	light.setColor(data.color);
+	light.setSpotLightCone(data.innerAngle, data.outerAngle);
+}
+
 void LightSystem::synchronize(ecs::Registry& registry) const
 {
-	// TODO: All create functions are too similar. Can we merge then?
-	createSunLights(registry);
-	updateSunLights(registry);
+	createLights<ecs::DirectionalLight, Light::Type::DIRECTIONAL>(registry);
+	updateLights<ecs::DirectionalLight>(registry);
 
-	createDirectionalLights(registry);
-	updateDirectionalLights(registry);
+	createLights<ecs::PointLight, Light::Type::POINT>(registry);
+	updateLights<ecs::PointLight>(registry);
 
-	createPointLights(registry);
-	updatePointLights(registry);
+	createLights<ecs::SunLight, Light::Type::SUN>(registry);
+	updateLights<ecs::SunLight>(registry);
 
-	createSpotLights(registry);
-	updateSpotLights(registry);
-}
+	createLights<ecs::SpotLight, Light::Type::SPOT>(registry);
+	updateLights<ecs::SpotLight>(registry);
 
-void LightSystem::updateSunLights(ecs::Registry& registry) const
-{
-    auto view = registry.getEntities<ecs::SunLight, Light>();
-
-    for (auto entity : view)
-    {
-        const auto& data = registry.getComponent<const ecs::SunLight>(entity);
-        auto& light = registry.getComponent<Light>(entity);
-
-        light.setSunHaloFalloff(data.haloFalloff);
-        light.setSunHaloSize(data.haloSize);
-        light.setSunAngularRadius(data.angularRadius);
-        light.setIntensity(data.intensity);
-        light.setColor(data.color);
-    }
-}
-
-void LightSystem::createSunLights(ecs::Registry& registry) const
-{
-    auto view = registry.getEntities<Entity, ecs::SunLight>(ecs::ExcludeComponents<Light>);
-
-    for (auto entity : view)
-    {
-        const auto& renderable = registry.getComponent<const Entity>(entity);
-        registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::SUN);
-    }
-}
-
-void LightSystem::createSpotLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<Entity, ecs::SpotLight>(ecs::ExcludeComponents<Light>);
-
-	for (auto entity : view)
-	{
-		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::SPOT);
-	}
-}
-
-void LightSystem::updateSpotLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<ecs::SpotLight, Light>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const ecs::SpotLight>(entity);
-		auto& light = registry.getComponent<Light>(entity);
-
-		light.setFalloff(data.falloff);
-		light.setDirection(data.direction);
-		light.setIntensity(data.intensity);
-		light.setColor(data.color);
-		light.setSpotLightCone(data.innerAngle, data.outerAngle);
-	}
-}
-
-void LightSystem::createPointLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<Entity, ecs::PointLight>(ecs::ExcludeComponents<Light>);
-
-	for (auto entity : view)
-	{
-		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::POINT);
-	}
-}
-
-void LightSystem::updatePointLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<ecs::PointLight, Light>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const ecs::PointLight>(entity);
-		auto& light = registry.getComponent<Light>(entity);
-
-		light.setFalloff(data.falloff);
-		light.setIntensity(data.intensity);
-		light.setColor(data.color);
-	}
-}
-
-void LightSystem::createDirectionalLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<Entity, ecs::DirectionalLight>(ecs::ExcludeComponents<Light>);
-
-	for (auto entity : view)
-	{
-		const auto& renderable = registry.getComponent<const Entity>(entity);
-		registry.addComponent<Light>(entity, mEngine, renderable.get(), Light::Type::DIRECTIONAL);
-	}
-}
-
-void LightSystem::updateDirectionalLights(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<ecs::DirectionalLight, Light>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const ecs::DirectionalLight>(entity);
-		auto& light = registry.getComponent<Light>(entity);
-
-		light.setIntensity(data.intensity);
-		light.setDirection(data.direction);
-		light.setColor(data.color);
-		light.setShadowCaster(data.castShadows);
-	}
+	clearRemovedLights<ecs::DirectionalLight, ecs::PointLight, ecs::SunLight, ecs::SpotLight>(registry);
 }
 
 } // namespace spatial::render

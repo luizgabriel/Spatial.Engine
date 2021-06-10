@@ -11,6 +11,8 @@ class Collapse
 	Collapse(const std::string_view name, bool defaultOpen = true);
 	~Collapse();
 
+	bool isOpen() const;
+
 	bool onClose() const;
 
   private:

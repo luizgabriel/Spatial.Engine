@@ -38,4 +38,9 @@ bool Collapse::onClose() const
 	return !mOpened;
 }
 
+bool Collapse::isOpen() const
+{
+	return mRendered;
+}
+
 } // namespace spatial::ui

@@ -3,11 +3,11 @@
 namespace spatial::ui
 {
 
-class NoPaddingWindow
+class MenuBar
 {
   public:
-	NoPaddingWindow();
-	~NoPaddingWindow();
+	MenuBar();
+	~MenuBar();
 };
 
 } // namespace spatial::ui

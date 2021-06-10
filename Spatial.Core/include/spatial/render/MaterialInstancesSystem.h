@@ -27,6 +27,13 @@ class MaterialInstancesSystem
 			[](const auto& data, auto& materialInstance) { data.setParameters(materialInstance.ref()); });
 	}
 
+	template <typename... MaterialComponents>
+	void clearRemovedMaterials(ecs::Registry& registry)
+	{
+		auto view = registry.getEntities<MaterialInstance>(ecs::ExcludeComponents<MaterialComponents...>);
+		registry.removeComponent<MaterialInstance>(view.begin(), view.end());
+	}
+
   private:
 	filament::Engine& mEngine;
 };

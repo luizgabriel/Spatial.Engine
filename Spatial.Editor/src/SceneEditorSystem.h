@@ -33,17 +33,8 @@ class SceneEditorSystem
 	desktop::Window& mWindow;
 	const desktop::InputState& mInputState;
 
-	ecs::Registry mRegistry;
-
 	render::TextureView mEditorView;
 	render::Scene mEditorScene;
-
-	render::SceneControllerSystem mSceneControllerSystem;
-	render::MaterialInstancesSystem mMaterialInstancesSystem;
-	render::TransformSystem mTransformSystem;
-	render::CameraSystem mCameraSystem;
-	render::LightSystem mLightSystem;
-	render::RenderableMeshSystem mRenderableMeshSystem;
 
 	render::Material mDefaultMaterial;
 	render::Texture mIblTexture;
@@ -53,7 +44,16 @@ class SceneEditorSystem
 
 	ecs::Entity mSelectedEntity;
 
+	ecs::Registry mRegistry;
+
 	EditorCameraScript mCameraEditorScript;
+
+	render::SceneControllerSystem mSceneControllerSystem;
+	render::MaterialInstancesSystem mMaterialInstancesSystem;
+	render::TransformSystem mTransformSystem;
+	render::CameraSystem mCameraSystem;
+	render::LightSystem mLightSystem;
+	render::RenderableMeshSystem mRenderableMeshSystem;
 
   public:
 	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window,

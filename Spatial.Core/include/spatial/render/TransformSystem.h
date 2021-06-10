@@ -11,13 +11,14 @@ class TransformSystem
   public:
 	explicit TransformSystem(filament::Engine& engine);
 
-	void synchronize(ecs::Registry& registry);
+	void synchronize(ecs::Registry& registry) const;
 
   private:
 	filament::Engine& mEngine;
 	void createTransforms(ecs::Registry& registry) const;
-	void updateTransforms(ecs::Registry& registry);
-	void updateTransformsParents(ecs::Registry& registry);
+	void updateTransforms(ecs::Registry& registry) const;
+	void updateTransformsParents(ecs::Registry& registry) const;
+	void clearRemovedTransforms(ecs::Registry& registry) const;
 };
 
-}
+} // namespace spatial::render

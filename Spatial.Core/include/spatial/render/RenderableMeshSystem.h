@@ -22,7 +22,9 @@ class RenderableMeshSystem
 
 	void synchronize(ecs::Registry& registry);
 
-	void define(const HashedString& resourceName, const FilameshFile& filamesh);
+	void load(const HashedString& resourceName, const FilameshFile& filamesh);
+
+	void unload(const HashedString& resourceName);
 
   private:
 	filament::Engine& mEngine;

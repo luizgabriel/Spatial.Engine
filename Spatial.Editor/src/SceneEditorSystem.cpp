@@ -23,9 +23,11 @@
 #include <spatial/ui/components/DockSpace.h>
 #include <spatial/ui/components/PropertiesPanel.h>
 #include <spatial/ui/components/Window.h>
-#include <spatial/ui/components/styles/NoPaddingWindow.h>
+#include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <fstream>
+#include <spatial/ui/components/Menu.h>
+#include <spatial/ui/components/MenuBar.h>
 #include <thread>
 
 namespace fl = filament;
@@ -44,17 +46,8 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mWindow{window},
 	  mInputState{inputState},
 
-	  mRegistry{},
-
 	  mEditorView{mEngine, window.getSize()},
 	  mEditorScene{render::createScene(mEngine)},
-
-	  mSceneControllerSystem{mEngine, mEditorScene.ref()},
-	  mMaterialInstancesSystem{mEngine},
-	  mTransformSystem{mEngine},
-	  mCameraSystem{mEngine},
-	  mLightSystem{mEngine},
-	  mRenderableMeshSystem{mEngine},
 
 	  mDefaultMaterial{render::createMaterial(mEngine, {ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE})},
 
@@ -67,20 +60,28 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mSelectedEntity{ecs::NullEntity},
 
-	  mCameraEditorScript{mRegistry, mWindow, mInputState}
+	  mRegistry{},
+
+	  mCameraEditorScript{mRegistry, mWindow, mInputState},
+
+	  mSceneControllerSystem{mEngine, mEditorScene.ref()},
+	  mMaterialInstancesSystem{mEngine},
+	  mTransformSystem{mEngine},
+	  mCameraSystem{mEngine},
+	  mLightSystem{mEngine},
+	  mRenderableMeshSystem{mEngine}
 
 {
-	mRenderableMeshSystem.define("editor://meshes/cube",
+	mRenderableMeshSystem.load("editor://meshes/cube",
 								 fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
-	mRenderableMeshSystem.define("editor://meshes/sphere",
+	mRenderableMeshSystem.load("editor://meshes/sphere",
 								 fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
-	mRenderableMeshSystem.define("editor://meshes/plane",
+	mRenderableMeshSystem.load("editor://meshes/plane",
 								 fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
-	mRenderableMeshSystem.define("editor://meshes/cylinder",
+	mRenderableMeshSystem.load("editor://meshes/cylinder",
 								 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 
 	createDefaultScene(mRegistry);
-	onSceneWindowResized()
 }
 
 void SceneEditorSystem::onStart()
@@ -88,8 +89,6 @@ void SceneEditorSystem::onStart()
 	mEditorScene->setIndirectLight(mSkyboxLight.get());
 	mEditorScene->setSkybox(mSkybox.get());
 	mEditorView.getView()->setScene(mEditorScene.get());
-
-	onSceneWindowResized({1280, 720});
 }
 
 ecs::Entity createDefaultScene(ecs::Registry& registry)
@@ -151,11 +150,13 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mCameraEditorScript.onUpdateFrame(delta);
 
 	mSceneControllerSystem.synchronize(mRegistry);
-	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
 	mTransformSystem.synchronize(mRegistry);
 	mCameraSystem.synchronize(mRegistry);
 	mLightSystem.synchronize(mRegistry);
 	mRenderableMeshSystem.synchronize(mRegistry);
+
+	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
+	mMaterialInstancesSystem.clearRemovedMaterials<DefaultMaterial>(mRegistry);
 
 	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
 	if (mRegistry.isValid(cameraEntity))
@@ -170,32 +171,39 @@ void SceneEditorSystem::onDrawGui()
 	auto dockSpace = ui::DockSpace{"Spatial"};
 	std::string_view menuPopup{};
 
-	ImGui::BeginMainMenuBar();
-	if (ImGui::BeginMenu("File"))
 	{
-		if (ImGui::MenuItem("New", "CTRL+N"))
-			menuPopup = "New Scene";
-		if (ImGui::MenuItem("Open", "CTRL+O"))
-			menuPopup = "Open Scene";
-		if (ImGui::MenuItem("Save", "CTRL+S"))
-			menuPopup = "Save Scene";
-		ImGui::EndMenu();
+		auto mainMenu = ui::MenuBar{};
+
+		{
+			auto menu = ui::Menu{"File"};
+			if (menu.isOpen())
+			{
+				if (menu.item("New", "CTRL+N"))
+					menuPopup = "New Scene";
+				if (menu.item("Open", "CTRL+O"))
+					menuPopup = "Open Scene";
+				if (menu.item("Save", "CTRL+S"))
+					menuPopup = "Save Scene";
+			}
+		}
+
+		{
+			auto menu = ui::Menu{"Scene"};
+			if (menu.isOpen()) {
+				if (menu.item("Create Default", "CTRL+N"))
+					createDefaultScene(mRegistry);
+			}
+		}
 	}
-	if (ImGui::BeginMenu("Scene"))
-	{
-		if (ImGui::MenuItem("Create Default", "CTRL+N"))
-			createDefaultScene(mRegistry);
-		ImGui::EndMenu();
-	}
-	ImGui::EndMainMenuBar();
 
 	{
-		auto style = ui::NoPaddingWindow{};
+		auto style = ui::WindowPaddingStyle{};
 		auto window = ui::Window{"Scene View"};
 		ui::image(mEditorView.getColorTexture().get(), window.getSize() - int2{0, 25});
+		onSceneWindowResized(window.getSize());
+
 		if (ImGui::IsItemClicked()) {
 			mCameraEditorScript.toggleControl();
-			onSceneWindowResized(window.getSize());
 		}
 	}
 
