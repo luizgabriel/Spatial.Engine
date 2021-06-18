@@ -1,34 +1,39 @@
 #include "SceneEditorSystem.h"
 
 #include <assets/generated.h>
-#include <filament/LightManager.h>
+
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Tags.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/render/Transform.h>
 #include <spatial/resources/Common.h>
 #include <spatial/resources/FilameshFile.h>
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 
+#include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/DockSpace.h>
+#include <spatial/ui/components/Menu.h>
+#include <spatial/ui/components/MenuBar.h>
+#include <spatial/ui/components/PopupModal.h>
+#include <spatial/ui/components/PropertiesPanel.h>
+#include <spatial/ui/components/Window.h>
+#include <spatial/ui/components/NewSceneModal.h>
+#include <spatial/ui/components/OpenSceneModal.h>
+#include <spatial/ui/components/SaveSceneModal.h>
+
+#include <spatial/ui/components/styles/WindowPaddingStyle.h>
+
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include "Serialization.h"
 #include "Tags.h"
-#include <spatial/ui/components/Collapse.h>
-#include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/DockSpace.h>
-#include <spatial/ui/components/PropertiesPanel.h>
-#include <spatial/ui/components/Window.h>
-#include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <fstream>
-#include <spatial/ui/components/Menu.h>
-#include <spatial/ui/components/MenuBar.h>
-#include <thread>
+
 
 namespace fl = filament;
 namespace fs = ghc::filesystem;
@@ -73,13 +78,13 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 {
 	mRenderableMeshSystem.load("editor://meshes/cube",
-								 fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
+							   fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
 	mRenderableMeshSystem.load("editor://meshes/sphere",
-								 fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
+							   fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
 	mRenderableMeshSystem.load("editor://meshes/plane",
-								 fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
+							   fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
 	mRenderableMeshSystem.load("editor://meshes/cylinder",
-								 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
+							   fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 
 	createDefaultScene(mRegistry);
 }
@@ -189,7 +194,8 @@ void SceneEditorSystem::onDrawGui()
 
 		{
 			auto menu = ui::Menu{"Scene"};
-			if (menu.isOpen()) {
+			if (menu.isOpen())
+			{
 				if (menu.item("Create Default", "CTRL+N"))
 					createDefaultScene(mRegistry);
 			}
@@ -202,9 +208,8 @@ void SceneEditorSystem::onDrawGui()
 		ui::image(mEditorView.getColorTexture().get(), window.getSize() - int2{0, 25});
 		onSceneWindowResized(window.getSize());
 
-		if (ImGui::IsItemClicked()) {
+		if (ImGui::IsItemClicked())
 			mCameraEditorScript.toggleControl();
-		}
 	}
 
 	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
@@ -229,72 +234,28 @@ void SceneEditorSystem::onDrawGui()
 
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-	if (ImGui::BeginPopupModal("New Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("Are you sure? If you continue, all unsaved changes will be discarded.");
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Discard unsaved changes and create a new scene."))
-		{
+		auto modal = ui::NewSceneModal{};
+		if (modal.onConfirm())
 			newScene();
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-			ImGui::CloseCurrentPopup();
-
-		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal("Save Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ui::inputText("Scene File Path", scenePath);
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Save"))
-		{
+		auto modal = ui::SaveSceneModal{scenePath};
+		if (modal.onConfirm())
 			saveScene(fs::path{scenePath});
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-			ImGui::CloseCurrentPopup();
-
-		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal("Open Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ui::inputText("Scene File Path", scenePath);
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Open"))
-		{
+		auto modal = ui::OpenSceneModal{scenePath};
+		if (modal.onConfirm())
 			loadScene(fs::path{scenePath});
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-			ImGui::CloseCurrentPopup();
-
-		ImGui::EndPopup();
 	}
 }
 
 void SceneEditorSystem::saveScene(const fs::path& outputPath)
 {
+	gLogger.info("Saving scene: {}", fs::absolute(outputPath).string());
 	auto ss = std::fstream{outputPath, std::ios_base::out | std::ios_base::trunc};
 	if (!ss)
 		return;
@@ -305,11 +266,12 @@ void SceneEditorSystem::saveScene(const fs::path& outputPath)
 
 void SceneEditorSystem::loadScene(const fs::path& inputPath)
 {
+	gLogger.info("Loading scene: {}", fs::absolute(inputPath).string());
 	auto ss = std::fstream{inputPath, std::ios_base::in};
 	if (!ss)
 		return;
 
-	mRegistry = ecs::Registry{};
+	newScene();
 	auto xml = XMLInputArchive{ss};
 	ecs::deserialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
 }

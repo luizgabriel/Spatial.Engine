@@ -53,7 +53,7 @@ void EditorCameraScript::onUpdateFrame(float delta)
 		{
 			const auto mouseRotation = mInputState.getMouseOffset() * math::pi * options.sensitivity * delta;
 			transform.rotation = math::float3{
-				std::clamp(transform.rotation.x + mouseRotation.y, -math::pi, math::pi), // clamp the pitch
+				std::clamp(transform.rotation.x + mouseRotation.y, -math::pi / 2.0f, math::pi / 2.0f), // clamp the pitch
 				transform.rotation.y + mouseRotation.x,
 				.0f // remove the roll
 			};

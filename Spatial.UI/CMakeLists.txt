@@ -14,6 +14,9 @@ add_library(Spatial.UI
 	include/spatial/ui/components/ListPanel.h
 	include/spatial/ui/components/MenuBar.h
 	include/spatial/ui/components/Menu.h
+	include/spatial/ui/components/PopupModal.h
+	include/spatial/ui/components/NewSceneModal.h
+	include/spatial/ui/components/OpenSceneModal.h
 	
 	include/spatial/ui/components/styles/BorderlessWindowStyle.h
 	include/spatial/ui/components/styles/WindowPaddingStyle.h
@@ -32,6 +35,10 @@ add_library(Spatial.UI
 	src/components/Components.cpp
 	src/components/MenuBar.cpp
 	src/components/Menu.cpp
+	src/components/PopupModal.cpp
+	src/components/NewSceneModal.cpp
+	src/components/SaveSceneModal.cpp
+	src/components/OpenSceneModal.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
 	src/components/styles/WindowPaddingStyle.cpp)
