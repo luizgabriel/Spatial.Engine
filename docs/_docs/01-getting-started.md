@@ -33,7 +33,7 @@ Spatial.Engine
 └── Spatial.Res (A C++ code generator for embedding resource files inside the Spatial.Editor binary)
 ```
 
-You can take a look at the `Spatial.Core` folder to understand how the darker details have been implemented. But for now we will understand how `Spatial.Editor` makes use of the engine's features.
+You can take a look at the `Spatial.Core` folder to understand how the darker details have been implemented.
 
 ## First time here, buddy?
 

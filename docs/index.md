@@ -12,6 +12,6 @@ layout: home
     </p>
     <div class="d-flex">
         <a href="/docs/getting-started" class="btn btn-blue">Getting Started</a>
-        <a href="/docs/getting-started" class="btn ml-2">View on Github</a>
+        <a href="https://github.com/luizgabriel/Spatial.Engine" class="btn ml-2">View on Github</a>
     </div>
 </div>
