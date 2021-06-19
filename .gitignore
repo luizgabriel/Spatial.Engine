@@ -4,7 +4,6 @@
 dependencies/
 build/
 out/
-docs/
 imgui_log.txt
 __tmp/
 *.log
