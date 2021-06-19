@@ -11,7 +11,7 @@ layout: default
         This projects uses C++17 and modern cmake features.
     </p>
     <div class="d-flex">
-        <a href="/docs/getting-started" class="btn btn-blue">Getting Started</a>
+        <a href="/docs/01-getting-started" class="btn btn-blue">Getting Started</a>
         <a href="https://github.com/luizgabriel/Spatial.Engine" class="btn ml-2">View on Github</a>
     </div>
 </div>
