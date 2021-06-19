@@ -2,7 +2,7 @@
 layout: default
 ---
 
-# Welcome to the Spatial Engine!
+<h1 class="text-center">Welcome to the Spatial Engine!</h1>
 
 <div class="d-flex" style="flex-direction: column; align-items: center;">
     <img src="/assets/preview.png" alt="Engine Screenshot Preview"/>
