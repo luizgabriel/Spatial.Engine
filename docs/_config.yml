@@ -37,8 +37,3 @@ just_the_docs:
       name: Documentation
       nav_exclude: false
       search_exclude: false
-
-kramdown:
-  syntax_highlighter_opts:
-    block:
-      line_numbers: true
