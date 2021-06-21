@@ -3,6 +3,7 @@ title: Understanding the Engine
 layout: default
 nav_order: 3
 has_children: true
+has_toc: false
 ---
 
 ## Table of contents
@@ -16,7 +17,7 @@ has_children: true
 Now we will understand how `Spatial.Editor` makes use of the engine's features.
 
 If you open the file `Spatial.Editor\src\main.cpp`, you will see the starting point of the executable.
-{% highlight cpp %}
+```
 int main(int argc, char* argv[])
 {
 	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
@@ -51,8 +52,8 @@ int main(int argc, char* argv[])
 
 	return app.run();
 }
-{% endhighlight %}
-###### See also [Spatial.Editor/src/main.cpp](https://github.com/luizgabriel/Spatial.Engine/blob/cc6096997b3546c87d4cc45d33a69b275f1dd828/Spatial.Editor/src/main.cpp#L29)
+```
+See also [Spatial.Editor/src/main.cpp](https://github.com/luizgabriel/Spatial.Engine/blob/cc6096997b3546c87d4cc45d33a69b275f1dd828/Spatial.Editor/src/main.cpp#L29)
 
 ## Parsing Command Line Arguments
 This part it's not related to the engine itself. The editor was design to be started from the command line, so the [Argh! Library](https://github.com/adishavit/argh) was used for that purpose.

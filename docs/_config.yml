@@ -66,3 +66,6 @@ just_the_docs:
       # Supports true or false (default)
       search_exclude: false
 
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
