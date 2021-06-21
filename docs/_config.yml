@@ -12,7 +12,7 @@ remote_theme: pmarsceill/just-the-docs
 back_to_top: true
 back_to_top_text: "Back to top"
 
-logo: "/assets/logo.png"
+logo: "/assets/images/logo.png"
 
 aux_links:
   "GitHub":
@@ -24,7 +24,7 @@ gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub."
 gh_edit_repository: "https://github.com/luizgabriel/Spatial.Engine"
 
-color_theme: auto
+color_theme: dark
 
 collections:
   docs:
