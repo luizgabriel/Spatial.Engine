@@ -107,7 +107,7 @@ auto input = desktop::InputSystem{window};
 This line creates a system responsible for mantanning the `desktop::InputState` of the `desktop::PlatformContext`.
 We need to call `input.getState()` to get the read input or mouse in the game loop. 
 
-> PS.: There is no "Input::pressed(...)" facade or singleton here. Just clear dependencies throughout the code. 
+> There is no "Input::pressed(...)" facade or singleton here. Just clear dependencies throughout the code. 
 > As a design mindset we tend to avoid the usage of Singletons because of its undesired effects it may cause on the application. 
 >
 > See also: [Retiring the Singleton Pattern: Concrete Suggestions for What to use Instead - Peter Muldoon](https://www.youtube.com/watch?v=K5c7uvWe_hw)
