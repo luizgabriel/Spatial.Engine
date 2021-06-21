@@ -12,7 +12,7 @@ has_toc: false
 1. TOC
 {:toc}
 
-## The Engine Entry Point
+## The Entry Point
 
 Now we will understand how `Spatial.Editor` makes use of the engine's features.
 
