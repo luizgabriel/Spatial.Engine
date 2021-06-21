@@ -16,7 +16,7 @@ has_children: true
 Now we will understand how `Spatial.Editor` makes use of the engine's features.
 
 If you open the file `Spatial.Editor\src\main.cpp`, you will see the starting point of the executable.
-```cpp
+{% highlight cpp %}
 int main(int argc, char* argv[])
 {
 	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
 	return app.run();
 }
-```
+{% endhighlight %}
 ###### See also [Spatial.Editor/src/main.cpp](https://github.com/luizgabriel/Spatial.Engine/blob/cc6096997b3546c87d4cc45d33a69b275f1dd828/Spatial.Editor/src/main.cpp#L29)
 
 ## Parsing Command Line Arguments
