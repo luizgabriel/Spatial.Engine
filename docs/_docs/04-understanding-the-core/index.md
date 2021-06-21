@@ -20,7 +20,7 @@ The application owns the main event queue. When we connect our subsystems to the
 
 All these member functions are optional. The connect function uses static reflections to check the existence of these functions. So, they must match the below signature.
 
-```
+{% highlight cpp %}
 struct MySubSystem
 {
     // Called once on the application start
@@ -42,7 +42,7 @@ struct MySubSystem
     // Used for drawing debug user interface
     void onDrawGui();
 };
-```
+{% endhighlight %}
 
 To instantiate and connect the subsystem
 ```cpp
