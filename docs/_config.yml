@@ -28,10 +28,7 @@ url: "https://luizgabriel.github.io" # the base hostname & protocol for your sit
 github_username:  luizgabriel
 
 # Build settings
-theme: just-the-docs
-plugins:
-  - jekyll-seo-tag
-
+remote_theme: pmarsceill/just-the-docs
 back_to_top: true
 back_to_top_text: "Back to top"
 
