@@ -135,7 +135,7 @@ Now, press `Ctrl + Shift + P` and type `CMake: Configure` then `CMake: Build`
 
 Open the Preferences Panel:
 
-![Preferences Panel Menu Item](/assets/clion-file-menu.png)
+![Preferences Panel Menu Item]({{site.baseurl}}/assets/clion-file-menu.png)
 
 Go to `Build, Execution, Deployment` > `CMake`:
 - On `Build Directory` put `out/build/debug`
@@ -143,6 +143,6 @@ Go to `Build, Execution, Deployment` > `CMake`:
 - On `Build Type` put `Debug`
 - On `Toolchain` put `System`
 
-![Build, Execution, Deployment, CMake](/assets/clion-config.png)
+![Build, Execution, Deployment, CMake]({{site.baseurl}}/assets/clion-config.png)
 
 
