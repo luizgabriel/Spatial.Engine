@@ -13,7 +13,6 @@ code {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: 'Fira Code';
-  overflow: scroll;
 }
 
 .flex-column {
@@ -31,57 +30,4 @@ blockquote {
   background-color: #46c6ac1f;
   margin-right: 0;
   border-radius: .2em;
-}
-
-$green: #A6E22A;
-$blue: #84D7EC;
-$yellow: #E6DB74;
-$magenta: #F92672;
-$greylight: #E6E6E6;
-$original: #eee;
-$background: #383830;
-$grey: #595959;
-$violet: #AE81FF;
-
-.highlight {
-  width: 97%;
-  margin: 10px auto;
-  font-size: 16px;
-  line-height: 1.2em;
-  background-color: $background;
-  color: $original;
-  padding: 10px;
-  box-shadow: 3px 3px 12px 3px $background;
-  border-radius: 10px;
-
-  .lineno {
-    margin: 3px;
-    font-size: 16px;
-    color: $greylight;
-  }
-
-  .c, .cm, .cp, .c1, .cs { /* comment */
-    color: $grey;
-  }
-
-  .k, .kc, .kd, .kn, .kp, .kr, .kt, .o, .nt { /* key word*/
-    color: $magenta;
-  }
-
-  .m, .mf, .mh, .mi, .mo { /*number*/
-    color: $violet;
-  }
-
-  .s, .sb, .sc, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss { /*string*/
-    color: $yellow;
-  }
-
-  .nf, .na, .nc {
-    color: $green;
-  }
-
-  .css .k, .nb, .kd, .n {
-    font-style: italic;
-    color: $blue;
-  }
 }
