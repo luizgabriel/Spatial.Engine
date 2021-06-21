@@ -23,8 +23,8 @@ email: your-email@example.com
 description: >-
   Spatial is a cross-platform C++ game engine created on top off google's filament rendering engine.
   This projects uses C++17 and modern cmake features.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/Spatial.Engine" # the subpath of your site, e.g. /blog
+url: "https://luizgabriel.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  luizgabriel
 
 # Build settings
@@ -47,7 +47,7 @@ gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub."
 gh_edit_repository: "https://github.com/luizgabriel/Spatial.Engine"
 
-color_scheme: light
+color_theme: auto
 
 collections:
   # Define a collection named "docs", its documents reside in the "_docs" directory
