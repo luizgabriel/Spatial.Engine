@@ -5,7 +5,7 @@ layout: default
 <h1 class="text-center">Welcome to the Spatial Engine!</h1>
 
 <div class="d-flex flex-column align-center">
-    <img src="{{site.baseurl}}/assets/preview.png" alt="Engine Screenshot Preview"/>
+    <img src="{{site.baseurl}}/assets/images/preview.png" alt="Engine Screenshot Preview"/>
     <p class="text-center">
         Spatial is a cross-platform C++ game engine created on top off google's filament rendering engine.<br/>
         This projects uses C++17 and modern cmake features.
