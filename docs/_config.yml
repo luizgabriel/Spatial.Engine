@@ -18,8 +18,8 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
-email: your-email@example.com
+title: Spatial Engine
+email: luizgabriel.info@gmail.com
 description: >-
   Spatial is a cross-platform C++ game engine created on top off google's filament rendering engine.
   This projects uses C++17 and modern cmake features.
