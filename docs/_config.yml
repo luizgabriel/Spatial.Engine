@@ -9,6 +9,8 @@ github_username:  luizgabriel
 
 # Build settings
 remote_theme: pmarsceill/just-the-docs
+color_scheme: dark
+
 back_to_top: true
 back_to_top_text: "Back to top"
 
@@ -23,8 +25,6 @@ aux_links_new_tab: true
 gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub."
 gh_edit_repository: "https://github.com/luizgabriel/Spatial.Engine"
-
-color_theme: dark
 
 collections:
   docs:
