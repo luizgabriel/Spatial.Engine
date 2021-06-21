@@ -20,40 +20,39 @@ If you open the file `Spatial.Editor\src\main.cpp`, you will see the starting po
 ```cpp
 int main(int argc, char* argv[])
 {
-	const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
-	const auto executablePath = fs::path{args[0]}.parent_path();
+    const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
+    const auto executablePath = fs::path{args[0]}.parent_path();
 
-	auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
-	args({"-w", "--width"}) >> config.windowWidth;
-	args({"-h", "--height"}) >> config.windowHeight;
+    auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
+    args({"-w", "--width"}) >> config.windowWidth;
+    args({"-h", "--height"}) >> config.windowHeight;
 
-	auto app = Application{};
-	auto desktopContext = desktop::PlatformContext{};
-	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
-	auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
-	auto input = desktop::InputSystem{window};
-	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
-	ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
-	ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
+    auto app = Application{};
+    auto desktopContext = desktop::PlatformContext{};
+    auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
+    auto rendering = RenderingSystem{fl::backend::Backend::OPENGL, window};
+    auto input = desktop::InputSystem{window};
+    auto ui = UserInterfaceSystem{rendering.getEngine(), window};
+    ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
+    ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
+    auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
 
-	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> ui >> editor;
+    // Connect all Systems to the Application Main Loop
+    app >> desktopContext >> input >> rendering >> ui >> editor;
 
-	// Connect Desktop Events to All Systems
-	desktopContext >> app >> input >> rendering >> ui >> editor;
+    // Connect Desktop Events to All Systems
+    desktopContext >> app >> input >> rendering >> ui >> editor;
 
-	// Connect Gui Render to Editor
-	ui >> editor;
+    // Connect Gui Render to Editor
+    ui >> editor;
 
-	// Connect Rendering to Editor and UI
-	rendering >> editor >> ui;
+    // Connect Rendering to Editor and UI
+    rendering >> editor >> ui;
 
-	return app.run();
+    return app.run();
 }
 ```
-See also [Spatial.Editor/src/main.cpp](https://github.com/luizgabriel/Spatial.Engine/blob/cc6096997b3546c87d4cc45d33a69b275f1dd828/Spatial.Editor/src/main.cpp#L29)
 
 ## Parsing Command Line Arguments
 This part it's not related to the engine itself. The editor was design to be started from the command line, so the [Argh! Library](https://github.com/adishavit/argh) was used for that purpose.
