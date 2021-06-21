@@ -65,7 +65,3 @@ just_the_docs:
       # Exclude the collection from the search
       # Supports true or false (default)
       search_exclude: false
-
-kramdown:
-  math_engine: mathjax
-  syntax_highlighter: rouge
