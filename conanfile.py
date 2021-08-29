@@ -16,8 +16,7 @@ class SpatialEngineConan(ConanFile):
     build_requires = "cmake/3.16.3"
     exports_sources = "*"
     requires = [
-        "boost_locale/1.67.0@bincrafters/stable",
-        "boost_tti/1.67.0@bincrafters/stable",
+        "boost/1.73.0",
         "argh/1.2.1@adishavit/stable",
         "glfw/3.3.4",
         "ghc-filesystem/1.4.0",
@@ -27,6 +26,7 @@ class SpatialEngineConan(ConanFile):
         "entt/3.7.0",
         "cereal/1.3.0",
 
+        # Remember to run 'setup.py' to make this dependencies available
         "imgui/docking@vendor/stable",  # Installed with vendor/imgui.py
         "filament/1.9.21@vendor/stable",  # Installed with vendor/filament.py
     ]

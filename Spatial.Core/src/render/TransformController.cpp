@@ -2,17 +2,17 @@
 #include <spatial/ecs/SceneNode.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Transform.h>
-#include <spatial/render/TransformSystem.h>
+#include <spatial/render/TransformController.h>
 
 namespace spatial::render
 {
 
-TransformSystem::TransformSystem(filament::Engine& engine)
+TransformController::TransformController(filament::Engine& engine)
 	: mEngine{engine}
 {
 }
 
-void TransformSystem::synchronize(ecs::Registry& registry) const
+void TransformController::synchronize(ecs::Registry& registry) const
 {
 	createTransforms(registry);
 	updateTransformsParents(registry);
@@ -20,7 +20,7 @@ void TransformSystem::synchronize(ecs::Registry& registry) const
 	//clearRemovedTransforms(registry);
 }
 
-void TransformSystem::createTransforms(ecs::Registry& registry) const
+void TransformController::createTransforms(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<Entity, ecs::Transform>(ecs::ExcludeComponents<Transform>);
 
@@ -32,7 +32,7 @@ void TransformSystem::createTransforms(ecs::Registry& registry) const
 	}
 }
 
-void TransformSystem::updateTransformsParents(ecs::Registry& registry) const
+void TransformController::updateTransformsParents(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Transform, Transform>();
 
@@ -52,7 +52,7 @@ void TransformSystem::updateTransformsParents(ecs::Registry& registry) const
 	}
 }
 
-void TransformSystem::updateTransforms(ecs::Registry& registry) const
+void TransformController::updateTransforms(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Transform, Transform>();
 
@@ -65,7 +65,7 @@ void TransformSystem::updateTransforms(ecs::Registry& registry) const
 	}
 }
 
-void TransformSystem::clearRemovedTransforms(ecs::Registry& registry) const
+void TransformController::clearRemovedTransforms(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<Transform>(ecs::ExcludeComponents<ecs::Transform>);
 

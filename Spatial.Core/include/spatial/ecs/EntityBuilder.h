@@ -70,7 +70,7 @@ class EntityBuilder
 	DirectionalLightEntityBuilder asDirectionalLight();
 	SunLightEntityBuilder asSunLight();
 
-	MeshEntityBuilder asMesh(std::string resourceName);
+	MeshEntityBuilder asMesh(uint32_t resourceId);
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -243,9 +243,11 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
   public:
 	using Base = BasicEntityBuilder<Mesh>;
 
-	MeshEntityBuilder(Registry& registry, Entity entity, std::string resourceName);
+	MeshEntityBuilder(Registry& registry, Entity entity, std::uint32_t resourceId);
 
-	MeshEntityBuilder& withShadowOptions(float castShadows, float receiveShadows);
+	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
+
+	MeshEntityBuilder& withDefaultMaterial(Entity materialEntity);
 
 	MeshEntityBuilder& withMaterialAt(std::uint8_t index, Entity materialEntity);
 

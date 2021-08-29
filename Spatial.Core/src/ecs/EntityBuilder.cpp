@@ -60,9 +60,9 @@ SunLightEntityBuilder EntityBuilder::asSunLight()
 	return {mRegistry, mEntity};
 }
 
-MeshEntityBuilder EntityBuilder::asMesh(std::string resourceName)
+MeshEntityBuilder EntityBuilder::asMesh(uint32_t resourceId)
 {
-	return {mRegistry, mEntity, std::move(resourceName)};
+	return {mRegistry, mEntity, resourceId};
 }
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
@@ -296,17 +296,23 @@ SunLightEntityBuilder& SunLightEntityBuilder::withCastShadows(bool castShadows)
 	return *this;
 }
 
-MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, std::string resourceName)
+MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, uint32_t resourceId)
 	: Base(registry, entity)
 {
-	with(Mesh{resourceName}).with<ecs::tags::IsRenderable>();
+	with(Mesh{resourceId}).with<ecs::tags::IsRenderable>();
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(float castShadows, float receiveShadows)
+MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
 {
 	auto& component = getComponent();
 	component.castShadows = castShadows;
 	component.receiveShadows = receiveShadows;
+	return *this;
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withDefaultMaterial(Entity materialEntity)
+{
+	getComponent().defaultMaterial = materialEntity;
 	return *this;
 }
 

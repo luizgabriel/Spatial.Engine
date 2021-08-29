@@ -6,10 +6,10 @@
 namespace spatial::render
 {
 
-class TransformSystem
+class TransformController
 {
   public:
-	explicit TransformSystem(filament::Engine& engine);
+	explicit TransformController(filament::Engine& engine);
 
 	void synchronize(ecs::Registry& registry) const;
 

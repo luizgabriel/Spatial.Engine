@@ -2,17 +2,17 @@
 #include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Resources.h>
-#include <spatial/render/SceneControllerSystem.h>
+#include <spatial/render/SceneController.h>
 
 namespace spatial::render
 {
 
-SceneControllerSystem::SceneControllerSystem(filament::Engine& engine, filament::Scene& scene)
+SceneController::SceneController(filament::Engine& engine, filament::Scene& scene)
 	: mEngine{engine}, mScene{scene}
 {
 }
 
-void SceneControllerSystem::synchronize(ecs::Registry& registry) const
+void SceneController::synchronize(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>);
 

@@ -9,10 +9,10 @@
 namespace spatial::render
 {
 
-class LightSystem
+class LightController
 {
   public:
-	explicit LightSystem(filament::Engine& engine);
+	explicit LightController(filament::Engine& engine);
 
 	void synchronize(ecs::Registry& registry) const;
 

@@ -11,7 +11,7 @@ namespace cereal
 template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::Mesh& mesh)
 {
-	ar(make_nvp("resourceName", mesh.resourceName));
+	ar(make_nvp("resourceId", mesh.resourceId));
 	ar(make_nvp("receiveShadows", mesh.receiveShadows));
 	ar(make_nvp("castShadows", mesh.castShadows));
 

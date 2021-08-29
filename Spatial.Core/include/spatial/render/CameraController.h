@@ -9,10 +9,10 @@
 namespace spatial::render
 {
 
-class CameraSystem
+class CameraController
 {
   public:
-	explicit CameraSystem(filament::Engine& engine);
+	explicit CameraController(filament::Engine& engine);
 
 	void synchronize(ecs::Registry& registry) const;
 

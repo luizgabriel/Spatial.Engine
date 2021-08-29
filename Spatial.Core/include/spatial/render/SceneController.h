@@ -7,10 +7,10 @@
 namespace spatial::render
 {
 
-class SceneControllerSystem
+class SceneController
 {
   public:
-	SceneControllerSystem(filament::Engine& engine, filament::Scene& scene);
+	SceneController(filament::Engine& engine, filament::Scene& scene);
 
 	void synchronize(ecs::Registry& registry) const;
 

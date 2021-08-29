@@ -10,7 +10,7 @@
 namespace spatial::render
 {
 
-class RenderableMeshSystem
+class MeshController
 {
   public:
 	struct MeshGeometry {
@@ -18,25 +18,25 @@ class RenderableMeshSystem
 		std::uint32_t count;
 	};
 
-	RenderableMeshSystem(filament::Engine& engine);
+	explicit MeshController(filament::Engine& engine);
 
 	void synchronize(ecs::Registry& registry);
 
-	void load(const HashedString& resourceName, const FilameshFile& filamesh);
+	void load(std::uint32_t resourceId, const FilameshFile& filamesh);
 
-	void unload(const HashedString& resourceName);
+	void unload(std::uint32_t resourceId);
 
   private:
 	filament::Engine& mEngine;
-	std::unordered_map<HashedString::hash_type, VertexBuffer> mVertexBuffers;
-	std::unordered_map<HashedString::hash_type, IndexBuffer> mIndexBuffers;
-	std::unordered_map<HashedString::hash_type, std::vector<MeshGeometry>> mMeshGeometries;
-	std::unordered_map<HashedString::hash_type, filament::Box> mBoundingBoxes;
+	std::unordered_map<std::uint32_t, VertexBuffer> mVertexBuffers;
+	std::unordered_map<std::uint32_t, IndexBuffer> mIndexBuffers;
+	std::unordered_map<std::uint32_t, std::vector<MeshGeometry>> mMeshGeometries;
+	std::unordered_map<std::uint32_t, filament::Box> mBoundingBoxes;
 
 	void createRenderableMeshes(ecs::Registry& registry) const;
 	void updateMeshGeometries(ecs::Registry& registry);
 	void updateMeshMaterials(ecs::Registry& registry) const;
-	bool hasMeshData(HashedString::hash_type resourceId) const;
+	bool hasMeshData(std::uint32_t resourceId) const;
 	void clearDeletedMeshes(ecs::Registry& registry);
 };
 

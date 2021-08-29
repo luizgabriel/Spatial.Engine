@@ -39,11 +39,11 @@ add_library(Spatial.Core
 	include/spatial/render/Light.h
 	include/spatial/render/Transform.h
 	include/spatial/render/Renderable.h
-	include/spatial/render/SceneControllerSystem.h
-	include/spatial/render/TransformSystem.h
-	include/spatial/render/LightSystem.h
-	include/spatial/render/CameraSystem.h
-	include/spatial/render/RenderableMeshSystem.h
+		include/spatial/render/SceneController.h
+		include/spatial/render/TransformController.h
+		include/spatial/render/LightController.h
+		include/spatial/render/CameraController.h
+		include/spatial/render/MeshController.h
 	include/spatial/render/TextureView.h
 	
 	include/spatial/serialization/Archives.h
@@ -83,11 +83,11 @@ add_library(Spatial.Core
 	src/render/Transform.cpp
 	src/render/Light.cpp
 	src/render/Renderable.cpp
-	src/render/TransformSystem.cpp
-	src/render/LightSystem.cpp
-	src/render/CameraSystem.cpp
-	src/render/RenderableMeshSystem.cpp
-	src/render/SceneControllerSystem.cpp
+		src/render/TransformController.cpp
+		src/render/LightController.cpp
+		src/render/CameraController.cpp
+		src/render/MeshController.cpp
+		src/render/SceneController.cpp
 	src/render/TextureView.cpp
 	
 	src/resources/Common.cpp
@@ -102,7 +102,7 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
-	PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility>)
+	PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits>)
 
 target_include_directories(Spatial.Core
 	PUBLIC
@@ -113,11 +113,10 @@ target_include_directories(Spatial.Core
 # LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.Core
 	PUBLIC
+	CONAN_PKG::boost
 	CONAN_PKG::entt
 	CONAN_PKG::filament
 	CONAN_PKG::spdlog
-	CONAN_PKG::boost_tti
-	CONAN_PKG::boost_locale
 	CONAN_PKG::stb
 	CONAN_PKG::glfw
 	CONAN_PKG::cereal)

@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-#include "EditorCameraScript.h"
+#include "EditorCameraController.h"
 #include <entt/entity/entity.hpp>
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
@@ -10,13 +10,13 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
 #include <spatial/ecs/EntityHandle.h>
-#include <spatial/render/CameraSystem.h>
-#include <spatial/render/LightSystem.h>
-#include <spatial/render/MaterialInstancesSystem.h>
-#include <spatial/render/RenderableMeshSystem.h>
-#include <spatial/render/SceneControllerSystem.h>
-#include <spatial/render/TransformSystem.h>
+#include <spatial/render/CameraController.h>
+#include <spatial/render/LightController.h>
+#include <spatial/render/MaterialController.h>
+#include <spatial/render/MeshController.h>
+#include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
+#include <spatial/render/TransformController.h>
 #include <spatial/resources/FilameshFile.h>
 
 #include <ghc/filesystem.hpp>
@@ -46,14 +46,14 @@ class SceneEditorSystem
 
 	ecs::Registry mRegistry;
 
-	EditorCameraScript mCameraEditorScript;
+	EditorCameraController mEditorCameraController;
 
-	render::SceneControllerSystem mSceneControllerSystem;
-	render::MaterialInstancesSystem mMaterialInstancesSystem;
-	render::TransformSystem mTransformSystem;
-	render::CameraSystem mCameraSystem;
-	render::LightSystem mLightSystem;
-	render::RenderableMeshSystem mRenderableMeshSystem;
+	render::SceneController mSceneController;
+	render::MaterialController mMaterialController;
+	render::TransformController mTransformController;
+	render::CameraController mCameraController;
+	render::LightController mLightController;
+	render::MeshController mMeshController;
 
   public:
 	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window,

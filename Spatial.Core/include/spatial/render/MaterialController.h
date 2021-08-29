@@ -7,10 +7,10 @@
 namespace spatial::render
 {
 
-class MaterialInstancesSystem
+class MaterialController
 {
   public:
-	MaterialInstancesSystem(filament::Engine& engine) : mEngine{engine}
+	MaterialController(filament::Engine& engine) : mEngine{engine}
 	{
 	}
 

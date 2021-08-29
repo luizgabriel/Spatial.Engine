@@ -1,20 +1,19 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/render/Entity.h>
+#include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/render/RenderableMeshSystem.h>
-#include <spatial/render/Resources.h>
 #include <spatial/render/ResourceLoaders.h>
+#include <spatial/render/Resources.h>
 
 namespace spatial::render
 {
 
-RenderableMeshSystem::RenderableMeshSystem(filament::Engine& engine) : mEngine{engine}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
+MeshController::MeshController(filament::Engine& engine) : mEngine{engine}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
 {
 }
 
-void RenderableMeshSystem::load(const HashedString& resourceName, const FilameshFile& filamesh)
+void MeshController::load(std::uint32_t resourceId, const FilameshFile& filamesh)
 {
-	auto resourceId = resourceName.value();
 	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh.header, filamesh.vertexData));
 	mIndexBuffers.emplace(resourceId, createIndexBuffer(mEngine, filamesh.header, filamesh.indexData));
 	mBoundingBoxes.emplace(resourceId, filamesh.header.aabb);
@@ -32,16 +31,15 @@ void RenderableMeshSystem::load(const HashedString& resourceName, const Filamesh
 	mMeshGeometries.emplace(resourceId, std::move(geometries));
 }
 
-void RenderableMeshSystem::unload(const HashedString& resourceName)
+void MeshController::unload(std::uint32_t resourceId)
 {
-	auto resourceId = resourceName.value();
 	mVertexBuffers.erase(resourceId);
 	mIndexBuffers.erase(resourceId);
 	mBoundingBoxes.erase(resourceId);
 	mMeshGeometries.erase(resourceId);
 }
 
-void RenderableMeshSystem::synchronize(ecs::Registry& registry)
+void MeshController::synchronize(ecs::Registry& registry)
 {
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
@@ -49,37 +47,27 @@ void RenderableMeshSystem::synchronize(ecs::Registry& registry)
 	clearDeletedMeshes(registry);
 }
 
-void RenderableMeshSystem::updateMeshMaterials(ecs::Registry& registry) const
+void MeshController::updateMeshMaterials(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Mesh, Renderable>();
 
 	for (auto entity : view)
 	{
 		const auto& data = registry.getComponent<const ecs::Mesh>(entity);
-		const auto resourceId = HashedString{data.resourceName.data()}.value();
 
-		if (!hasMeshData(resourceId))
+		if (!hasMeshData(data.resourceId))
 			continue;
 
 		auto& renderableMesh = registry.getComponent<Renderable>(entity);
 
-		renderableMesh.setCastShadows(data.castShadows);
-		renderableMesh.setReceiveShadows(data.receiveShadows);
 
-		const auto& parts = mMeshGeometries.at(resourceId);
-		for (auto i = 0; i < data.partsCount; i++)
-		{
-			auto materialEntity = data.materials[i];
-			if (registry.isValid(materialEntity) && registry.hasAllComponents<MaterialInstance>(materialEntity)) {
-				const auto& materialInstance = registry.getComponent<const MaterialInstance>(materialEntity);
-				renderableMesh.setMaterialInstanceAt(i, materialInstance.get());
-			}
-		}
+
+
 	}
 }
 
 
-void RenderableMeshSystem::createRenderableMeshes(ecs::Registry& registry) const
+void MeshController::createRenderableMeshes(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::Mesh>(ecs::ExcludeComponents<Renderable>);
 
@@ -92,42 +80,56 @@ void RenderableMeshSystem::createRenderableMeshes(ecs::Registry& registry) const
 	}
 }
 
-void RenderableMeshSystem::updateMeshGeometries(ecs::Registry& registry)
+void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<ecs::Mesh, Renderable>();
 
 	for (auto entity : view)
 	{
 		const auto& data = registry.getComponent<const ecs::Mesh>(entity);
-		const auto resourceId = HashedString{data.resourceName.data()}.value();
 
-		if (!hasMeshData(resourceId))
+		if (!hasMeshData(data.resourceId))
 			continue;
 
-		const auto& parts = mMeshGeometries.at(resourceId);
-		auto& vertexBuffer = mVertexBuffers.at(resourceId);
-		auto& indexBuffer = mIndexBuffers.at(resourceId);
-		auto& boundingBox = mBoundingBoxes.at(resourceId);
+		const auto& parts = mMeshGeometries.at(data.resourceId);
+		auto& vertexBuffer = mVertexBuffers.at(data.resourceId);
+		auto& indexBuffer = mIndexBuffers.at(data.resourceId);
+		auto& boundingBox = mBoundingBoxes.at(data.resourceId);
 
 		auto& renderableMesh = registry.getComponent<Renderable>(entity);
 
 		renderableMesh.setAxisAlignedBoundingBox(boundingBox);
+		renderableMesh.setCastShadows(data.castShadows);
+		renderableMesh.setReceiveShadows(data.receiveShadows);
+		renderableMesh.setCulling(data.culling);
 
 		for (auto i = 0; i < data.partsCount; i++)
 		{
 			const auto& geometry = parts[data.partsOffset + i];
 			renderableMesh.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(),
 										 indexBuffer.get(), geometry.offset, geometry.count);
+
+			ecs::Entity materialEntity;
+			if (i > 31 || !registry.isValid(data.materials[i]))
+				materialEntity = data.defaultMaterial;
+			else
+				materialEntity = data.materials[i];
+
+			if (registry.hasAllComponents<MaterialInstance>(materialEntity)) {
+				const auto& materialInstance = registry.getComponent<const MaterialInstance>(materialEntity);
+				renderableMesh.setMaterialInstanceAt(i, materialInstance.get());
+			}
 		}
+
 	}
 }
 
-bool RenderableMeshSystem::hasMeshData(HashedString::hash_type resourceId) const
+bool MeshController::hasMeshData(HashedString::hash_type resourceId) const
 {
 	return mMeshGeometries.find(resourceId) != mMeshGeometries.end();
 }
 
-void RenderableMeshSystem::clearDeletedMeshes(ecs::Registry& registry)
+void MeshController::clearDeletedMeshes(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
 	registry.removeComponent<Renderable>(view.begin(), view.end());

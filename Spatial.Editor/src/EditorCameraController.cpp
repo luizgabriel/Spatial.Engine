@@ -1,4 +1,4 @@
-#include "EditorCameraScript.h"
+#include "EditorCameraController.h"
 #include "EditorCamera.h"
 #include "Tags.h"
 #include <spatial/ecs/Camera.h>
@@ -10,21 +10,37 @@ using namespace spatial::math;
 namespace spatial::editor
 {
 
-float3 EditorCameraScript::getInputAxis()
+float3 getInputAxis(const desktop::InputState& input)
 {
 	return {
-		mInputState.axis(Key::W, Key::S),
-		mInputState.axis(Key::D, Key::A),
-		mInputState.axis(Key::Space, Key::LShift),
+		input.axis(Key::W, Key::S),
+		input.axis(Key::D, Key::A),
+		input.axis(Key::Space, Key::LShift),
 	};
 }
 
-void EditorCameraScript::onUpdateFrame(float delta)
+void createCamera(ecs::Registry& registry)
 {
-	int count = 0;
+	ecs::build(registry)
+		.withName("Editor Camera")
+		.with(EditorCamera{.5f, 10.0f})
+		.with<tags::IsEditorEntity>()
+		.asTransform()
+		.withPosition({3.0f, 3.0f, 20.0f})
+		.asPerspectiveCamera()
+		.withFieldOfView(60.0)
+		.withAspectRatio(19.0 / 6.0);
+}
 
-	mRegistry.getEntities<ecs::Transform, EditorCamera>().each([&count, delta, this](auto& transform, auto& options) {
-		const auto keyboardDelta = delta * options.velocity * getInputAxis();
+void EditorCameraController::onUpdateFrame(ecs::Registry& registry, float delta)
+{
+	if (!registry.hasAnyEntity<EditorCamera>())
+		createCamera(registry);
+
+	const auto axis = getInputAxis(mInputState);
+
+	registry.getEntities<ecs::Transform, EditorCamera>().each([&](auto& transform, auto& options) {
+		const auto keyboardDelta = delta * options.velocity * axis;
 		const auto forward = math::forwardVector(transform.getMatrix());
 		const auto right = cross(forward, math::axisY);
 
@@ -53,56 +69,41 @@ void EditorCameraScript::onUpdateFrame(float delta)
 		{
 			const auto mouseRotation = mInputState.getMouseOffset() * math::pi * options.sensitivity * delta;
 			transform.rotation = math::float3{
-				std::clamp(transform.rotation.x + mouseRotation.y, -math::pi / 2.0f, math::pi / 2.0f), // clamp the pitch
+				std::clamp(transform.rotation.x + mouseRotation.y, -math::pi / 2.0f,
+						   math::pi / 2.0f), // clamp the pitch
 				transform.rotation.y + mouseRotation.x,
 				.0f // remove the roll
 			};
 		}
-
-		count++;
 	});
-
-	if (count == 0)
-		createCamera();
 }
 
-void EditorCameraScript::createCamera()
-{
-	ecs::build(mRegistry)
-		.withName("Editor Camera")
-		.with(EditorCamera{.5f, 10.0f})
-		.with<tags::IsEditorEntity>()
-		.asTransform()
-		.withPosition({3.0f, 3.0f, 20.0f})
-		.asPerspectiveCamera()
-		.withFieldOfView(60.0)
-		.withAspectRatio(19.0 / 6.0);
-}
-
-EditorCameraScript::EditorCameraScript(ecs::Registry& stage, const desktop::Window& window,
-									   const desktop::InputState& inputState)
-	: mRegistry{stage}, mWindow{window}, mInputState{inputState}
+EditorCameraController::EditorCameraController(const desktop::Window& window, const desktop::InputState& inputState)
+	: mWindow{window}, mInputState{inputState}
 {
 }
 
-void EditorCameraScript::onEditorViewResized(double aspectRatio)
+void EditorCameraController::onEditorViewResized(ecs::Registry& registry, double aspectRatio)
 {
-	mRegistry.getEntities<ecs::PerspectiveCamera, EditorCamera>().each(
+	registry.getEntities<ecs::PerspectiveCamera, EditorCamera>().each(
 		[=](auto& camera, auto&) { camera.aspectRatio = aspectRatio; });
 
-	mRegistry.getEntities<ecs::OrthographicCamera, EditorCamera>().each([=](auto& camera, auto&) {
+	registry.getEntities<ecs::OrthographicCamera, EditorCamera>().each([=](auto& camera, auto&) {
 		camera.left = -aspectRatio;
 		camera.right = aspectRatio;
 	});
 }
 
-void EditorCameraScript::toggleControl()
+void EditorCameraController::toggleControl(ecs::Registry& registry)
 {
-	mRegistry.getEntities<EditorCamera>().each([](auto& options) {
-		if (options.enabled) {
+	registry.getEntities<EditorCamera>().each([](auto& options) {
+		if (options.enabled)
+		{
 			options.justStarted = 0;
 			options.enabled = false;
-		} else {
+		}
+		else
+		{
 			options.startPressed = true;
 		}
 	});

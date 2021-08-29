@@ -1,6 +1,6 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/Light.h>
-#include <spatial/render/LightSystem.h>
+#include <spatial/render/LightController.h>
 #include <spatial/render/Transform.h>
 
 #include <spatial/ecs/Light.h>
@@ -8,18 +8,18 @@
 namespace spatial::render
 {
 
-LightSystem::LightSystem(filament::Engine& engine) : mEngine{engine}
+LightController::LightController(filament::Engine& engine) : mEngine{engine}
 {
 }
 
-void LightSystem::update(const ecs::PointLight& data, Light& light) const
+void LightController::update(const ecs::PointLight& data, Light& light) const
 {
 	light.setFalloff(data.falloff);
 	light.setIntensity(data.intensity);
 	light.setColor(data.color);
 }
 
-void LightSystem::update(const ecs::DirectionalLight& data, Light& light) const
+void LightController::update(const ecs::DirectionalLight& data, Light& light) const
 {
 	light.setIntensity(data.intensity);
 	light.setDirection(data.direction);
@@ -27,7 +27,7 @@ void LightSystem::update(const ecs::DirectionalLight& data, Light& light) const
 	light.setShadowCaster(data.castShadows);
 }
 
-void LightSystem::update(const ecs::SunLight& data, Light& light) const
+void LightController::update(const ecs::SunLight& data, Light& light) const
 {
 	light.setSunHaloFalloff(data.haloFalloff);
 	light.setSunHaloSize(data.haloSize);
@@ -36,7 +36,7 @@ void LightSystem::update(const ecs::SunLight& data, Light& light) const
 	light.setColor(data.color);
 }
 
-void LightSystem::update(const ecs::SpotLight& data, Light& light) const
+void LightController::update(const ecs::SpotLight& data, Light& light) const
 {
 	light.setFalloff(data.falloff);
 	light.setDirection(data.direction);
@@ -45,7 +45,7 @@ void LightSystem::update(const ecs::SpotLight& data, Light& light) const
 	light.setSpotLightCone(data.innerAngle, data.outerAngle);
 }
 
-void LightSystem::synchronize(ecs::Registry& registry) const
+void LightController::synchronize(ecs::Registry& registry) const
 {
 	createLights<ecs::DirectionalLight, Light::Type::DIRECTIONAL>(registry);
 	updateLights<ecs::DirectionalLight>(registry);

@@ -3,8 +3,8 @@ add_subdirectory(assets)
 add_executable(Spatial.Editor
 	src/main.cpp
 	src/SceneEditorSystem.cpp
-	src/EditorCameraScript.h
-	src/EditorCameraScript.cpp
+		src/EditorCameraController.h
+		src/EditorCameraController.cpp
 	src/EditorCamera.h
 	src/DefaultMaterial.h
 	src/DefaultMaterial.cpp

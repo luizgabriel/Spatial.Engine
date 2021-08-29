@@ -28,7 +28,7 @@ ui::NewSceneModal::NewSceneModal() : mModal{"New Scene"}
 
 bool ui::NewSceneModal::onConfirm()
 {
-	return mIsConfirmed;
+	return mModal.isOpen() && mIsConfirmed;
 }
 
 }

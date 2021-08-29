@@ -18,12 +18,11 @@
 #include <spatial/ui/components/DockSpace.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
-#include <spatial/ui/components/PopupModal.h>
-#include <spatial/ui/components/PropertiesPanel.h>
-#include <spatial/ui/components/Window.h>
 #include <spatial/ui/components/NewSceneModal.h>
 #include <spatial/ui/components/OpenSceneModal.h>
+#include <spatial/ui/components/PropertiesPanel.h>
 #include <spatial/ui/components/SaveSceneModal.h>
+#include <spatial/ui/components/Window.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
@@ -33,7 +32,6 @@
 #include "Tags.h"
 
 #include <fstream>
-
 
 namespace fl = filament;
 namespace fs = ghc::filesystem;
@@ -67,24 +65,24 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mRegistry{},
 
-	  mCameraEditorScript{mRegistry, mWindow, mInputState},
+	  mEditorCameraController{mWindow, mInputState},
 
-	  mSceneControllerSystem{mEngine, mEditorScene.ref()},
-	  mMaterialInstancesSystem{mEngine},
-	  mTransformSystem{mEngine},
-	  mCameraSystem{mEngine},
-	  mLightSystem{mEngine},
-	  mRenderableMeshSystem{mEngine}
+	  mSceneController{mEngine, mEditorScene.ref()},
+	  mMaterialController{mEngine},
+	  mTransformController{mEngine},
+	  mCameraController{mEngine},
+	  mLightController{mEngine},
+	  mMeshController{mEngine}
 
 {
-	mRenderableMeshSystem.load("editor://meshes/cube",
-							   fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
-	mRenderableMeshSystem.load("editor://meshes/sphere",
-							   fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
-	mRenderableMeshSystem.load("editor://meshes/plane",
-							   fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
-	mRenderableMeshSystem.load("editor://meshes/cylinder",
-							   fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/cube"_hs,
+						 fromEmbed<FilameshFile>(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/sphere"_hs,
+						 fromEmbed<FilameshFile>(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/plane"_hs,
+						 fromEmbed<FilameshFile>(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/cylinder"_hs,
+						 fromEmbed<FilameshFile>(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 
 	createDefaultScene(mRegistry);
 }
@@ -100,68 +98,57 @@ ecs::Entity createDefaultScene(ecs::Registry& registry)
 {
 	ecs::build(registry).withName("Main Light").asDirectionalLight().withDirection({.34f, -.66f, -.67f});
 
-	{
-		auto m1 = ecs::build(registry).withName("Red Material").asMaterial(DefaultMaterial{float3{.4f, 0.1f, 0.1f}});
+	auto m1 = ecs::build(registry).withName("Red Material").asMaterial(DefaultMaterial{float3{.4f, 0.1f, 0.1f}});
+	auto m2 = ecs::build(registry).withName("White Material").asMaterial(DefaultMaterial{float3{.8f, .8f, .8f}});
+	auto m3 = ecs::build(registry).withName("Green Material").asMaterial(DefaultMaterial{float3{.1f, 0.4f, 0.1f}});
+	auto m4 = ecs::build(registry).withName("Blue Material").asMaterial(DefaultMaterial{float3{.1f, 0.1f, 0.4}});
 
-		ecs::build(registry)
-			.withName("Cube")
-			.asTransform()
-			.withPosition({.0f})
-			.asMesh("editor://meshes/cube")
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, m1);
-	}
+	ecs::build(registry)
+		.withName("Cube")
+		.asTransform()
+		.withPosition({.0f})
+		.asMesh("editor://meshes/cube"_hs)
+		.withShadowOptions(true, true)
+		.withMaterialAt(0, m1);
 
-	{
-		auto m2 = ecs::build(registry).withName("White Material").asMaterial(DefaultMaterial{float3{.8f, .8f, .8f}});
+	ecs::build(registry)
+		.withName("Plane")
+		.asTransform()
+		.withPosition({3.0f, -1.0f, .0f})
+		.withScale({10.0f})
+		.asMesh("editor://meshes/plane"_hs)
+		.withShadowOptions(false, true)
+		.withMaterialAt(0, m2);
 
-		ecs::build(registry)
-			.withName("Plane")
-			.asTransform()
-			.withPosition({3.0f, -1.0f, .0f})
-			.withScale({10.0f})
-			.asMesh("editor://meshes/plane")
-			.withShadowOptions(false, true)
-			.withMaterialAt(0, m2);
-	}
+	ecs::build(registry)
+		.withName("Cylinder")
+		.asTransform()
+		.withPosition({6.0f, .0f, .0f})
+		.asMesh("editor://meshes/cylinder"_hs)
+		.withShadowOptions(true, true)
+		.withMaterialAt(0, m3);
 
-	{
-		auto m3 = ecs::build(registry).withName("Green Material").asMaterial(DefaultMaterial{float3{.1f, 0.4f, 0.1f}});
-
-		ecs::build(registry)
-			.withName("Cylinder")
-			.asTransform()
-			.withPosition({6.0f, .0f, .0f})
-			.asMesh("editor://meshes/cylinder")
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, m3);
-	}
-
-	{
-		auto m4 = ecs::build(registry).withName("Blue Material").asMaterial(DefaultMaterial{float3{.1f, 0.1f, 0.4}});
-
-		return ecs::build(registry)
-			.withName("Sphere")
-			.asTransform()
-			.withPosition({3.0f, .0f, .0f})
-			.asMesh("editor://meshes/sphere")
-			.withShadowOptions(true, true)
-			.withMaterialAt(0, m4);
-	}
+	return ecs::build(registry)
+		.withName("Sphere")
+		.asTransform()
+		.withPosition({3.0f, .0f, .0f})
+		.asMesh("editor://meshes/sphere"_hs)
+		.withShadowOptions(true, true)
+		.withMaterialAt(0, m4);
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
-	mCameraEditorScript.onUpdateFrame(delta);
+	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	mSceneControllerSystem.synchronize(mRegistry);
-	mTransformSystem.synchronize(mRegistry);
-	mCameraSystem.synchronize(mRegistry);
-	mLightSystem.synchronize(mRegistry);
-	mRenderableMeshSystem.synchronize(mRegistry);
+	mSceneController.synchronize(mRegistry);
+	mTransformController.synchronize(mRegistry);
+	mCameraController.synchronize(mRegistry);
+	mLightController.synchronize(mRegistry);
+	mMeshController.synchronize(mRegistry);
 
-	mMaterialInstancesSystem.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-	mMaterialInstancesSystem.clearRemovedMaterials<DefaultMaterial>(mRegistry);
+	mMaterialController.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
+	mMaterialController.clearRemovedMaterials<DefaultMaterial>(mRegistry);
 
 	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
 	if (mRegistry.isValid(cameraEntity))
@@ -209,7 +196,7 @@ void SceneEditorSystem::onDrawGui()
 		onSceneWindowResized(window.getSize());
 
 		if (ImGui::IsItemClicked())
-			mCameraEditorScript.toggleControl();
+			mEditorCameraController.toggleControl(mRegistry);
 	}
 
 	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
@@ -229,7 +216,7 @@ void SceneEditorSystem::onDrawGui()
 	if (menuPopup.data())
 		ImGui::OpenPopup(menuPopup.data());
 
-	static std::string scenePath{"scene.xml"};
+	static std::string scenePath{"scenes/scene.xml"};
 	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -280,7 +267,7 @@ void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 {
 	auto width = static_cast<double>(size.x);
 	auto height = static_cast<double>(size.y);
-	mCameraEditorScript.onEditorViewResized(width / height);
+	mEditorCameraController.onEditorViewResized(mRegistry, width / height);
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const

@@ -66,9 +66,7 @@ conan_basic_setup()
         cmake.install()
 
     def package_info(self):
-        lib_dir = "lib/" + str(self.settings.arch)
-
-        self.cpp_info.libdirs = [lib_dir]
+        self.cpp_info.libdirs = ["lib/x86_64", "lib/arm64"]
         self.cpp_info.libs = [
             "backend", "filaflat", "geometry", "matdbg",
             "bluegl", "filamat", "gltfio", "meshoptimizer",

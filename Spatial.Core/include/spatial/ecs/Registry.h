@@ -36,6 +36,12 @@ class Registry
 	}
 
 	template <typename Component>
+	bool hasAnyEntity()
+	{
+		return isValid(getFirstEntity<Component>());
+	}
+
+	template <typename Component>
 	auto getOnConstructSignal()
 	{
 		return mRegistry.on_construct<Component>();
@@ -139,13 +145,13 @@ class Registry
 	template <typename Component, typename... Args>
 	Component& getOrAddComponent(Entity entity, Args&&... args)
 	{
-		return mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
+		return isValid(entity) && mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename... Component>
 	bool hasAllComponents(Entity entity) const
 	{
-		return mRegistry.all_of<Component...>(entity);
+		return isValid(entity) && mRegistry.all_of<Component...>(entity);
 	}
 
 	template <typename... Component>

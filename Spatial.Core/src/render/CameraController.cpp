@@ -1,16 +1,16 @@
 #include <spatial/ecs/Camera.h>
 #include <spatial/render/Camera.h>
-#include <spatial/render/CameraSystem.h>
+#include <spatial/render/CameraController.h>
 #include <spatial/render/Entity.h>
 
 namespace spatial::render
 {
 
-CameraSystem::CameraSystem(filament::Engine& engine) : mEngine{engine}
+CameraController::CameraController(filament::Engine& engine) : mEngine{engine}
 {
 }
 
-void CameraSystem::synchronize(ecs::Registry& registry) const
+void CameraController::synchronize(ecs::Registry& registry) const
 {
 	createCameras<ecs::OrthographicCamera>(registry);
 	updateCameras<ecs::OrthographicCamera>(registry);
@@ -24,17 +24,17 @@ void CameraSystem::synchronize(ecs::Registry& registry) const
 	clearRemovedCameras<ecs::OrthographicCamera, ecs::CustomCamera, ecs::PerspectiveCamera>(registry);
 }
 
-void CameraSystem::update(const ecs::PerspectiveCamera& data, Camera& camera) const
+void CameraController::update(const ecs::PerspectiveCamera& data, Camera& camera) const
 {
 	camera.setPerspectiveProjection(data.fieldOfView, data.aspectRatio, data.near, data.far);
 }
 
-void CameraSystem::update(const ecs::OrthographicCamera& data, Camera& camera) const
+void CameraController::update(const ecs::OrthographicCamera& data, Camera& camera) const
 {
 	camera.setOrtographicProjection(data.left, data.right, data.bottom, data.top, data.near, data.far);
 }
 
-void CameraSystem::update(const ecs::CustomCamera& data, Camera& camera) const
+void CameraController::update(const ecs::CustomCamera& data, Camera& camera) const
 {
 	camera.setCustomProjection(data.projectionMatrix, data.near, data.far);
 }

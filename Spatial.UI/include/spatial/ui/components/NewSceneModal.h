@@ -13,7 +13,7 @@ class NewSceneModal
 
   private:
 	PopupModal mModal;
-	bool mIsConfirmed;
+	bool mIsConfirmed{false};
 };
 
 }

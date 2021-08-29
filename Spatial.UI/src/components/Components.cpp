@@ -548,7 +548,7 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
 
-	inputText("Resource", mesh.resourceName);
+	ImGui::Text("Resource ID: %02X", mesh.resourceId);
 
 	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
 	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
