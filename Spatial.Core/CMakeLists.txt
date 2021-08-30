@@ -40,11 +40,11 @@ add_library(Spatial.Core
 	include/spatial/render/Light.h
 	include/spatial/render/Transform.h
 	include/spatial/render/Renderable.h
-		include/spatial/render/SceneController.h
-		include/spatial/render/TransformController.h
-		include/spatial/render/LightController.h
-		include/spatial/render/CameraController.h
-		include/spatial/render/MeshController.h
+	include/spatial/render/SceneController.h
+	include/spatial/render/TransformController.h
+	include/spatial/render/LightController.h
+	include/spatial/render/CameraController.h
+	include/spatial/render/MeshController.h
 	include/spatial/render/TextureView.h
 	
 	include/spatial/serialization/Archives.h
@@ -84,11 +84,11 @@ add_library(Spatial.Core
 	src/render/Transform.cpp
 	src/render/Light.cpp
 	src/render/Renderable.cpp
-		src/render/TransformController.cpp
-		src/render/LightController.cpp
-		src/render/CameraController.cpp
-		src/render/MeshController.cpp
-		src/render/SceneController.cpp
+	src/render/TransformController.cpp
+	src/render/LightController.cpp
+	src/render/CameraController.cpp
+	src/render/MeshController.cpp
+	src/render/SceneController.cpp
 	src/render/TextureView.cpp
 	
 	src/resources/Common.cpp

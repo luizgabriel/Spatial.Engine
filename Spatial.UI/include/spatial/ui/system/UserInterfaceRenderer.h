@@ -55,12 +55,12 @@ class UserInterfaceRenderer
 	 * \brief Should be called every frame start
 	 * @param delta The delta time in seconds
 	 */
-	void beforeRender(float delta) const;
+	void initNewFrame(float delta);
 
 	/**
 	 * \brief Dispatches render commands. Should be called every frame, before the render
 	 */
-	void dispatchCommands();
+	void drawFrame();
 
 	// region Getters
 	const auto& getView() const

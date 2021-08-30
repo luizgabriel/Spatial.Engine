@@ -34,8 +34,6 @@ class UserInterfaceSystem
 
 	void onStart();
 
-	void onStartFrame(float delta);
-
 	void onUpdateFrame(float delta);
 
 	void onRender(filament::Renderer& renderer) const;

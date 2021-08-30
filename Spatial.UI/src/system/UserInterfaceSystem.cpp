@@ -48,15 +48,11 @@ void UserInterfaceSystem::setViewport(const math::int2& windowSize, const math::
 	mRenderer.setViewport(windowSize, frameBufferSize);
 }
 
-void UserInterfaceSystem::onStartFrame(float delta)
+void UserInterfaceSystem::onUpdateFrame(float delta)
 {
-	mRenderer.beforeRender(delta);
-}
-
-void UserInterfaceSystem::onUpdateFrame(float)
-{
+	mRenderer.initNewFrame(delta);
 	mRenderGuiSignal();
-	mRenderer.dispatchCommands();
+	mRenderer.drawFrame();
 }
 
 void UserInterfaceSystem::onRender(filament::Renderer& renderer) const

@@ -154,15 +154,17 @@ void UserInterfaceRenderer::setViewport(const math::float2& windowSize, const ma
 	ui::imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);
 }
 
-void UserInterfaceRenderer::beforeRender(float delta) const
+void UserInterfaceRenderer::initNewFrame(float delta)
 {
 	ImGui::SetCurrentContext(mImguiContext);
 	ui::imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();
 }
 
-void UserInterfaceRenderer::dispatchCommands()
+void UserInterfaceRenderer::drawFrame()
 {
+	ImGui::SetCurrentContext(mImguiContext);
+
 	// Avoid rendering when minimized and scale coordinates for retina displays.
 	if (ui::imguiIsMinimized())
 		return;
@@ -172,6 +174,9 @@ void UserInterfaceRenderer::dispatchCommands()
 	renderDrawData();
 }
 
+/**
+ * TODO: Refactor to Entity-Component-System API Calls (Instead of direct render commands)
+ */
 void UserInterfaceRenderer::renderDrawData()
 {
 	auto imguiData = ImGui::GetDrawData();

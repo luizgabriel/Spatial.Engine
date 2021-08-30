@@ -29,8 +29,8 @@ class InputSystem
 	}
 
   private:
-	InputState mInputState;
 	const Window& mWindow;
+	InputState mInputState;
 
 	Signal<const InputState&> mOnChangeStateSignal;
 };

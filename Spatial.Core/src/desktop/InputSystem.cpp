@@ -3,7 +3,7 @@
 namespace spatial::desktop
 {
 
-InputSystem::InputSystem(const Window& window) : mInputState{}, mWindow{window}
+InputSystem::InputSystem(const Window& window) : mWindow{window}, mInputState{}
 {
 }
 
@@ -28,4 +28,4 @@ void InputSystem::onEvent(const KeyEvent& event)
 	mInputState.set(key, event.action);
 }
 
-} // namespace spatial
+} // namespace spatial::desktop
