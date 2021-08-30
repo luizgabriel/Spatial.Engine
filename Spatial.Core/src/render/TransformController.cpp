@@ -12,7 +12,7 @@ TransformController::TransformController(filament::Engine& engine)
 {
 }
 
-void TransformController::synchronize(ecs::Registry& registry) const
+void TransformController::onUpdateFrame(ecs::Registry& registry) const
 {
 	createTransforms(registry);
 	updateTransformsParents(registry);

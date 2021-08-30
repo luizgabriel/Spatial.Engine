@@ -11,7 +11,7 @@ class TransformController
   public:
 	explicit TransformController(filament::Engine& engine);
 
-	void synchronize(ecs::Registry& registry) const;
+	void onUpdateFrame(ecs::Registry& registry) const;
 
   private:
 	filament::Engine& mEngine;

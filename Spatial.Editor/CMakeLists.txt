@@ -9,7 +9,7 @@ add_executable(Spatial.Editor
 	src/DefaultMaterial.h
 	src/DefaultMaterial.cpp
 	src/Serialization.h
-)
+        src/CustomComponents.h src/CustomComponents.cpp)
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
 target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)

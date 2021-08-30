@@ -12,7 +12,7 @@ class SceneController
   public:
 	SceneController(filament::Engine& engine, filament::Scene& scene);
 
-	void synchronize(ecs::Registry& registry) const;
+	void onUpdateFrame(ecs::Registry& registry) const;
 
   private:
 	filament::Engine& mEngine;

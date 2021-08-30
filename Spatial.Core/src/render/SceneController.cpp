@@ -12,7 +12,7 @@ SceneController::SceneController(filament::Engine& engine, filament::Scene& scen
 {
 }
 
-void SceneController::synchronize(ecs::Registry& registry) const
+void SceneController::onUpdateFrame(ecs::Registry& registry) const
 {
 	auto view = registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>);
 

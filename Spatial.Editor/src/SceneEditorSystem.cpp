@@ -26,12 +26,14 @@
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
+#include "CustomComponents.h"
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include "Serialization.h"
 #include "Tags.h"
 
 #include <fstream>
+#include <spatial/ui/components/ComponentCollapse.h>
 
 namespace fl = filament;
 namespace fs = ghc::filesystem;
@@ -141,14 +143,12 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	mSceneController.synchronize(mRegistry);
-	mTransformController.synchronize(mRegistry);
-	mCameraController.synchronize(mRegistry);
-	mLightController.synchronize(mRegistry);
-	mMeshController.synchronize(mRegistry);
-
-	mMaterialController.synchronize<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-	mMaterialController.clearRemovedMaterials<DefaultMaterial>(mRegistry);
+	mSceneController.onUpdateFrame(mRegistry);
+	mTransformController.onUpdateFrame(mRegistry);
+	mCameraController.onUpdateFrame(mRegistry);
+	mLightController.onUpdateFrame(mRegistry);
+	mMeshController.onUpdateFrame(mRegistry);
+	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
 
 	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
 	if (mRegistry.isValid(cameraEntity))
@@ -208,8 +208,12 @@ void SceneEditorSystem::onDrawGui()
 		auto panel = ui::PropertiesPanel{mRegistry, mSelectedEntity};
 		if (mRegistry.isValid(mSelectedEntity))
 		{
-			ui::collapseComponentInput<EditorCamera>("Editor Camera", mRegistry, mSelectedEntity);
-			ui::collapseComponentInput<DefaultMaterial>("Default Material", mRegistry, mSelectedEntity);
+			auto collapse = ui::ComponentCollapse{mRegistry, mSelectedEntity};
+			if (collapse.hasComponentAndIsOpen<EditorCamera>("Editor Camera"))
+				ui::editorCameraComponent(mRegistry, mSelectedEntity);
+
+			if (collapse.hasComponentAndIsOpen<DefaultMaterial>("Default Material"))
+				ui::defaultMaterialComponent(mRegistry, mSelectedEntity);
 		}
 	}
 

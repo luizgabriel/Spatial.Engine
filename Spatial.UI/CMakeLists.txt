@@ -17,7 +17,8 @@ add_library(Spatial.UI
 	include/spatial/ui/components/PopupModal.h
 	include/spatial/ui/components/NewSceneModal.h
 	include/spatial/ui/components/OpenSceneModal.h
-	
+	include/spatial/ui/components/ComponentCollapse.h
+
 	include/spatial/ui/components/styles/BorderlessWindowStyle.h
 	include/spatial/ui/components/styles/WindowPaddingStyle.h
 	

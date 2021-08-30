@@ -61,7 +61,7 @@ void UserInterfaceSystem::onUpdateFrame(float)
 
 void UserInterfaceSystem::onRender(filament::Renderer& renderer) const
 {
-	renderer.render(&getView());
+	renderer.render(&mRenderer.getView());
 }
 
 } // namespace spatial

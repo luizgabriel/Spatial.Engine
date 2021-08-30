@@ -114,21 +114,6 @@ void EditorCameraController::toggleControl(ecs::Registry& registry)
 namespace spatial::ui
 {
 
-template <>
-void componentInput<editor::EditorCamera>(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& data = registry.getComponent<editor::EditorCamera>(entity);
 
-	ImGui::DragFloat("Velocity", &data.velocity);
-	ImGui::DragFloat("Sensitivity", &data.sensitivity);
-
-	data.startPressed = ImGui::Button("Free Camera Control");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::Text("Left Ctrl + Left Mouse Click");
-		ImGui::EndTooltip();
-	}
-}
 
 } // namespace spatial::ui

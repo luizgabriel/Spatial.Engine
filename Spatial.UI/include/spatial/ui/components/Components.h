@@ -33,6 +33,8 @@ bool vec3Input(const std::string_view label, math::float3& v, float resetValue =
 bool vec4Input(const std::string_view label, math::float4& v, float resetValue = .0f, float speed = .1f,
 			   float min = .0f, float max = .0f, const std::string_view format = "%.2f");
 
+void spacing(std::uint32_t times = 1);
+
 template <typename Component>
 void componentInput(ecs::Registry& registry, ecs::Entity entity);
 
@@ -69,21 +71,6 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 		}
 
 		ImGui::EndCombo();
-	}
-}
-
-template <typename Component>
-void collapseComponentInput(const std::string_view name, ecs::Registry& registry, ecs::Entity entity)
-{
-	if (registry.hasAllComponents<Component>(entity))
-	{
-		auto collapse = Collapse{name};
-
-		if (registry.hasAllComponents<Component>(entity) && collapse.isOpen())
-			componentInput<Component>(registry, entity);
-
-		if (collapse.onClose())
-			registry.removeComponent<Component>(entity);
 	}
 }
 

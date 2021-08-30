@@ -48,11 +48,6 @@ class UserInterfaceSystem
 
 	void onEvent(const TextEvent& event);
 
-	const auto& getView() const
-	{
-		return mRenderer.getView();
-	}
-
 	auto& getDrawGuiSignal()
 	{
 		return mRenderGuiSignal;

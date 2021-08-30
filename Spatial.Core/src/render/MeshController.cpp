@@ -39,7 +39,7 @@ void MeshController::unload(std::uint32_t resourceId)
 	mMeshGeometries.erase(resourceId);
 }
 
-void MeshController::synchronize(ecs::Registry& registry)
+void MeshController::onUpdateFrame(ecs::Registry& registry)
 {
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);

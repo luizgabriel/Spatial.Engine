@@ -167,6 +167,14 @@ bool vec4Input(const std::string_view label, math::float4& v, float resetValue, 
 	return changed;
 }
 
+void spacing(std::uint32_t times)
+{
+	for (std::uint32_t i = 0; i < times; i++)
+	{
+		ImGui::Spacing();
+	}
+}
+
 int inputTextCallback(ImGuiInputTextCallbackData* data)
 {
 	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
@@ -547,37 +555,52 @@ template <>
 void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
+	const auto& colors = ImGui::GetStyle().Colors;
 
-	ImGui::Text("Resource ID: %02X", mesh.resourceId);
+	ImGui::Text("Resource ID: ");
+	ImGui::SameLine();
+	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "0x%02X", mesh.resourceId);
+
+	spacing(3);
+
+	ImGui::Separator();
+
+	spacing(3);
 
 	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
 	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
-	ImGui::Text("Parts Count: %lu", mesh.partsCount);
-	ImGui::Text("Parts Offset: %lu", mesh.partsOffset);
 
-	ImGui::Spacing();
-	ImGui::Spacing();
-	ImGui::Spacing();
+	spacing(3);
 
-	ImGui::Spacing();
+	ImGui::Separator();
 
-	if (ImGui::BeginTable("Materials", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
+	spacing(3);
+
+	ImGui::Text("Parts Count: ");
+	ImGui::SameLine();
+	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "%lu",  mesh.partsCount);
+
+	ImGui::Text("Parts Offset: ");
+	ImGui::SameLine();
+	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "%lu",  mesh.partsOffset);
+
+	spacing(3);
+
+	if (ImGui::BeginTable("Materials", 2,
+						  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchSame))
 	{
 		ImGui::TableSetupColumn("Geometry Index");
 		ImGui::TableSetupColumn("Material");
 		ImGui::TableHeadersRow();
 
-		for (std::uint8_t i = 0; i < mesh.partsCount; i++)
+		for (std::size_t i = 0; i < mesh.partsCount; i++)
 		{
-			ImGui::TableNextRow();
-
 			auto& material = mesh.materials[i];
 
 			ImGui::TableNextColumn();
-			ImGui::Text("Index: %u", i);
+			ImGui::Text("Index: %lu", i);
 
 			ImGui::TableNextColumn();
-
 			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 			selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, material);
 		}
@@ -592,7 +615,11 @@ void componentInput<ecs::Transform>(ecs::Registry& registry, ecs::Entity entity)
 	auto& transform = registry.getComponent<ecs::Transform>(entity);
 
 	vec3Input("Position", transform.position);
-	vec3Input("Rotation", transform.rotation);
+
+	auto eulerAnglesRotation = math::rad2deg * transform.rotation;
+	vec3Input("Rotation", eulerAnglesRotation);
+	transform.rotation = math::deg2rad * eulerAnglesRotation;
+
 	vec3Input("Scale", transform.scale);
 }
 

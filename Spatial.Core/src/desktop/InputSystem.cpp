@@ -12,6 +12,11 @@ void InputSystem::onStartFrame(float)
 	mInputState.setMousePosition(mWindow.getMousePosition());
 }
 
+void InputSystem::onUpdateFrame(float)
+{
+	mOnChangeStateSignal.trigger(mInputState);
+}
+
 void InputSystem::onEndFrame()
 {
 	mInputState.reset();

@@ -10,7 +10,7 @@ CameraController::CameraController(filament::Engine& engine) : mEngine{engine}
 {
 }
 
-void CameraController::synchronize(ecs::Registry& registry) const
+void CameraController::onUpdateFrame(ecs::Registry& registry) const
 {
 	createCameras<ecs::OrthographicCamera>(registry);
 	updateCameras<ecs::OrthographicCamera>(registry);

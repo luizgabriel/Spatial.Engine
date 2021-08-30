@@ -10,12 +10,14 @@ namespace spatial::desktop
 class InputSystem
 {
   public:
-	InputSystem(const Window& window);
+	explicit InputSystem(const Window& window);
 
 	InputSystem(const InputSystem& other) = delete;
 	InputSystem& operator=(const InputSystem& w) = delete;
 
 	void onStartFrame(float delta);
+
+	void onUpdateFrame(float delta);
 
 	void onEndFrame();
 
@@ -26,9 +28,16 @@ class InputSystem
 		return mInputState;
 	}
 
+	auto& getOnChangeStateSignal()
+	{
+		return mOnChangeStateSignal;
+	}
+
   private:
 	InputState mInputState;
 	const Window& mWindow;
+
+	Signal<const InputState&> mOnChangeStateSignal;
 };
 
 } // namespace spatial

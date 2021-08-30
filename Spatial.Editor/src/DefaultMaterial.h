@@ -8,7 +8,7 @@ namespace spatial::editor
 
 struct DefaultMaterial
 {
-	math::float3 baseColor;
+	math::float3 baseColor{1.0f};
 	float metallic{.8f};
 	float roughness{0.8f};
 	float reflectance{.1f};

@@ -20,7 +20,7 @@ class MeshController
 
 	explicit MeshController(filament::Engine& engine);
 
-	void synchronize(ecs::Registry& registry);
+	void onUpdateFrame(ecs::Registry& registry);
 
 	void load(std::uint32_t resourceId, const FilameshFile& filamesh);
 
