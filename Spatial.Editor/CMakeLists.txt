@@ -1,9 +1,9 @@
 add_subdirectory(assets)
 
-set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
-set_source_files_properties(${SPATIAL_EDITOR_MACOS_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+# set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
+# set_source_files_properties(${SPATIAL_EDITOR_MACOS_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-add_executable(Spatial.Editor WIN32 MACOSX_BUNDLE
+add_executable(Spatial.Editor
         src/main.cpp
         src/SceneEditorSystem.cpp
         src/EditorCameraController.h
@@ -18,7 +18,7 @@ add_executable(Spatial.Editor WIN32 MACOSX_BUNDLE
         src/EditorSettings.h
         ${SPATIAL_EDITOR_MACOS_ICON})
 
-set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
+# set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
