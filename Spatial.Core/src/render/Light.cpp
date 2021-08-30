@@ -14,20 +14,20 @@ Light::Light(filament::Engine& engine, utils::Entity entity, Light::Type type)
 	}
 }
 
-Light::Light(Light&& other) : mManager{other.mManager}, mEntity{std::exchange(other.mEntity, {})}
+Light::Light(Light&& other) noexcept : mManager{other.mManager}, mEntity{other.release()}
 {
 }
 
-Light& Light::operator=(Light&& other)
+Light& Light::operator=(Light&& other) noexcept
 {
-	mEntity = std::exchange(other.mEntity, {});
+	reset();
+	mEntity = other.release();
 	return *this;
 }
 
 Light::~Light()
 {
-	if (isValid())
-		mManager.destroy(mEntity);
+	reset();
 }
 
 bool Light::isValid() const noexcept
@@ -168,6 +168,19 @@ bool Light::isShadowCaster() const noexcept
 Light::Instance Light::getInstance() const noexcept
 {
 	return mManager.getInstance(mEntity);
+}
+
+utils::Entity Light::release() noexcept
+{
+	return std::exchange(mEntity, {});
+}
+
+void Light::reset() noexcept
+{
+	if (isValid())
+		mManager.destroy(mEntity);
+
+	mEntity = utils::Entity{};
 }
 
 } // namespace spatial::render

@@ -22,28 +22,28 @@ class Light
 	Light(const Light& other) = delete;
 	Light& operator=(const Light& other) = delete;
 
-	Light(Light&& other);
-	Light& operator=(Light&& other);
+	Light(Light&& other) noexcept;
+	Light& operator=(Light&& other) noexcept;
 
 	~Light();
 
-	bool isValid() const noexcept;
+	[[nodiscard]] bool isValid() const noexcept;
 
-	Type getType() const noexcept;
+	[[nodiscard]] Type getType() const noexcept;
 
-	bool isDirectional() const noexcept;
+	[[nodiscard]] bool isDirectional() const noexcept;
 
-	bool isPointLight() const noexcept;
+	[[nodiscard]] bool isPointLight() const noexcept;
 
-	bool isSpotLight() const noexcept;
+	[[nodiscard]] bool isSpotLight() const noexcept;
 
 	void setDirection(const math::float3& direction) noexcept;
 
-	const math::float3& getDirection() const noexcept;
+	[[nodiscard]] const math::float3& getDirection() const noexcept;
 
 	void setColor(const filament::LinearColor& color) noexcept;
 
-	const math::float3& getColor() const noexcept;
+	[[nodiscard]] const math::float3& getColor() const noexcept;
 
 	void setIntensity(float intensity) noexcept;
 
@@ -51,35 +51,39 @@ class Light
 
 	void setIntensityCandela(float intensity) noexcept;
 
-	float getIntensity() const noexcept;
+	[[nodiscard]] float getIntensity() const noexcept;
 
 	void setFalloff(float radius) noexcept;
 
-	float getFalloff() const noexcept;
+	[[nodiscard]] float getFalloff() const noexcept;
 
 	void setSpotLightCone(float inner, float outer) noexcept;
 
-	float getSpotLightOuterCone() const noexcept;
+	[[nodiscard]] float getSpotLightOuterCone() const noexcept;
 
 	void setSunAngularRadius(float angularRadius) noexcept;
 
-	float getSunAngularRadius() const noexcept;
+	[[nodiscard]] float getSunAngularRadius() const noexcept;
 
 	void setSunHaloSize(float haloSize) noexcept;
 
-	float getSunHaloSize() const noexcept;
+	[[nodiscard]] float getSunHaloSize() const noexcept;
 
 	void setSunHaloFalloff(float haloFalloff) noexcept;
 
-	float getSunHaloFalloff() const noexcept;
+	[[nodiscard]] float getSunHaloFalloff() const noexcept;
 
-	ShadowOptions const& getShadowOptions() const noexcept;
+	[[nodiscard]] ShadowOptions const& getShadowOptions() const noexcept;
 
 	void setShadowOptions(ShadowOptions const& options) noexcept;
 
 	void setShadowCaster(bool shadowCaster) noexcept;
 
-	bool isShadowCaster() const noexcept;
+	[[nodiscard]] bool isShadowCaster() const noexcept;
+
+	[[nodiscard]] utils::Entity release() noexcept;
+
+	void reset() noexcept;
 
   private:
 	Manager& mManager;
