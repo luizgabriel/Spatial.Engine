@@ -9,10 +9,7 @@ namespace spatial::render
 Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
 	: mEngine{engine}, mEntity{entity}
 {
-	if (Builder(primitivesCount)
-			.castShadows(true)
-			.receiveShadows(true)
-			.build(engine, entity)
+	if (Builder(primitivesCount).castShadows(true).receiveShadows(true).build(engine, entity)
 		!= Builder::Result::Success)
 	{
 		throw std::runtime_error("Could not create renderable");
@@ -21,8 +18,15 @@ Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size
 
 Renderable::~Renderable()
 {
+	reset();
+}
+
+void Renderable::reset()
+{
 	if (isValid())
 		getManager().destroy(mEntity);
+
+	mEntity = utils::Entity{};
 }
 
 bool Renderable::isValid() const noexcept
@@ -152,14 +156,20 @@ Renderable::Manager& Renderable::getManager() noexcept
 	return mEngine.getRenderableManager();
 }
 
-Renderable::Renderable(Renderable&& other) : mEngine{other.mEngine}, mEntity(std::exchange(other.mEntity, {}))
+utils::Entity Renderable::release() noexcept
+{
+	return std::exchange(mEntity, {});
+}
+
+Renderable::Renderable(Renderable&& other) noexcept : mEngine{other.mEngine}, mEntity(other.release())
 {
 }
 
-Renderable& Renderable::operator=(Renderable&& other)
+Renderable& Renderable::operator=(Renderable&& other) noexcept
 {
 	assert(&other.mEngine == &mEngine);
-	mEntity = std::exchange(other.mEntity, {});
+	reset();
+	mEntity = other.release();
 
 	return *this;
 }

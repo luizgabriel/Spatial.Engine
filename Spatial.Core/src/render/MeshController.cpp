@@ -14,8 +14,8 @@ MeshController::MeshController(filament::Engine& engine) : mEngine{engine}, mVer
 
 void MeshController::load(std::uint32_t resourceId, const FilameshFile& filamesh)
 {
-	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh.header, filamesh.vertexData));
-	mIndexBuffers.emplace(resourceId, createIndexBuffer(mEngine, filamesh.header, filamesh.indexData));
+	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh.header, &filamesh.vertexData[0]));
+	mIndexBuffers.emplace(resourceId, createIndexBuffer(mEngine, filamesh.header, &filamesh.indexData[0]));
 	mBoundingBoxes.emplace(resourceId, filamesh.header.aabb);
 
 	auto geometries = std::vector<MeshGeometry>(filamesh.parts.size());
@@ -43,29 +43,8 @@ void MeshController::onUpdateFrame(ecs::Registry& registry)
 {
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
-	updateMeshMaterials(registry);
 	clearDeletedMeshes(registry);
 }
-
-void MeshController::updateMeshMaterials(ecs::Registry& registry) const
-{
-	auto view = registry.getEntities<ecs::Mesh, Renderable>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const ecs::Mesh>(entity);
-
-		if (!hasMeshData(data.resourceId))
-			continue;
-
-		auto& renderableMesh = registry.getComponent<Renderable>(entity);
-
-
-
-
-	}
-}
-
 
 void MeshController::createRenderableMeshes(ecs::Registry& registry) const
 {

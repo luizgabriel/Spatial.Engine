@@ -22,8 +22,10 @@ class ComponentCollapse
 			auto collapse = Collapse{componentName};
 			isOpen = collapse.isOpen();
 
-			if (collapse.onClose())
+			if (collapse.onClose()) {
 				mRegistry.removeComponent<Component>(mEntity);
+				isOpen = false;
+			}
 		}
 
 		return isOpen;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <filament/Box.h>
+#include <spatial/resources/BoundingBox.h>
 #include <spatial/common/Math.h>
 
 #include <cstdint>
@@ -50,19 +50,20 @@ struct FilameshFile
 {
 	FilameshFileHeader header{};
 	std::vector<FilameshFilePart> parts{};
-	std::vector<char> vertexData{};
-	std::vector<char> indexData{};
+	std::vector<uint8_t> vertexData{};
+	std::vector<uint8_t> indexData{};
 };
+
+std::istream& operator>>(std::istream& stream, spatial::FilameshFilePart& part);
+
+std::istream& operator>>(std::istream& stream, spatial::FilameshFileHeader& header);
+
+std::istream& operator>>(std::istream& stream, spatial::FilameshFile& filamesh);
+
+FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size);
 
 } // namespace spatial
 
-namespace std
-{
 
-istream& operator>>(istream& stream, spatial::FilameshFilePart& part);
 
-istream& operator>>(istream& stream, spatial::FilameshFileHeader& header);
 
-istream& operator>>(istream& stream, spatial::FilameshFile& filamesh);
-
-} // namespace std

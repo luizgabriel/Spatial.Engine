@@ -1,8 +1,10 @@
-#include <spatial/resources/Common.h>
+#include <spatial/resources/Math.h>
 #include <spatial/resources/FilameshFile.h>
 #include <sstream>
 
-namespace std
+using namespace std;
+
+namespace spatial
 {
 
 istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
@@ -60,10 +62,10 @@ istream& operator>>(istream& stream, spatial::FilameshFile& filamesh)
 	stream >> filamesh.header;
 
 	filamesh.vertexData.resize(filamesh.header.vertexSize);
-	stream.read(&filamesh.vertexData[0], filamesh.header.vertexSize);
+	stream.read(reinterpret_cast<char*>(&filamesh.vertexData[0]), filamesh.header.vertexSize);
 
 	filamesh.indexData.resize(filamesh.header.indexSize);
-	stream.read(&filamesh.indexData[0], filamesh.header.indexSize);
+	stream.read(reinterpret_cast<char*>(&filamesh.indexData[0]), filamesh.header.indexSize);
 
 	filamesh.parts.resize(filamesh.header.partsCount);
 	for (size_t i = 0; i < filamesh.header.partsCount; i++)
@@ -83,17 +85,11 @@ istream& operator>>(istream& stream, spatial::FilameshFile& filamesh)
 	return stream;
 }
 
-} // namespace std
-
-namespace spatial
-{
-
-template <>
-FilameshFile fromEmbed<FilameshFile>(const char* data, std::size_t size)
+FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size)
 {
 	auto filamesh = FilameshFile{};
 
-	const auto s = std::string{data, size};
+	const auto s = std::string{reinterpret_cast<const char *>(data), size};
 	auto stream = std::istringstream{s};
 	stream >> filamesh;
 

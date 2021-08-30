@@ -90,9 +90,9 @@ add_library(Spatial.Core
 	src/render/MeshController.cpp
 	src/render/SceneController.cpp
 	src/render/TextureView.cpp
-	
-	src/resources/Common.cpp
-	src/resources/FilameshFile.cpp)
+
+		src/resources/BoundingBox.cpp
+	src/resources/FilameshFile.cpp include/spatial/resources/Math.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

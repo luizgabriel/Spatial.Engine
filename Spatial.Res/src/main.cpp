@@ -24,7 +24,7 @@ std::string toVariableName(const fs::path& filePath, char separator, const std::
 	return fileName;
 }
 
-std::string formatToHex(char value)
+std::string formatToHex(uint8_t value)
 {
 	return fmt::format("{:#04x}", value);
 }
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 		const auto variableName = prefix + toVariableName(relativeInputFile, '_', locale);
 		std::cout << fmt::format("Generating {1} and {1}_SIZE\n", inputFile.string(), variableName);
 		size_t count = 0;
-		outputSource << fmt::format("\nextern const char {0}[] = {{\n", variableName);
+		outputSource << fmt::format("\nextern const unsigned char {0}[] = {{\n", variableName);
 
 		{
 			auto ifs = std::ifstream{inputFile};
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 
 		// Build header file
 		outputHeader << fmt::format("\n\n// {0}", relativeInputFile.string());
-		outputHeader << fmt::format("\nextern const char {0}[{1}];", variableName, count);
+		outputHeader << fmt::format("\nextern const unsigned char {0}[{1}];", variableName, count);
 		outputHeader << fmt::format("\nconstexpr unsigned int {0}_SIZE = {1};", variableName, count);
 	}
 

@@ -40,6 +40,7 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_ibl.ktx
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx
 	textures/uv.png
+	textures/icon.png
 	${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh
 	${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh
 	${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh

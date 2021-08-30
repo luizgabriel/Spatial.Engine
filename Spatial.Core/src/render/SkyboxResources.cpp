@@ -9,22 +9,19 @@ namespace fl = filament;
 namespace spatial::render
 {
 
-Texture createKtxTexture(fl::Engine& engine, const std::string_view resourceData)
+Texture createKtxTexture(fl::Engine& engine, const uint8_t* data, uint32_t size)
 {
 	using namespace std;
 
-	// we are using "new" here because of this legacy api
-	// but this pointer is destroyed once the texture has been uploaded
-	const auto ktxBundle =
-		new image::KtxBundle(reinterpret_cast<const uint8_t*>(resourceData.data()), resourceData.size());
+	auto ktxBundle = new image::KtxBundle(data, size);
 	return Texture{engine, image::ktx::createTexture(&engine, ktxBundle, false)};
 }
 
-bands_t parseShFile(const std::string_view resourceData)
+bands_t parseShFile(const uint8_t* data, uint32_t size)
 {
 	auto bands = bands_t{};
 	auto stream = std::stringstream{};
-	std::copy(resourceData.begin(), resourceData.end(), std::ostream_iterator<char>(stream));
+	std::copy(data, data + size, std::ostream_iterator<char>(stream));
 
 	stream >> std::skipws;
 
@@ -79,9 +76,9 @@ IndirectLight createImageBasedLight(fl::Engine& engine, fl::Texture& cubemap, fl
 }
 
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,
-									const std::string_view shResourceData, float intensity)
+									const uint8_t* data, uint32_t size, float intensity)
 {
-	auto bands = parseShFile(shResourceData);
+	const auto bands = parseShFile(data, size);
 	return createImageBasedLight(engine, cubemap, bands, intensity);
 }
 

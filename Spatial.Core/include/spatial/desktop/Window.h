@@ -31,6 +31,8 @@ class Window
   public:
 	~Window();
 
+	void setIconPixels(const uint8_t* pixelsData, uint32_t size);
+
 	void* getNativeHandle() const;
 	GLFWwindow* getHandle() const
 	{

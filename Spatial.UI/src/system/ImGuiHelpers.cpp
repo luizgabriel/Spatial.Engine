@@ -1,4 +1,5 @@
 #include <spatial/ui/system/ImGuiHelpers.h>
+#include <vector>
 
 namespace fl = filament;
 
@@ -56,21 +57,20 @@ render::IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, uint32_t capacity
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const std::string_view resourceData)
+render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const uint8_t* data, uint32_t size)
 {
 	auto& io = ImGui::GetIO();
 
-	ImFontConfig fontConfig;
-	fontConfig.FontDataOwnedByAtlas = false;
-	io.Fonts->AddFontFromMemoryTTF(const_cast<char*>(resourceData.data()), static_cast<int>(resourceData.size()), 16.0f, &fontConfig);
+	auto copiedData = new uint8_t[size];
+	std::copy(data, data + size, &copiedData[0]);
+	io.Fonts->AddFontFromMemoryTTF(&copiedData[0], static_cast<int>(size), 16.0f);
 
-	unsigned char* data;
+	unsigned char* imageData;
 	int width, height, bpp;
+	io.Fonts->GetTexDataAsAlpha8(&imageData, &width, &height, &bpp);
 
-	io.Fonts->GetTexDataAsAlpha8(&data, &width, &height, &bpp);
-
-	const auto size = static_cast<size_t>(width * height * bpp);
-	auto pb = fl::Texture::PixelBufferDescriptor{data, size, fl::Texture::Format::R, fl::Texture::Type::UBYTE};
+	auto textureSize = width * height * bpp;
+	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::R, fl::Texture::Type::UBYTE};
 	const auto texture = fl::Texture::Builder()
 							 .width(static_cast<uint32_t>(width))
 							 .height(static_cast<uint32_t>(height))

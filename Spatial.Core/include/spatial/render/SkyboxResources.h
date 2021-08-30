@@ -9,18 +9,18 @@
 namespace spatial::render
 {
 
-Texture createKtxTexture(filament::Engine& engine, const std::string_view resourceData);
+Texture createKtxTexture(filament::Engine& engine, const uint8_t* data, uint32_t size);
 
 using bands_t = std::array<filament::math::float3, 9>;
 
-bands_t parseShFile(const std::string_view resourceData);
+bands_t parseShFile(const uint8_t* data, uint32_t size);
 
 Skybox createSkybox(fl::Engine& engine, fl::math::float4 color);
 
 Skybox createSkybox(filament::Engine& engine, filament::Texture& skybox, bool showSun = true);
 
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,
-									const std::string_view shResourceData, float intensity = 30000.0f);
+									const uint8_t* data, uint32_t size, float intensity = 30000.0f);
 
 IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap, const bands_t& bands,
 									float intensity = 30000.0f);

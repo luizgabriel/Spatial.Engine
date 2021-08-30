@@ -26,8 +26,8 @@ class Renderable
 	Renderable(const Renderable& other) = delete;
 	Renderable& operator=(const Renderable& other) = delete;
 
-	Renderable(Renderable&& other);
-	Renderable& operator=(Renderable&& other);
+	Renderable(Renderable&& other) noexcept;
+	Renderable& operator=(Renderable&& other) noexcept;
 
 	void setAxisAlignedBoundingBox(const filament::Box& aabb) noexcept;
 
@@ -73,6 +73,10 @@ class Renderable
 	filament::AttributeBitset getEnabledAttributesAt(std::size_t primitiveIndex) const noexcept;
 
 	bool isValid() const noexcept;
+
+	[[nodiscard]] utils::Entity release() noexcept;
+
+	void reset();
 
   private:
 	filament::Engine& mEngine;

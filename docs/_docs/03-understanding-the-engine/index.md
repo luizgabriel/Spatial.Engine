@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
     const auto executablePath = fs::path{args[0]}.parent_path();
 
-    auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
+    auto config = EditorSettings{"Spatial Engine | Editor", 1280, 720};
     args({"-w", "--width"}) >> config.windowWidth;
     args({"-h", "--height"}) >> config.windowHeight;
 
@@ -60,7 +60,7 @@ This part it's not related to the engine itself. The editor was design to be sta
 const auto args = argh::parser(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
 const auto executablePath = fs::path{args[0]}.parent_path();
 
-auto config = SetupConfig{"Spatial Engine | Editor", 1280, 720};
+auto config = EditorSettings{"Spatial Engine | Editor", 1280, 720};
 args({"-w", "--width"}) >> config.windowWidth;
 args({"-h", "--height"}) >> config.windowHeight;
 ```

@@ -1,20 +1,11 @@
-#include <filament/Box.h>
 #include <spatial/common/Math.h>
 #include <istream>
 
 namespace spatial
 {
 
-template <typename OutputType>
-OutputType fromEmbed(const char* data, std::size_t size);
-
-}
-
-namespace std
-{
-
 template <typename T>
-istream& operator>>(istream& stream, spatial::math::vec2<T>& vector)
+std::istream& operator>>(std::istream& stream, spatial::math::vec2<T>& vector)
 {
 	stream.read(reinterpret_cast<char*>(&vector[0]), sizeof(T));
 	stream.read(reinterpret_cast<char*>(&vector[1]), sizeof(T));
@@ -23,7 +14,7 @@ istream& operator>>(istream& stream, spatial::math::vec2<T>& vector)
 }
 
 template <typename T>
-istream& operator>>(istream& stream, spatial::math::vec3<T>& vector)
+std::istream& operator>>(std::istream& stream, spatial::math::vec3<T>& vector)
 {
 	stream.read(reinterpret_cast<char*>(&vector[0]), sizeof(T));
 	stream.read(reinterpret_cast<char*>(&vector[1]), sizeof(T));
@@ -32,6 +23,7 @@ istream& operator>>(istream& stream, spatial::math::vec3<T>& vector)
 	return stream;
 }
 
-istream& operator>>(istream& stream, filament::Box& box);
 
 }
+
+

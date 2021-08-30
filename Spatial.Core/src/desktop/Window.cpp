@@ -11,6 +11,9 @@
 #define GLFW_EXPOSE_NATIVE_X11
 #endif
 #include <GLFW/glfw3native.h>
+#include <array>
+
+#include <stb_image.h>
 
 using namespace filament::math;
 
@@ -89,4 +92,14 @@ void Window::warpMouse(const math::float2& position) const
 	glfwSetCursorPos(mWindowHandle, position.x, position.y);
 }
 
-} // namespace spatial
+void Window::setIconPixels(const uint8_t* data, uint32_t size)
+{
+	auto icons = std::array<GLFWimage, 1>{};
+	icons[0].pixels = stbi_load_from_memory(data, static_cast<int>(size), &icons[0].width, &icons[0].height, nullptr, 4);
+
+	glfwSetWindowIcon(mWindowHandle, 1, &icons[0]);
+
+	stbi_image_free(icons[0].pixels);
+}
+
+} // namespace spatial::desktop

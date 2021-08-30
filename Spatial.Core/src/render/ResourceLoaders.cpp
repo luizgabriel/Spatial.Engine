@@ -4,9 +4,6 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include <sstream>
-#include <math/vec2.h>
-#include <math/vec3.h>
 
 using namespace filament::math;
 using namespace std::string_literals;
@@ -15,14 +12,14 @@ namespace fl = filament;
 namespace spatial::render
 {
 
-Material createMaterial(fl::Engine& engine, const std::string& resourceData)
+Material createMaterial(fl::Engine& engine, const uint8_t* data, uint32_t size)
 {
-	auto material = fl::Material::Builder().package(resourceData.data(), resourceData.size()).build(engine);
+	auto material = fl::Material::Builder().package(data, size).build(engine);
 	return Material{engine, material};
 }
 
-Texture createTexture(filament::Engine& engine, math::int2 dimensions,
-					  fl::Texture::InternalFormat format, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
+Texture createTexture(filament::Engine& engine, math::int2 dimensions, fl::Texture::InternalFormat format,
+					  fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	auto texture = fl::Texture::Builder()
 					   .width(dimensions.x)
@@ -36,14 +33,14 @@ Texture createTexture(filament::Engine& engine, math::int2 dimensions,
 	return Texture{engine, texture};
 }
 
-Texture createTexture(fl::Engine& engine, const std::string& resourceData, fl::Texture::Usage usage, fl::Texture::Sampler sampler)
+Texture createTexture(fl::Engine& engine, const uint8_t* data, uint32_t size, const std::string& resourceData,
+					  fl::Texture::Usage usage, fl::Texture::Sampler sampler)
 {
 	int width, height, n;
-	const auto data = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(resourceData.data()), resourceData.size(),
-											&width, &height, &n, 4);
+	const auto* imageData = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &n, 4);
 
 	auto bufferDescriptor = fl::Texture::PixelBufferDescriptor{
-		data, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
+		imageData, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
 		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
 
 	auto texture = createTexture(engine, {static_cast<uint32_t>(width), static_cast<uint32_t>(height)},
@@ -53,7 +50,7 @@ Texture createTexture(fl::Engine& engine, const std::string& resourceData, fl::T
 	return std::move(texture);
 }
 
-VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& vertices)
+VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data)
 {
 	const uint32_t FLAG_SNORM16_UV = 0x2;
 	auto uvType = fl::VertexBuffer::AttributeType::HALF2;
@@ -78,8 +75,8 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 						 .attribute(filament::UV0, 0, uvType, header.offsetUV0, static_cast<uint8_t>(header.strideUV0))
 						 .normalized(filament::UV0, uvNormalized);
 
-	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max() &&
-		header.strideUV1 != std::numeric_limits<uint32_t>::max())
+	if (header.offsetUV1 != std::numeric_limits<uint32_t>::max()
+		&& header.strideUV1 != std::numeric_limits<uint32_t>::max())
 	{
 		vbBuilder.attribute(filament::UV1, 0, uvType, header.offsetUV1, static_cast<uint8_t>(header.strideUV1))
 			.normalized(filament::UV1, uvNormalized);
@@ -87,7 +84,7 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 
 	auto vb = VertexBuffer{engine, vbBuilder.build(engine)};
 
-	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(&vertices[0], header.vertexSize);
+	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(data, header.vertexSize);
 	vb->setBufferAt(engine, 0, std::move(vbBufferDescriptor));
 
 	fl::Fence::waitAndDestroy(engine.createFence());
@@ -95,7 +92,7 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 	return vb;
 }
 
-IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const std::vector<char>& indices)
+IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data)
 {
 	auto ibBuilder =
 		fl::IndexBuffer::Builder()
@@ -104,7 +101,7 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 
 	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
 
-	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(&indices[0], header.indexSize);
+	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(data, header.indexSize);
 	ib->setBuffer(engine, std::move(ibBufferDescriptor));
 
 	fl::Fence::waitAndDestroy(engine.createFence());
