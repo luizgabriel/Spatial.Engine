@@ -45,11 +45,9 @@ namespace spatial::editor
 
 auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window,
-									 const desktop::InputState& inputState)
+SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
 	: mEngine{engine},
 	  mWindow{window},
-	  mInputState{inputState},
 
 	  mEditorView{mEngine, window.getSize()},
 	  mEditorScene{render::createScene(mEngine)},
@@ -67,7 +65,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mRegistry{},
 
-	  mEditorCameraController{mWindow, mInputState},
+	  mEditorCameraController{mWindow},
 
 	  mSceneController{mEngine, mEditorScene.ref()},
 	  mMaterialController{mEngine},
@@ -282,6 +280,11 @@ void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 void SceneEditorSystem::newScene()
 {
 	mRegistry = ecs::Registry{};
+}
+
+void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
+{
+	mEditorCameraController.onUpdateInput(input);
 }
 
 } // namespace spatial::editor

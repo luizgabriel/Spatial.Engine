@@ -7,6 +7,7 @@
 #include <spatial/core/Application.h>
 #include <spatial/core/ApplicationUtils.h>
 #include <spatial/desktop/InputSystem.h>
+#include <spatial/desktop/InputSystemUtils.h>
 #include <spatial/desktop/PlatformEventUtils.h>
 #include <spatial/desktop/Window.h>
 #include <spatial/render/RenderingSystem.h>
@@ -45,7 +46,7 @@ int main(int argc, char* argv[])
 	ui.setMaterial(toShared(render::createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
 	ui.setFontTexture(toShared(ui::imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
+	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window};
 
 	// Connect all Systems to the Application Main Loop
 	app >> desktopContext >> input >> rendering >> ui >> editor;
@@ -58,6 +59,9 @@ int main(int argc, char* argv[])
 
 	// Connect Rendering to Editor and UI
 	rendering >> editor >> ui;
+
+	// Connect Input to Editor
+	input >> editor;
 
 	return app.run();
 }

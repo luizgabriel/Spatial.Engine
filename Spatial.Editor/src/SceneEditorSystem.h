@@ -31,7 +31,6 @@ class SceneEditorSystem
   private:
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
-	const desktop::InputState& mInputState;
 
 	render::TextureView mEditorView;
 	render::Scene mEditorScene;
@@ -56,12 +55,13 @@ class SceneEditorSystem
 	render::MeshController mMeshController;
 
   public:
-	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window,
-							   const desktop::InputState& inputState);
+	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window);
 
 	void onStart();
 
 	void onUpdateFrame(float delta);
+
+	void onUpdateInput(const desktop::InputState& input);
 
 	void onDrawGui();
 

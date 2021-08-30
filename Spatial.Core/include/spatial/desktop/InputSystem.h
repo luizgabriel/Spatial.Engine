@@ -23,11 +23,6 @@ class InputSystem
 
 	void onEvent(const KeyEvent& event);
 
-	const auto& getState()
-	{
-		return mInputState;
-	}
-
 	auto& getOnChangeStateSignal()
 	{
 		return mOnChangeStateSignal;

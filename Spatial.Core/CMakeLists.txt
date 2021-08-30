@@ -15,8 +15,9 @@ add_library(Spatial.Core
 	include/spatial/desktop/PlatformEventUtils.h
 	include/spatial/desktop/Window.h
 	include/spatial/desktop/InputSystem.h
+	include/spatial/desktop/InputSystemUtils.h
 	include/spatial/desktop/InputState.h
-	
+
 	include/spatial/ecs/Transform.h
 	include/spatial/ecs/Camera.h
 	include/spatial/ecs/Light.h

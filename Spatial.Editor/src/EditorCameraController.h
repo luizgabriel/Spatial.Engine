@@ -11,7 +11,7 @@ namespace spatial::editor
 class EditorCameraController
 {
   public:
-	EditorCameraController(const desktop::Window& window, const desktop::InputState& inputState);
+	EditorCameraController(const desktop::Window& window);
 
 	void toggleControl(ecs::Registry& registry);
 
@@ -19,9 +19,18 @@ class EditorCameraController
 
 	void onEditorViewResized(ecs::Registry& registry, double aspectRatio);
 
+	void onUpdateInput(const desktop::InputState& state);
+
   private:
+	struct InputControls {
+		math::float3 movementOffset{.0f};
+		math::float2 viewOffset{.0f};
+		bool cancelled{false};
+		bool started{false};
+	};
+
 	const desktop::Window& mWindow;
-	const desktop::InputState& mInputState;
+	InputControls mControls;
 };
 
 } // namespace spatial::editor
