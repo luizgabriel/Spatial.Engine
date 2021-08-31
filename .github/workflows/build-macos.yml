@@ -16,7 +16,7 @@ jobs:
   build:
     name: Build MacOS
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: macos-10.15
+    runs-on: "macos-11.0"
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.conan/
-          key: ${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+          key: ${{ matrix.os }}-${{ hashFiles('conanfile.py') }}
 
       - name: Configure CMake
         shell: bash
