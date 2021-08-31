@@ -25,20 +25,20 @@ class Registry
 
 	Entity createEntity();
 
-	bool isValid(Entity entity) const;
+	bool isValid(Entity entity) const noexcept;
 
-	size_t getEntitiesCount() const;
+	size_t getEntitiesCount() const noexcept;
 
 	template <typename Component>
-	size_t getEntitiesCount() const
+	size_t getEntitiesCount() const noexcept
 	{
 		return mRegistry.size<Component>();
 	}
 
-	template <typename Component>
-	bool hasAnyEntity()
+	template <typename... Components>
+	bool hasAnyEntity() const noexcept
 	{
-		return isValid(getFirstEntity<Component>());
+		return isValid(getFirstEntity<Components...>());
 	}
 
 	template <typename Component>
@@ -72,9 +72,9 @@ class Registry
 	}
 
 	template <typename... Component, typename... Exclude>
-	Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {})
+	Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
-		auto view = mRegistry.view<Component...>(std::move(excludes));
+		auto view = mRegistry.view<const Component...>(std::move(excludes));
 		for (auto entity : view) {
 			return entity;
 		}
@@ -115,7 +115,7 @@ class Registry
 	template <typename Component>
 	Component& addComponent(Entity entity, Component&& component)
 	{
-		return mRegistry.emplace<Component>(entity, std::move(component));
+		return mRegistry.emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
@@ -127,7 +127,7 @@ class Registry
 	template <typename Component>
 	Component& addOrReplaceComponent(Entity entity, Component&& component)
 	{
-		return mRegistry.emplace_or_replace<Component>(entity, std::move(component));
+		return mRegistry.emplace_or_replace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
@@ -139,7 +139,7 @@ class Registry
 	template <typename Component>
 	Component& getOrAddComponent(Entity entity, Component&& component)
 	{
-		return mRegistry.get_or_emplace<Component>(entity, std::move(component));
+		return mRegistry.get_or_emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
@@ -160,7 +160,7 @@ class Registry
 		return mRegistry.any_of<Component...>(entity);
 	}
 
-	VersionType getVersion(Entity entity) const;
+	static VersionType getVersion(Entity entity) noexcept;
 
 	void destroy(Entity entity);
 

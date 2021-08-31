@@ -13,12 +13,12 @@ Entity Registry::createEntity()
 	return mRegistry.create();
 }
 
-bool Registry::isValid(Entity entity) const
+bool Registry::isValid(Entity entity) const noexcept
 {
 	return mRegistry.valid(entity);
 }
 
-size_t Registry::getEntitiesCount() const
+size_t Registry::getEntitiesCount() const noexcept
 {
 	return mRegistry.size();
 }
@@ -28,9 +28,9 @@ void Registry::destroy(Entity entity)
 	mRegistry.destroy(entity);
 }
 
-Registry::VersionType Registry::getVersion(Entity entity) const
+Registry::VersionType Registry::getVersion(Entity entity) noexcept
 {
-	return mRegistry.version(entity);
+	return entt::registry::version(entity);
 }
 
 } // namespace spatial

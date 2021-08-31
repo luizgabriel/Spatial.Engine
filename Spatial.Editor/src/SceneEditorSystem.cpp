@@ -273,6 +273,7 @@ void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
+	assert(hasEditorCamera());
 	renderer.render(mEditorView.getView().get());
 }
 
@@ -284,6 +285,11 @@ void SceneEditorSystem::newScene()
 void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 {
 	mEditorCameraController.onUpdateInput(input);
+}
+
+bool SceneEditorSystem::hasEditorCamera() const
+{
+	return mRegistry.hasAnyEntity<EditorCamera, render::Camera>();
 }
 
 } // namespace spatial::editor

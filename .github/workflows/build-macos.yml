@@ -15,8 +15,8 @@ env:
 jobs:
   build:
     name: Build MacOS
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
-    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: macos-10.15
 
     steps:
       - uses: actions/checkout@v2

@@ -74,6 +74,7 @@ class SceneEditorSystem
 	void loadScene(const ghc::filesystem::path& inputPath);
 
 	void newScene();
+	bool hasEditorCamera() const;
 };
 
 ecs::Entity createDefaultScene(ecs::Registry& registry);

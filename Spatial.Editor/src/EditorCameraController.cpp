@@ -112,8 +112,3 @@ void EditorCameraController::onUpdateInput(const desktop::InputState& input)
 }
 
 } // namespace spatial::editor
-
-namespace spatial::ui
-{
-
-} // namespace spatial::ui
