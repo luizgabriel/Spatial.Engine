@@ -32,11 +32,17 @@ jobs:
           python3 $GITHUB_WORKSPACE/setup.py
           cmake -E make_directory ${{runner.workspace}}/build
 
+      - name: Get Date
+        id: get-date
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
+        shell: bash
+
       - name: Cache Conan Data
         uses: actions/cache@v2
         with:
           path: ~/.conan/
-          key: ${{ matrix.os }}-${{ hashFiles('conanfile.py') }}
+          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('conanfile.py') }}
 
       - name: Configure CMake
         shell: bash
