@@ -22,14 +22,6 @@ void editorCameraComponent(ecs::Registry& registry, ecs::Entity entity)
 
 	ImGui::DragFloat("Velocity", &data.velocity);
 	ImGui::DragFloat("Sensitivity", &data.sensitivity);
-
-	data.startPressed = ImGui::Button("Free Camera Control");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::Text("Left Ctrl + Left Mouse Click");
-		ImGui::EndTooltip();
-	}
 }
 
 } // namespace spatial::ui

@@ -64,8 +64,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mRegistry{},
 
-	  mEditorCameraController{mWindow},
-
+	  mEditorCameraController{},
 	  mSceneController{mEngine, mEditorScene.ref()},
 	  mMaterialController{mEngine},
 	  mTransformController{mEngine},
@@ -139,7 +138,6 @@ ecs::Entity createDefaultScene(ecs::Registry& registry)
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
-
 	mSceneController.onUpdateFrame(mRegistry);
 	mTransformController.onUpdateFrame(mRegistry);
 	mCameraController.onUpdateFrame(mRegistry);
@@ -189,11 +187,13 @@ void SceneEditorSystem::onDrawGui()
 	{
 		auto style = ui::WindowPaddingStyle{};
 		auto window = ui::Window{"Scene View"};
-		ui::image(mEditorView.getColorTexture().get(), window.getSize() - int2{0, 25});
-		onSceneWindowResized(window.getSize());
+		const auto imageSize = window.getSize() - math::float2{0, 24};
 
-		if (ImGui::IsItemClicked())
-			mEditorCameraController.toggleControl(mRegistry);
+		ui::image(mEditorView.getColorTexture().get(), imageSize);
+		onSceneWindowResized(imageSize);
+
+		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
+			mWindow.warpMouse(mWindow.getSize() * .5f);
 	}
 
 	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
@@ -266,9 +266,7 @@ void SceneEditorSystem::loadScene(const fs::path& inputPath)
 
 void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 {
-	auto width = static_cast<double>(size.x);
-	auto height = static_cast<double>(size.y);
-	mEditorCameraController.onEditorViewResized(mRegistry, width / height);
+	mEditorCameraController.onEditorViewResized(mRegistry, size.x / static_cast<double>(size.y));
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
@@ -285,6 +283,8 @@ void SceneEditorSystem::newScene()
 void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 {
 	mEditorCameraController.onUpdateInput(input);
+	if (input.released(Key::Escape))
+		mEditorCameraController.disable();
 }
 
 bool SceneEditorSystem::hasEditorCamera() const

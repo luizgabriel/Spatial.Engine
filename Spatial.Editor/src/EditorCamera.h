@@ -14,9 +14,6 @@ struct EditorCamera
 {
 	float sensitivity{1.0f};
 	float velocity{1.0f};
-	bool enabled{false};
-	int justStarted{0};
-	bool startPressed{false};
 };
 
 } // namespace spatial::editor

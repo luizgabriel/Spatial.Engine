@@ -6,7 +6,7 @@ namespace spatial::ui
 
 Window::Window(const std::string_view name)
 {
-	ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 }
 
 Window::~Window()

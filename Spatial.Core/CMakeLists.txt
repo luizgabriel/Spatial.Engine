@@ -28,7 +28,8 @@ add_library(Spatial.Core
 	include/spatial/ecs/Mesh.h
 	include/spatial/ecs/Tags.h
 	include/spatial/ecs/EntityBuilder.h
-	
+	include/spatial/ecs/UpdateSystem.h
+
 	include/spatial/render/Engine.h
 	include/spatial/render/EngineResource.h
 	include/spatial/render/Entity.h
@@ -92,7 +93,7 @@ add_library(Spatial.Core
 	src/render/TextureView.cpp
 
 		src/resources/BoundingBox.cpp
-	src/resources/FilameshFile.cpp include/spatial/resources/Math.h)
+	src/resources/FilameshFile.cpp include/spatial/resources/Math.h include/spatial/ecs/UpdateSystem.h include/spatial/render/EngineUpdateSystem.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
