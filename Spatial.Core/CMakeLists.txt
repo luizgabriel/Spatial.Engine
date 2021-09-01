@@ -57,7 +57,11 @@ add_library(Spatial.Core
 	include/spatial/serialization/EntityName.h
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
-	
+
+	include/spatial/resources/Math.h
+	include/spatial/resources/BoundingBox.h
+	include/spatial/resources/FilameshFile.h
+
 	## SOURCES
 	src/common/Key.cpp
 	src/common/StringHelpers.cpp
@@ -92,8 +96,8 @@ add_library(Spatial.Core
 	src/render/SceneController.cpp
 	src/render/TextureView.cpp
 
-		src/resources/BoundingBox.cpp
-	src/resources/FilameshFile.cpp include/spatial/resources/Math.h include/spatial/ecs/UpdateSystem.h include/spatial/render/EngineUpdateSystem.h)
+	src/resources/BoundingBox.cpp
+	src/resources/FilameshFile.cpp )
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
