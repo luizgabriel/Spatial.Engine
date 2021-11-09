@@ -12,7 +12,6 @@ add_executable(Spatial.Core.Tests
 	RegistrySerialization.test.cpp
 	DesktopWindowContext.test.cpp
 	RenderingSystem.test.cpp
-	FileSystem.test.cpp
 	main.cpp)
 
 target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)

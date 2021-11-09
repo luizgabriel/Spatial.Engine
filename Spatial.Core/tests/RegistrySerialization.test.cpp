@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <entt/entity/snapshot.hpp>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/serialization/Archives.h>

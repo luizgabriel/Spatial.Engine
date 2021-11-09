@@ -16,7 +16,7 @@ struct RenderingSystemMockListener {
 
 TEST(RenderingSystem, TestOnRenderSignal)
 {
-	auto renderingSystem = RenderingSystem{RenderingSystem::Backend::NOOP, nullptr};
+	auto renderingSystem = RenderingSystem{nullptr};
 	auto listener = RenderingSystemMockListener{};
 
 	EXPECT_CALL(listener, onRender(_)).Times(1);
