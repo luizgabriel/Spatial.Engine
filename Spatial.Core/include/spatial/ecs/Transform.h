@@ -11,13 +11,9 @@ struct Transform
 	math::float3 scale;
 	math::float3 rotation;
 
-	Transform() : position{0}, scale{1}, rotation{0}
-	{
-	}
-
-	Transform(const math::float3& position, const math::float3& scale, const math::float3& rotation);
+	explicit Transform(const math::float3& position = {0}, const math::float3& scale = {1}, const math::float3& rotation = {0});
 
 	[[nodiscard]] math::mat4f getMatrix() const noexcept;
 };
 
-}
+} // namespace spatial::ecs
