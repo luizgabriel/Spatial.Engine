@@ -12,10 +12,10 @@ class RenderingSystem
   public:
 	using Backend = filament::backend::Backend;
 
-	RenderingSystem(const Backend backend, void* nativeWindowHandle);
+	RenderingSystem(void* nativeWindowHandle);
 
 	template <typename WindowImpl>
-	RenderingSystem(const Backend backend, WindowImpl& window) : RenderingSystem(backend, window.getNativeHandle())
+	RenderingSystem(WindowImpl& window) : RenderingSystem(window.getNativeHandle())
 	{
 	}
 

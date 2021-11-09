@@ -13,22 +13,24 @@ class SpatialEngineConan(ConanFile):
     options = {"editor": [True, False]}
     default_options = {"editor": True}
     generators = "cmake"
-    build_requires = "cmake/3.16.3"
+    build_requires = "cmake/3.19.8"
     exports_sources = "*"
     requires = [
-        "boost/1.73.0",
-        "argh/1.2.1@adishavit/stable",
+        "boost/1.77.0",
+        "argh/1.3.1",
         "glfw/3.3.4",
-        "ghc-filesystem/1.4.0",
         "gtest/1.10.0",
         "spdlog/1.8.5",
         "stb/20200203",
         "entt/3.7.0",
         "cereal/1.3.0",
+        "imguizmo/cci.20210223",
+        "magic_enum/0.7.3",
 
         # Remember to run 'setup.py' to make this dependencies available
         "imgui/docking@vendor/stable",  # Installed with vendor/imgui.py
-        "filament/1.9.21@vendor/stable",  # Installed with vendor/filament.py
+        "filament/1.12.11@vendor/stable",  # Installed with vendor/filament.py
+        # "v8/8.8.214@vendor/stable",  # Installed with vendor/v8.py
     ]
 
     def imports(self):

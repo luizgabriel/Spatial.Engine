@@ -15,7 +15,7 @@ add_executable(Spatial.Editor
         src/CustomComponents.h
         src/CustomComponents.cpp
         src/EditorSettings.cpp
-        src/EditorSettings.h
+        src/Settings.h
         ${SPATIAL_EDITOR_MACOS_ICON})
 
 # set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
@@ -27,8 +27,7 @@ target_link_libraries(Spatial.Editor PUBLIC
         Spatial.Core
         Spatial.UI
         CONAN_PKG::fmt
-        CONAN_PKG::argh
-        CONAN_PKG::ghc-filesystem)
+        CONAN_PKG::argh)
 
 target_link_libraries(Spatial.Editor PRIVATE Spatial.Editor.Resources)
 

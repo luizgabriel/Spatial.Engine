@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spatial/ui/components/Collapse.h>
+#include <spatial/ecs/Registry.h>
 
 namespace spatial::ui
 {

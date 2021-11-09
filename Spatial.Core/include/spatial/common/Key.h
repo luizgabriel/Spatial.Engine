@@ -120,15 +120,11 @@ enum class Key
 	Count ///< Keep last -- the total number of keyboard keys
 };
 
-std::string nameOf(const Key key);
-
 enum class KeyAction
 {
 	UnknownAction,
 	Pressed,
 	Released,
 };
-
-std::string nameOf(const KeyAction action);
 
 } // namespace spatial

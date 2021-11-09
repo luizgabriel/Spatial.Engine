@@ -8,11 +8,12 @@ add_custom_command(
 )
 
 add_executable(Spatial.Core.Tests
-	${CMAKE_CURRENT_BINARY_DIR}/assets/plane.filamesh
 	Application.test.cpp
 	RegistrySerialization.test.cpp
 	DesktopWindowContext.test.cpp
-	RenderingSystem.test.cpp)
+	RenderingSystem.test.cpp
+	FileSystem.test.cpp
+	main.cpp)
 
 target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)
 

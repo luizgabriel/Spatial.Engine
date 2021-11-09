@@ -22,7 +22,11 @@ render::VertexBuffer imguiCreateVertexBuffer(filament::Engine& engine, uint32_t 
 
 render::IndexBuffer imguiCreateIndexBuffer(filament::Engine& engine, uint32_t capacity);
 
-render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const uint8_t* data, uint32_t size);
+void imguiAddFont(const uint8_t* data, size_t size);
+
+void imguiAddIconFont(const uint8_t* data, size_t size, uint16_t min, uint16_t max);
+
+render::Texture imguiCreateTextureAtlas(filament::Engine& engine);
 
 template <typename ImGuiType>
 filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiType>& imVector)

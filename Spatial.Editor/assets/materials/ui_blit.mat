@@ -1,13 +1,9 @@
 material {
-    name : ui,
+    name : uiBlit,
     parameters : [
         {
             type : sampler2d,
             name : albedo
-        },
-        {
-            type : bool,
-            name : isTexture
         }
     ],
     requires : [
@@ -22,16 +18,11 @@ material {
 
 fragment {
     void material(inout MaterialInputs material) {
-        prepareMaterial(material);
-        if (materialParams.isTexture) {
-            material.baseColor = texture(materialParams_albedo, getUV0());
-        } else {
-            vec2 uv = getUV0();
-            uv.y = 1.0 - uv.y;
-            float alpha = texture(materialParams_albedo, uv).r;
-            material.baseColor = getColor();
-            material.baseColor.a *= alpha;
-            material.baseColor.rgb *= material.baseColor.a;
-        }
+	prepareMaterial(material);
+        vec2 uv = getUV0();
+        uv.y = 1.0 - uv.y;
+        vec4 albedo = texture(materialParams_albedo, uv);
+        material.baseColor = getColor() * albedo;
+        material.baseColor.rgb *= material.baseColor.a;
     }
 }

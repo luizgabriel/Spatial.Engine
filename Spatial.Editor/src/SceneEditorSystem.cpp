@@ -1,18 +1,21 @@
 #include "SceneEditorSystem.h"
+#include "CustomComponents.h"
+#include "DefaultMaterial.h"
+#include "EditorCamera.h"
+#include "Serialization.h"
+#include "Settings.h"
+#include "Tags.h"
 
 #include <assets/generated.h>
 
 #include <spatial/core/Logger.h>
-#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Tags.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/resources/FilameshFile.h>
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 
-#include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DockSpace.h>
 #include <spatial/ui/components/Menu.h>
@@ -22,20 +25,17 @@
 #include <spatial/ui/components/PropertiesPanel.h>
 #include <spatial/ui/components/SaveSceneModal.h>
 #include <spatial/ui/components/Window.h>
+#include <spatial/ui/components/AssetsExplorer.h>
+#include <spatial/ui/components/ComponentCollapse.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
-#include "CustomComponents.h"
-#include "DefaultMaterial.h"
-#include "EditorCamera.h"
-#include "Serialization.h"
-#include "Tags.h"
-
 #include <fstream>
-#include <spatial/ui/components/ComponentCollapse.h>
+
+#include <string>
 
 namespace fl = filament;
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 using namespace spatial::math;
 
@@ -44,8 +44,9 @@ namespace spatial::editor
 
 auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
-	: mEngine{engine},
+SceneEditorSystem::SceneEditorSystem(Settings settings, filament::Engine& engine, desktop::Window& window)
+	: mSettings{std::move(settings)},
+	  mEngine{engine},
 	  mWindow{window},
 
 	  mEditorView{mEngine, window.getSize()},
@@ -53,12 +54,13 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mDefaultMaterial{render::createMaterial(mEngine, ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE)},
 
-	  mIblTexture{
-		  render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE)},
+	  mIblTexture{render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE)},
 	  mSkyboxTexture{
 		  render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE)},
 	  mSkyboxLight{render::createImageBasedLight(mEngine, mIblTexture.ref(), ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE)},
 	  mSkybox{render::createSkybox(mEngine, mSkyboxTexture.ref())},
+
+	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
 	  mSelectedEntity{ecs::NullEntity},
 
@@ -70,19 +72,10 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mTransformController{mEngine},
 	  mCameraController{mEngine},
 	  mLightController{mEngine},
-	  mMeshController{mEngine}
+	  mMeshController{mEngine, mSettings.assetsFolder},
 
+	  mCurrentAssetsPath{mSettings.assetsFolder}
 {
-	mMeshController.load("editor://meshes/cube"_hs,
-						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/sphere"_hs,
-						 loadFilameshFromMemory(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/plane"_hs,
-						 loadFilameshFromMemory(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/cylinder"_hs,
-						 loadFilameshFromMemory(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
-
-	createDefaultScene(mRegistry);
 }
 
 void SceneEditorSystem::onStart()
@@ -92,49 +85,6 @@ void SceneEditorSystem::onStart()
 	mEditorView.getView()->setScene(mEditorScene.get());
 }
 
-ecs::Entity createDefaultScene(ecs::Registry& registry)
-{
-	ecs::build(registry).withName("Main Light").asDirectionalLight().withDirection({.34f, -.66f, -.67f});
-
-	auto m1 = ecs::build(registry).withName("Red Material").asMaterial(DefaultMaterial{float3{.4f, 0.1f, 0.1f}});
-	auto m2 = ecs::build(registry).withName("White Material").asMaterial(DefaultMaterial{float3{.8f, .8f, .8f}});
-	auto m3 = ecs::build(registry).withName("Green Material").asMaterial(DefaultMaterial{float3{.1f, 0.4f, 0.1f}});
-	auto m4 = ecs::build(registry).withName("Blue Material").asMaterial(DefaultMaterial{float3{.1f, 0.1f, 0.4}});
-
-	ecs::build(registry)
-		.withName("Cube")
-		.asTransform()
-		.withPosition({.0f})
-		.asMesh("editor://meshes/cube"_hs)
-		.withShadowOptions(true, true)
-		.withMaterialAt(0, m1);
-
-	ecs::build(registry)
-		.withName("Plane")
-		.asTransform()
-		.withPosition({3.0f, -1.0f, .0f})
-		.withScale({10.0f})
-		.asMesh("editor://meshes/plane"_hs)
-		.withShadowOptions(false, true)
-		.withMaterialAt(0, m2);
-
-	ecs::build(registry)
-		.withName("Cylinder")
-		.asTransform()
-		.withPosition({6.0f, .0f, .0f})
-		.asMesh("editor://meshes/cylinder"_hs)
-		.withShadowOptions(true, true)
-		.withMaterialAt(0, m3);
-
-	return ecs::build(registry)
-		.withName("Sphere")
-		.asTransform()
-		.withPosition({3.0f, .0f, .0f})
-		.asMesh("editor://meshes/sphere"_hs)
-		.withShadowOptions(true, true)
-		.withMaterialAt(0, m4);
-}
-
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
@@ -142,7 +92,7 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mTransformController.onUpdateFrame(mRegistry);
 	mCameraController.onUpdateFrame(mRegistry);
 	mLightController.onUpdateFrame(mRegistry);
-	mMeshController.onUpdateFrame(mRegistry);
+	mMeshController.onUpdateFrame(mRegistry, delta);
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
 
 	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
@@ -173,15 +123,6 @@ void SceneEditorSystem::onDrawGui()
 					menuPopup = "Save Scene";
 			}
 		}
-
-		{
-			auto menu = ui::Menu{"Scene"};
-			if (menu.isOpen())
-			{
-				if (menu.item("Create Default", "CTRL+N"))
-					createDefaultScene(mRegistry);
-			}
-		}
 	}
 
 	{
@@ -189,7 +130,7 @@ void SceneEditorSystem::onDrawGui()
 		auto window = ui::Window{"Scene View"};
 		const auto imageSize = window.getSize() - math::float2{0, 24};
 
-		ui::image(mEditorView.getColorTexture().get(), imageSize);
+		ui::image(mEditorView.getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 		onSceneWindowResized(imageSize);
 
 		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
@@ -217,10 +158,16 @@ void SceneEditorSystem::onDrawGui()
 	if (menuPopup.data())
 		ImGui::OpenPopup(menuPopup.data());
 
-	static std::string scenePath{"scenes/scene.xml"};
+	static std::string scenePath{mSettings.assetsFolder / "scenes" / "scene.xml"};
 	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	{
+		auto assets = ui::AssetsExplorer{mSettings.assetsFolder, mIconTexture.ref()};
+		assets.header(mCurrentAssetsPath);
+		assets.onSelectPath(mCurrentAssetsPath);
+	}
 
 	{
 		auto modal = ui::NewSceneModal{};
@@ -244,7 +191,7 @@ void SceneEditorSystem::onDrawGui()
 void SceneEditorSystem::saveScene(const fs::path& outputPath)
 {
 	gLogger.info("Saving scene: {}", fs::absolute(outputPath).string());
-	auto ss = std::fstream{outputPath, std::ios_base::out | std::ios_base::trunc};
+	auto ss = std::ofstream{outputPath};
 	if (!ss)
 		return;
 
@@ -255,7 +202,7 @@ void SceneEditorSystem::saveScene(const fs::path& outputPath)
 void SceneEditorSystem::loadScene(const fs::path& inputPath)
 {
 	gLogger.info("Loading scene: {}", fs::absolute(inputPath).string());
-	auto ss = std::fstream{inputPath, std::ios_base::in};
+	auto ss = std::ifstream{inputPath};
 	if (!ss)
 		return;
 
@@ -271,8 +218,8 @@ void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
-	assert(hasEditorCamera());
-	renderer.render(mEditorView.getView().get());
+	if (hasEditorCamera())
+		renderer.render(mEditorView.getView().get());
 }
 
 void SceneEditorSystem::newScene()

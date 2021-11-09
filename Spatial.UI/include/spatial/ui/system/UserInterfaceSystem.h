@@ -20,18 +20,6 @@ class UserInterfaceSystem
   public:
 	explicit UserInterfaceSystem(filament::Engine& engine);
 
-	template <typename WindowImpl>
-	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
-	{
-		setViewport(window.getSize(), window.getFrameBufferSize());
-	}
-
-	void setFontTexture(const render::SharedTexture& fontTexture);
-
-	void setMaterial(const render::SharedMaterial& material);
-
-	void setViewport(const math::int2& windowSize, const math::int2& frameBufferSize);
-
 	void onStart();
 
 	void onUpdateFrame(float delta);
@@ -46,9 +34,20 @@ class UserInterfaceSystem
 
 	void onEvent(const TextEvent& event);
 
+	auto& getRenderer()
+	{
+		return mRenderer;
+	}
+
 	auto& getDrawGuiSignal()
 	{
 		return mRenderGuiSignal;
+	}
+
+	template <typename WindowImpl>
+	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
+	{
+		getRenderer().setViewport(window.getSize(), window.getFrameBufferSize());
 	}
 };
 

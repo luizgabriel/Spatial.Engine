@@ -57,25 +57,33 @@ render::IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, uint32_t capacity
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-render::Texture imguiCreateTextureAtlas(fl::Engine& engine, const uint8_t* data, uint32_t size)
+void imguiAddFont(const uint8_t* data, size_t size)
+{
+	auto& io = ImGui::GetIO();
+	auto config = ImFontConfig{};
+	config.FontDataOwnedByAtlas = false;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+		io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), 16.0f, &config);
+#pragma clang diagnostic pop
+}
+
+render::Texture imguiCreateTextureAtlas(fl::Engine& engine)
 {
 	auto& io = ImGui::GetIO();
 
-	auto copiedData = new uint8_t[size];
-	std::copy(data, data + size, &copiedData[0]);
-	io.Fonts->AddFontFromMemoryTTF(&copiedData[0], static_cast<int>(size), 16.0f);
-
 	unsigned char* imageData;
 	int width, height, bpp;
-	io.Fonts->GetTexDataAsAlpha8(&imageData, &width, &height, &bpp);
+	io.Fonts->GetTexDataAsRGBA32(&imageData, &width, &height, &bpp);
 
 	auto textureSize = width * height * bpp;
-	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::R, fl::Texture::Type::UBYTE};
+	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE};
 	const auto texture = fl::Texture::Builder()
 							 .width(static_cast<uint32_t>(width))
 							 .height(static_cast<uint32_t>(height))
 							 .levels(static_cast<uint8_t>(1))
-							 .format(fl::Texture::InternalFormat::R8)
+							 .format(fl::Texture::InternalFormat::RGBA8)
 							 .sampler(fl::Texture::Sampler::SAMPLER_2D)
 							 .build(engine);
 

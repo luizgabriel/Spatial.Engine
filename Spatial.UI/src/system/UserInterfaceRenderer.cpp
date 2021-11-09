@@ -25,8 +25,8 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	  mCamera{render::createCamera(mEngine, mCameraEntity.get())},
 	  mEntity{render::createEntity(mEngine)},
 	  mSkybox{render::createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
-	  mMaterial{},
-	  mFontTexture{}
+	  mMaterial{mEngine},
+	  mFontTexture{mEngine}
 {
 	mView->setCamera(mCamera.getInstance());
 	mView->setScene(mScene.get());
@@ -40,20 +40,21 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	mImguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const render::SharedMaterial& material)
+void UserInterfaceRenderer::setMaterial(const uint8_t* data, size_t size)
 {
-	mMaterial = material;
+	mMaterial = render::createMaterial(mEngine, data, size);
 }
 
-void UserInterfaceRenderer::setFontTexture(const render::SharedTexture& fontTextureAtlas)
+void UserInterfaceRenderer::addFont(const uint8_t* data, size_t size)
 {
-	mFontTexture = fontTextureAtlas;
-	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
-								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+	ImGui::SetCurrentContext(mImguiContext);
+	ui::imguiAddFont(data, size);
 }
 
 void UserInterfaceRenderer::setupEngineTheme()
 {
+	ImGui::SetCurrentContext(mImguiContext);
+
 	auto& io = ImGui::GetIO();
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_DpiEnableScaleFonts | ImGuiConfigFlags_IsSRGB;
@@ -151,6 +152,8 @@ void UserInterfaceRenderer::setViewport(const math::float2& windowSize, const ma
 
 	const auto scaleX = windowSize.x > 0 ? frameBufferSize.x / windowSize.x : 0;
 	const auto scaleY = windowSize.y > 0 ? frameBufferSize.y / windowSize.y : 0;
+
+	ImGui::SetCurrentContext(mImguiContext);
 	ui::imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);
 }
 
@@ -230,20 +233,10 @@ void UserInterfaceRenderer::renderDrawData()
 							   static_cast<uint32_t>(pcmd.ClipRect.z - pcmd.ClipRect.x),
 							   static_cast<uint32_t>(pcmd.ClipRect.w - pcmd.ClipRect.y));
 
-				if (pcmd.TextureId)
-				{
-					mi->setParameter("isTexture", true);
-					mi->setParameter("albedo", reinterpret_cast<const fl::Texture*>(pcmd.TextureId),
-									 fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
-														fl::TextureSampler::MagFilter::LINEAR});
-				}
-				else
-				{
-					mi->setParameter("albedo", mFontTexture.get(),
-									 fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
-														fl::TextureSampler::MagFilter::LINEAR});
-					mi->setParameter("isTexture", false);
-				}
+				mi->setParameter(
+					"albedo",
+					pcmd.TextureId ? reinterpret_cast<const fl::Texture*>(pcmd.TextureId) : mFontTexture.get(),
+					fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
 				rBuilder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
@@ -330,6 +323,14 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 		auto ibDescriptor = ui::imguiCreateDescriptor<ImDrawIdx>(ib);
 		mIndexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 	}
+}
+
+void UserInterfaceRenderer::createFontTextureAtlas()
+{
+	assert(mMaterial.isValid());
+	mFontTexture = ui::imguiCreateTextureAtlas(mEngine);
+	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
+								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }
 
 } // namespace spatial

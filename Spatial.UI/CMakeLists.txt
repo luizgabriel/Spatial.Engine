@@ -42,7 +42,7 @@ add_library(Spatial.UI
 	src/components/OpenSceneModal.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/WindowPaddingStyle.cpp)
+	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/AssetsExplorer.h src/components/AssetsExplorer.cpp include/spatial/ui/components/Icons.h)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

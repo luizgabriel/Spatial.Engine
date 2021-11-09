@@ -12,7 +12,7 @@ namespace fl = filament;
 namespace spatial::render
 {
 
-Material createMaterial(fl::Engine& engine, const uint8_t* data, uint32_t size)
+Material createMaterial(fl::Engine& engine, const uint8_t* data, size_t size)
 {
 	auto material = fl::Material::Builder().package(data, size).build(engine);
 	return Material{engine, material};
@@ -33,8 +33,8 @@ Texture createTexture(filament::Engine& engine, math::int2 dimensions, fl::Textu
 	return Texture{engine, texture};
 }
 
-Texture createTexture(fl::Engine& engine, const uint8_t* data, uint32_t size, const std::string& resourceData,
-					  fl::Texture::Usage usage, fl::Texture::Sampler sampler)
+Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size,
+					  filament::Texture::Usage usage, filament::Texture::Sampler sampler)
 {
 	int width, height, n;
 	const auto* imageData = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &n, 4);
@@ -50,8 +50,10 @@ Texture createTexture(fl::Engine& engine, const uint8_t* data, uint32_t size, co
 	return std::move(texture);
 }
 
-VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data)
+VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 {
+	const auto& header = filamesh.header;
+
 	const uint32_t FLAG_SNORM16_UV = 0x2;
 	auto uvType = fl::VertexBuffer::AttributeType::HALF2;
 	if (header.flags & FLAG_SNORM16_UV)
@@ -84,7 +86,7 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 
 	auto vb = VertexBuffer{engine, vbBuilder.build(engine)};
 
-	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(data, header.vertexSize);
+	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(&filamesh.vertexData[0], header.vertexSize);
 	vb->setBufferAt(engine, 0, std::move(vbBufferDescriptor));
 
 	fl::Fence::waitAndDestroy(engine.createFence());
@@ -92,8 +94,10 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& he
 	return vb;
 }
 
-IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data)
+IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 {
+	const auto& header = filamesh.header;
+
 	auto ibBuilder =
 		fl::IndexBuffer::Builder()
 			.indexCount(header.indexCount)
@@ -101,7 +105,7 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& head
 
 	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
 
-	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(data, header.indexSize);
+	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(&filamesh.indexData[0], header.indexSize);
 	ib->setBuffer(engine, std::move(ibBufferDescriptor));
 
 	fl::Fence::waitAndDestroy(engine.createFence());

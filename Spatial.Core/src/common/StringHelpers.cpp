@@ -24,4 +24,14 @@ std::vector<std::string_view> split(std::string_view value, char separator)
 	return output;
 }
 
+HashedString::hash_type hashOf(const std::string_view value)
+{
+	return HashedString{value.data()}.value();
+}
+
+HashedWString::hash_type hashOf(const std::wstring_view value)
+{
+	return HashedWString{value.data()}.value();
+}
+
 } // namespace spatial

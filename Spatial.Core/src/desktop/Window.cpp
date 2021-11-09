@@ -92,10 +92,10 @@ void Window::warpMouse(const math::float2& position) const
 	glfwSetCursorPos(mWindowHandle, position.x, position.y);
 }
 
-void Window::setIconPixels(const uint8_t* data, uint32_t size)
+void Window::setIcon(const uint8_t* pixelsData, uint32_t size)
 {
 	auto icons = std::array<GLFWimage, 1>{};
-	icons[0].pixels = stbi_load_from_memory(data, static_cast<int>(size), &icons[0].width, &icons[0].height, nullptr, 4);
+	icons[0].pixels = stbi_load_from_memory(pixelsData, static_cast<int>(size), &icons[0].width, &icons[0].height, nullptr, 4);
 
 	glfwSetWindowIcon(mWindowHandle, 1, &icons[0]);
 

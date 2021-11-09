@@ -72,22 +72,8 @@ class EntityHandle
 		return mRegistry.getComponent<const Component>(mEntity);
 	}
 
-	template <typename Component, typename... Args>
-	Component& addOrReplace(Args&&... args)
-	{
-		assert(isValid());
-		return mRegistry.addOrReplaceComponent<Component>(mEntity, std::forward<Args>(args)...);
-	}
-
-	template <typename Component, typename... Args>
-	Component& getOrAdd(Args&&... args)
-	{
-		assert(isValid());
-		return mRegistry.getOrAddComponent<Component>(mEntity, std::forward<Args>(args)...);
-	}
-
 	template <typename... Component>
-	bool has() const
+	[[nodiscard]] bool has() const
 	{
 		assert(isValid());
 		return mRegistry.hasAllComponents<Component...>(mEntity);

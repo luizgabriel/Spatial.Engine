@@ -15,7 +15,7 @@ using bands_t = std::array<filament::math::float3, 9>;
 
 bands_t parseShFile(const uint8_t* data, uint32_t size);
 
-Skybox createSkybox(fl::Engine& engine, fl::math::float4 color);
+Skybox createSkybox(filament::Engine& engine, filament::math::float4 color);
 
 Skybox createSkybox(filament::Engine& engine, filament::Texture& skybox, bool showSun = true);
 

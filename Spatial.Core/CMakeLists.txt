@@ -57,13 +57,13 @@ add_library(Spatial.Core
 	include/spatial/serialization/EntityName.h
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
+	include/spatial/serialization/FileSystem.h
 
 	include/spatial/resources/Math.h
 	include/spatial/resources/BoundingBox.h
 	include/spatial/resources/FilameshFile.h
 
 	## SOURCES
-	src/common/Key.cpp
 	src/common/StringHelpers.cpp
 	
 	src/core/Application.cpp
@@ -78,7 +78,8 @@ add_library(Spatial.Core
 	src/ecs/Registry.cpp
 	src/ecs/RegistryUtils.cpp
 	src/ecs/EntityBuilder.cpp
-	
+	src/ecs/Relation.cpp
+
 	src/render/Resources.cpp
 	src/render/Engine.cpp
 	src/render/Entity.cpp
@@ -97,7 +98,7 @@ add_library(Spatial.Core
 	src/render/TextureView.cpp
 
 	src/resources/BoundingBox.cpp
-	src/resources/FilameshFile.cpp )
+	src/resources/FilameshFile.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
@@ -108,7 +109,7 @@ set_property(
 	PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
-	PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits>)
+	PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits> <set> <random> <array>)
 
 target_include_directories(Spatial.Core
 	PUBLIC
@@ -125,7 +126,8 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::spdlog
 	CONAN_PKG::stb
 	CONAN_PKG::glfw
-	CONAN_PKG::cereal)
+	CONAN_PKG::cereal
+	CONAN_PKG::magic_enum)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

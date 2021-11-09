@@ -43,6 +43,7 @@ int Application::run()
 	while (mRunning)
 	{
 		const auto delta = mClock.getDeltaTime().count();
+		std::this_thread::sleep_for(Clock<float>::delta_t{mDesiredDelta - delta});
 
 		mStartFrameSignal(delta);
 
@@ -50,7 +51,6 @@ int Application::run()
 
 		mEndFrameSignal();
 
-		std::this_thread::sleep_for(Clock<float>::delta_t{mDesiredDelta - delta});
 		mClock.tick();
 	}
 

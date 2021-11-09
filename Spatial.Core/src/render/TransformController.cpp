@@ -1,5 +1,5 @@
 #include <spatial/ecs/EntityName.h>
-#include <spatial/ecs/SceneNode.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Transform.h>
 #include <spatial/render/TransformController.h>
@@ -42,8 +42,8 @@ void TransformController::updateTransformsParents(ecs::Registry& registry) const
 		auto& transform = registry.getComponent<Transform>(entity);
 
 		// TODO: This branching can be optimized (sorting may help?)
-		if (registry.hasAllComponents<ecs::SceneNode>(entity)) {
-			const auto& node = registry.getComponent<const ecs::SceneNode>(entity);
+		if (registry.hasAllComponents<ecs::Relation>(entity)) {
+			const auto& node = registry.getComponent<const ecs::Relation>(entity);
 			if (registry.isValid(node.parent) && registry.hasAllComponents<Transform>(node.parent)) {
 				const auto& parentTransform = registry.getComponent<const Transform>(node.parent);
 				transform.setParent(parentTransform);

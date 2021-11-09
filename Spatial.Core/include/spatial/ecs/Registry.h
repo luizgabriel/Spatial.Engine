@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GLFW/glfw3native.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
@@ -60,7 +61,7 @@ class Registry
 	}
 
 	template <typename... Component, typename... Exclude>
-	auto getEntities(entt::exclude_t<Exclude...> excludes = {}) const
+	auto getEntities(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
 		return mRegistry.view<Component...>(std::move(excludes));
 	}
@@ -85,18 +86,21 @@ class Registry
 	template <typename Component>
 	const Component& getComponent(Entity entity) const
 	{
+		assert(isValid(entity));
 		return mRegistry.get<Component>(entity);
 	}
 
 	template <typename Component>
 	Component& getComponent(Entity entity)
 	{
+		assert(isValid(entity));
 		return mRegistry.get<Component>(entity);
 	}
 
 	template <typename Component>
 	void removeComponent(Entity entity)
 	{
+		assert(isValid(entity));
 		mRegistry.remove<Component>(entity);
 	}
 
@@ -109,43 +113,22 @@ class Registry
 	template <typename Component>
 	void addComponent(Entity entity)
 	{
+		assert(isValid(entity));
 		mRegistry.emplace<Component>(entity);
 	}
 
 	template <typename Component>
 	Component& addComponent(Entity entity, Component&& component)
 	{
+		assert(isValid(entity));
 		return mRegistry.emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	Component& addComponent(Entity entity, Args&&... args)
 	{
+		assert(isValid(entity));
 		return mRegistry.emplace<Component>(entity, std::forward<Args>(args)...);
-	}
-
-	template <typename Component>
-	Component& addOrReplaceComponent(Entity entity, Component&& component)
-	{
-		return mRegistry.emplace_or_replace<Component>(entity, std::forward<Component>(component));
-	}
-
-	template <typename Component, typename... Args>
-	Component& addOrReplaceComponent(Entity entity, Args&&... args)
-	{
-		return mRegistry.emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
-	}
-
-	template <typename Component>
-	Component& getOrAddComponent(Entity entity, Component&& component)
-	{
-		return mRegistry.get_or_emplace<Component>(entity, std::forward<Component>(component));
-	}
-
-	template <typename Component, typename... Args>
-	Component& getOrAddComponent(Entity entity, Args&&... args)
-	{
-		return isValid(entity) && mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename... Component>
@@ -172,6 +155,25 @@ class Registry
 	operator entt::registry&()
 	{
 		return mRegistry;
+	}
+
+	template <typename... Component, typename... Exclude>
+	void clone(Registry& destination, ExcludeComponentsType<Exclude...> excludes = {}) const
+	{
+		auto view = getEntities<Component...>(std::move(excludes));
+		destination.mRegistry.insert(view.data(), view.data() + view.size(), view.raw(), view.raw() + view.size());
+	}
+
+	template <typename Component>
+	const Component* getComponentIfExists(Entity entity) const
+	{
+		return mRegistry.template try_get<const Component>(entity);
+	}
+
+	template <typename Component>
+	Component* getComponentIfExists(Entity entity)
+	{
+		return mRegistry.template try_get<Component>(entity);
 	}
 
   private:

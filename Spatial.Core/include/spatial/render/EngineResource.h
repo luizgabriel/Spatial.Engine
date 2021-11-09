@@ -3,8 +3,6 @@
 #include <filament/Engine.h>
 #include <memory>
 
-namespace fl = filament;
-
 namespace spatial::render
 {
 
@@ -20,7 +18,7 @@ class EngineResource
 	ResourceType* mResource;
 
   public:
-	explicit EngineResource(fl::Engine& engine, ResourceType* resource = nullptr) noexcept
+	explicit EngineResource(filament::Engine& engine, ResourceType* resource = nullptr) noexcept
 		: mEngine{engine}, mResource{resource}
 	{
 	}

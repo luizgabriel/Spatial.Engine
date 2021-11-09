@@ -3,8 +3,9 @@
 #include "EditorCamera.h"
 #include "DefaultMaterial.h"
 
-#include <spatial/serialization/Math.h>
 #include <cereal/cereal.hpp>
+#include <magic_enum.hpp>
+#include <spatial/serialization/Math.h>
 
 namespace cereal
 {
@@ -15,7 +16,6 @@ void serialize(Archive& ar, spatial::editor::EditorCamera& camera)
 	ar(cereal::make_nvp("velocity", camera.velocity));
 	ar(cereal::make_nvp("sensitivity", camera.sensitivity));
 }
-
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::DefaultMaterial& material)

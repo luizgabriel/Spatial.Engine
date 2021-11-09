@@ -47,7 +47,7 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 		&& registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity))
 	{
 		const auto& entityName = registry.getComponent<const ecs::EntityName>(selectedEntity);
-		selectedItemName = entityName;
+		selectedItemName = entityName.name;
 	}
 	else
 	{
@@ -92,6 +92,8 @@ void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs
 	}
 }
 
-void image(filament::Texture* texture, const math::float2& size);
+void image(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
+
+bool imageButton(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
 
 } // namespace spatial::ui

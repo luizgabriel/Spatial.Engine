@@ -20,7 +20,7 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   </a>
 
   <a href="https://buymeacoffee.com/luizgabriel" title="Donate to this project using Buy Me A Coffee">
-    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" />
+    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate fileButton" />
   </a>
 </p>
 

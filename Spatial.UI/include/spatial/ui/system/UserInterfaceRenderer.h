@@ -22,8 +22,8 @@ class UserInterfaceRenderer
 	render::Camera mCamera;
 	render::Entity mEntity;
 	render::Skybox mSkybox;
-	render::SharedMaterial mMaterial;
-	render::SharedTexture mFontTexture;
+	render::Material mMaterial;
+	render::Texture mFontTexture;
 
 	std::vector<render::VertexBuffer> mVertexBuffers;
 	std::vector<render::IndexBuffer> mIndexBuffers;
@@ -45,9 +45,11 @@ class UserInterfaceRenderer
 
 	void setViewport(const math::float2& windowSize, const math::float2& frameBufferSize);
 
-	void setMaterial(const render::SharedMaterial& material);
+	void setMaterial(const uint8_t* data, size_t size);
 
-	void setFontTexture(const render::SharedTexture& fontTextureAtlas);
+	void addFont(const uint8_t* data, size_t size);
+
+	void createFontTextureAtlas();
 
 	void setupEngineTheme();
 
@@ -63,7 +65,7 @@ class UserInterfaceRenderer
 	void drawFrame();
 
 	// region Getters
-	const auto& getView() const
+	[[nodiscard]] const auto& getView() const
 	{
 		return mView.ref();
 	}

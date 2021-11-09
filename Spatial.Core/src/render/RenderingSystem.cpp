@@ -7,8 +7,8 @@ namespace bk = filament::backend;
 namespace spatial
 {
 
-RenderingSystem::RenderingSystem(const RenderingSystem::Backend backend, void* nativeWindowHandle)
-	: mEngine{render::createEngine(backend)},
+RenderingSystem::RenderingSystem(void* nativeWindowHandle)
+	: mEngine{render::createEngine(Backend::OPENGL)},
 	  mSwapChain{render::createSwapChain(getEngine(), nativeWindowHandle)},
 	  mRenderer{render::createRenderer(getEngine())},
 	  mOnRenderSignal{}

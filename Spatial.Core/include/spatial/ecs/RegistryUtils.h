@@ -13,4 +13,11 @@ EntityHandle createEntity(Registry& registry, std::string name);
 
 EntityBuilder build(Registry& registry);
 
+Entity findEntityFromName(const ecs::Registry& registry, std::string_view entityName);
+
+Entity findEntityFromUUID(const ecs::Registry& registry, UUID uuid);
+
+std::optional<UUID> findUUIDFromEntityName(const ecs::Registry& registry, std::string_view name);
+
+
 } // namespace spatial

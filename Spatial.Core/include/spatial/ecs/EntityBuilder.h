@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntityHandle.h"
+#include "EntityName.h"
 #include "Mesh.h"
 #include "Tags.h"
 #include <spatial/common/Math.h>
@@ -41,14 +42,14 @@ class EntityBuilder
 	template <typename Component>
 	EntityBuilder& with(Component&& component)
 	{
-		mRegistry.addOrReplaceComponent<Component>(mEntity, std::move(component));
+		mRegistry.template addComponent<Component>(mEntity, std::move(component));
 		return *this;
 	}
 
 	template <typename Component, typename... Args>
 	EntityBuilder& with(Args&&... args)
 	{
-		mRegistry.addOrReplaceComponent<Component>(mEntity, std::forward<Args>(args)...);
+		mRegistry.addComponent<Component>(mEntity, std::forward<Args>(args)...);
 		return *this;
 	}
 
@@ -70,7 +71,7 @@ class EntityBuilder
 	DirectionalLightEntityBuilder asDirectionalLight();
 	SunLightEntityBuilder asSunLight();
 
-	MeshEntityBuilder asMesh(uint32_t resourceId);
+	MeshEntityBuilder asMesh(std::filesystem::path path, Entity defaultMaterial);
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -243,15 +244,21 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
   public:
 	using Base = BasicEntityBuilder<Mesh>;
 
-	MeshEntityBuilder(Registry& registry, Entity entity, std::uint32_t resourceId);
+	MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath, Entity defaultMaterial);
 
 	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
-
-	MeshEntityBuilder& withDefaultMaterial(Entity materialEntity);
 
 	MeshEntityBuilder& withMaterialAt(std::uint8_t index, Entity materialEntity);
 
 	MeshEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
+};
+
+class FileEntityBuilder : public EntityBuilder
+{
+  public:
+	FileEntityBuilder(Registry& registry, Entity entity);
+
+	FileEntityBuilder& fromPath(const std::filesystem::path& path);
 };
 
 } // namespace spatial::ecs

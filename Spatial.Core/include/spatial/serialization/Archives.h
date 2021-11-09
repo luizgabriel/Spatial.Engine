@@ -6,7 +6,7 @@
 namespace spatial
 {
 
-using JsonOuputArchive = cereal::JSONOutputArchive;
+using JsonOutputArchive = cereal::JSONOutputArchive;
 using JsonInputArchive = cereal::JSONInputArchive;
 
 using XMLInputArchive = cereal::XMLInputArchive;

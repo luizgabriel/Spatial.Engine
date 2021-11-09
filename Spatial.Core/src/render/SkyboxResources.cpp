@@ -14,7 +14,7 @@ Texture createKtxTexture(fl::Engine& engine, const uint8_t* data, uint32_t size)
 	using namespace std;
 
 	auto ktxBundle = new image::KtxBundle(data, size);
-	return Texture{engine, image::ktx::createTexture(&engine, ktxBundle, false)};
+	return Texture{engine, image::ktx::createTexture(&engine, ktxBundle, true)};
 }
 
 bands_t parseShFile(const uint8_t* data, uint32_t size)

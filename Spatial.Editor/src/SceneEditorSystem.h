@@ -3,13 +3,14 @@
 #include <imgui.h>
 
 #include "EditorCameraController.h"
-#include <entt/entity/entity.hpp>
+#include "EditorCamera.h"
+#include "Settings.h"
+
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
 #include <spatial/desktop/InputState.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
-#include <spatial/ecs/EntityHandle.h>
 #include <spatial/render/CameraController.h>
 #include <spatial/render/LightController.h>
 #include <spatial/render/MaterialController.h>
@@ -17,9 +18,6 @@
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
-#include <spatial/resources/FilameshFile.h>
-
-#include <ghc/filesystem.hpp>
 
 namespace fl = filament;
 
@@ -29,6 +27,8 @@ namespace spatial::editor
 class SceneEditorSystem
 {
   private:
+	Settings mSettings;
+
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 
@@ -40,8 +40,13 @@ class SceneEditorSystem
 	render::Texture mSkyboxTexture;
 	render::IndirectLight mSkyboxLight;
 	render::Skybox mSkybox;
+	render::Texture mIconTexture;
 
 	ecs::Entity mSelectedEntity;
+
+	// TODO: Handle multiple scenes
+	// std::vector<ecs::Registry> mOpenedScenes;
+	// std::size_t mCurrentSelectedScene;
 
 	ecs::Registry mRegistry;
 
@@ -54,8 +59,14 @@ class SceneEditorSystem
 	render::LightController mLightController;
 	render::MeshController mMeshController;
 
+	std::filesystem::path mCurrentAssetsPath;
+
   public:
-	explicit SceneEditorSystem(filament::Engine& engine, desktop::Window& window);
+	SceneEditorSystem(
+		Settings settings,
+		filament::Engine& engine,
+		desktop::Window& window
+	);
 
 	void onStart();
 
@@ -69,14 +80,12 @@ class SceneEditorSystem
 
 	void onSceneWindowResized(const math::int2& size);
 
-	void saveScene(const ghc::filesystem::path& outputPath);
+	void saveScene(const std::filesystem::path& outputPath);
 
-	void loadScene(const ghc::filesystem::path& inputPath);
+	void loadScene(const std::filesystem::path& inputPath);
 
 	void newScene();
 	bool hasEditorCamera() const;
 };
-
-ecs::Entity createDefaultScene(ecs::Registry& registry);
 
 } // namespace spatial::editor

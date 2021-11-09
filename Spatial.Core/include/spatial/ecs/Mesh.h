@@ -2,9 +2,7 @@
 
 #include <array>
 #include <filament/Box.h>
-#include <string>
-
-#include <spatial/common/StringHelpers.h>
+#include <filesystem>
 #include <spatial/ecs/Registry.h>
 
 namespace spatial::ecs
@@ -12,19 +10,30 @@ namespace spatial::ecs
 
 struct Mesh
 {
-	constexpr static std::uint8_t MAX_GEOMETRIES = 32;
+	constexpr static uint8_t MAX_GEOMETRIES = 16;
+	constexpr static size_t ALL_PARTS = std::numeric_limits<std::size_t>::max();
 
-	std::uint32_t resourceId;
+	std::filesystem::path resourcePath;
 
 	bool castShadows{false};
 	bool receiveShadows{false};
 	bool culling{false};
 
-	std::size_t partsCount{1};
-	std::size_t partsOffset{0};
+	size_t partsCount{ALL_PARTS};
+	size_t partsOffset{0};
 
 	Entity defaultMaterial;
 	std::array<Entity, Mesh::MAX_GEOMETRIES> materials{};
+
+	Mesh()
+		: resourcePath{}, defaultMaterial{NullEntity}
+	{
+	}
+
+	Mesh(std::filesystem::path resourcePath, Entity defaultMaterial)
+		: resourcePath{std::move(resourcePath)}, defaultMaterial{defaultMaterial}
+	{
+	}
 };
 
-}
+} // namespace spatial::ecs

@@ -10,18 +10,18 @@
 namespace spatial::render
 {
 
-Material createMaterial(filament::Engine& engine, const uint8_t* data, uint32_t size);
+Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size);
 
-Texture createTexture(filament::Engine& engine, math::int2 dimensions,
-					  fl::Texture::InternalFormat format, fl::Texture::Usage usage = fl::Texture::Usage::DEFAULT,
-					  fl::Texture::Sampler sampler = fl::Texture::Sampler::SAMPLER_2D);
+Texture createTexture(filament::Engine& engine, math::int2 dimensions, filament::Texture::InternalFormat format,
+					  filament::Texture::Usage usage = filament::Texture::Usage::DEFAULT,
+					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
 
-Texture createTexture(filament::Engine& engine, const uint8_t* data, uint32_t size,
-					  fl::Texture::Usage usage = fl::Texture::Usage::DEFAULT,
-					  fl::Texture::Sampler sampler = fl::Texture::Sampler::SAMPLER_2D);
+Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size,
+					  filament::Texture::Usage usage = filament::Texture::Usage::DEFAULT,
+					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
 
-VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data);
+VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
-IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFileHeader& header, const uint8_t* data);
+IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
 } // namespace spatial::render

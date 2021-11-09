@@ -7,16 +7,6 @@ UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{e
 {
 }
 
-void UserInterfaceSystem::setFontTexture(const render::SharedTexture& fontTexture)
-{
-	mRenderer.setFontTexture(fontTexture);
-}
-
-void UserInterfaceSystem::setMaterial(const render::SharedMaterial& material)
-{
-	mRenderer.setMaterial(material);
-}
-
 void UserInterfaceSystem::onStart()
 {
 	mRenderer.setupEngineTheme();
@@ -25,7 +15,7 @@ void UserInterfaceSystem::onStart()
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 {
-	setViewport(event.windowSize, event.frameBufferSize);
+	getRenderer().setViewport(event.windowSize, event.frameBufferSize);
 }
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
@@ -41,11 +31,6 @@ void UserInterfaceSystem::onEvent(const KeyEvent& event)
 void UserInterfaceSystem::onEvent(const TextEvent& event)
 {
 	mInput.setText(event.text);
-}
-
-void UserInterfaceSystem::setViewport(const math::int2& windowSize, const math::int2& frameBufferSize)
-{
-	mRenderer.setViewport(windowSize, frameBufferSize);
 }
 
 void UserInterfaceSystem::onUpdateFrame(float delta)

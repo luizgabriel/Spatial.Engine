@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <argh.h>
-#include <ghc/filesystem.hpp>
 #include <fmt/format.h>
 #include <fstream>
 #include <iostream>
@@ -8,7 +7,7 @@
 #include <locale>
 #include <string>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 std::string toVariableName(const fs::path& filePath, char separator, const std::locale& locale)
 {

@@ -559,7 +559,10 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	ImGui::Text("Resource ID: ");
 	ImGui::SameLine();
-	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "0x%02X", mesh.resourceId);
+
+	std::string resourcePath = mesh.resourcePath.string();
+	ui::inputText("Resource", resourcePath);
+	mesh.resourcePath = resourcePath;
 
 	spacing(3);
 
@@ -664,9 +667,20 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
 }
 
-void image(filament::Texture* texture, const math::float2& size)
+void image(const filament::Texture& texture, math::float2 size, math::float4 uv)
 {
-	ImGui::Image(reinterpret_cast<ImTextureID>(texture), ImVec2(size.x, size.y));
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+#pragma clang diagnostic pop
+}
+
+bool imageButton(const filament::Texture& texture, math::float2 size, math::float4 uv)
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+#pragma clang diagnostic pop
 }
 
 } // namespace spatial::ui
