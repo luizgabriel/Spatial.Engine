@@ -8,7 +8,7 @@ OpenSceneModal::OpenSceneModal(std::string& openPath) : mModal{"Open Scene"}
 {
 	if (mModal.isOpen())
 	{
-		ui::inputText("Scene File Path", openPath);
+		ui::inputText("Path", openPath);
 
 		ImGui::Separator();
 

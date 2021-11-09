@@ -39,7 +39,6 @@ void deserialize(Archive& ar, Registry& registry)
 {
 	auto snapshot = entt::snapshot_loader{registry};
 	snapshot.component<ecs::EntityName>(ar);
-	snapshot.component<ecs::UUID>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
 	snapshot.component<ecs::OrthographicCamera>(ar);
@@ -49,6 +48,7 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
+	snapshot.component<ecs::UUID>(ar);
 
 	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);

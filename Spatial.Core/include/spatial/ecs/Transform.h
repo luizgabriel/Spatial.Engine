@@ -15,7 +15,9 @@ struct Transform
 	{
 	}
 
-	math::mat4f getMatrix() const noexcept;
+	Transform(const math::float3& position, const math::float3& scale, const math::float3& rotation);
+
+	[[nodiscard]] math::mat4f getMatrix() const noexcept;
 };
 
 }

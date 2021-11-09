@@ -1,10 +1,10 @@
 #pragma once
 
-#include <spatial/ui/system/UserInterfaceInput.h>
-#include <spatial/ui/system/UserInterfaceRenderer.h>
 #include <spatial/common/Math.h>
 #include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
+#include <spatial/ui/system/ImGuiRenderer.h>
+#include <spatial/ui/system/UserInterfaceInput.h>
 
 #include <string_view>
 
@@ -13,7 +13,7 @@ namespace spatial
 class UserInterfaceSystem
 {
   private:
-	UserInterfaceRenderer mRenderer;
+	ImGuiRenderer mRenderer;
 	UserInterfaceInput mInput;
 	Signal<> mRenderGuiSignal;
 

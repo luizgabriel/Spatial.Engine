@@ -45,19 +45,19 @@
 	<value22>5</value22>
 	<value23>
 		<position>
-			<x>0</x>
-			<y>0</y>
-			<z>0</z>
+			<x>2.5</x>
+			<y>1</y>
+			<z>2.7999999523162842</z>
 		</position>
 		<rotation>
 			<x>0</x>
-			<y>0</y>
+			<y>0.68416875600814819</y>
 			<z>0</z>
 		</rotation>
 		<scale>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
+			<x>2</x>
+			<y>2</y>
+			<z>2</z>
 		</scale>
 	</value23>
 	<value24>6</value24>
@@ -81,27 +81,27 @@
 	<value26>7</value26>
 	<value27>
 		<position>
-			<x>6</x>
+			<x>8.6999998092651367</x>
 			<y>0</y>
 			<z>0</z>
 		</position>
 		<rotation>
-			<x>0</x>
-			<y>0</y>
+			<x>1.5707963705062866</x>
+			<y>0.45204004645347595</y>
 			<z>0</z>
 		</rotation>
 		<scale>
 			<x>1</x>
-			<y>1</y>
+			<y>10</y>
 			<z>1</z>
 		</scale>
 	</value27>
 	<value28>8</value28>
 	<value29>
 		<position>
-			<x>3</x>
-			<y>0</y>
-			<z>0</z>
+			<x>-3.7000000476837158</x>
+			<y>0.69999998807907104</y>
+			<z>5.0999999046325684</z>
 		</position>
 		<rotation>
 			<x>0</x>
@@ -109,21 +109,21 @@
 			<z>0</z>
 		</rotation>
 		<scale>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
+			<x>2</x>
+			<y>2</y>
+			<z>2</z>
 		</scale>
 	</value29>
 	<value30>9</value30>
 	<value31>
 		<position>
-			<x>6.6703081130981445</x>
-			<y>2.8964006900787354</y>
-			<z>10.73358154296875</z>
+			<x>8.9185123443603516</x>
+			<y>4.9779047966003418</y>
+			<z>21.099102020263672</z>
 		</position>
 		<rotation>
-			<x>-0.34404087066650391</x>
-			<y>0.35078376531600952</y>
+			<x>-0.21678736805915833</x>
+			<y>0.26931312680244446</y>
 			<z>0</z>
 		</rotation>
 		<scale>
@@ -136,7 +136,7 @@
 	<value33>9</value33>
 	<value34>
 		<fieldOfView>60</fieldOfView>
-		<aspectRatio>0.99856321839080464</aspectRatio>
+		<aspectRatio>1.3204022988505748</aspectRatio>
 		<near>0.10000000149011612</near>
 		<far>10000</far>
 	</value34>
@@ -164,28 +164,28 @@
 	<value43>4</value43>
 	<value44>5</value44>
 	<value45>
-		<resourceId>43184947</resourceId>
+		<resourcePath>meshes/cube.filamesh</resourcePath>
 		<receiveShadows>true</receiveShadows>
 		<castShadows>true</castShadows>
 		<material0>1</material0>
 	</value45>
 	<value46>6</value46>
 	<value47>
-		<resourceId>1853369288</resourceId>
+		<resourcePath>meshes/cube.filamesh</resourcePath>
 		<receiveShadows>true</receiveShadows>
 		<castShadows>false</castShadows>
 		<material0>2</material0>
 	</value47>
 	<value48>7</value48>
 	<value49>
-		<resourceId>494407520</resourceId>
+		<resourcePath>meshes/cube.filamesh</resourcePath>
 		<receiveShadows>true</receiveShadows>
 		<castShadows>true</castShadows>
 		<material0>3</material0>
 	</value49>
 	<value50>8</value50>
 	<value51>
-		<resourceId>4066889203</resourceId>
+		<resourcePath>meshes/cube.filamesh</resourcePath>
 		<receiveShadows>true</receiveShadows>
 		<castShadows>true</castShadows>
 		<material0>4</material0>

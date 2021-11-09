@@ -25,14 +25,6 @@ PropertiesPanel::PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEn
 		inputText("##Name", node.name);
 	}
 
-	ImGui::SameLine();
-	ImGui::PushItemWidth(-1);
-
-	ImGui::Spacing();
-	ImGui::Spacing();
-
-	ImGui::PopItemWidth();
-
 	{
 		auto collapse = ComponentCollapse{registry, selectedEntity};
 		if (collapse.hasComponentAndIsOpen<ecs::Transform>("Transform"))

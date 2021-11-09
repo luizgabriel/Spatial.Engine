@@ -16,22 +16,7 @@
 namespace spatial::ui
 {
 
-bool inputText(const std::string_view label, std::string& value);
-
-bool directionInput(const std::string_view label, math::float3& v, float size = 100.0f,
-					std::uint32_t color = 0x22ff2200);
-
-bool buttonInput(const std::string_view label, float& value, float resetValue = .0f, float speed = .1f, float min = .0f,
-				 float max = .0f, const std::string_view format = "%.2f");
-
-bool vec2Input(const std::string_view label, math::float2& v, float resetValue = .0f, float speed = .1f,
-			   float min = .0f, float max = .0f, const std::string_view format = "%.2f");
-
-bool vec3Input(const std::string_view label, math::float3& v, float resetValue = .0f, float speed = .1f,
-			   float min = .0f, float max = .0f, const std::string_view format = "%.2f");
-
-bool vec4Input(const std::string_view label, math::float4& v, float resetValue = .0f, float speed = .1f,
-			   float min = .0f, float max = .0f, const std::string_view format = "%.2f");
+bool inputText(std::string_view label, std::string& value);
 
 void spacing(std::uint32_t times = 1);
 
@@ -95,5 +80,7 @@ void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs
 void image(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
 
 bool imageButton(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
+
+void mainMenu(std::string_view& openedMenu);
 
 } // namespace spatial::ui

@@ -3,7 +3,7 @@ add_library(Spatial.UI
 	## HEADERS
 	include/spatial/ui/system/ImGuiHelpers.h
 	include/spatial/ui/system/UserInterfaceSystem.h
-	include/spatial/ui/system/UserInterfaceRenderer.h
+		include/spatial/ui/system/ImGuiRenderer.h
 	include/spatial/ui/system/UserInterfaceInput.h
 	
 	include/spatial/ui/components/Window.h
@@ -42,7 +42,7 @@ add_library(Spatial.UI
 	src/components/OpenSceneModal.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/AssetsExplorer.h src/components/AssetsExplorer.cpp include/spatial/ui/components/Icons.h)
+	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/AssetsExplorer.h src/components/AssetsExplorer.cpp include/spatial/ui/components/Icons.h include/spatial/ui/components/DirectionInput.h src/components/DirectionInput.cpp include/spatial/ui/components/VectorInput.h src/components/VectorInput.cpp include/spatial/ui/components/DragAndDrop.h src/components/DragAndDrop.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

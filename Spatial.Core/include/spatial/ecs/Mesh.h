@@ -19,7 +19,7 @@ struct Mesh
 	bool receiveShadows{false};
 	bool culling{false};
 
-	size_t partsCount{ALL_PARTS};
+	size_t partsCount{1};
 	size_t partsOffset{0};
 
 	Entity defaultMaterial;

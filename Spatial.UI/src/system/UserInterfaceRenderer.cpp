@@ -1,5 +1,5 @@
 #include <spatial/ui/system/ImGuiHelpers.h>
-#include <spatial/ui/system/UserInterfaceRenderer.h>
+#include <spatial/ui/system/ImGuiRenderer.h>
 
 #include <spatial/common/Math.h>
 
@@ -17,7 +17,7 @@ namespace fl = filament;
 namespace spatial
 {
 
-UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
+ImGuiRenderer::ImGuiRenderer(fl::Engine& engine)
 	: mEngine{engine},
 	  mView{render::createView(mEngine)},
 	  mScene{render::createScene(mEngine)},
@@ -40,23 +40,22 @@ UserInterfaceRenderer::UserInterfaceRenderer(fl::Engine& engine)
 	mImguiContext = ImGui::CreateContext();
 }
 
-void UserInterfaceRenderer::setMaterial(const uint8_t* data, size_t size)
+void ImGuiRenderer::setMaterial(const uint8_t* data, size_t size)
 {
 	mMaterial = render::createMaterial(mEngine, data, size);
 }
 
-void UserInterfaceRenderer::addFont(const uint8_t* data, size_t size)
+void ImGuiRenderer::addFont(const uint8_t* data, size_t size)
 {
 	ImGui::SetCurrentContext(mImguiContext);
 	ui::imguiAddFont(data, size);
 }
 
-void UserInterfaceRenderer::setupEngineTheme()
+void ImGuiRenderer::setupEngineTheme()
 {
 	ImGui::SetCurrentContext(mImguiContext);
 
 	auto& io = ImGui::GetIO();
-	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_DpiEnableScaleFonts | ImGuiConfigFlags_IsSRGB;
 
 	auto& style = ImGui::GetStyle();
@@ -136,12 +135,12 @@ void UserInterfaceRenderer::setupEngineTheme()
 	colors[ImGuiCol_DockingPreview] = ImVec4(0.85f, 0.85f, 0.85f, 0.28f);
 }
 
-UserInterfaceRenderer::~UserInterfaceRenderer()
+ImGuiRenderer::~ImGuiRenderer()
 {
 	ImGui::DestroyContext(mImguiContext);
 }
 
-void UserInterfaceRenderer::setViewport(const math::float2& windowSize, const math::float2& frameBufferSize)
+void ImGuiRenderer::setViewport(const math::float2& windowSize, const math::float2& frameBufferSize)
 {
 	const auto dpiScaleX = frameBufferSize.x / windowSize.x;
 	const auto dpiScaleY = frameBufferSize.y / windowSize.y;
@@ -157,14 +156,14 @@ void UserInterfaceRenderer::setViewport(const math::float2& windowSize, const ma
 	ui::imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);
 }
 
-void UserInterfaceRenderer::initNewFrame(float delta)
+void ImGuiRenderer::initNewFrame(float delta)
 {
 	ImGui::SetCurrentContext(mImguiContext);
 	ui::imguiRefreshDeltaTime(delta);
 	ImGui::NewFrame();
 }
 
-void UserInterfaceRenderer::drawFrame()
+void ImGuiRenderer::drawFrame()
 {
 	ImGui::SetCurrentContext(mImguiContext);
 
@@ -180,7 +179,7 @@ void UserInterfaceRenderer::drawFrame()
 /**
  * TODO: Refactor to Entity-Component-System API Calls (Instead of direct render commands)
  */
-void UserInterfaceRenderer::renderDrawData()
+void ImGuiRenderer::renderDrawData()
 {
 	auto imguiData = ImGui::GetDrawData();
 	auto& rcm = mEngine.getRenderableManager();
@@ -259,7 +258,7 @@ void UserInterfaceRenderer::renderDrawData()
 	}
 }
 
-void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
+void ImGuiRenderer::createBuffers(size_t numRequiredBuffers)
 {
 	if (numRequiredBuffers > mVertexBuffers.size())
 	{
@@ -286,7 +285,7 @@ void UserInterfaceRenderer::createBuffers(size_t numRequiredBuffers)
 	}
 }
 
-void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
+void ImGuiRenderer::createMaterialInstances(size_t numRequiredInstances)
 {
 	const size_t previousSize = mMaterialInstances.size();
 	if (numRequiredInstances > mMaterialInstances.size())
@@ -299,8 +298,8 @@ void UserInterfaceRenderer::createMaterialInstances(size_t numRequiredInstances)
 	}
 }
 
-void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
-											   const ImVector<ImDrawIdx>& ib)
+void ImGuiRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
+									   const ImVector<ImDrawIdx>& ib)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
@@ -325,7 +324,7 @@ void UserInterfaceRenderer::populateVertexData(size_t bufferIndex, const ImVecto
 	}
 }
 
-void UserInterfaceRenderer::createFontTextureAtlas()
+void ImGuiRenderer::createFontTextureAtlas()
 {
 	assert(mMaterial.isValid());
 	mFontTexture = ui::imguiCreateTextureAtlas(mEngine);

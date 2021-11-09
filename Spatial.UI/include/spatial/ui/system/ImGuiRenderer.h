@@ -11,7 +11,7 @@
 namespace spatial
 {
 
-class UserInterfaceRenderer
+class ImGuiRenderer
 {
   private:
 	filament::Engine& mEngine;
@@ -37,11 +37,11 @@ class UserInterfaceRenderer
 	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
 
   public:
-	explicit UserInterfaceRenderer(filament::Engine& engine);
-	~UserInterfaceRenderer();
+	explicit ImGuiRenderer(filament::Engine& engine);
+	~ImGuiRenderer();
 
-	UserInterfaceRenderer(const UserInterfaceRenderer& other) = delete;
-	UserInterfaceRenderer& operator=(const UserInterfaceRenderer& other) = delete;
+	ImGuiRenderer(const ImGuiRenderer& other) = delete;
+	ImGuiRenderer& operator=(const ImGuiRenderer& other) = delete;
 
 	void setViewport(const math::float2& windowSize, const math::float2& frameBufferSize);
 

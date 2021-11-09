@@ -14,6 +14,8 @@ namespace spatial::ui
 class AssetsExplorer
 {
   public:
+	static constexpr auto DND_SELECTED_FILE = "SELECTED_ASSET_PATH";
+
 	explicit AssetsExplorer(const std::filesystem::path& rootPath, const filament::Texture& texture);
 	~AssetsExplorer();
 

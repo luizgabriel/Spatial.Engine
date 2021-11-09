@@ -6,9 +6,15 @@ namespace spatial::ui
 
 struct Icon
 {
-	math::float4 uv;
-	constexpr explicit Icon(const math::float4& uv) : uv(uv)
+	math::float2 pos;
+	constexpr explicit Icon(math::float2 pos) : pos(pos)
 	{
+	}
+
+	[[nodiscard]] constexpr auto uv() const
+	{
+		const auto offset = math::float2{0.1, 0.12};
+		return math::float4{pos * offset, (pos + math::float2{1, 1}) * offset};
 	}
 };
 
@@ -39,22 +45,16 @@ struct Icons
 	}
 };
 
-constexpr math::float4 toIconUV(const math::float2& pos)
-{
-	const auto offset = math::float2{0.1, 0.12};
-	return math::float4{pos * offset, (pos + math::float2{1, 1}) * offset} ;
-}
-
 constexpr auto gIcons = Icons{
-	Icon{toIconUV({0, 1})},
-	Icon{toIconUV({0, 0})},
-	Icon{toIconUV({1, 0})},
-	Icon{toIconUV({2, 0})},
-	Icon{toIconUV({3, 0})},
-	Icon{toIconUV({4, 0})},
-	Icon{toIconUV({5, 0})},
-	Icon{toIconUV({6, 0})},
-	Icon{toIconUV({7, 0})},
+	Icon{{0, 1}},
+	Icon{{0, 0}},
+	Icon{{1, 0}},
+	Icon{{2, 0}},
+	Icon{{3, 0}},
+	Icon{{4, 0}},
+	Icon{{5, 0}},
+	Icon{{6, 0}},
+	Icon{{7, 0}},
 };
 
 } // namespace spatial::ui

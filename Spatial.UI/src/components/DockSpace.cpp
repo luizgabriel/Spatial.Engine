@@ -18,7 +18,7 @@ DockSpace::DockSpace(const std::string_view name)
 		ImGui::Begin(name.data(), nullptr,
 					 ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
 						 | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus
-						 | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
+						 | ImGuiWindowFlags_NoNavFocus);
 	}
 
 	// DockSpace

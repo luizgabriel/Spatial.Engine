@@ -27,6 +27,7 @@
 #include <spatial/ui/components/Window.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/ComponentCollapse.h>
+#include <spatial/ui/components/DragAndDrop.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
@@ -107,23 +108,9 @@ void SceneEditorSystem::onDrawGui()
 {
 	auto dockSpace = ui::DockSpace{"Spatial"};
 	std::string_view menuPopup{};
+	ui::mainMenu(menuPopup);
 
-	{
-		auto mainMenu = ui::MenuBar{};
-
-		{
-			auto menu = ui::Menu{"File"};
-			if (menu.isOpen())
-			{
-				if (menu.item("New", "CTRL+N"))
-					menuPopup = "New Scene";
-				if (menu.item("Open", "CTRL+O"))
-					menuPopup = "Open Scene";
-				if (menu.item("Save", "CTRL+S"))
-					menuPopup = "Save Scene";
-			}
-		}
-	}
+	static std::string scenePath{std::filesystem::path{"scenes"} / "scene.xml"};
 
 	{
 		auto style = ui::WindowPaddingStyle{};
@@ -135,6 +122,17 @@ void SceneEditorSystem::onDrawGui()
 
 		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
 			mWindow.warpMouse(mWindow.getSize() * .5f);
+
+		{
+			auto dnd = ui::DragAndDropTarget{};
+			if (dnd.isStarted()) {
+				auto result = dnd.getPathPayload(ui::AssetsExplorer::DND_SELECTED_FILE);
+				if (result) {
+					scenePath = result.value().string();
+					menuPopup = "Open Scene";
+				}
+			}
+		}
 	}
 
 	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
@@ -155,19 +153,19 @@ void SceneEditorSystem::onDrawGui()
 		}
 	}
 
-	if (menuPopup.data())
-		ImGui::OpenPopup(menuPopup.data());
-
-	static std::string scenePath{mSettings.assetsFolder / "scenes" / "scene.xml"};
-	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
 	{
 		auto assets = ui::AssetsExplorer{mSettings.assetsFolder, mIconTexture.ref()};
 		assets.header(mCurrentAssetsPath);
 		assets.onSelectPath(mCurrentAssetsPath);
 	}
+
+
+	if (menuPopup.data())
+		ImGui::OpenPopup(menuPopup.data());
+
+	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
 
 	{
 		auto modal = ui::NewSceneModal{};
@@ -190,8 +188,7 @@ void SceneEditorSystem::onDrawGui()
 
 void SceneEditorSystem::saveScene(const fs::path& outputPath)
 {
-	gLogger.info("Saving scene: {}", fs::absolute(outputPath).string());
-	auto ss = std::ofstream{outputPath};
+	auto ss = std::ofstream{mSettings.assetsFolder / outputPath};
 	if (!ss)
 		return;
 
@@ -201,8 +198,7 @@ void SceneEditorSystem::saveScene(const fs::path& outputPath)
 
 void SceneEditorSystem::loadScene(const fs::path& inputPath)
 {
-	gLogger.info("Loading scene: {}", fs::absolute(inputPath).string());
-	auto ss = std::ifstream{inputPath};
+	auto ss = std::ifstream{mSettings.assetsFolder / inputPath};
 	if (!ss)
 		return;
 

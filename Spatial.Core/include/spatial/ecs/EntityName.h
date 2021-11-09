@@ -1,10 +1,10 @@
 #pragma once
 
-#include <string>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <string>
 
 namespace spatial::ecs
 {
@@ -23,10 +23,18 @@ struct UUID
 {
 	boost::uuids::uuid value;
 
+	UUID() : value{}
+	{
+	}
+
+	explicit UUID(boost::uuids::uuid value) : value{std::move(value)}
+	{
+	}
+
 	static UUID generate()
 	{
 		static auto generator = boost::uuids::random_generator{};
-		return {generator()};
+		return UUID{generator()};
 	}
 
 	bool operator==(const UUID& rhs) const
@@ -66,15 +74,13 @@ struct UUID
 
 	static UUID fromString(const std::string_view value)
 	{
-		return {
-			boost::lexical_cast<boost::uuids::uuid>(value)
-		};
+		return UUID{boost::lexical_cast<boost::uuids::uuid>(value)};
 	}
 };
 
 } // namespace spatial::ecs
 
-template<>
+template <>
 struct std::hash<spatial::ecs::UUID>
 {
 	std::size_t operator()(const spatial::ecs::UUID& id) const noexcept
