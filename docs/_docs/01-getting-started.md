@@ -95,12 +95,21 @@ pip install conan
 
 ## Building the Engine
 
-This script install all required conan dependencies which are not found by conan by default.
+First, let's clone the repository:
+```sh
+git clone https://github.com/luizgabriel/Spatial.Engine.git
+cd Spatial.Engine
+```
+
+Now, inside the project's folder. Run this script install all required conan dependencies which are not found by conan by default.
 ```
 python setup.py
 ```
 
 ### From the Command Line
+
+If you're wishing to build from the command line, you'll just need to run these commands:
+
 ```sh
 # Creates a build directory
 mkdir -p out/build && cd out/build

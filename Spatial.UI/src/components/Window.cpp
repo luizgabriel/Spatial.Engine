@@ -6,7 +6,7 @@ namespace spatial::ui
 
 Window::Window(const std::string_view name)
 {
-	ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+	mIsOpen = ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 }
 
 Window::~Window()
@@ -39,6 +39,11 @@ void Window::setPosition(const math::float2& size)
 bool Window::isFocused() const
 {
 	return ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+}
+
+bool Window::isOpen() const
+{
+	return mIsOpen;
 }
 
 } // namespace spatial::ui

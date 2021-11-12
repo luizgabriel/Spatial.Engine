@@ -16,8 +16,8 @@ template <typename... CustomComponent, typename Archive>
 void serialize(Archive& ar, const Registry& registry)
 {
 	auto snapshot = entt::snapshot{registry};
+	snapshot.entities(ar);
 	snapshot.component<ecs::EntityName>(ar);
-	snapshot.component<ecs::UUID>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
 	snapshot.component<ecs::OrthographicCamera>(ar);
@@ -27,17 +27,20 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
+	snapshot.component<ecs::UUID>(ar);
 
 	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
+
 }
 
 template <typename... CustomComponent, typename Archive>
 void deserialize(Archive& ar, Registry& registry)
 {
 	auto snapshot = entt::snapshot_loader{registry};
+	snapshot.entities(ar);
 	snapshot.component<ecs::EntityName>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
@@ -54,24 +57,8 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
+
+	snapshot.orphans();
 }
-
-template <typename Archive, typename... CustomComponents>
-class RegistrySerializationGuard
-{
-  public:
-	RegistrySerializationGuard(const Registry& registry, Archive& archive) : mRegistry{registry}, mArchive{archive}
-	{
-	}
-
-	~RegistrySerializationGuard()
-	{
-		serialize<CustomComponents...>(mArchive, mRegistry);
-	}
-
-  private:
-	const Registry& mRegistry;
-	Archive& mArchive;
-};
 
 } // namespace spatial::ecs

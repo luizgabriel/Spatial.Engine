@@ -18,6 +18,12 @@ add_library(Spatial.UI
 	include/spatial/ui/components/NewSceneModal.h
 	include/spatial/ui/components/OpenSceneModal.h
 	include/spatial/ui/components/ComponentCollapse.h
+	include/spatial/ui/components/AssetsExplorer.h
+	include/spatial/ui/components/DirectionInput.h
+	include/spatial/ui/components/VectorInput.h
+	include/spatial/ui/components/DragAndDrop.h
+
+	include/spatial/ui/components/Icons.h
 
 	include/spatial/ui/components/styles/BorderlessWindowStyle.h
 	include/spatial/ui/components/styles/WindowPaddingStyle.h
@@ -40,9 +46,14 @@ add_library(Spatial.UI
 	src/components/NewSceneModal.cpp
 	src/components/SaveSceneModal.cpp
 	src/components/OpenSceneModal.cpp
+	src/components/AssetsExplorer.cpp
+	src/components/VectorInput.cpp
+	src/components/DragAndDrop.cpp
+
+	src/components/DirectionInput.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/AssetsExplorer.h src/components/AssetsExplorer.cpp include/spatial/ui/components/Icons.h include/spatial/ui/components/DirectionInput.h src/components/DirectionInput.cpp include/spatial/ui/components/VectorInput.h src/components/VectorInput.cpp include/spatial/ui/components/DragAndDrop.h src/components/DragAndDrop.cpp)
+	src/components/styles/WindowPaddingStyle.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

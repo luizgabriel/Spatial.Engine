@@ -60,9 +60,9 @@ SunLightEntityBuilder EntityBuilder::asSunLight()
 	return {mRegistry, mEntity};
 }
 
-MeshEntityBuilder EntityBuilder::asMesh(std::filesystem::path path, Entity defaultMaterial)
+MeshEntityBuilder EntityBuilder::asMesh(std::filesystem::path path)
 {
-	return {mRegistry, mEntity, path, defaultMaterial};
+	return {mRegistry, mEntity, std::move(path)};
 }
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
@@ -296,10 +296,10 @@ SunLightEntityBuilder& SunLightEntityBuilder::withCastShadows(bool castShadows)
 	return *this;
 }
 
-MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath, Entity defaultMaterial)
+MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath)
 	: Base(registry, entity)
 {
-	with(Mesh{std::move(resourcePath), defaultMaterial}).with<ecs::tags::IsRenderable>();
+	with<Mesh>(std::move(resourcePath)).with<ecs::tags::IsRenderable>();
 }
 
 MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
@@ -310,19 +310,19 @@ MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool r
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withMaterialAt(std::uint8_t index, Entity materialEntity)
-{
-	assert(mRegistry.hasAllComponents<ecs::tags::IsMeshMaterial>(materialEntity));
-	getComponent().materials.at(index) = materialEntity;
-	return *this;
-}
-
 MeshEntityBuilder& MeshEntityBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
 {
 	assert(count > 0); // there is no sub-mesh with size zero
 	auto& component = getComponent();
 	component.partsCount = count;
 	component.partsOffset = offset;
+	return *this;
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withMaterial(Entity materialEntity)
+{
+	auto& component = getComponent();
+	component.defaultMaterial = materialEntity;
 	return *this;
 }
 

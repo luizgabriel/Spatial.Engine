@@ -15,10 +15,6 @@ class TransformController
 
   private:
 	filament::Engine& mEngine;
-	void createTransforms(ecs::Registry& registry) const;
-	void updateTransforms(ecs::Registry& registry) const;
-	void updateTransformsParents(ecs::Registry& registry) const;
-	void clearRemovedTransforms(ecs::Registry& registry) const;
 };
 
 } // namespace spatial::render

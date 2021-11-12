@@ -16,23 +16,20 @@
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 
+#include <spatial/ui/components/AssetsExplorer.h>
+#include <spatial/ui/components/ComponentCollapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DockSpace.h>
-#include <spatial/ui/components/Menu.h>
-#include <spatial/ui/components/MenuBar.h>
+#include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/NewSceneModal.h>
 #include <spatial/ui/components/OpenSceneModal.h>
 #include <spatial/ui/components/PropertiesPanel.h>
 #include <spatial/ui/components/SaveSceneModal.h>
 #include <spatial/ui/components/Window.h>
-#include <spatial/ui/components/AssetsExplorer.h>
-#include <spatial/ui/components/ComponentCollapse.h>
-#include <spatial/ui/components/DragAndDrop.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <fstream>
-
 #include <string>
 
 namespace fl = filament;
@@ -125,9 +122,11 @@ void SceneEditorSystem::onDrawGui()
 
 		{
 			auto dnd = ui::DragAndDropTarget{};
-			if (dnd.isStarted()) {
+			if (dnd.isStarted())
+			{
 				auto result = dnd.getPathPayload(ui::AssetsExplorer::DND_SELECTED_FILE);
-				if (result) {
+				if (result)
+				{
 					scenePath = result.value().string();
 					menuPopup = "Open Scene";
 				}
@@ -159,13 +158,11 @@ void SceneEditorSystem::onDrawGui()
 		assets.onSelectPath(mCurrentAssetsPath);
 	}
 
-
 	if (menuPopup.data())
 		ImGui::OpenPopup(menuPopup.data());
 
 	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
 
 	{
 		auto modal = ui::NewSceneModal{};

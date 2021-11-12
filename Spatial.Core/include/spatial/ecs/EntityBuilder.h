@@ -71,7 +71,7 @@ class EntityBuilder
 	DirectionalLightEntityBuilder asDirectionalLight();
 	SunLightEntityBuilder asSunLight();
 
-	MeshEntityBuilder asMesh(std::filesystem::path path, Entity defaultMaterial);
+	MeshEntityBuilder asMesh(std::filesystem::path path);
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -82,17 +82,12 @@ class EntityBuilder
 	template <typename MaterialComponent>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(MaterialComponent&& component)
 	{
-		return MaterialEntityBuilder<MaterialComponent>{mRegistry, mEntity, std::move(component)};
+		return MaterialEntityBuilder<MaterialComponent>{mRegistry, mEntity, std::forward<MaterialComponent>(component)};
 	}
 
-	EntityHandle get() const
+	[[nodiscard]] EntityHandle get() const
 	{
 		return {mRegistry, mEntity};
-	}
-
-	operator EntityHandle() const
-	{
-		return get();
 	}
 
 	operator Entity() const
@@ -228,13 +223,13 @@ class MaterialEntityBuilder : public EntityBuilder
 	template <typename... Args>
 	MaterialEntityBuilder(Registry& registry, Entity entity, Args&&... args) : EntityBuilder(registry, entity)
 	{
-		this->template with<ecs::tags::IsMeshMaterial>();
+		this->with<ecs::tags::IsMeshMaterial>();
 		this->template with<MaterialComponent>(std::forward<Args>(args)...);
 	}
 
 	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params) : EntityBuilder(registry, entity)
 	{
-		this->template with<ecs::tags::IsMeshMaterial>();
+		this->with<ecs::tags::IsMeshMaterial>();
 		this->template with<MaterialComponent>(std::move(params));
 	}
 };
@@ -244,21 +239,13 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
   public:
 	using Base = BasicEntityBuilder<Mesh>;
 
-	MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath, Entity defaultMaterial);
+	MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath);
 
 	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
 
-	MeshEntityBuilder& withMaterialAt(std::uint8_t index, Entity materialEntity);
+	MeshEntityBuilder& withMaterial(Entity materialEntity);
 
 	MeshEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
-};
-
-class FileEntityBuilder : public EntityBuilder
-{
-  public:
-	FileEntityBuilder(Registry& registry, Entity entity);
-
-	FileEntityBuilder& fromPath(const std::filesystem::path& path);
 };
 
 } // namespace spatial::ecs

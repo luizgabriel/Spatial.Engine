@@ -1,107 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cereal>
-	<value0>10</value0>
+	<value0>13</value0>
 	<value1>0</value1>
 	<value2>
-		<name>Main Light</name>
+		<name>Editor Camera</name>
 	</value2>
 	<value3>1</value3>
 	<value4>
-		<name>Red Material</name>
+		<name>Unnamed Entity 0</name>
 	</value4>
 	<value5>2</value5>
 	<value6>
-		<name>White Material</name>
+		<name>Unnamed Entity 1</name>
 	</value6>
 	<value7>3</value7>
 	<value8>
-		<name>Green Material</name>
+		<name>Unnamed Entity 2</name>
 	</value8>
 	<value9>4</value9>
 	<value10>
-		<name>Blue Material</name>
+		<name>Unnamed Entity 3</name>
 	</value10>
 	<value11>5</value11>
 	<value12>
-		<name>Cube</name>
+		<name>Unnamed Entity 4</name>
 	</value12>
 	<value13>6</value13>
 	<value14>
-		<name>Plane</name>
+		<name>Unnamed Entity 5</name>
 	</value14>
 	<value15>7</value15>
 	<value16>
-		<name>Cylinder</name>
+		<name>Unnamed Entity 6</name>
 	</value16>
 	<value17>8</value17>
 	<value18>
-		<name>Sphere</name>
+		<name>Unnamed Entity 7</name>
 	</value18>
 	<value19>9</value19>
 	<value20>
-		<name>Editor Camera</name>
+		<name>Unnamed Entity 8</name>
 	</value20>
-	<value21>5</value21>
-	<value22>5</value22>
-	<value23>
-		<position>
-			<x>0</x>
-			<y>0</y>
-			<z>0</z>
-		</position>
-		<rotation>
-			<x>0</x>
-			<y>0</y>
-			<z>0</z>
-		</rotation>
-		<scale>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
-		</scale>
-	</value23>
-	<value24>6</value24>
-	<value25>
-		<position>
-			<x>3</x>
-			<y>-1</y>
-			<z>0</z>
-		</position>
-		<rotation>
-			<x>0</x>
-			<y>0</y>
-			<z>0</z>
-		</rotation>
-		<scale>
-			<x>10</x>
-			<y>10</y>
-			<z>10</z>
-		</scale>
-	</value25>
-	<value26>7</value26>
-	<value27>
-		<position>
-			<x>6</x>
-			<y>0</y>
-			<z>0</z>
-		</position>
-		<rotation>
-			<x>0</x>
-			<y>0</y>
-			<z>0</z>
-		</rotation>
-		<scale>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
-		</scale>
-	</value27>
-	<value28>8</value28>
+	<value21>10</value21>
+	<value22>
+		<name>Unnamed Entity 9</name>
+	</value22>
+	<value23>11</value23>
+	<value24>
+		<name>Unnamed Entity 10</name>
+	</value24>
+	<value25>12</value25>
+	<value26>
+		<name>Unnamed Entity 11</name>
+	</value26>
+	<value27>1</value27>
+	<value28>0</value28>
 	<value29>
 		<position>
 			<x>3</x>
-			<y>0</y>
-			<z>0</z>
+			<y>3</y>
+			<z>20</z>
 		</position>
 		<rotation>
 			<x>0</x>
@@ -114,154 +72,33 @@
 			<z>1</z>
 		</scale>
 	</value29>
-	<value30>9</value30>
-	<value31>
-		<position>
-			<x>6.6703081130981445</x>
-			<y>2.8964006900787354</y>
-			<z>10.73358154296875</z>
-		</position>
-		<rotation>
-			<x>-0.34404087066650391</x>
-			<y>0.35078376531600952</y>
-			<z>0</z>
-		</rotation>
-		<scale>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
-		</scale>
-	</value31>
-	<value32>1</value32>
-	<value33>9</value33>
-	<value34>
+	<value30>1</value30>
+	<value31>0</value31>
+	<value32>
 		<fieldOfView>60</fieldOfView>
-		<aspectRatio>0.99856321839080464</aspectRatio>
+		<aspectRatio>1.3311688311688312</aspectRatio>
 		<near>0.10000000149011612</near>
 		<far>10000</far>
-	</value34>
+	</value32>
+	<value33>0</value33>
+	<value34>0</value34>
 	<value35>0</value35>
 	<value36>0</value36>
 	<value37>0</value37>
-	<value38>1</value38>
+	<value38>0</value38>
 	<value39>0</value39>
-	<value40>
-		<intensity>100000</intensity>
-		<direction>
-			<x>0.4831005334854126</x>
-			<y>-0.57324755191802979</y>
-			<z>-0.66181653738021851</z>
-		</direction>
-		<color>
-			<x>1</x>
-			<y>1</y>
-			<z>1</z>
-		</color>
-		<castShadows>true</castShadows>
-	</value40>
+	<value40>0</value40>
 	<value41>0</value41>
-	<value42>0</value42>
-	<value43>4</value43>
-	<value44>5</value44>
-	<value45>
-		<resourcePath>meshes/cube.filamesh</resourcePath>
-		<receiveShadows>true</receiveShadows>
-		<castShadows>true</castShadows>
-		<partsCount>1</partsCount>
-		<partsOffset>0</partsOffset>
-		<material0>1</material0>
-	</value45>
-	<value46>6</value46>
+	<value42>1</value42>
+	<value43>0</value43>
+	<value44>0</value44>
+	<value45>1</value45>
+	<value46>0</value46>
 	<value47>
-		<resourcePath>meshes/cube.filamesh</resourcePath>
-		<receiveShadows>true</receiveShadows>
-		<castShadows>false</castShadows>
-		<partsCount>1</partsCount>
-		<partsOffset>0</partsOffset>
-		<material0>2</material0>
-	</value47>
-	<value48>7</value48>
-	<value49>
-		<resourcePath>meshes/cube.filamesh</resourcePath>
-		<receiveShadows>true</receiveShadows>
-		<castShadows>true</castShadows>
-		<partsCount>1</partsCount>
-		<partsOffset>0</partsOffset>
-		<material0>3</material0>
-	</value49>
-	<value50>8</value50>
-	<value51>
-		<resourcePath>meshes/cube.filamesh</resourcePath>
-		<receiveShadows>true</receiveShadows>
-		<castShadows>true</castShadows>
-		<partsCount>1</partsCount>
-		<partsOffset>0</partsOffset>
-		<material0>4</material0>
-	</value51>
-	<value52>4</value52>
-	<value53>1</value53>
-	<value54>2</value54>
-	<value55>3</value55>
-	<value56>4</value56>
-	<value57>6</value57>
-	<value58>0</value58>
-	<value59>5</value59>
-	<value60>6</value60>
-	<value61>7</value61>
-	<value62>8</value62>
-	<value63>9</value63>
-	<value64>4</value64>
-	<value65>1</value65>
-	<value66>
-		<baseColor>
-			<x>0.40000000596046448</x>
-			<y>0.10000000149011612</y>
-			<z>0.10000000149011612</z>
-		</baseColor>
-		<roughness>0.05000000074505806</roughness>
-		<metallic>0.86000001430511475</metallic>
-		<reflectance>0.97000002861022949</reflectance>
-	</value66>
-	<value67>2</value67>
-	<value68>
-		<baseColor>
-			<x>0.80000001192092896</x>
-			<y>0.80000001192092896</y>
-			<z>0.80000001192092896</z>
-		</baseColor>
-		<roughness>0.15999999642372131</roughness>
-		<metallic>0.89999997615814209</metallic>
-		<reflectance>0</reflectance>
-	</value68>
-	<value69>3</value69>
-	<value70>
-		<baseColor>
-			<x>0.10000000149011612</x>
-			<y>0.40000000596046448</y>
-			<z>0.10000000149011612</z>
-		</baseColor>
-		<roughness>0.18999999761581421</roughness>
-		<metallic>0.92000001668930054</metallic>
-		<reflectance>0.25</reflectance>
-	</value70>
-	<value71>4</value71>
-	<value72>
-		<baseColor>
-			<x>0.10000000149011612</x>
-			<y>0.10000000149011612</y>
-			<z>0.40000000596046448</z>
-		</baseColor>
-		<roughness>0.5899999737739563</roughness>
-		<metallic>1</metallic>
-		<reflectance>0.46000000834465027</reflectance>
-	</value72>
-	<value73>1</value73>
-	<value74>9</value74>
-	<value75>
 		<velocity>10</velocity>
 		<sensitivity>0.5</sensitivity>
-	</value75>
-	<value76>1</value76>
-	<value77>9</value77>
+	</value47>
+	<value48>1</value48>
+	<value49>0</value49>
 </cereal>
 

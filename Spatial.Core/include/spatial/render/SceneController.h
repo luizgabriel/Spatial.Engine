@@ -12,11 +12,13 @@ class SceneController
   public:
 	SceneController(filament::Engine& engine, filament::Scene& scene);
 
-	void onUpdateFrame(ecs::Registry& registry) const;
+	void onUpdateFrame(ecs::Registry& registry);
 
   private:
 	filament::Engine& mEngine;
 	filament::Scene& mScene;
+	void addToScene(ecs::Registry& registry);
+	void removeFromScene(ecs::Registry& registry);
 };
 
 } // namespace spatial::render

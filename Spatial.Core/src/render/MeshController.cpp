@@ -1,4 +1,5 @@
 #include <c++/v1/fstream>
+#include <utility>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
@@ -11,7 +12,7 @@ namespace spatial::render
 {
 
 MeshController::MeshController(filament::Engine& engine, std::filesystem::path root)
-	: mEngine{engine}, mRoot{root}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
+	: mEngine{engine}, mRoot{std::move(root)}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
 {
 }
 
@@ -77,21 +78,17 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 		renderableMesh.setReceiveShadows(data.receiveShadows);
 		renderableMesh.setCulling(data.culling);
 
-		for (auto i = 0; i < data.partsCount; i++)
+		const auto partsCount = data.partsCount == 0 ? parts.size() : data.partsCount;
+
+		for (auto i = 0; i < partsCount; i++)
 		{
 			const auto& geometry = parts[data.partsOffset + i];
 			renderableMesh.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
 										 geometry.offset, geometry.count);
 
-			ecs::Entity materialEntity;
-			if (i > ecs::Mesh::MAX_GEOMETRIES - 1 || !registry.isValid(data.materials[i]))
-				materialEntity = data.defaultMaterial;
-			else
-				materialEntity = data.materials[i];
-
-			if (registry.hasAllComponents<MaterialInstance>(materialEntity))
+			if (registry.hasAllComponents<MaterialInstance>(data.defaultMaterial))
 			{
-				const auto& materialInstance = registry.getComponent<const MaterialInstance>(materialEntity);
+				const auto& materialInstance = registry.getComponent<const MaterialInstance>(data.defaultMaterial);
 				renderableMesh.setMaterialInstanceAt(i, materialInstance.get());
 			}
 		}

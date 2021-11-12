@@ -7,12 +7,23 @@
 namespace spatial::render
 {
 
-SceneController::SceneController(filament::Engine& engine, filament::Scene& scene)
-	: mEngine{engine}, mScene{scene}
+SceneController::SceneController(filament::Engine& engine, filament::Scene& scene) : mEngine{engine}, mScene{scene}
 {
 }
 
-void SceneController::onUpdateFrame(ecs::Registry& registry) const
+void SceneController::onUpdateFrame(ecs::Registry& registry)
+{
+	addToScene(registry);
+	removeFromScene(registry);
+}
+
+void SceneController::removeFromScene(ecs::Registry& registry)
+{
+	auto view = registry.getEntities<const Entity>(ecs::ExcludeComponents<ecs::tags::IsRenderable>);
+	view.each([this](const auto& renderable) { mScene.remove(renderable.get()); });
+}
+
+void SceneController::addToScene(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>);
 

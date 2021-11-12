@@ -9,7 +9,7 @@ namespace spatial::ui
 class Window
 {
   public:
-	Window(const std::string_view name);
+	explicit Window(const std::string_view name);
 	~Window();
 
 	[[nodiscard]] math::float2 getSize() const;
@@ -18,7 +18,12 @@ class Window
 	[[nodiscard]] math::float2 getPosition() const;
 	void setPosition(const math::float2& size);
 
+	[[nodiscard]] bool isOpen() const;
+
 	[[nodiscard]] bool isFocused() const;
+
+  private:
+	bool mIsOpen;
 };
 
 } // namespace spatial::ui

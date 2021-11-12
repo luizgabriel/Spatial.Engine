@@ -2,15 +2,16 @@
 
 #include "Collapse.h"
 #include "ListPanel.h"
+#include <filament/Texture.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <filament/Texture.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/EntityName.h>
 #include <spatial/ecs/Light.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Transform.h>
 
 namespace spatial::ui
@@ -66,6 +67,11 @@ void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs
 
 	if (panel.selectedNone())
 		selectedEntity = ecs::NullEntity;
+
+	if (ImGui::Button("Add Entity")) {
+		static auto unnamedEntitiesCount = 0;
+		ecs::build(registry).withName(fmt::format("Unnamed Entity {0}", unnamedEntitiesCount++));
+	}
 
 	auto view = registry.getEntities<ecs::EntityName, FilterComponents...>(std::move(exclude));
 

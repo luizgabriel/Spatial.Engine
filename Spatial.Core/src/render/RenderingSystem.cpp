@@ -8,7 +8,7 @@ namespace spatial
 {
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle)
-	: mEngine{render::createEngine(Backend::OPENGL)},
+	: mEngine{render::createEngine(nativeWindowHandle ? Backend::OPENGL : Backend::NOOP)},
 	  mSwapChain{render::createSwapChain(getEngine(), nativeWindowHandle)},
 	  mRenderer{render::createRenderer(getEngine())},
 	  mOnRenderSignal{}

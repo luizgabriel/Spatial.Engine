@@ -4,6 +4,13 @@
   <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/tkJzpLU.png" alt="Spatial Engine" width="500"></a>
 </h1>
 
+<p align="center">
+  <a href="https://luizgabriel.github.io/Spatial.Engine/">Documentation</a> •
+  <a href="#key-features">Key Features</a> •
+  <a href="https://github.com/luizgabriel/Spatial.Engine/projects/2">Road Map</a> •
+  <a href="https://github.com/luizgabriel/Spatial.Engine/blob/master/LICENSE">License</a>
+</p>
+
 <h4 align="center">
 Spatial is a cross-platform C++ game engine created on top off google's <a href="https://github.com/google/filament">filament</a> rendering engine. <br>This projects uses C++17 and modern cmake features.
 </h4>
@@ -24,14 +31,11 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   </a>
 </p>
 
-<p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="https://github.com/luizgabriel/Spatial.Engine/projects/2">Road Map</a> •
-  <a href="https://luizgabriel.github.io/Spatial.Engine/">Documentation</a> •
-  <a href="https://github.com/luizgabriel/Spatial.Engine/blob/master/LICENSE">License</a>
-</p>
-
 ![screenshot](https://i.imgur.com/2WMBo2H.png)
+
+## Documentation
+
+Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/Spatial.Engine/).
 
 ## Key Features
 

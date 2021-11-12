@@ -3,6 +3,7 @@
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Registry.h>
+#include <optional>
 
 namespace spatial::ecs
 {

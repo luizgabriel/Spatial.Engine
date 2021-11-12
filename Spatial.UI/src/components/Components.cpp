@@ -12,7 +12,6 @@
 namespace spatial::ui
 {
 
-
 void spacing(std::uint32_t times)
 {
 	for (std::uint32_t i = 0; i < times; i++)
@@ -138,27 +137,10 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	spacing(3);
 
-	if (ImGui::BeginTable("Materials", 2,
-						  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchSame))
-	{
-		ImGui::TableSetupColumn("Geometry Index");
-		ImGui::TableSetupColumn("Material");
-		ImGui::TableHeadersRow();
-
-		for (std::size_t i = 0; i < mesh.partsCount; i++)
-		{
-			auto& material = mesh.materials[i];
-
-			ImGui::TableNextColumn();
-			ImGui::Text("Index: %lu", i);
-
-			ImGui::TableNextColumn();
-			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-			selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, material);
-		}
-
-		ImGui::EndTable();
-	}
+	ImGui::Text("Material");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+	selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, mesh.defaultMaterial);
 }
 
 template <>
