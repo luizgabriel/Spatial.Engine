@@ -70,9 +70,9 @@ SceneEditorSystem::SceneEditorSystem(Settings settings, filament::Engine& engine
 	  mTransformController{mEngine},
 	  mCameraController{mEngine},
 	  mLightController{mEngine},
-	  mMeshController{mEngine, mSettings.assetsFolder},
+	  mMeshController{mEngine, mSettings.projectFolder},
 
-	  mCurrentAssetsPath{mSettings.assetsFolder}
+	  mCurrentAssetsPath{mSettings.projectFolder}
 {
 }
 
@@ -153,7 +153,7 @@ void SceneEditorSystem::onDrawGui()
 	}
 
 	{
-		auto assets = ui::AssetsExplorer{mSettings.assetsFolder, mIconTexture.ref()};
+		auto assets = ui::AssetsExplorer{mSettings.projectFolder, mIconTexture.ref()};
 		assets.header(mCurrentAssetsPath);
 		assets.onSelectPath(mCurrentAssetsPath);
 	}
@@ -185,7 +185,7 @@ void SceneEditorSystem::onDrawGui()
 
 void SceneEditorSystem::saveScene(const fs::path& outputPath)
 {
-	auto ss = std::ofstream{mSettings.assetsFolder / outputPath};
+	auto ss = std::ofstream{mSettings.projectFolder / outputPath};
 	if (!ss)
 		return;
 
@@ -195,7 +195,7 @@ void SceneEditorSystem::saveScene(const fs::path& outputPath)
 
 void SceneEditorSystem::loadScene(const fs::path& inputPath)
 {
-	auto ss = std::ifstream{mSettings.assetsFolder / inputPath};
+	auto ss = std::ifstream{mSettings.projectFolder / inputPath};
 	if (!ss)
 		return;
 

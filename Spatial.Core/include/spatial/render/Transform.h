@@ -25,9 +25,9 @@ class Transform
 
 	~Transform();
 
-	bool isValid() const noexcept;
+	[[nodiscard]] bool isValid() const noexcept;
 
-	math::mat4f getMatrix() const noexcept;
+	[[nodiscard]] math::mat4f getMatrix() const noexcept;
 
 	void setMatrix(const math::mat4f& matrix) noexcept;
 

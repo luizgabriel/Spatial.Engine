@@ -17,9 +17,8 @@ Settings Settings::load(int argc, char** argv)
 	args({"-w", "--width"}) >> config.windowWidth;
 	args({"-h", "--height"}) >> config.windowHeight;
 
-	std::string assetsFolder = "assets";
-	args({"-a", "--assets"}) >> assetsFolder;
-	config.assetsFolder = fs::is_directory(assetsFolder)  ? std::filesystem::path{assetsFolder} : std::filesystem::current_path();
+	std::filesystem::path projectFolder = args[1];
+	config.projectFolder = fs::is_directory(projectFolder) ? projectFolder : std::filesystem::current_path();
 
 	return config;
 }
