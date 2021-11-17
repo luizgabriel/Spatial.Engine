@@ -21,8 +21,6 @@ class EditorCameraController : public ecs::UpdateSystem<ecs::Transform, EditorCa
 
 	void disable() noexcept;
 
-	void onEditorViewResized(ecs::Registry& registry, double aspectRatio);
-
 	void onUpdateInput(const desktop::InputState& state);
 
   protected:

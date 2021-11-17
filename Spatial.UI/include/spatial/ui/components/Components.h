@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Collapse.h"
-#include "ListPanel.h"
 #include <filament/Texture.h>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -25,9 +23,10 @@ template <typename Component>
 void componentInput(ecs::Registry& registry, ecs::Entity entity);
 
 template <typename... FilterComponents>
-void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity)
+bool selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
-	std::string selectedItemName = "";
+	std::string selectedItemName;
+	bool changed = false;
 
 	if (registry.isValid(selectedEntity)
 		&& registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity))
@@ -49,8 +48,10 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 			auto& entityName = registry.getComponent<ecs::EntityName>(entity);
 
 			auto selected = selectedEntity == entity;
-			if (ImGui::Selectable(entityName.name.data(), selected))
+			if (ImGui::Selectable(entityName.name.data(), selected)) {
 				selectedEntity = entity;
+				changed = true;
+			}
 
 			if (selected)
 				ImGui::SetItemDefaultFocus();
@@ -58,35 +59,13 @@ void selectEntityInput(const std::string_view name, ecs::Registry& registry, ecs
 
 		ImGui::EndCombo();
 	}
-}
 
-template <typename... FilterComponents, typename... ExcludeComponents>
-void entitiesListPanel(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity, ecs::ExcludeComponentsType<ExcludeComponents...> exclude = {})
-{
-	auto panel = ListPanel{name};
-
-	if (panel.selectedNone())
-		selectedEntity = ecs::NullEntity;
-
-	if (ImGui::Button("Add Entity")) {
-		static auto unnamedEntitiesCount = 0;
-		ecs::build(registry).withName(fmt::format("Unnamed Entity {0}", unnamedEntitiesCount++));
-	}
-
-	auto view = registry.getEntities<ecs::EntityName, FilterComponents...>(std::move(exclude));
-
-	for (auto entity : view) {
-		auto& component = registry.getComponent<ecs::EntityName>(entity);
-		if (panel.item(component.name, selectedEntity == entity)) {
-			selectedEntity = entity;
-		}
-	}
+	return changed;
 }
 
 void image(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
 
 bool imageButton(const filament::Texture& texture, math::float2 size = math::float2{0, 0}, math::float4 uv = math::float4{0, 0, 1, 1});
 
-void mainMenu(std::string_view& openedMenu);
 
 } // namespace spatial::ui

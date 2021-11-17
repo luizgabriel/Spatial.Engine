@@ -89,8 +89,6 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFile& filamesh
 	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(&filamesh.vertexData[0], header.vertexSize);
 	vb->setBufferAt(engine, 0, std::move(vbBufferDescriptor));
 
-	fl::Fence::waitAndDestroy(engine.createFence());
-
 	return vb;
 }
 

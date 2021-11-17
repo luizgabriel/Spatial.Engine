@@ -9,17 +9,12 @@ class TextureView
   public:
 	TextureView(filament::Engine& engine, math::int2 size);
 
-	const auto& getColorTexture() const
+	[[nodiscard]] const auto& getColorTexture() const
 	{
 		return mRenderColorTexture;
 	}
 
-	auto& getColorTexture()
-	{
-		return mRenderColorTexture;
-	}
-
-	const auto& getView() const
+	[[nodiscard]] const auto& getView() const
 	{
 		return mView;
 	}

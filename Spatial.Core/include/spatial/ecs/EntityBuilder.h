@@ -106,6 +106,7 @@ class BasicEntityBuilder : public EntityBuilder
   public:
 	BasicEntityBuilder(Registry& registry, Entity entity): EntityBuilder(registry, entity)
 	{
+		with(Component{});
 	}
 
   protected:
@@ -223,13 +224,13 @@ class MaterialEntityBuilder : public EntityBuilder
 	template <typename... Args>
 	MaterialEntityBuilder(Registry& registry, Entity entity, Args&&... args) : EntityBuilder(registry, entity)
 	{
-		this->with<ecs::tags::IsMeshMaterial>();
+		this->with<ecs::tags::IsMaterial>();
 		this->template with<MaterialComponent>(std::forward<Args>(args)...);
 	}
 
 	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params) : EntityBuilder(registry, entity)
 	{
-		this->with<ecs::tags::IsMeshMaterial>();
+		this->with<ecs::tags::IsMaterial>();
 		this->template with<MaterialComponent>(std::move(params));
 	}
 };

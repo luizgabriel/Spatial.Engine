@@ -53,17 +53,6 @@ void EditorCameraController::onUpdateEntity(float delta, ecs::Transform& transfo
 	};
 }
 
-void EditorCameraController::onEditorViewResized(ecs::Registry& registry, double aspectRatio)
-{
-	registry.getEntities<ecs::PerspectiveCamera, EditorCamera>().each(
-		[=](auto& camera, auto&) { camera.aspectRatio = aspectRatio; });
-
-	registry.getEntities<ecs::OrthographicCamera, EditorCamera>().each([=](auto& camera, auto&) {
-		camera.left = -aspectRatio;
-		camera.right = aspectRatio;
-	});
-}
-
 bool EditorCameraController::toggleControl() noexcept
 {
 	mEnabled = !mEnabled;

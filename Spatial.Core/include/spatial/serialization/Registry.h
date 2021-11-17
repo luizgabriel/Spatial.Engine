@@ -29,7 +29,7 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::Mesh>(ar);
 	snapshot.component<ecs::UUID>(ar);
 
-	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
+	snapshot.component<ecs::tags::IsMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
@@ -53,7 +53,7 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::Mesh>(ar);
 	snapshot.component<ecs::UUID>(ar);
 
-	snapshot.component<ecs::tags::IsMeshMaterial>(ar);
+	snapshot.component<ecs::tags::IsMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);

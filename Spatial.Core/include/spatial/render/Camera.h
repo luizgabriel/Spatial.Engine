@@ -25,11 +25,11 @@ class Camera
 	Camera(const Camera& other) = delete;
 	Camera& operator=(const Camera& other) = delete;
 
-	const filament::Camera* getInstance() const;
+	[[nodiscard]] const filament::Camera* getInstance() const;
 
 	filament::Camera* getInstance();
 
-	bool isValid() const noexcept
+	[[nodiscard]] bool isValid() const noexcept
 	{
 		return !mEntity.isNull();
 	}
@@ -40,7 +40,7 @@ class Camera
 
 	void setPerspectiveProjection(double fovInDegrees, double aspect, double near, double far) noexcept;
 
-	void setOrtographicProjection(
+	void setOrthographicProjection(
 					   double left, double right,
 					   double bottom, double top,
 					   double near, double far) noexcept;
@@ -57,6 +57,10 @@ class Camera
   private:
 	filament::Engine& mEngine;
 	utils::Entity mEntity;
+
+	void reset();
+
+	utils::Entity release();
 };
 
 } // namespace spatial::render

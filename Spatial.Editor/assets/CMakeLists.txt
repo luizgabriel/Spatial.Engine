@@ -23,6 +23,18 @@ add_custom_command(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+find_program(FILAMESH_COMMAND filamesh)
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh ${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh ${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh ${CMAKE_CURRENT_BINARY_DIR}/meshes/cylinder.filamesh
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/meshes/plane.obj ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cube.obj ${CMAKE_CURRENT_SOURCE_DIR}/meshes/sphere.obj ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cylinder.obj
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/meshes/
+	COMMAND ${FILAMESH_COMMAND} meshes/plane.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh
+	COMMAND ${FILAMESH_COMMAND} meshes/cube.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh
+	COMMAND ${FILAMESH_COMMAND} meshes/sphere.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh
+	COMMAND ${FILAMESH_COMMAND} meshes/cylinder.obj ${CMAKE_CURRENT_BINARY_DIR}/meshes/cylinder.filamesh
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_custom_target(Spatial.Editor.Materials SOURCES
 	${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat
 	${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat)
@@ -34,7 +46,11 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
 	${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt
 	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_ibl.ktx
-	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx)
+	${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/default_skybox_skybox.ktx
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/plane.filamesh
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/cube.filamesh
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh
+	${CMAKE_CURRENT_BINARY_DIR}/meshes/cylinder.filamesh)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated.h

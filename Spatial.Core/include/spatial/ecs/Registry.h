@@ -140,7 +140,7 @@ class Registry
 	template <typename... Component>
 	bool hasAnyComponent(Entity entity) const
 	{
-		return mRegistry.any_of<Component...>(entity);
+		return isValid(entity) && mRegistry.any_of<Component...>(entity);
 	}
 
 	static VersionType getVersion(Entity entity) noexcept;

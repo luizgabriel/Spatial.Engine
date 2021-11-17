@@ -11,13 +11,15 @@ Menu::Menu(const std::string_view name)
 
 bool Menu::item(const std::string_view name)
 {
-	assert(isOpen());
+	if (!isOpen())
+		return false;
 	return ImGui::MenuItem(name.data());
 }
 
 bool Menu::item(const std::string_view name, const std::string_view shortcut)
 {
-	assert(isOpen());
+	if (!isOpen())
+		return false;
 	return ImGui::MenuItem(name.data(), shortcut.data());
 }
 

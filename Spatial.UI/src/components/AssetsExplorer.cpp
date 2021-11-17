@@ -16,8 +16,9 @@ AssetsExplorer::AssetsExplorer(const std::filesystem::path& rootPath, const fila
 bool AssetsExplorer::header(std::filesystem::path& selectedPath)
 {
 	bool changed = false;
+	auto fullPath = (mRootPath / selectedPath).lexically_normal();
 
-	if (selectedPath != mRootPath)
+	if (fullPath != mRootPath)
 	{
 		ImGui::PushID("BackButton");
 		changed = imageButton(mIconTexture, math::float2{20}, gIcons.back.uv());
@@ -28,7 +29,7 @@ bool AssetsExplorer::header(std::filesystem::path& selectedPath)
 
 	ImGui::SameLine();
 	ImGui::AlignTextToFramePadding();
-	ImGui::TextWrapped("%s", selectedPath.string().c_str());
+	ImGui::TextWrapped("%s", (mRootPath / selectedPath).string().c_str());
 	ImGui::Separator();
 
 	ImGui::Columns(8);
@@ -45,14 +46,14 @@ bool AssetsExplorer::onSelectPath(std::filesystem::path& selectedPath)
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
 
-	if (!is_directory(mRootPath))
+	if (!is_directory(mRootPath / selectedPath))
 		return false;
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 50.0f, 100.0f)};
-	for (const auto& entry : directory_iterator{selectedPath})
+	for (const auto& entry : directory_iterator{mRootPath / selectedPath})
 	{
-		const auto path = entry.path();
+		const auto& path = entry.path();
 
 		if (entry.is_directory())
 		{

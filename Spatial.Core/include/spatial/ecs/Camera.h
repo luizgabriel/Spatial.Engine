@@ -11,12 +11,9 @@ struct CustomCamera
 	double near{0.1};
 	double far{10000.0};
 
-	constexpr CustomCamera()
-	{
-	}
-
-	constexpr CustomCamera(math::mat4 projection, double near, double far)
-		: projectionMatrix{std::move(projection)}, near{near}, far{far}
+	constexpr explicit CustomCamera(math::mat4 projection = math::mat4::perspective(60.0, 19.0 / 6.0, 0.1, 10000.0),
+						   double near = 0.1, double far = 10000.0)
+		: projectionMatrix{projection}, near{near}, far{far}
 	{
 	}
 };

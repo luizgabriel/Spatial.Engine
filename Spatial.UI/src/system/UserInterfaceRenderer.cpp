@@ -25,8 +25,8 @@ ImGuiRenderer::ImGuiRenderer(fl::Engine& engine)
 	  mCamera{render::createCamera(mEngine, mCameraEntity.get())},
 	  mEntity{render::createEntity(mEngine)},
 	  mSkybox{render::createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
-	  mMaterial{mEngine},
-	  mFontTexture{mEngine}
+	  mMaterial{mEngine, nullptr},
+	  mFontTexture{mEngine, nullptr}
 {
 	mView->setCamera(mCamera.getInstance());
 	mView->setScene(mScene.get());
@@ -146,7 +146,7 @@ void ImGuiRenderer::setViewport(const math::float2& windowSize, const math::floa
 	const auto dpiScaleY = frameBufferSize.y / windowSize.y;
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
-	mCamera.setOrtographicProjection(0.0, static_cast<double>(frameBufferSize.x / dpiScaleX),
+	mCamera.setOrthographicProjection(0.0, static_cast<double>(frameBufferSize.x / dpiScaleX),
 									 static_cast<double>(frameBufferSize.y / dpiScaleY), 0.0, 0.0, 1.0);
 
 	const auto scaleX = windowSize.x > 0 ? frameBufferSize.x / windowSize.x : 0;

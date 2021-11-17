@@ -67,7 +67,6 @@ MeshEntityBuilder EntityBuilder::asMesh(std::filesystem::path path)
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with(Transform{});
 }
 
 TransformEntityBuilder& TransformEntityBuilder::withPosition(math::float3 position)
@@ -91,7 +90,7 @@ TransformEntityBuilder& TransformEntityBuilder::withRotation(math::float3 rotati
 PerspectiveCameraEntityBuilder::PerspectiveCameraEntityBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
-	with(PerspectiveCamera{60.0f, 16.0f / 9.0f, .1f, 10000.0f}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withFieldOfView(double fieldOfView)
@@ -117,7 +116,7 @@ PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withClippingPlan
 OrthographicCameraEntityBuilder::OrthographicCameraEntityBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
-	with(OrthographicCamera{-1.0f, 1.0f, -1.0f, 1.0f, .1f, 1.0f}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withProjection(double left, double right,
@@ -141,8 +140,7 @@ OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withClippingPl
 
 CustomCameraEntityBuilder::CustomCameraEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	auto defaultProjection = math::mat4::perspective(60.0f, 19.0f / 6.0f, .0f, 10000.0f);
-	with(CustomCamera{std::move(defaultProjection), .0f, 10000.0f}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 CustomCameraEntityBuilder& CustomCameraEntityBuilder::withProjection(math::mat4 projectionMatrix)
@@ -161,7 +159,7 @@ CustomCameraEntityBuilder& CustomCameraEntityBuilder::withClippingPlanes(double 
 
 PointLightEntityBuilder::PointLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with(PointLight{}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 PointLightEntityBuilder& PointLightEntityBuilder::withFalloff(float falloff)
@@ -184,7 +182,7 @@ PointLightEntityBuilder& PointLightEntityBuilder::withColor(math::float3 color)
 
 SpotLightEntityBuilder::SpotLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with(SpotLight{}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 SpotLightEntityBuilder& SpotLightEntityBuilder::withDirection(math::float3 direction)
@@ -228,7 +226,7 @@ SpotLightEntityBuilder& SpotLightEntityBuilder::withColor(math::float3 color)
 
 DirectionalLightEntityBuilder::DirectionalLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with(DirectionalLight{}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withIntensity(float intensity)
@@ -239,13 +237,13 @@ DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withIntensity(floa
 
 DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withColor(math::float3 color)
 {
-	getComponent().color = std::move(color);
+	getComponent().color = color;
 	return *this;
 }
 
 DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withDirection(math::float3 direction)
 {
-	getComponent().direction = std::move(direction);
+	getComponent().direction = direction;
 	return *this;
 }
 
@@ -257,7 +255,7 @@ DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withCastShadows(bo
 
 SunLightEntityBuilder::SunLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with(SunLight{}).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
 }
 
 SunLightEntityBuilder& SunLightEntityBuilder::withIntensity(float intensity)
@@ -299,7 +297,8 @@ SunLightEntityBuilder& SunLightEntityBuilder::withCastShadows(bool castShadows)
 MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath)
 	: Base(registry, entity)
 {
-	with<Mesh>(std::move(resourcePath)).with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>();
+	getComponent().resourcePath = resourcePath;
 }
 
 MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)

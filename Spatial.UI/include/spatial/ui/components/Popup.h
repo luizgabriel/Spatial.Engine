@@ -5,18 +5,16 @@
 namespace spatial::ui
 {
 
-class PopupModal
+class Popup
 {
   public:
-	explicit PopupModal(std::string_view name);
-	~PopupModal();
+	explicit Popup(std::string_view name, bool useContext = true);
+	~Popup();
 
 	[[nodiscard]] bool isOpen() const;
 
-	void close();
-
   private:
-	bool mOpened{false};
+	bool mOpen;
 };
 
 }

@@ -21,11 +21,15 @@ class MeshController
 		std::uint32_t count;
 	};
 
-	explicit MeshController(filament::Engine& engine, std::filesystem::path root);
+	explicit MeshController(filament::Engine& engine);
 
 	void onUpdateFrame(ecs::Registry& registry, float delta);
 
-	static uint32_t toMeshId(const std::filesystem::path& path);
+	void load(MeshId resourceId, const FilameshFile& filamesh);
+
+	void setRootPath(const std::filesystem::path& root);
+
+	void setDefaultMaterialInstance(const SharedMaterialInstance& mDefaultMaterialInstance);
 
   private:
 	filament::Engine& mEngine;
@@ -35,13 +39,13 @@ class MeshController
 	std::unordered_map<MeshId, std::vector<MeshGeometry>> mMeshGeometries;
 	std::unordered_map<MeshId, filament::Box> mBoundingBoxes;
 
-	void loadMeshes(ecs::Registry& registry);
+	SharedMaterialInstance mDefaultMaterialInstance;
 
-	void load(MeshId resourceId, const FilameshFile& filamesh);
+	void populateMeshesDatabase(ecs::Registry& registry);
 
 	void createRenderableMeshes(ecs::Registry& registry);
 	void updateMeshGeometries(ecs::Registry& registry);
-	void clearDeletedMeshes(ecs::Registry& registry);
+	void clearDeletedOrDirtyMeshes(ecs::Registry& registry);
 
 	[[nodiscard]] bool hasMeshData(MeshId resourceId) const;
 };

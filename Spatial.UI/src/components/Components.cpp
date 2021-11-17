@@ -2,10 +2,8 @@
 #include <imgui.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Tags.h>
+#include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/Menu.h>
-#include <spatial/ui/components/MenuBar.h>
-#include <spatial/ui/components/Window.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/VectorInput.h>
 
@@ -42,7 +40,6 @@ bool inputText(const std::string_view label, std::string& value)
 	}
 
 	ImGui::PushID(label.data());
-
 	const auto changed = ImGui::InputText("##", value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
 							&inputTextCallback, &value);
 	ImGui::PopID();
@@ -103,13 +100,10 @@ template <>
 void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
-	const auto& colors = ImGui::GetStyle().Colors;
-
-	ImGui::Text("Resource ID: ");
-	ImGui::SameLine();
+	bool changed = false;
 
 	std::string resourcePath = mesh.resourcePath.string();
-	ui::inputText("Resource", resourcePath);
+	changed |= ui::inputText("Resource", resourcePath);
 	mesh.resourcePath = resourcePath;
 
 	spacing(3);
@@ -123,24 +117,27 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	spacing(3);
 
-	ImGui::Separator();
+	const size_t smallStep = 1, largeStep = 5;
 
-	spacing(3);
-
-	ImGui::Text("Parts Count: ");
-	ImGui::SameLine();
-	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "%lu",  mesh.partsCount);
-
-	ImGui::Text("Parts Offset: ");
-	ImGui::SameLine();
-	ImGui::TextColored(colors[ImGuiCol_HeaderActive], "%lu",  mesh.partsOffset);
-
-	spacing(3);
-
-	ImGui::Text("Material");
+	ImGui::Text("Default Material");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-	selectEntityInput<ecs::tags::IsMeshMaterial>("##Material", registry, mesh.defaultMaterial);
+	changed |= selectEntityInput<ecs::tags::IsMaterial>("##Material", registry, mesh.defaultMaterial);
+
+	spacing(3);
+
+	if (ImGui::TreeNodeEx("Geometry Configuration", ImGuiTreeNodeFlags_SpanFullWidth)) {
+		spacing(3);
+
+		changed |= ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
+		changed |= ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
+		ImGui::TreePop();
+
+		spacing(3);
+	}
+
+	if (changed && !registry.hasAnyComponent<ecs::tags::IsMeshDirty>(entity))
+		registry.addComponent<ecs::tags::IsMeshDirty>(entity);
 }
 
 template <>
@@ -212,24 +209,6 @@ bool imageButton(const filament::Texture& texture, math::float2 size, math::floa
 #pragma clang diagnostic ignored "-Wold-style-cast"
 	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 #pragma clang diagnostic pop
-}
-
-void mainMenu(std::string_view& openedMenu)
-{
-	auto mainMenu = ui::MenuBar{};
-
-	{
-		auto menu = ui::Menu{"File"};
-		if (menu.isOpen())
-		{
-			if (menu.item("New", "CTRL+N"))
-				openedMenu = "New Scene";
-			if (menu.item("Open", "CTRL+O"))
-				openedMenu = "Open Scene";
-			if (menu.item("Save", "CTRL+S"))
-				openedMenu = "Save Scene";
-		}
-	}
 }
 
 } // namespace spatial::ui

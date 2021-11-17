@@ -1,18 +1,28 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <c++/v1/fstream>
-#include <utility>
+#include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
+#include <utility>
 
 namespace spatial::render
 {
 
-MeshController::MeshController(filament::Engine& engine, std::filesystem::path root)
-	: mEngine{engine}, mRoot{std::move(root)}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
+auto gLogger = createDefaultLogger();
+
+MeshController::MeshController(filament::Engine& engine)
+	: mEngine{engine},
+	  mRoot{},
+	  mVertexBuffers{},
+	  mIndexBuffers{},
+	  mMeshGeometries{},
+	  mBoundingBoxes{}
 {
 }
 
@@ -35,64 +45,64 @@ void MeshController::load(MeshId resourceId, const FilameshFile& filamesh)
 
 void MeshController::onUpdateFrame(ecs::Registry& registry, float delta)
 {
-	loadMeshes(registry);
+	populateMeshesDatabase(registry);
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
-	clearDeletedMeshes(registry);
+	clearDeletedOrDirtyMeshes(registry);
 }
 
 void MeshController::createRenderableMeshes(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<ecs::Mesh>(ecs::ExcludeComponents<Renderable>);
+	registry.getEntities<const Entity, ecs::Mesh>(ecs::ExcludeComponents<Renderable>)
+		.each([&](ecs::Entity e, const auto& entity, const auto& mesh) {
+			const auto resourceId = mesh.getResourceId();
 
-	for (auto entity : view)
-	{
-		const auto& renderable = registry.getComponent<const Entity>(entity);
-		const auto& data = registry.getComponent<const ecs::Mesh>(entity);
+			if (!hasMeshData(mesh.getResourceId()))
+				return;
 
-		registry.addComponent<Renderable>(entity, mEngine, renderable.get(), data.partsCount);
-	}
+			const auto& parts = mMeshGeometries.at(resourceId);
+			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
+			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
+		});
 }
 
 void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<ecs::Mesh, Renderable>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const ecs::Mesh>(entity);
-		const auto resourceId = toMeshId(data.resourcePath);
+	registry.getEntities<const ecs::Mesh, Renderable>().each([&, this](const auto& mesh, auto& renderable) {
+		const auto resourceId = mesh.getResourceId();
 
 		if (!hasMeshData(resourceId))
-			continue;
+			return;
 
 		const auto& parts = mMeshGeometries.at(resourceId);
 		auto& vertexBuffer = mVertexBuffers.at(resourceId);
 		auto& indexBuffer = mIndexBuffers.at(resourceId);
 		auto& boundingBox = mBoundingBoxes.at(resourceId);
 
-		auto& renderableMesh = registry.getComponent<Renderable>(entity);
+		renderable.setAxisAlignedBoundingBox(boundingBox);
+		renderable.setCastShadows(mesh.castShadows);
+		renderable.setReceiveShadows(mesh.receiveShadows);
+		renderable.setCulling(mesh.culling);
 
-		renderableMesh.setAxisAlignedBoundingBox(boundingBox);
-		renderableMesh.setCastShadows(data.castShadows);
-		renderableMesh.setReceiveShadows(data.receiveShadows);
-		renderableMesh.setCulling(data.culling);
+		const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
 
-		const auto partsCount = data.partsCount == 0 ? parts.size() : data.partsCount;
-
-		for (auto i = 0; i < partsCount; i++)
+		for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 		{
-			const auto& geometry = parts[data.partsOffset + i];
-			renderableMesh.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
-										 geometry.offset, geometry.count);
+			const auto& geometry = parts[std::min(mesh.partsOffset + i, parts.size() - 1)];
+			renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
+									 geometry.offset, geometry.count);
 
-			if (registry.hasAllComponents<MaterialInstance>(data.defaultMaterial))
+			if (registry.hasAnyComponent<MaterialInstance>(mesh.defaultMaterial))
 			{
-				const auto& materialInstance = registry.getComponent<const MaterialInstance>(data.defaultMaterial);
-				renderableMesh.setMaterialInstanceAt(i, materialInstance.get());
+				const auto& materialInstance = registry.getComponent<const MaterialInstance>(mesh.defaultMaterial);
+				renderable.setMaterialInstanceAt(i, materialInstance.get());
+			}
+			else if (mDefaultMaterialInstance.get())
+			{
+				renderable.setMaterialInstanceAt(i, mDefaultMaterialInstance.get());
 			}
 		}
-	}
+	});
 }
 
 bool MeshController::hasMeshData(MeshId resourceId) const
@@ -100,35 +110,62 @@ bool MeshController::hasMeshData(MeshId resourceId) const
 	return mMeshGeometries.find(resourceId) != mMeshGeometries.end();
 }
 
-void MeshController::clearDeletedMeshes(ecs::Registry& registry)
+void MeshController::clearDeletedOrDirtyMeshes(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
-	registry.removeComponent<Renderable>(view.begin(), view.end());
+	{
+		auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
+		registry.removeComponent<Renderable>(view.begin(), view.end());
+	}
+
+	{
+		auto view = registry.getEntities<Renderable, ecs::tags::IsMeshDirty>();
+		registry.removeComponent<Renderable>(view.begin(), view.end());
+	}
+
+	{
+		auto view = registry.getEntities<ecs::tags::IsMeshDirty>();
+		registry.removeComponent<ecs::tags::IsMeshDirty>(view.begin(), view.end());
+	}
 }
 
-uint32_t MeshController::toMeshId(const std::filesystem::path& path)
+void MeshController::setRootPath(const std::filesystem::path& root)
 {
-	return HashedString{path.string().c_str()}.value();
+	mRoot = root;
 }
 
-void MeshController::loadMeshes(ecs::Registry& registry)
+void MeshController::populateMeshesDatabase(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<const ecs::Mesh>();
-	view.each([this](auto& mesh) {
-		const auto path = mesh.resourcePath;
-		const auto resourceId = toMeshId(mesh.resourcePath);
-		if (!hasMeshData(resourceId))
+	registry.getEntities<const ecs::Mesh>().each([this](auto& mesh) {
+		const auto resourceId = mesh.getResourceId();
+
+		if (hasMeshData(resourceId))
+			return;
+
+		const auto path = mRoot / mesh.resourcePath;
+
+		if (!boost::algorithm::ends_with(path.string(), ".filamesh") || !std::filesystem::exists(path))
+			return;
+
+		auto fs = std::ifstream{path};
+		if (!fs)
+			return;
+
+		try
 		{
-			std::thread{[=]() {
-				auto fs = std::ifstream{mRoot / path};
-				if (!fs) return;
-
-				auto mesh = FilameshFile{};
-				fs >> mesh;
-				load(resourceId, mesh);
-			}};
+			auto filamesh = FilameshFile{};
+			fs >> filamesh;
+			load(resourceId, filamesh);
+		}
+		catch (const std::ios::failure& e)
+		{
+			gLogger.error(fmt::format("Could not load filamesh file: {0}\n Reason: ", path.c_str(), e.what()));
 		}
 	});
+}
+
+void MeshController::setDefaultMaterialInstance(const SharedMaterialInstance& defaultMaterialInstance)
+{
+	mDefaultMaterialInstance = defaultMaterialInstance;
 }
 
 } // namespace spatial::render

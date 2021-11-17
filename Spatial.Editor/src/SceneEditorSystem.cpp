@@ -3,13 +3,11 @@
 #include "DefaultMaterial.h"
 #include "EditorCamera.h"
 #include "Serialization.h"
-#include "Settings.h"
 #include "Tags.h"
 
 #include <assets/generated.h>
 
 #include <spatial/core/Logger.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/SkyboxResources.h>
@@ -17,17 +15,14 @@
 #include <spatial/serialization/Registry.h>
 
 #include <spatial/ui/components/AssetsExplorer.h>
-#include <spatial/ui/components/ComponentCollapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DockSpace.h>
 #include <spatial/ui/components/DragAndDrop.h>
-#include <spatial/ui/components/NewSceneModal.h>
-#include <spatial/ui/components/OpenSceneModal.h>
-#include <spatial/ui/components/PropertiesPanel.h>
-#include <spatial/ui/components/SaveSceneModal.h>
 #include <spatial/ui/components/Window.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
+
+#include <boost/algorithm/string/predicate.hpp>
 
 #include <fstream>
 #include <string>
@@ -42,12 +37,10 @@ namespace spatial::editor
 
 auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(Settings settings, filament::Engine& engine, desktop::Window& window)
-	: mSettings{std::move(settings)},
-	  mEngine{engine},
+SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
+	: mEngine{engine},
 	  mWindow{window},
 
-	  mEditorView{mEngine, window.getSize()},
 	  mEditorScene{render::createScene(mEngine)},
 
 	  mDefaultMaterial{render::createMaterial(mEngine, ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE)},
@@ -60,27 +53,81 @@ SceneEditorSystem::SceneEditorSystem(Settings settings, filament::Engine& engine
 
 	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
-	  mSelectedEntity{ecs::NullEntity},
-
 	  mRegistry{},
 
 	  mEditorCameraController{},
 	  mSceneController{mEngine, mEditorScene.ref()},
 	  mMaterialController{mEngine},
 	  mTransformController{mEngine},
-	  mCameraController{mEngine},
+	  mCameraController{mEngine, mEditorScene.ref()},
 	  mLightController{mEngine},
-	  mMeshController{mEngine, mSettings.projectFolder},
+	  mMeshController{mEngine},
 
-	  mCurrentAssetsPath{mSettings.projectFolder}
+	  mRootPath{},
+	  mScenePath{"scenes/default.spatial.xml"},
+	  isReloadSceneFlagEnabled{false},
+	  isClearSceneFlagEnabled{false},
+	  isSaveSceneFlagEnabled{false}
 {
+	auto materialInstance = toShared(render::createMaterialInstance(mEngine, mDefaultMaterial.ref()));
+	materialInstance->setParameter("baseColor", math::float3{1.0f});
+	materialInstance->setParameter("metallic", .1f);
+	materialInstance->setParameter("roughness", 1.0f);
+	materialInstance->setParameter("reflectance", .1f);
+
+	mMeshController.setDefaultMaterialInstance(materialInstance);
 }
 
 void SceneEditorSystem::onStart()
 {
 	mEditorScene->setIndirectLight(mSkyboxLight.get());
 	mEditorScene->setSkybox(mSkybox.get());
-	mEditorView.getView()->setScene(mEditorScene.get());
+
+	mMeshController.load("editor://meshes/cube.filamesh"_hs,
+						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/sphere.filamesh"_hs,
+						 loadFilameshFromMemory(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/plane.filamesh"_hs,
+						 loadFilameshFromMemory(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
+	mMeshController.load("editor://meshes/cylinder.filamesh"_hs,
+						 loadFilameshFromMemory(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
+}
+
+void SceneEditorSystem::onStartFrame(float)
+{
+	if (isClearSceneFlagEnabled)
+	{
+		mRegistry = ecs::Registry{};
+	}
+
+	if (isReloadSceneFlagEnabled)
+	{
+		auto ss = std::ifstream{mRootPath / mScenePath};
+		if (!ss)
+			return;
+
+		mRegistry = ecs::Registry{};
+		auto xml = XMLInputArchive{ss};
+		try
+		{
+			ecs::deserialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
+		}
+		catch (const std::exception& e)
+		{
+			gLogger.error(
+				fmt::format("Could not load scene: {0}\nReason: {1}", (mRootPath / mScenePath).string(), e.what()));
+		}
+	}
+
+	if (isSaveSceneFlagEnabled)
+	{
+		auto ss = std::ofstream{mRootPath / mScenePath};
+		if (!ss)
+			return;
+
+		auto xml = XMLOutputArchive{ss};
+		ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
+	}
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
@@ -92,132 +139,109 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mLightController.onUpdateFrame(mRegistry);
 	mMeshController.onUpdateFrame(mRegistry, delta);
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-
-	auto cameraEntity = mRegistry.getFirstEntity<EditorCamera, render::Camera>();
-	if (mRegistry.isValid(cameraEntity))
-	{
-		auto& camera = mRegistry.getComponent<render::Camera>(cameraEntity);
-		mEditorView.getView()->setCamera(camera.getInstance());
-	}
 }
 
 void SceneEditorSystem::onDrawGui()
 {
 	auto dockSpace = ui::DockSpace{"Spatial"};
-	std::string_view menuPopup{};
-	ui::mainMenu(menuPopup);
 
-	static std::string scenePath{std::filesystem::path{"scenes"} / "scene.xml"};
+	static fs::path currentPath{""};
+	static ecs::Entity selectedEntity{ecs::NullEntity};
+
+	auto mainMenu = ui::EditorMainMenu{mRootPath, mScenePath};
+	bool isDndLoadScene = false;
 
 	{
-		auto style = ui::WindowPaddingStyle{};
-		auto window = ui::Window{"Scene View"};
-		const auto imageSize = window.getSize() - math::float2{0, 24};
-
-		ui::image(mEditorView.getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
-		onSceneWindowResized(imageSize);
-
-		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
-			mWindow.warpMouse(mWindow.getSize() * .5f);
-
+		auto view = mRegistry.getEntities<const ecs::EntityName, render::TextureView, tags::IsEditorEntity>();
+		for (auto entity : view)
 		{
-			auto dnd = ui::DragAndDropTarget{};
-			if (dnd.isStarted())
+			const auto& name = mRegistry.getComponent<const ecs::EntityName>(entity);
+			auto& textureView = mRegistry.getComponent<render::TextureView>(entity);
+
+			auto style = ui::WindowPaddingStyle{};
+			auto window = ui::Window{fmt::format("Scene View ({0})", name.name)};
+			const auto imageSize = window.getSize() - math::float2{0, 24};
+			const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
+
+			ui::image(textureView.getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
+
+			if (auto* perspectiveCamera = mRegistry.getComponentIfExists<ecs::PerspectiveCamera>(entity);
+				perspectiveCamera)
 			{
-				auto result = dnd.getPathPayload(ui::AssetsExplorer::DND_SELECTED_FILE);
-				if (result)
+				perspectiveCamera->aspectRatio = aspectRatio;
+			}
+
+			if (auto* orthographicCamera = mRegistry.getComponentIfExists<ecs::OrthographicCamera>(entity);
+				orthographicCamera)
+			{
+				orthographicCamera->left = -aspectRatio;
+				orthographicCamera->right = aspectRatio;
+			}
+
+			// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
+			if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
+				mWindow.warpMouse(mWindow.getSize() * .5f);
+
+			{
+				auto dnd = ui::DragAndDropTarget{};
+				if (dnd.isStarted())
 				{
-					scenePath = result.value().string();
-					menuPopup = "Open Scene";
+					auto result = dnd.getPathPayload(ui::AssetsExplorer::DND_SELECTED_FILE);
+					if (result && boost::algorithm::ends_with(result->filename().string(), ".xml"))
+					{
+						isDndLoadScene = true;
+						selectedEntity = ecs::NullEntity;
+						mScenePath = result.value();
+					}
+
+					if (result && boost::algorithm::ends_with(result->filename().string(), ".filamesh"))
+					{
+						ecs::build(mRegistry).withName(result->stem().string()).asTransform().asMesh(result.value());
+					}
 				}
 			}
 		}
 	}
 
-	ui::entitiesListPanel<tags::IsEditorEntity>("Debug", mRegistry, mSelectedEntity);
-	ui::entitiesListPanel<ecs::tags::IsMeshMaterial>("Materials", mRegistry, mSelectedEntity);
-	ui::entitiesListPanel("Scene Graph", mRegistry, mSelectedEntity,
-						  ecs::ExcludeComponents<ecs::tags::IsMeshMaterial, tags::IsEditorEntity>);
-
 	{
-		auto panel = ui::PropertiesPanel{mRegistry, mSelectedEntity};
-		if (mRegistry.isValid(mSelectedEntity))
-		{
-			auto collapse = ui::ComponentCollapse{mRegistry, mSelectedEntity};
-			if (collapse.hasComponentAndIsOpen<EditorCamera>("Editor Camera"))
-				ui::editorCameraComponent(mRegistry, mSelectedEntity);
+		static std::string search{};
+		static bool showDebugEntities{false};
 
-			if (collapse.hasComponentAndIsOpen<DefaultMaterial>("Default Material"))
-				ui::defaultMaterialComponent(mRegistry, mSelectedEntity);
-		}
+		auto sceneGraph = ui::SceneGraphWindow{showDebugEntities};
+		sceneGraph.header(mRegistry, search);
+		sceneGraph.listTree(mRegistry, selectedEntity, search);
 	}
 
 	{
-		auto assets = ui::AssetsExplorer{mSettings.projectFolder, mIconTexture.ref()};
-		assets.header(mCurrentAssetsPath);
-		assets.onSelectPath(mCurrentAssetsPath);
-	}
+		static std::string search{};
 
-	if (menuPopup.data())
-		ImGui::OpenPopup(menuPopup.data());
-
-	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-	{
-		auto modal = ui::NewSceneModal{};
-		if (modal.onConfirm())
-			newScene();
+		auto sceneGraph = ui::MaterialsWindow{};
+		sceneGraph.header(mRegistry, search);
+		sceneGraph.list(mRegistry, selectedEntity, search);
 	}
 
 	{
-		auto modal = ui::SaveSceneModal{scenePath};
-		if (modal.onConfirm())
-			saveScene(fs::path{scenePath});
+		auto panel = ui::PropertiesPanel{mRegistry, selectedEntity};
 	}
 
 	{
-		auto modal = ui::OpenSceneModal{scenePath};
-		if (modal.onConfirm())
-			loadScene(fs::path{scenePath});
+		auto assets = ui::AssetsExplorer{mRootPath, mIconTexture.ref()};
+		assets.header(currentPath);
+		assets.onSelectPath(currentPath);
 	}
-}
 
-void SceneEditorSystem::saveScene(const fs::path& outputPath)
-{
-	auto ss = std::ofstream{mSettings.projectFolder / outputPath};
-	if (!ss)
-		return;
+	if (mainMenu.onOpenProject())
+		currentPath = mRootPath;
 
-	auto xml = XMLOutputArchive{ss};
-	ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
-}
-
-void SceneEditorSystem::loadScene(const fs::path& inputPath)
-{
-	auto ss = std::ifstream{mSettings.projectFolder / inputPath};
-	if (!ss)
-		return;
-
-	newScene();
-	auto xml = XMLInputArchive{ss};
-	ecs::deserialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
-}
-
-void SceneEditorSystem::onSceneWindowResized(const math::int2& size)
-{
-	mEditorCameraController.onEditorViewResized(mRegistry, size.x / static_cast<double>(size.y));
+	isClearSceneFlagEnabled = mainMenu.onNewScene();
+	isReloadSceneFlagEnabled = mainMenu.onOpenScene() || isDndLoadScene;
+	isSaveSceneFlagEnabled = mainMenu.onSaveScene();
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
-	if (hasEditorCamera())
-		renderer.render(mEditorView.getView().get());
-}
-
-void SceneEditorSystem::newScene()
-{
-	mRegistry = ecs::Registry{};
+	mRegistry.getEntities<const render::TextureView, const tags::IsEditorEntity>().each(
+		[&](const auto& textureView) { renderer.render(textureView.getView().get()); });
 }
 
 void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
@@ -227,9 +251,11 @@ void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 		mEditorCameraController.disable();
 }
 
-bool SceneEditorSystem::hasEditorCamera() const
+void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 {
-	return mRegistry.hasAnyEntity<EditorCamera, render::Camera>();
+	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
+		return;
+	mRootPath = path;
 }
 
 } // namespace spatial::editor

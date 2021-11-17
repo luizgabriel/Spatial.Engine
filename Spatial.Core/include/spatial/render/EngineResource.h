@@ -18,7 +18,7 @@ class EngineResource
 	ResourceType* mResource;
 
   public:
-	explicit EngineResource(filament::Engine& engine, ResourceType* resource = nullptr) noexcept
+	explicit EngineResource(filament::Engine& engine, ResourceType* resource) noexcept
 		: mEngine{engine}, mResource{resource}
 	{
 	}
@@ -27,7 +27,7 @@ class EngineResource
 	EngineResource& operator=(const EngineResource&) = delete;
 
 	EngineResource(EngineResource&& other) noexcept
-		: mEngine{other.mEngine}, mResource{std::exchange(other.mResource, nullptr)}
+		: mEngine{other.mEngine}, mResource{other.release()}
 	{
 	}
 
@@ -99,7 +99,7 @@ class EngineResource
 		return mResource;
 	}
 
-	bool isValid() const noexcept
+	[[nodiscard]] bool isValid() const noexcept
 	{
 		return mResource != nullptr;
 	}

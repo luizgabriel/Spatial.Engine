@@ -22,11 +22,11 @@ istream& operator>>(istream& stream, spatial::FilameshFilePart& part)
 
 istream& operator>>(istream& stream, spatial::FilameshFileHeader& header)
 {
-	char magic[9];
-	stream.read(magic, 8);
+	auto magic = std::array<char, 9>{};
+	stream.read(magic.data(), 8);
 	magic[8] = '\0';
 
-	if (strcmp(magic, "FILAMESH") != 0)
+	if (strcmp(magic.data(), "FILAMESH") != 0)
 	{
 		stream.setstate(ios_base::failbit);
 		return stream;

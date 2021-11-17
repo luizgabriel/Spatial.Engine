@@ -3,21 +3,16 @@ add_library(Spatial.UI
 	## HEADERS
 	include/spatial/ui/system/ImGuiHelpers.h
 	include/spatial/ui/system/UserInterfaceSystem.h
-		include/spatial/ui/system/ImGuiRenderer.h
+	include/spatial/ui/system/ImGuiRenderer.h
 	include/spatial/ui/system/UserInterfaceInput.h
 	
 	include/spatial/ui/components/Window.h
-	include/spatial/ui/components/PropertiesPanel.h
 	include/spatial/ui/components/Collapse.h
 	include/spatial/ui/components/DockSpace.h
 	include/spatial/ui/components/Components.h
-	include/spatial/ui/components/ListPanel.h
 	include/spatial/ui/components/MenuBar.h
 	include/spatial/ui/components/Menu.h
 	include/spatial/ui/components/PopupModal.h
-	include/spatial/ui/components/NewSceneModal.h
-	include/spatial/ui/components/OpenSceneModal.h
-	include/spatial/ui/components/ComponentCollapse.h
 	include/spatial/ui/components/AssetsExplorer.h
 	include/spatial/ui/components/DirectionInput.h
 	include/spatial/ui/components/VectorInput.h
@@ -35,17 +30,12 @@ add_library(Spatial.UI
 	src/system/UserInterfaceInput.cpp
 	
 	src/components/Window.cpp
-	src/components/PropertiesPanel.cpp
 	src/components/Collapse.cpp
 	src/components/DockSpace.cpp
-	src/components/ListPanel.cpp
 	src/components/Components.cpp
 	src/components/MenuBar.cpp
 	src/components/Menu.cpp
 	src/components/PopupModal.cpp
-	src/components/NewSceneModal.cpp
-	src/components/SaveSceneModal.cpp
-	src/components/OpenSceneModal.cpp
 	src/components/AssetsExplorer.cpp
 	src/components/VectorInput.cpp
 	src/components/DragAndDrop.cpp
@@ -53,7 +43,7 @@ add_library(Spatial.UI
 	src/components/DirectionInput.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/WindowPaddingStyle.cpp)
+	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/Popup.h src/components/Popup.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

@@ -33,9 +33,9 @@ int main(int argc, char* argv[])
 	ui.getRenderer().addFont(ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE);
 	ui.getRenderer().createFontTextureAtlas();
 
-	auto editor = editor::SceneEditorSystem{config,
-											rendering.getEngine(),
+	auto editor = editor::SceneEditorSystem{rendering.getEngine(),
 											window};
+	editor.setRootPath(config.projectFolder);
 
 	// Connect all Systems to the Application Main Loop
 	app >> desktopContext >> input >> rendering >> ui >> editor;

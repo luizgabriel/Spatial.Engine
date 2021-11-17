@@ -6,7 +6,7 @@ namespace spatial::ui
 
 PopupModal::PopupModal(const std::string_view name)
 {
-	mOpened = ImGui::BeginPopupModal(name.data(), NULL, ImGuiWindowFlags_AlwaysAutoResize);
+	mOpened = ImGui::BeginPopupModal(name.data(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 }
 
 PopupModal::~PopupModal()
@@ -15,7 +15,7 @@ PopupModal::~PopupModal()
 		ImGui::EndPopup();
 }
 
-bool PopupModal::isOpen()
+bool PopupModal::isOpen() const
 {
 	return mOpened;
 }

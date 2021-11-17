@@ -16,19 +16,26 @@ Camera::Camera(filament::Engine& engine, utils::Entity entity)
 
 Camera::~Camera()
 {
+	reset();
+}
+
+void Camera::reset()
+{
 	if (isValid())
 		mEngine.destroyCameraComponent(mEntity);
+
+	mEntity = utils::Entity{};
 }
 
 Camera::Camera(Camera&& other) noexcept
-	: mEngine{other.mEngine}, mEntity{other.mEntity}
+	: mEngine{other.mEngine}, mEntity{other.release()}
 {
-	//getInstance()->
 }
 
 Camera& Camera::operator=(Camera&& other) noexcept
 {
-	mEntity = std::exchange(other.mEntity, {});
+	reset();
+	mEntity = other.release();
 	return *this;
 }
 
@@ -59,7 +66,7 @@ void Camera::setPerspectiveProjection(double fovInDegrees, double aspect, double
 	getInstance()->setProjection(fovInDegrees, aspect, near, far);
 }
 
-void Camera::setOrtographicProjection(double left, double right, double bottom, double top, double near,
+void Camera::setOrthographicProjection(double left, double right, double bottom, double top, double near,
 									  double far) noexcept
 {
 	getInstance()->setProjection(filament::Camera::Projection::ORTHO, left,right, bottom, top, near, far);
@@ -84,6 +91,11 @@ void Camera::setCustomProjection(const math::mat4& projection, const math::mat4&
 void Camera::setScaling(math::double2 scaling) noexcept
 {
 	getInstance()->setScaling(scaling);
+}
+
+utils::Entity Camera::release()
+{
+	return std::exchange(mEntity, {});
 }
 
 } // namespace spatial

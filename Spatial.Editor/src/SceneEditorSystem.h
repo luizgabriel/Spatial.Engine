@@ -27,12 +27,9 @@ namespace spatial::editor
 class SceneEditorSystem
 {
   private:
-	Settings mSettings;
-
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 
-	render::TextureView mEditorView;
 	render::Scene mEditorScene;
 
 	render::Material mDefaultMaterial;
@@ -41,8 +38,6 @@ class SceneEditorSystem
 	render::IndirectLight mSkyboxLight;
 	render::Skybox mSkybox;
 	render::Texture mIconTexture;
-
-	ecs::Entity mSelectedEntity;
 
 	// TODO: Handle multiple scenes
 	// std::vector<ecs::Registry> mOpenedScenes;
@@ -59,16 +54,22 @@ class SceneEditorSystem
 	render::LightController mLightController;
 	render::MeshController mMeshController;
 
-	std::filesystem::path mCurrentAssetsPath;
+	std::filesystem::path mRootPath;
+	std::filesystem::path mScenePath;
+
+	bool isReloadSceneFlagEnabled;
+	bool isClearSceneFlagEnabled;
+	bool isSaveSceneFlagEnabled;
 
   public:
 	SceneEditorSystem(
-		Settings settings,
 		filament::Engine& engine,
 		desktop::Window& window
 	);
 
 	void onStart();
+
+	void onStartFrame(float delta);
 
 	void onUpdateFrame(float delta);
 
@@ -78,14 +79,8 @@ class SceneEditorSystem
 
 	void onRender(filament::Renderer& renderer) const;
 
-	void onSceneWindowResized(const math::int2& size);
+	void setRootPath(const std::filesystem::path& path);
 
-	void saveScene(const std::filesystem::path& outputPath);
-
-	void loadScene(const std::filesystem::path& inputPath);
-
-	void newScene();
-	bool hasEditorCamera() const;
 };
 
 } // namespace spatial::editor

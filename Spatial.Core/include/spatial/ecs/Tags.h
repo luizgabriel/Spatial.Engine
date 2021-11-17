@@ -3,11 +3,15 @@
 namespace spatial::ecs::tags
 {
 
-struct IsMeshMaterial
+struct IsMaterial
 {
 };
 
 struct IsRenderable
+{
+};
+
+struct IsMeshDirty
 {
 };
 

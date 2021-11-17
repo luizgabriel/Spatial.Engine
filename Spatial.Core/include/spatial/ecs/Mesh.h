@@ -3,6 +3,7 @@
 #include <array>
 #include <filament/Box.h>
 #include <filesystem>
+#include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Registry.h>
 
 namespace spatial::ecs
@@ -27,6 +28,11 @@ struct Mesh
 	explicit Mesh(std::filesystem::path resourcePath = {})
 		: resourcePath{std::move(resourcePath)}
 	{
+	}
+
+	[[nodiscard]] uint32_t getResourceId() const
+	{
+		return HashedString{resourcePath.c_str()}.value();
 	}
 };
 

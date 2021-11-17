@@ -81,15 +81,17 @@ class Light
 
 	[[nodiscard]] bool isShadowCaster() const noexcept;
 
-	[[nodiscard]] utils::Entity release() noexcept;
 
-	void reset() noexcept;
 
   private:
 	Manager& mManager;
 	utils::Entity mEntity;
 
 	Instance getInstance() const noexcept;
+
+	void reset() noexcept;
+
+	[[nodiscard]] utils::Entity release() noexcept;
 };
 
 } // namespace spatial::render
