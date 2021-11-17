@@ -31,9 +31,9 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   </a>
 </p>
 
-![screenshot](https://i.imgur.com/2WMBo2H.png)
+https://user-images.githubusercontent.com/7469145/142241873-93051432-cd4f-41ba-95c1-3a1323b9da29.mp4
 
-## Documentation
+## Getting Started
 
 Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/Spatial.Engine/).
 
