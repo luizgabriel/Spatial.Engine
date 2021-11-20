@@ -18,7 +18,11 @@ class EntityProperties
   public:
 	static bool displayComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
 
+	static void popup(ecs::Registry& registry, ecs::Entity selectedEntity);
+
   private:
+	static void addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity);
+
 	static bool displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
 	static bool displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
 	static bool displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity selectedEntity);

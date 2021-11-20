@@ -186,6 +186,7 @@ void SceneEditorSystem::onDrawGui()
 			orthographicCamera->setAspectRatio(aspectRatio);
 
 		{
+			auto style2 = ui::WindowPaddingStyle{4};
 			auto popup = ui::Popup{"Scene View Popup"};
 			if (popup.isOpen())
 				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
@@ -202,40 +203,33 @@ void SceneEditorSystem::onDrawGui()
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity, createEntityPosition);
 	}
 
-	{
-		auto window = ui::Window{"Scene Tree"};
-
-		{
-			auto popup = ui::Popup{"Scene Graph Popup"};
-			if (popup.isOpen()) {
-				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
-				ui::SceneOptionsMenu::viewOptionsMenu(showDebugEntities);
-			}
-		}
+	ui::Window::show("Scene Tree", [&]() {
+		ui::Popup::show("Scene Graph Popup", [&]() {
+			ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+			ui::SceneOptionsMenu::viewOptionsMenu(showDebugEntities);
+		});
 
 		static std::string search;
 		ui::Search::searchText(search);
 		ui::SceneTree::displayTree(mRegistry, selectedEntity, showDebugEntities, search);
-	}
+	});
 
-	{
-		auto window = ui::Window{"Materials Manager"};
+	ui::Window::show("Materials Manager", [&]() {
+		ui::MaterialsManager::popup(mRegistry, selectedEntity);
 
 		static std::string search;
 		ui::Search::searchText(search);
-		ui::MaterialsManager::popup(mRegistry, selectedEntity);
 		ui::MaterialsManager::list(mRegistry, selectedEntity, search);
-	}
+	});
 
-	{
-		auto window = ui::Window{"Properties"};
+	ui::Window::show("Properties", [&]() {
+		ui::EntityProperties::popup(mRegistry, selectedEntity);
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
-	}
+	});
 
-	{
-		auto window = ui::Window{"Assets Explorer"};
+	ui::Window::show("Assets Explorer", [&]() {
 		ui::AssetsExplorer::displayFiles(mRootPath, currentPath, mIconTexture.get());
-	}
+	});
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const

@@ -19,8 +19,7 @@ class Search
 		std::string selectedItemName;
 		bool changed = false;
 
-		if (registry.isValid(selectedEntity)
-			&& registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity))
+		if (registry.hasAllComponents<ecs::EntityName, FilterComponents...>(selectedEntity))
 		{
 			const auto& entityName = registry.getComponent<const ecs::EntityName>(selectedEntity);
 			selectedItemName = entityName.name;
@@ -46,7 +45,6 @@ class Search
 					}
 				}
 			}
-
 		}
 
 		return changed;

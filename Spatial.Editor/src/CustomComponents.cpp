@@ -61,7 +61,6 @@ bool EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ec
 	bool changed = false;
 
 	changed |= displayComponent<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
-
 	changed |= displayComponent<editor::DefaultMaterial>("Default Material", registry, selectedEntity);
 
 	return changed;
@@ -97,6 +96,56 @@ bool EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 	}
 
 	return changed;
+}
+
+void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
+	auto menu = ui::Menu{"Add Component"};
+	if (!menu.isOpen())
+		return;
+
+	if (!registry.hasAnyComponent<ecs::Transform>(selectedEntity) && menu.item("Transform"))
+		registry.addComponent<ecs::Transform>(selectedEntity);
+
+	ImGui::Separator();
+
+	if (!registry.hasAnyComponent<ecs::Mesh>(selectedEntity) && menu.item("Mesh"))
+		registry.addComponent<ecs::Mesh>(selectedEntity);
+
+	ImGui::Separator();
+
+	if (!registry.hasAnyComponent<ecs::DirectionalLight>(selectedEntity) && menu.item("Directional Light"))
+		registry.addComponent<ecs::DirectionalLight>(selectedEntity);
+
+	if (!registry.hasAnyComponent<ecs::SpotLight>(selectedEntity) && menu.item("Spot Light"))
+		registry.addComponent<ecs::SpotLight>(selectedEntity);
+
+	if (!registry.hasAnyComponent<ecs::PointLight>(selectedEntity) && menu.item("Point Light"))
+		registry.addComponent<ecs::PointLight>(selectedEntity);
+
+	ImGui::Separator();
+
+	if (!registry.hasAnyComponent<ecs::PerspectiveCamera>(selectedEntity) && menu.item("Perspective Camera"))
+		registry.addComponent<ecs::PerspectiveCamera>(selectedEntity);
+
+	if (!registry.hasAnyComponent<ecs::OrthographicCamera>(selectedEntity) && menu.item("Orthographic Camera"))
+		registry.addComponent<ecs::OrthographicCamera>(selectedEntity);
+
+	if (!registry.hasAnyComponent<ecs::CustomCamera>(selectedEntity) && menu.item("Custom Camera"))
+		registry.addComponent<ecs::CustomCamera>(selectedEntity);
+}
+
+void EntityProperties::popup(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
+	if (!registry.isValid(selectedEntity))
+		return;
+
+	{
+		auto popup = ui::Popup{"Properties Popup"};
+		if (popup.isOpen()) {
+			EntityProperties::addComponentMenu(registry, selectedEntity);
+		}
+	}
 }
 
 EditorMainMenu::EditorMainMenu(std::filesystem::path& rootPath, std::filesystem::path& scenePath) : mMenuBar{}
@@ -202,9 +251,7 @@ NewSceneModal::NewSceneModal() : mModal{"New Scene"}
 
 	mIsConfirmed = ImGui::Button("Discard unsaved changes and create a new scene.");
 	if (mIsConfirmed)
-	{
 		mModal.close();
-	}
 
 	ImGui::SetItemDefaultFocus();
 	ImGui::SameLine();
@@ -451,13 +498,13 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 		{
 			auto menu = ui::Menu{"Create Material"};
 
-			if (menu.item("Default Material")) {
+			if (menu.item("Default Material"))
+			{
 				selectedEntity = ecs::build(registry)
 									 .withName(fmt::format("Default Material {0}", newMaterialsCount++))
 									 .asMaterial<editor::DefaultMaterial>();
 				changed = true;
 			}
-
 		}
 	}
 
@@ -498,7 +545,8 @@ bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedE
 	return false;
 }
 
-bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition)
+bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity,
+										  math::float3 createEntitiesPosition)
 {
 	auto menu = Menu{"Create Entity"};
 	if (!menu.isOpen())
@@ -508,7 +556,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Empty"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Empty Entity"));
+		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Empty Entity")).with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
@@ -562,7 +610,11 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Point Light"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName("Point Light").asTransform().withPosition(createEntitiesPosition).asPointLight();
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Point Light")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asPointLight();
 		changed = true;
 	}
 
@@ -574,7 +626,11 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Spot Light"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName("Spot Light").asTransform().withPosition(createEntitiesPosition).asSpotLight();
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Spot Light")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asSpotLight();
 		changed = true;
 	}
 
@@ -582,13 +638,21 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Perspective Camera"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Perspective Camera")).asTransform().withPosition(createEntitiesPosition).asPerspectiveCamera();
+		selectedEntity = ecs::build(mRegistry)
+							 .withName(fmt::format("Perspective Camera"))
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asPerspectiveCamera();
 		changed = true;
 	}
 
 	if (menu.item("Orthographic Camera"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Orthographic Camera")).asTransform().withPosition(createEntitiesPosition).asOrthographicCamera();
+		selectedEntity = ecs::build(mRegistry)
+							 .withName(fmt::format("Orthographic Camera"))
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asOrthographicCamera();
 		changed = true;
 	}
 
@@ -603,7 +667,8 @@ bool SceneOptionsMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
 
 	bool changed = false;
 
-	if (menu.item("Toggle Debug Entities")) {
+	if (menu.item("Toggle Debug Entities"))
+	{
 		isEditorEntitiesShowing = !isEditorEntitiesShowing;
 		changed = true;
 	}

@@ -22,6 +22,15 @@ class Window
 
 	[[nodiscard]] bool isFocused() const;
 
+	template <typename Function>
+	static void show(const std::string_view name, Function func)
+	{
+		auto window = Window{name};
+		if (window.isOpen()) {
+			std::invoke(std::forward<Function>(func));
+		}
+	}
+
   private:
 	bool mIsOpen;
 };
