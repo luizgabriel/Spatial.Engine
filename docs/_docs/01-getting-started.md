@@ -18,7 +18,7 @@ So, if you REALLY want to make a game, go straight away with those engines.
 But, if you need a simple visualization tool with game engine like tools and functions, I think that the Spatial Engine is a nice solution to consider.
 
 Programming a game engine is hard and the necessary skill are completely different from creating a game. 
-The Spatial Engine stills pretty simple and also really far from complete, but it already do some neat things.
+The Spatial Engine is still pretty simple and also really far from complete, but it already do some neat things.
 
 ## The Project Structure
 Now, let's dive into the usage details of the Spatial Engine.
@@ -31,6 +31,7 @@ Spatial.Engine
 └── Spatial.UI (The user interface library)
 └── Spatial.Editor (The engine scene editor built using with all the Core tools)
 └── Spatial.Res (A C++ code generator for embedding resource files inside the Spatial.Editor binary)
+└── Spatial.Game (An example game with some assets for you to play with the engine editor)
 ```
 
 You can take a look at the `Spatial.Core` folder to understand how the darker details have been implemented.
@@ -67,9 +68,11 @@ xcode-select --install
 Install all these tools:
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
-- [Visual Studio 2019 Community](https://visualstudio.microsoft.com/pt-br/downloads/)
+- [Visual Studio 2019 Community](https://my.visualstudio.com/Downloads?q=visual%20studio%20community%202019&wt.mc_id=o~msft~vscom~older-downloads)
 
 This is the recommend conan profile to compile on Windows (`~/.conan/profiles/default`):
+> If there's no `profiles/default` file, run: `conan profile new default --detect`
+
 ```
 [settings]
 os=Windows
@@ -81,6 +84,8 @@ compiler=Visual Studio
 compiler.version=16
 compiler.runtime=MTd
 ```
+
+The most important setting is this `compiler.runtime=MTd` (This is required for the `filament` library to build properly).
 
 ### Linux
 After, install [CMake](https://cmake.org/install/).
@@ -130,11 +135,14 @@ Install these extensions:
   - Install the [CMake Extension](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
   - Install the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
 
-Create a `.vscode/settings.yml` file:
+Create a `.vscode/settings.json` file:
 ```json
 {
     "cmake.buildDirectory": "${workspaceFolder}/out/build",
-    "cmake.installPrefix": "${workspaceFolder}/out/install"
+    "cmake.installPrefix": "${workspaceFolder}/out/install",
+    "cmake.configureSettings": {
+       "CMAKE_BUILD_TYPE": "${buildType}"
+    }
 }
 ```
 
@@ -153,5 +161,3 @@ Go to `Build, Execution, Deployment` > `CMake`:
 - On `Toolchain` put `System`
 
 ![Build, Execution, Deployment, CMake]({{site.baseurl}}/assets/images/clion-config.png)
-
-
