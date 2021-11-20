@@ -167,13 +167,13 @@ class Registry
 	template <typename Component>
 	const Component* getComponentIfExists(Entity entity) const
 	{
-		return mRegistry.template try_get<const Component>(entity);
+		return isValid(entity) ? mRegistry.template try_get<const Component>(entity) : nullptr;
 	}
 
 	template <typename Component>
 	Component* getComponentIfExists(Entity entity)
 	{
-		return mRegistry.template try_get<Component>(entity);
+		return isValid(entity) ? mRegistry.template try_get<Component>(entity) : nullptr;
 	}
 
   private:

@@ -24,7 +24,6 @@ class SpatialEngineConan(ConanFile):
         "stb/20200203",
         "entt/3.7.0",
         "cereal/1.3.0",
-        "imguizmo/cci.20210223",
         "magic_enum/0.7.3",
 
         # Remember to run 'setup.py' to make this dependencies available

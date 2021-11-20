@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spatial/common/Math.h>
+
 namespace spatial::ui
 {
 
@@ -30,8 +31,9 @@ struct Icons
 	Icon sceneFile;
 	Icon jsFile;
 
-	constexpr Icons(const Icon& back, const Icon& folder, const Icon& unknownFile, const Icon& meshFile, const Icon& pngFile,
-		  const Icon& jpgFile, const Icon& exrFile, const Icon& sceneFile, const Icon& jsFile)
+	constexpr Icons(const Icon& back, const Icon& folder, const Icon& unknownFile, const Icon& meshFile,
+					const Icon& pngFile, const Icon& jpgFile, const Icon& exrFile, const Icon& sceneFile,
+					const Icon& jsFile)
 		: back(back),
 		  folder(folder),
 		  unknownFile(unknownFile),
@@ -46,15 +48,8 @@ struct Icons
 };
 
 constexpr auto gIcons = Icons{
-	Icon{{0, 1}},
-	Icon{{0, 0}},
-	Icon{{1, 0}},
-	Icon{{2, 0}},
-	Icon{{3, 0}},
-	Icon{{4, 0}},
-	Icon{{5, 0}},
-	Icon{{6, 0}},
-	Icon{{7, 0}},
+	Icon{{0, 1}}, Icon{{0, 0}}, Icon{{1, 0}}, Icon{{2, 0}}, Icon{{3, 0}},
+	Icon{{4, 0}}, Icon{{5, 0}}, Icon{{6, 0}}, Icon{{7, 0}},
 };
 
 } // namespace spatial::ui

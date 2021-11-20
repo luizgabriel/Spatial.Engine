@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
@@ -32,56 +33,70 @@ void componentInput<editor::EditorCamera>(ecs::Registry& registry, ecs::Entity e
 	ImGui::DragFloat("Sensitivity", &data.sensitivity);
 }
 
-PropertiesPanel::PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity)
-	: mWindow{"Properties"}, mRegistry{registry}, mSelectedEntity{selectedEntity}
+bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
 {
-	if (!mWindow.isOpen())
-		return;
+	bool changed = false;
 
+	changed |= displayComponent<ecs::Transform>("Transform", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::PerspectiveCamera>("Perspective Camera", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::OrthographicCamera>("Orthographic Camera", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::CustomCamera>("Custom Camera", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::DirectionalLight>("Directional Light", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::SpotLight>("Spot Light", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::PointLight>("Point Light", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::Mesh>("Mesh", registry, selectedEntity);
+
+	return changed;
+}
+
+bool EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
+	bool changed = false;
+
+	changed |= displayComponent<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
+
+	changed |= displayComponent<editor::DefaultMaterial>("Default Material", registry, selectedEntity);
+
+	return changed;
+}
+
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
 	bool isValid = registry.isValid(selectedEntity);
 	if (!isValid)
 	{
 		ImGui::Text("No entity selected.");
-		return;
+		return false;
 	}
+
+	bool changed = false;
+	changed |= displayEntityName(registry, selectedEntity);
+	changed |= displayEntityCoreComponents(registry, selectedEntity);
+	changed |= displayEntityEditorComponents(registry, selectedEntity);
+
+	return changed;
+}
+
+bool EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
+	bool changed = false;
 
 	if (registry.hasAllComponents<ecs::EntityName>(selectedEntity))
 	{
 		auto& name = registry.getComponent<ecs::EntityName>(selectedEntity);
 
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-		inputText("##Name", name.name);
+		changed = inputText("##Name", name.name);
 	}
 
-	if (onComponent<ecs::Transform>("Transform"))
-		componentInput<ecs::Transform>(registry, selectedEntity);
-
-	if (onComponent<ecs::PerspectiveCamera>("Perspective Camera"))
-		componentInput<ecs::PerspectiveCamera>(registry, selectedEntity);
-
-	if (onComponent<ecs::OrthographicCamera>("Orthographic Camera"))
-		componentInput<ecs::OrthographicCamera>(registry, selectedEntity);
-
-	if (onComponent<ecs::CustomCamera>("Custom Camera"))
-		componentInput<ecs::CustomCamera>(registry, selectedEntity);
-
-	if (onComponent<ecs::DirectionalLight>("Directional Light"))
-		componentInput<ecs::DirectionalLight>(registry, selectedEntity);
-
-	if (onComponent<ecs::SpotLight>("Spot Light"))
-		componentInput<ecs::SpotLight>(registry, selectedEntity);
-
-	if (onComponent<ecs::PointLight>("Point Light"))
-		componentInput<ecs::PointLight>(registry, selectedEntity);
-
-	if (onComponent<ecs::Mesh>("Mesh"))
-		componentInput<ecs::Mesh>(registry, selectedEntity);
-
-	if (onComponent<editor::EditorCamera>("Editor Camera"))
-		componentInput<editor::EditorCamera>(mRegistry, selectedEntity);
-
-	if (onComponent<editor::DefaultMaterial>("Default Material"))
-		componentInput<editor::DefaultMaterial>(mRegistry, selectedEntity);
+	return changed;
 }
 
 EditorMainMenu::EditorMainMenu(std::filesystem::path& rootPath, std::filesystem::path& scenePath) : mMenuBar{}
@@ -178,7 +193,8 @@ bool EditorMainMenu::onSaveScene()
 
 NewSceneModal::NewSceneModal() : mModal{"New Scene"}
 {
-	if (!mModal.isOpen()) return;
+	if (!mModal.isOpen())
+		return;
 
 	ImGui::Text("Are you sure? If you continue, all unsaved changes will be discarded.");
 
@@ -305,100 +321,9 @@ void OpenProjectModal::open()
 	ImGui::OpenPopup("Open Project");
 }
 
-SceneGraphWindow::SceneGraphWindow(bool& showDebugEntities)
-	: mWindow{"Scene Graph"}, mShowEditorEntities{showDebugEntities}
+bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities,
+							std::string_view search)
 {
-}
-
-bool SceneGraphWindow::header(ecs::Registry& registry, std::string& search)
-{
-	if (!mWindow.isOpen())
-		return false;
-
-	{
-		static auto newEntitiesCount = 1;
-
-		auto popup = ui::Popup{"Scene Graph Popup"};
-		if (popup.isOpen())
-		{
-			{
-				auto menu = ui::Menu{"Create Entity"};
-				if (menu.item("Empty"))
-					ecs::build(registry).withName(fmt::format("Entity {0}", newEntitiesCount++));
-
-				ImGui::Separator();
-
-				if (menu.item("Cube"))
-					ecs::build(registry)
-						.withName("Cube")
-						.asTransform()
-						.asMesh("editor://meshes/cube.filamesh")
-						.withSubMesh(0, 1);
-
-				if (menu.item("Plane"))
-					ecs::build(registry)
-						.withName("Plane")
-						.asTransform()
-						.asMesh("editor://meshes/plane.filamesh")
-						.withSubMesh(0, 1);
-
-				if (menu.item("Sphere"))
-					ecs::build(registry)
-						.withName("Sphere")
-						.asTransform()
-						.asMesh("editor://meshes/sphere.filamesh")
-						.withSubMesh(0, 1);
-
-				if (menu.item("Cylinder"))
-					ecs::build(registry)
-						.withName("Cylinder")
-						.asTransform()
-						.asMesh("editor://meshes/sphere.filamesh")
-						.withSubMesh(0, 1);
-
-				ImGui::Separator();
-
-				if (menu.item("Point Light"))
-					ecs::build(registry).withName("Point Light").asTransform().asPointLight();
-
-				if (menu.item("Directional Light"))
-					ecs::build(registry).withName("Directional Light").asDirectionalLight();
-
-				if (menu.item("Spot Light"))
-					ecs::build(registry).withName("Spot Light").asTransform().asSpotLight();
-
-				ImGui::Separator();
-
-				if (menu.item("Perspective Camera"))
-					ecs::build(registry)
-						.withName(fmt::format("Perspective Camera {0}", newEntitiesCount++))
-						.asPerspectiveCamera();
-
-				if (menu.item("Orthographic Camera"))
-					ecs::build(registry)
-						.withName(fmt::format("Orthographic Camera {0}", newEntitiesCount++))
-						.asOrthographicCamera();
-			}
-
-			{
-				auto menu = ui::Menu{"View"};
-				if (menu.item("Toggle Debug Entities"))
-					mShowEditorEntities = !mShowEditorEntities;
-			}
-		}
-	}
-
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-	bool changed = ui::inputText("Search: ", search);
-
-	return changed;
-}
-
-bool SceneGraphWindow::listTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search)
-{
-	if (!mWindow.isOpen())
-		return false;
-
 	bool changed = false;
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
@@ -425,7 +350,7 @@ bool SceneGraphWindow::listTree(const ecs::Registry& registry, ecs::Entity& sele
 			changed |= displayNode(registry, entity, selectedEntity);
 		};
 
-		if (mShowEditorEntities)
+		if (showDebugEntities)
 			registry.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMaterial>)
 				.each(onEachNodeFn);
 		else
@@ -440,7 +365,7 @@ bool SceneGraphWindow::listTree(const ecs::Registry& registry, ecs::Entity& sele
 	return changed;
 }
 
-bool SceneGraphWindow::displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity)
+bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity)
 {
 	const auto& name = registry.getComponent<ecs::EntityName>(entity);
 
@@ -477,43 +402,8 @@ bool SceneGraphWindow::displayNode(const ecs::Registry& registry, ecs::Entity en
 	return open;
 }
 
-MaterialsWindow::MaterialsWindow() : mWindow{"Materials"}
+bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search)
 {
-}
-
-bool MaterialsWindow::header(ecs::Registry& registry, std::string& search)
-{
-	if (!mWindow.isOpen())
-		return false;
-
-	{
-		static auto newMaterialsCount = 1;
-
-		auto popup = ui::Popup{"Materials Window Popup"};
-		if (popup.isOpen())
-		{
-			{
-				auto menu = ui::Menu{"Create Material"};
-
-				if (menu.item("Default Material"))
-					ecs::build(registry)
-						.withName(fmt::format("Default Material {0}", newMaterialsCount++))
-						.asMaterial<editor::DefaultMaterial>();
-			}
-		}
-	}
-
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-	bool changed = ui::inputText("Search: ", search);
-
-	return changed;
-}
-
-bool MaterialsWindow::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search)
-{
-	if (!mWindow.isOpen())
-		return false;
-
 	bool changed = false;
 
 	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
@@ -544,6 +434,178 @@ bool MaterialsWindow::list(const ecs::Registry& registry, ecs::Entity& selectedE
 		});
 
 		ImGui::EndTable();
+	}
+
+	return changed;
+}
+
+bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	static auto newMaterialsCount = 1;
+
+	bool changed = false;
+
+	auto popup = ui::Popup{"Materials Window Popup"};
+	if (popup.isOpen())
+	{
+		{
+			auto menu = ui::Menu{"Create Material"};
+
+			if (menu.item("Default Material")) {
+				selectedEntity = ecs::build(registry)
+									 .withName(fmt::format("Default Material {0}", newMaterialsCount++))
+									 .asMaterial<editor::DefaultMaterial>();
+				changed = true;
+			}
+
+		}
+	}
+
+	return changed;
+}
+
+bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
+{
+	auto dnd = DragAndDropTarget{};
+	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
+	if (result && boost::algorithm::ends_with(result->filename().string(), ".xml"))
+	{
+		selectedEntity = ecs::NullEntity;
+		scenePath = result.value();
+		return true;
+	}
+
+	return false;
+}
+
+bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								 math::float3 createEntityPosition)
+{
+	auto dnd = DragAndDropTarget{};
+	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
+
+	if (result && boost::algorithm::ends_with(result->filename().string(), ".filamesh"))
+	{
+		selectedEntity = ecs::build(registry)
+							 .withName(result->stem().string())
+							 .asTransform()
+							 .withPosition(createEntityPosition)
+							 .asMesh(result.value());
+
+		return true;
+	}
+
+	return false;
+}
+
+bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition)
+{
+	auto menu = Menu{"Create Entity"};
+	if (!menu.isOpen())
+		return false;
+
+	bool changed = false;
+
+	if (menu.item("Empty"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Empty Entity"));
+		changed = true;
+	}
+
+	ImGui::Separator();
+
+	if (menu.item("Cube"))
+	{
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Cube")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asMesh("editor://meshes/cube.filamesh")
+							 .withSubMesh(0, 1);
+		changed = true;
+	}
+
+	if (menu.item("Plane"))
+	{
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Plane")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asMesh("editor://meshes/plane.filamesh")
+							 .withSubMesh(0, 1);
+		changed = true;
+	}
+
+	if (menu.item("Sphere"))
+	{
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Sphere")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asMesh("editor://meshes/sphere.filamesh")
+							 .withSubMesh(0, 1);
+		changed = true;
+	}
+
+	if (menu.item("Cylinder"))
+	{
+		selectedEntity = ecs::build(mRegistry)
+							 .withName("Cylinder")
+							 .asTransform()
+							 .withPosition(createEntitiesPosition)
+							 .asMesh("editor://meshes/cylinder.filamesh")
+							 .withSubMesh(0, 1);
+		changed = true;
+	}
+
+	ImGui::Separator();
+
+	if (menu.item("Point Light"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName("Point Light").asTransform().withPosition(createEntitiesPosition).asPointLight();
+		changed = true;
+	}
+
+	if (menu.item("Directional Light"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName("Directional Light").asDirectionalLight();
+		changed = true;
+	}
+
+	if (menu.item("Spot Light"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName("Spot Light").asTransform().withPosition(createEntitiesPosition).asSpotLight();
+		changed = true;
+	}
+
+	ImGui::Separator();
+
+	if (menu.item("Perspective Camera"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Perspective Camera")).asTransform().withPosition(createEntitiesPosition).asPerspectiveCamera();
+		changed = true;
+	}
+
+	if (menu.item("Orthographic Camera"))
+	{
+		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Orthographic Camera")).asTransform().withPosition(createEntitiesPosition).asOrthographicCamera();
+		changed = true;
+	}
+
+	return changed;
+}
+
+bool SceneOptionsMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
+{
+	auto menu = Menu{"View"};
+	if (!menu.isOpen())
+		return false;
+
+	bool changed = false;
+
+	if (menu.item("Toggle Debug Entities")) {
+		isEditorEntitiesShowing = !isEditorEntitiesShowing;
+		changed = true;
 	}
 
 	return changed;

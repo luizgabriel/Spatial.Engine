@@ -42,7 +42,7 @@ class EntityBuilder
 	template <typename Component>
 	EntityBuilder& with(Component&& component)
 	{
-		mRegistry.template addComponent<Component>(mEntity, std::move(component));
+		mRegistry.template addComponent<Component>(mEntity, std::forward<Component>(component));
 		return *this;
 	}
 

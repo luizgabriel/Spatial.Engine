@@ -57,8 +57,8 @@ class SceneEditorSystem
 	std::filesystem::path mRootPath;
 	std::filesystem::path mScenePath;
 
-	bool isReloadSceneFlagEnabled;
-	bool isClearSceneFlagEnabled;
+	bool mIsReloadSceneFlagEnabled;
+	bool mIsClearSceneFlagEnabled;
 	bool isSaveSceneFlagEnabled;
 
   public:

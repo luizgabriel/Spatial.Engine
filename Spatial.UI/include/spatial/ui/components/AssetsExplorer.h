@@ -16,20 +16,13 @@ class AssetsExplorer
   public:
 	static constexpr auto DND_SELECTED_FILE = "SELECTED_ASSET_PATH";
 
-	explicit AssetsExplorer(const std::filesystem::path& rootPath, const filament::Texture& texture);
-	~AssetsExplorer();
-
-	bool header(std::filesystem::path& selectedPath);
-
-	bool onSelectPath(std::filesystem::path& selectedPath);
-
-	[[nodiscard]] bool fileButton(const math::float4& uv) const;
-
+	static bool displayFiles(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath, const filament::Texture* icon = nullptr);
 
   private:
 	ui::Window mWindow;
-	const std::filesystem::path& mRootPath;
-	const filament::Texture& mIconTexture;
+	static filament::Texture* sIconTexture;
+
+	static bool displayPathHeader(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath, const filament::Texture* icon = nullptr);
 };
 
 }

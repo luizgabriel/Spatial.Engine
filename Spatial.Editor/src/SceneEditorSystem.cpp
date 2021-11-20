@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <fstream>
+#include <spatial/ui/components/Search.h>
 #include <string>
 
 namespace fl = filament;
@@ -65,8 +66,8 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mRootPath{},
 	  mScenePath{"scenes/default.spatial.xml"},
-	  isReloadSceneFlagEnabled{false},
-	  isClearSceneFlagEnabled{false},
+	  mIsReloadSceneFlagEnabled{false},
+	  mIsClearSceneFlagEnabled{false},
 	  isSaveSceneFlagEnabled{false}
 {
 	auto materialInstance = toShared(render::createMaterialInstance(mEngine, mDefaultMaterial.ref()));
@@ -95,12 +96,13 @@ void SceneEditorSystem::onStart()
 
 void SceneEditorSystem::onStartFrame(float)
 {
-	if (isClearSceneFlagEnabled)
+	if (mIsClearSceneFlagEnabled)
 	{
 		mRegistry = ecs::Registry{};
+		mIsClearSceneFlagEnabled = false;
 	}
 
-	if (isReloadSceneFlagEnabled)
+	if (mIsReloadSceneFlagEnabled)
 	{
 		auto ss = std::ifstream{mRootPath / mScenePath};
 		if (!ss)
@@ -117,6 +119,8 @@ void SceneEditorSystem::onStartFrame(float)
 			gLogger.error(
 				fmt::format("Could not load scene: {0}\nReason: {1}", (mRootPath / mScenePath).string(), e.what()));
 		}
+
+		mIsReloadSceneFlagEnabled = false;
 	}
 
 	if (isSaveSceneFlagEnabled)
@@ -127,6 +131,7 @@ void SceneEditorSystem::onStartFrame(float)
 
 		auto xml = XMLOutputArchive{ss};
 		ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
+		isSaveSceneFlagEnabled = false;
 	}
 }
 
@@ -147,95 +152,90 @@ void SceneEditorSystem::onDrawGui()
 
 	static fs::path currentPath{""};
 	static ecs::Entity selectedEntity{ecs::NullEntity};
+	static bool showDebugEntities{false};
 
-	auto mainMenu = ui::EditorMainMenu{mRootPath, mScenePath};
-	bool isDndLoadScene = false;
+	auto mainMenu = ui::EditorMainMenu{mRootPath, currentPath};
+	mIsReloadSceneFlagEnabled = mainMenu.onOpenScene();
+	isSaveSceneFlagEnabled = mainMenu.onSaveScene();
+	if (mainMenu.onOpenScene() || mainMenu.onNewScene())
+	{
+		mIsClearSceneFlagEnabled = true;
+		mScenePath = currentPath;
+	}
+
+	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::EntityName, const ecs::Transform,
+													   const render::TextureView, tags::IsEditorEntity>();
+	const auto* cameraTransform = mRegistry.getComponentIfExists<const ecs::Transform>(cameraEntity);
+	const auto createEntityPosition =
+		cameraTransform ? (cameraTransform->position + cameraTransform->getForwardVector() * 10.0f) : math::float3{};
+	const auto* cameraRenderTextureView = mRegistry.getComponentIfExists<const render::TextureView>(cameraEntity);
+	auto* perspectiveCamera = mRegistry.getComponentIfExists<ecs::PerspectiveCamera>(cameraEntity);
+	auto* orthographicCamera = mRegistry.getComponentIfExists<ecs::OrthographicCamera>(cameraEntity);
 
 	{
-		auto view = mRegistry.getEntities<const ecs::EntityName, render::TextureView, tags::IsEditorEntity>();
-		for (auto entity : view)
+		auto style = ui::WindowPaddingStyle{};
+		auto window = ui::Window{"Scene View"};
+
+		const auto imageSize = window.getSize() - math::float2{0, 24};
+		const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
+
+		if (perspectiveCamera)
+			perspectiveCamera->aspectRatio = aspectRatio;
+
+		if (orthographicCamera)
+			orthographicCamera->setAspectRatio(aspectRatio);
+
 		{
-			const auto& name = mRegistry.getComponent<const ecs::EntityName>(entity);
-			auto& textureView = mRegistry.getComponent<render::TextureView>(entity);
+			auto popup = ui::Popup{"Scene View Popup"};
+			if (popup.isOpen())
+				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+		}
 
-			auto style = ui::WindowPaddingStyle{};
-			auto window = ui::Window{fmt::format("Scene View ({0})", name.name)};
-			const auto imageSize = window.getSize() - math::float2{0, 24};
-			const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
+		if (cameraRenderTextureView)
+			ui::image(cameraRenderTextureView->getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 
-			ui::image(textureView.getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
+		// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
+		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
+			mWindow.warpMouse(mWindow.getSize() * .5f);
 
-			if (auto* perspectiveCamera = mRegistry.getComponentIfExists<ecs::PerspectiveCamera>(entity);
-				perspectiveCamera)
-			{
-				perspectiveCamera->aspectRatio = aspectRatio;
-			}
+		mIsReloadSceneFlagEnabled |= ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity);
+		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity, createEntityPosition);
+	}
 
-			if (auto* orthographicCamera = mRegistry.getComponentIfExists<ecs::OrthographicCamera>(entity);
-				orthographicCamera)
-			{
-				orthographicCamera->left = -aspectRatio;
-				orthographicCamera->right = aspectRatio;
-			}
+	{
+		auto window = ui::Window{"Scene Tree"};
 
-			// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
-			if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
-				mWindow.warpMouse(mWindow.getSize() * .5f);
-
-			{
-				auto dnd = ui::DragAndDropTarget{};
-				if (dnd.isStarted())
-				{
-					auto result = dnd.getPathPayload(ui::AssetsExplorer::DND_SELECTED_FILE);
-					if (result && boost::algorithm::ends_with(result->filename().string(), ".xml"))
-					{
-						isDndLoadScene = true;
-						selectedEntity = ecs::NullEntity;
-						mScenePath = result.value();
-					}
-
-					if (result && boost::algorithm::ends_with(result->filename().string(), ".filamesh"))
-					{
-						ecs::build(mRegistry).withName(result->stem().string()).asTransform().asMesh(result.value());
-					}
-				}
+		{
+			auto popup = ui::Popup{"Scene Graph Popup"};
+			if (popup.isOpen()) {
+				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+				ui::SceneOptionsMenu::viewOptionsMenu(showDebugEntities);
 			}
 		}
+
+		static std::string search;
+		ui::Search::searchText(search);
+		ui::SceneTree::displayTree(mRegistry, selectedEntity, showDebugEntities, search);
 	}
 
 	{
-		static std::string search{};
-		static bool showDebugEntities{false};
+		auto window = ui::Window{"Materials Manager"};
 
-		auto sceneGraph = ui::SceneGraphWindow{showDebugEntities};
-		sceneGraph.header(mRegistry, search);
-		sceneGraph.listTree(mRegistry, selectedEntity, search);
+		static std::string search;
+		ui::Search::searchText(search);
+		ui::MaterialsManager::popup(mRegistry, selectedEntity);
+		ui::MaterialsManager::list(mRegistry, selectedEntity, search);
 	}
 
 	{
-		static std::string search{};
-
-		auto sceneGraph = ui::MaterialsWindow{};
-		sceneGraph.header(mRegistry, search);
-		sceneGraph.list(mRegistry, selectedEntity, search);
+		auto window = ui::Window{"Properties"};
+		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
 	}
 
 	{
-		auto panel = ui::PropertiesPanel{mRegistry, selectedEntity};
+		auto window = ui::Window{"Assets Explorer"};
+		ui::AssetsExplorer::displayFiles(mRootPath, currentPath, mIconTexture.get());
 	}
-
-	{
-		auto assets = ui::AssetsExplorer{mRootPath, mIconTexture.ref()};
-		assets.header(currentPath);
-		assets.onSelectPath(currentPath);
-	}
-
-	if (mainMenu.onOpenProject())
-		currentPath = mRootPath;
-
-	isClearSceneFlagEnabled = mainMenu.onNewScene();
-	isReloadSceneFlagEnabled = mainMenu.onOpenScene() || isDndLoadScene;
-	isSaveSceneFlagEnabled = mainMenu.onSaveScene();
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const

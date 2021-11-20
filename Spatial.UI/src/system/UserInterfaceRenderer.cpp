@@ -198,12 +198,12 @@ void ImGuiRenderer::renderDrawData()
 	size_t nPrims = 0;
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
 	{
-		const ImDrawList* cmds = imguiData->CmdLists[cmdListIndex];
-		nPrims += static_cast<size_t>(cmds->CmdBuffer.size());
+		const auto* commands = imguiData->CmdLists[cmdListIndex];
+		nPrims += static_cast<size_t>(commands->CmdBuffer.size());
 	}
 
-	auto rBuilder = fl::RenderableManager::Builder(nPrims);
-	rBuilder.boundingBox({{0, 0, 0}, {10000, 10000, 10000}}).culling(false);
+	auto builder = fl::RenderableManager::Builder(nPrims);
+	builder.boundingBox({{0, 0, 0}, {10000, 10000, 10000}}).culling(false);
 
 	// Ensure that we have a material instance for each scissor rectangle.
 	createMaterialInstances(nPrims);
@@ -214,48 +214,47 @@ void ImGuiRenderer::renderDrawData()
 	size_t primIndex = 0;
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
 	{
-		const ImDrawList* cmds = imguiData->CmdLists[cmdListIndex];
+		const auto* commands = imguiData->CmdLists[cmdListIndex];
 		size_t indexOffset = 0;
-		populateVertexData(bufferIndex, cmds->VtxBuffer, cmds->IdxBuffer);
+		populateVertexData(bufferIndex, commands->VtxBuffer, commands->IdxBuffer);
 
-		for (const auto& pcmd : cmds->CmdBuffer)
+		for (const auto& command : commands->CmdBuffer)
 		{
-			if (pcmd.UserCallback)
+			if (command.UserCallback)
 			{
-				pcmd.UserCallback(cmds, &pcmd);
+				command.UserCallback(commands, &command);
 			}
 			else
 			{
 				auto& mi = mMaterialInstances[primIndex];
-				mi->setScissor(static_cast<uint32_t>(pcmd.ClipRect.x),
-							   static_cast<uint32_t>(fbSize.y - pcmd.ClipRect.w),
-							   static_cast<uint32_t>(pcmd.ClipRect.z - pcmd.ClipRect.x),
-							   static_cast<uint32_t>(pcmd.ClipRect.w - pcmd.ClipRect.y));
+				mi->setScissor(static_cast<uint32_t>(command.ClipRect.x),
+							   static_cast<uint32_t>(fbSize.y - command.ClipRect.w),
+							   static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
+							   static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y));
 
 				mi->setParameter(
 					"albedo",
-					pcmd.TextureId ? reinterpret_cast<const fl::Texture*>(pcmd.TextureId) : mFontTexture.get(),
+					command.TextureId ? reinterpret_cast<const fl::Texture*>(command.TextureId) : mFontTexture.get(),
 					fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 
-				rBuilder
+				builder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
 							  mVertexBuffers[bufferIndex].get(), mIndexBuffers[bufferIndex].get(), indexOffset,
-							  pcmd.ElemCount)
+							  command.ElemCount)
 					.blendOrder(primIndex, static_cast<uint16_t>(primIndex))
 					.material(primIndex, mi.get());
 
 				primIndex++;
 			}
-			indexOffset += pcmd.ElemCount;
+
+			indexOffset += command.ElemCount;
 		}
 
 		bufferIndex++;
 	}
 
 	if (imguiData->CmdListsCount > 0)
-	{
-		rBuilder.build(mEngine, mEntity.get());
-	}
+		builder.build(mEngine, mEntity.get());
 }
 
 void ImGuiRenderer::createBuffers(size_t numRequiredBuffers)

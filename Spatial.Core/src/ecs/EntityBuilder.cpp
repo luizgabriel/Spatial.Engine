@@ -71,19 +71,19 @@ TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity
 
 TransformEntityBuilder& TransformEntityBuilder::withPosition(math::float3 position)
 {
-	getComponent().position = std::move(position);
+	getComponent().position = position;
 	return *this;
 }
 
 TransformEntityBuilder& TransformEntityBuilder::withScale(math::float3 scale)
 {
-	getComponent().scale = std::move(scale);
+	getComponent().scale = scale;
 	return *this;
 }
 
 TransformEntityBuilder& TransformEntityBuilder::withRotation(math::float3 rotation)
 {
-	getComponent().rotation = std::move(rotation);
+	getComponent().rotation = rotation;
 	return *this;
 }
 

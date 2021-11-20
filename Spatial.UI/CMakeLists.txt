@@ -43,7 +43,7 @@ add_library(Spatial.UI
 	src/components/DirectionInput.cpp
 	
 	src/components/styles/BorderlessWindowStyle.cpp
-	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/Popup.h src/components/Popup.cpp)
+	src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/Popup.h src/components/Popup.cpp include/spatial/ui/components/Search.h src/components/Search.cpp include/spatial/ui/components/Combo.h src/components/Combo.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

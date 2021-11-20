@@ -37,7 +37,7 @@ void EditorCameraController::onUpdateEntity(float delta, ecs::Transform& transfo
 		return;
 
 	const auto movementDelta = delta * camera.velocity * mControls.movementOffset;
-	const auto forward = math::forwardVector(transform.getMatrix());
+	const auto forward = transform.getForwardVector();
 	const auto right = cross(forward, math::axisY);
 
 	transform.position += forward * movementDelta.x;

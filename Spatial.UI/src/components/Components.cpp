@@ -6,6 +6,7 @@
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/VectorInput.h>
+#include <spatial/ui/components/Search.h>
 
 namespace spatial::ui
 {
@@ -119,10 +120,7 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	const size_t smallStep = 1, largeStep = 5;
 
-	ImGui::Text("Default Material");
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-	changed |= selectEntityInput<ecs::tags::IsMaterial>("##Material", registry, mesh.defaultMaterial);
+	changed |= Search::searchEntity<ecs::tags::IsMaterial>("Default Material", registry, mesh.defaultMaterial);
 
 	spacing(3);
 
@@ -147,7 +145,7 @@ void componentInput<ecs::Transform>(ecs::Registry& registry, ecs::Entity entity)
 
 	vec3Input("Position", transform.position);
 
-	auto eulerAnglesRotation = math::rad2deg * transform.rotation;
+	auto eulerAnglesRotation = transform.getEulerAnglesRotation();
 	vec3Input("Rotation", eulerAnglesRotation);
 	transform.rotation = math::deg2rad * eulerAnglesRotation;
 

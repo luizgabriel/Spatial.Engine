@@ -16,7 +16,17 @@ struct Transform
 	{
 	}
 
+	[[nodiscard]] math::float3 getEulerAnglesRotation() const noexcept;
+
+	[[nodiscard]] math::mat4f getTranslationMatrix() const noexcept;
+
+	[[nodiscard]] math::mat4f getScaleMatrix() const noexcept;
+
+	[[nodiscard]] math::mat4f getRotationMatrix() const noexcept;
+
 	[[nodiscard]] math::mat4f getMatrix() const noexcept;
+
+	[[nodiscard]] math::float3 getForwardVector() const noexcept;
 };
 
 } // namespace spatial::ecs

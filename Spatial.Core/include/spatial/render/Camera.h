@@ -54,6 +54,11 @@ class Camera
 
 	void setScaling(math::double2 scaling) noexcept;
 
+	const filament::Camera* operator->() const
+	{
+		return getInstance();
+	}
+
   private:
 	filament::Engine& mEngine;
 	utils::Entity mEntity;

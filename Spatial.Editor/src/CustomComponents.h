@@ -2,44 +2,50 @@
 
 #include <filesystem>
 #include <spatial/ecs/Registry.h>
+#include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/MenuBar.h>
+#include <spatial/ui/components/Popup.h>
 #include <spatial/ui/components/PopupModal.h>
 #include <spatial/ui/components/Window.h>
 
 namespace spatial::ui
 {
 
-class PropertiesPanel
+class EntityProperties
 {
   public:
-	PropertiesPanel(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static bool displayComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
+
+  private:
+	static bool displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static bool displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static bool displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
 
 	template <typename Component>
-	bool onComponent(const std::string_view componentName)
+	static bool displayComponent(const std::string_view componentName, ecs::Registry& registry, ecs::Entity selectedEntity)
 	{
-		if (!mWindow.isOpen()) return false;
-
 		auto isOpen = false;
 
-		if (mRegistry.hasAllComponents<Component>(mSelectedEntity))
+		if (registry.hasAllComponents<Component>(selectedEntity))
 		{
 			auto collapse = Collapse{componentName};
 			isOpen = collapse.isOpen();
 
-			if (collapse.onClose()) {
-				mRegistry.removeComponent<Component>(mSelectedEntity);
+			if (collapse.onClose())
+			{
+				registry.removeComponent<Component>(selectedEntity);
 				isOpen = false;
 			}
 		}
 
+		if (isOpen) {
+			componentInput<Component>(registry, selectedEntity);
+		}
+
 		return isOpen;
 	}
-
-  private:
-	Window mWindow;
-	ecs::Registry& mRegistry;
-	ecs::Entity mSelectedEntity;
 };
 
 class EditorMainMenu
@@ -121,33 +127,36 @@ class OpenProjectModal
 	bool mIsConfirmed;
 };
 
-class SceneGraphWindow
+class SceneOptionsMenu
 {
   public:
-	SceneGraphWindow(bool& showDebugEntities);
-
-	bool header(ecs::Registry& registry, std::string& search);
-
-	bool listTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "");
-
-  private:
-	Window mWindow;
-	bool& mShowEditorEntities;
-
-	bool displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
+	static bool createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
+	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
-class MaterialsWindow
+class SceneTree
 {
   public:
-	MaterialsWindow();
-
-	bool header(ecs::Registry& registry, std::string& search);
-
-	bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "");
+	static bool displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities = false,
+							std::string_view search = "");
 
   private:
-	Window mWindow;
+	static bool displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
 };
 
-}
+class MaterialsManager
+{
+  public:
+	static bool popup(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "");
+};
+
+class EditorDragAndDrop
+{
+  public:
+	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
+
+	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
+};
+
+} // namespace spatial::ui

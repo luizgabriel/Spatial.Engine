@@ -12,7 +12,7 @@ struct CustomCamera
 	double far{10000.0};
 
 	constexpr explicit CustomCamera(math::mat4 projection = math::mat4::perspective(60.0, 19.0 / 6.0, 0.1, 10000.0),
-						   double near = 0.1, double far = 10000.0)
+									double near = 0.1, double far = 10000.0)
 		: projectionMatrix{projection}, near{near}, far{far}
 	{
 	}
@@ -38,8 +38,12 @@ struct OrthographicCamera
 	{
 	}
 
-	constexpr OrthographicCamera()
+	constexpr OrthographicCamera() = default;
+
+	void setAspectRatio(double aspectRatio) noexcept
 	{
+		left = -aspectRatio;
+		right = aspectRatio;
 	}
 };
 

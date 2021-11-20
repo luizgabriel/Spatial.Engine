@@ -8,57 +8,29 @@
 namespace spatial::ui
 {
 
-AssetsExplorer::AssetsExplorer(const std::filesystem::path& rootPath, const filament::Texture& texture)
-	: mWindow{"Assets Explorer"}, mRootPath{rootPath}, mIconTexture{texture}
-{
-}
-
-bool AssetsExplorer::header(std::filesystem::path& selectedPath)
-{
-	bool changed = false;
-	auto fullPath = (mRootPath / selectedPath).lexically_normal();
-
-	if (fullPath != mRootPath)
-	{
-		ImGui::PushID("BackButton");
-		changed = imageButton(mIconTexture, math::float2{20}, gIcons.back.uv());
-		if (changed)
-			selectedPath = selectedPath.parent_path();
-		ImGui::PopID();
-	}
-
-	ImGui::SameLine();
-	ImGui::AlignTextToFramePadding();
-	ImGui::TextWrapped("%s", (mRootPath / selectedPath).string().c_str());
-	ImGui::Separator();
-
-	ImGui::Columns(8);
-	return changed;
-}
-
-AssetsExplorer::~AssetsExplorer()
-{
-	ImGui::Columns(1);
-}
-
-bool AssetsExplorer::onSelectPath(std::filesystem::path& selectedPath)
+bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath,
+								  std::filesystem::path& selectedPath, const filament::Texture* icon)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
 
-	if (!is_directory(mRootPath / selectedPath))
+	if (!is_directory(rootPath / selectedPath))
 		return false;
+
+	displayPathHeader(rootPath, selectedPath, icon);
+
+	ImGui::Columns(8);
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 50.0f, 100.0f)};
-	for (const auto& entry : directory_iterator{mRootPath / selectedPath})
+	for (const auto& entry : directory_iterator{rootPath / selectedPath})
 	{
 		const auto& path = entry.path();
 
 		if (entry.is_directory())
 		{
 			ImGui::PushID(path.c_str());
-			if (imageButton(mIconTexture, size, gIcons.folder.uv()))
+			if (icon ? imageButton(*icon, size, gIcons.folder.uv()) : ImGui::Button("Directory", ImVec2(size.x, size.y)))
 			{
 				selectedPath = path;
 				selected = true;
@@ -71,9 +43,9 @@ bool AssetsExplorer::onSelectPath(std::filesystem::path& selectedPath)
 			const auto filename = entry.path().filename().string();
 			if (starts_with(filename, ".")) continue;
 
-			const auto fileButton = [&, this](const math::float4& uv) {
+			const auto fileButton = [&](const math::float4& uv) {
 				ImGui::PushID(filename.data());
-				if (imageButton(mIconTexture, size, uv))
+				if (icon ? imageButton(*icon, size, uv) : ImGui::Button("File"))
 					selected = true;
 				ImGui::PopID();
 			};
@@ -96,7 +68,7 @@ bool AssetsExplorer::onSelectPath(std::filesystem::path& selectedPath)
 			{
 				auto dnd = DragAndDropSource{};
 				if (dnd.isStarted()) {
-					dnd.setPayload(DND_SELECTED_FILE, std::filesystem::relative(path, mRootPath));
+					dnd.setPayload(DND_SELECTED_FILE, std::filesystem::relative(path, rootPath));
 				}
 			}
 		}
@@ -105,7 +77,32 @@ bool AssetsExplorer::onSelectPath(std::filesystem::path& selectedPath)
 		ImGui::NextColumn();
 	}
 
+	ImGui::Columns(1);
+
 	return selected;
+}
+
+bool AssetsExplorer::displayPathHeader(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
+									   const filament::Texture* icon)
+{
+	bool changed = false;
+	auto fullPath = (rootPath / selectedPath).lexically_normal();
+
+	if (fullPath != rootPath)
+	{
+		ImGui::PushID("BackButton");
+		changed = icon ? imageButton(*icon, math::float2{20}, gIcons.back.uv()) : ImGui::Button("Back");
+		if (changed)
+			selectedPath = selectedPath.parent_path();
+		ImGui::PopID();
+	}
+
+	ImGui::SameLine();
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextWrapped("%s", (rootPath / selectedPath).string().c_str());
+	ImGui::Separator();
+
+	return changed;
 }
 
 } // namespace spatial::ui
