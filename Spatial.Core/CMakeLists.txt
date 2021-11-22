@@ -127,7 +127,8 @@ target_link_libraries(Spatial.Core
 	CONAN_PKG::stb
 	CONAN_PKG::glfw
 	CONAN_PKG::cereal
-	CONAN_PKG::magic_enum)
+	CONAN_PKG::magic_enum
+	CONAN_PKG::v8)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

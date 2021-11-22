@@ -25,8 +25,6 @@ struct Mesh
 
 	Entity defaultMaterial{ecs::NullEntity};
 
-	ecs::Entity firstMaterial;
-
 	explicit Mesh(std::filesystem::path resourcePath = {})
 		: resourcePath{std::move(resourcePath)}
 	{
@@ -36,11 +34,6 @@ struct Mesh
 	{
 		return HashedString{resourcePath.c_str()}.value();
 	}
-};
-
-struct LoadedMeshData
-{
-	size_t partsCount{0};
 };
 
 } // namespace spatial::ecs

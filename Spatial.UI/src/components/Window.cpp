@@ -6,7 +6,7 @@ namespace spatial::ui
 
 Window::Window(const std::string_view name)
 {
-	mIsOpen = ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+	mIsOpen = ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_None);
 }
 
 Window::~Window()
@@ -16,6 +16,7 @@ Window::~Window()
 
 math::float2 Window::getSize() const
 {
+	if (!mIsOpen) return {.0f};
 	auto size = ImGui::GetWindowSize();
 	return {size.x, size.y};
 }
