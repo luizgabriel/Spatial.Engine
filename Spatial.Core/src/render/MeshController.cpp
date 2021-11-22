@@ -1,15 +1,13 @@
 #include <boost/algorithm/string/predicate.hpp>
-#include <c++/v1/fstream>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
-#include <utility>
+#include <fstream>
 
 namespace spatial::render
 {
@@ -115,16 +113,6 @@ void MeshController::clearDeletedOrDirtyMeshes(ecs::Registry& registry)
 	{
 		auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
 		registry.removeComponent<Renderable>(view.begin(), view.end());
-	}
-
-	{
-		auto view = registry.getEntities<Renderable, ecs::tags::IsMeshDirty>();
-		registry.removeComponent<Renderable>(view.begin(), view.end());
-	}
-
-	{
-		auto view = registry.getEntities<ecs::tags::IsMeshDirty>();
-		registry.removeComponent<ecs::tags::IsMeshDirty>(view.begin(), view.end());
 	}
 }
 

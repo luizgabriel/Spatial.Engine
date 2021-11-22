@@ -37,7 +37,7 @@ class Application final
 
 	void stop();
 
-	bool isRunning() const
+	[[nodiscard]] bool isRunning() const
 	{
 		return mRunning;
 	}
