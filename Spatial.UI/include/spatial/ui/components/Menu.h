@@ -8,14 +8,18 @@ namespace spatial::ui
 class Menu
 {
   public:
-	Menu(const std::string_view name);
+	explicit Menu(std::string_view name);
 	~Menu();
 
-	bool isOpen();
+	[[nodiscard]] bool isOpen() const;
 
-	bool item(const std::string_view name);
+	[[nodiscard]] bool item(std::string_view name) const;
 
-	bool item(const std::string_view name, const std::string_view shortcut);
+	[[nodiscard]] bool item(std::string_view name, std::string_view shortcut) const;
+
+	static bool itemButton(std::string_view name);
+
+	static bool itemButton(std::string_view name, std::string_view shortcut);
 
   private:
 	bool mOpened{false};

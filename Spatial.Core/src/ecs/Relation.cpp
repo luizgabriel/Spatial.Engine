@@ -4,27 +4,35 @@
 namespace spatial::ecs
 {
 
-void Relation::addChild(Registry& registry, Entity parent, Entity child)
+void Parent::addChild(Registry& registry, Entity parentEntity, Entity childEntity)
 {
-	auto& parentRelation = registry.getComponent<ecs::Relation>(parent);
-	parentRelation.childrenCount++;
+	auto& parent = registry.getOrAddComponent<ecs::Parent>(parentEntity);
+	parent.childrenCount++;
 
-	auto& childRelation = registry.getComponent<ecs::Relation>(child);
-	childRelation.parent = parent;
+	auto& child = registry.getOrAddComponent<ecs::Child>(childEntity);
+	child.parent = parentEntity;
 
-	if (!registry.isValid(parentRelation.first))
+	if (!registry.isValid(parent.first))
 	{
-		parentRelation.first = child;
+		parent.first = childEntity;
 	}
-	else if (registry.isValid(parentRelation.last))
+	else if (registry.isValid(parent.last))
 	{
-		auto& lastChildRelation = registry.getComponent<ecs::Relation>(parentRelation.last);
-		lastChildRelation.next = child;
+		auto& lastChild = registry.getComponent<ecs::Child>(parent.last);
+		lastChild.next = childEntity;
 
-		childRelation.previous = parentRelation.last;
+		child.previous = parent.last;
 	}
 
-	parentRelation.last = child;
+	parent.last = childEntity;
+}
+
+Entity Parent::createChild(Registry& registry, Entity parentEntity)
+{
+	auto newChild = registry.createEntity();
+	Parent::addChild(registry, parentEntity, newChild);
+
+	return newChild;
 }
 
 } // namespace spatial::ecs

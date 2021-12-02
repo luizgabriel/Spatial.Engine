@@ -142,7 +142,8 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity selectedEntity
 
 	{
 		auto popup = ui::Popup{"Properties Popup"};
-		if (popup.isOpen()) {
+		if (popup.isOpen())
+		{
 			EntityProperties::addComponentMenu(registry, selectedEntity);
 		}
 	}
@@ -398,12 +399,12 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMaterial>)
+			registry.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::EntityName>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity>)
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -419,7 +420,7 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	ImGui::TableNextRow();
 	ImGui::TableNextColumn();
 
-	const auto* relation = registry.getComponentIfExists<ecs::Relation>(entity);
+	const auto* relation = registry.tryGetComponent<ecs::Parent>(entity);
 	const auto hasChildren = relation && relation->childrenCount > 0;
 
 	const auto selectedFlags = selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
@@ -439,9 +440,8 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 
 	if (open && hasChildren)
 	{
-		for (auto child = relation->first; registry.isValid(child);
-			 child = registry.getComponent<const ecs::Relation>(child).next)
-			displayNode(registry, child, selectedEntity);
+		ecs::Parent::forEachChild(registry, entity,
+								  [&](auto child) { SceneTree::displayNode(registry, child, selectedEntity); });
 
 		ImGui::TreePop();
 	}
@@ -545,18 +545,19 @@ bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedE
 	return false;
 }
 
-bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity,
-										  math::float3 createEntitiesPosition)
+bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+										  math::float3 createEntitiesPosition, bool addAsChild)
 {
 	auto menu = Menu{"Create Entity"};
 	if (!menu.isOpen())
 		return false;
 
 	bool changed = false;
+	ecs::Entity newEntity = ecs::NullEntity;
 
 	if (menu.item("Empty"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName(fmt::format("Empty Entity")).with<ecs::tags::IsRenderable>();
+		newEntity = ecs::build(registry).withName(fmt::format("Empty Entity")).with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
@@ -564,45 +565,49 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Cube"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Cube")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asMesh("editor://meshes/cube.filamesh")
-							 .withSubMesh(0, 1);
+		newEntity = ecs::build(registry)
+						.withName("Cube")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asMesh("editor://meshes/cube.filamesh")
+						.withShadowOptions(true, true)
+						.withSubMesh(0, 1);
 		changed = true;
 	}
 
 	if (menu.item("Plane"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Plane")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asMesh("editor://meshes/plane.filamesh")
-							 .withSubMesh(0, 1);
+		newEntity = ecs::build(registry)
+						.withName("Plane")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asMesh("editor://meshes/plane.filamesh")
+						.withShadowOptions(true, true)
+						.withSubMesh(0, 1);
 		changed = true;
 	}
 
 	if (menu.item("Sphere"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Sphere")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asMesh("editor://meshes/sphere.filamesh")
-							 .withSubMesh(0, 1);
+		newEntity = ecs::build(registry)
+						.withName("Sphere")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asMesh("editor://meshes/sphere.filamesh")
+						.withShadowOptions(true, true)
+						.withSubMesh(0, 1);
 		changed = true;
 	}
 
 	if (menu.item("Cylinder"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Cylinder")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asMesh("editor://meshes/cylinder.filamesh")
-							 .withSubMesh(0, 1);
+		newEntity = ecs::build(registry)
+						.withName("Cylinder")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asMesh("editor://meshes/cylinder.filamesh")
+						.withShadowOptions(true, true)
+						.withSubMesh(0, 1);
 		changed = true;
 	}
 
@@ -610,27 +615,27 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Point Light"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Point Light")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asPointLight();
+		newEntity = ecs::build(registry)
+						.withName("Point Light")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asPointLight();
 		changed = true;
 	}
 
 	if (menu.item("Directional Light"))
 	{
-		selectedEntity = ecs::build(mRegistry).withName("Directional Light").asDirectionalLight();
+		newEntity = ecs::build(registry).withName("Directional Light").asDirectionalLight();
 		changed = true;
 	}
 
 	if (menu.item("Spot Light"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName("Spot Light")
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asSpotLight();
+		newEntity = ecs::build(registry)
+						.withName("Spot Light")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asSpotLight();
 		changed = true;
 	}
 
@@ -638,22 +643,30 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity&
 
 	if (menu.item("Perspective Camera"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName(fmt::format("Perspective Camera"))
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asPerspectiveCamera();
+		newEntity = ecs::build(registry)
+						.withName(fmt::format("Perspective Camera"))
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asPerspectiveCamera();
 		changed = true;
 	}
 
 	if (menu.item("Orthographic Camera"))
 	{
-		selectedEntity = ecs::build(mRegistry)
-							 .withName(fmt::format("Orthographic Camera"))
-							 .asTransform()
-							 .withPosition(createEntitiesPosition)
-							 .asOrthographicCamera();
+		newEntity = ecs::build(registry)
+						.withName(fmt::format("Orthographic Camera"))
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asOrthographicCamera();
 		changed = true;
+	}
+
+	if (registry.isValid(newEntity))
+	{
+		if (registry.isValid(selectedEntity) && addAsChild)
+			ecs::Parent::addChild(registry, selectedEntity, newEntity);
+
+		selectedEntity = newEntity;
 	}
 
 	return changed;
@@ -674,6 +687,33 @@ bool SceneOptionsMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
 	}
 
 	return changed;
+}
+
+bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+									math::float3 createEntitiesPosition)
+{
+	if (!registry.isValid(selectedEntity))
+		return false;
+
+	auto* name = registry.tryGetComponent<ecs::EntityName>(selectedEntity);
+	auto menu = Menu{name ? fmt::format("Add Child to \"{}\"", name->c_str()) : "Add Child"};
+
+	if (!menu.isOpen()) return false;
+	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition, true);
+}
+
+bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	if (!registry.isValid(selectedEntity)) return false;
+
+	auto* name = registry.tryGetComponent<ecs::EntityName>(selectedEntity);
+	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
+	{
+		registry.destroy(selectedEntity);
+		selectedEntity = ecs::NullEntity;
+	}
+
+	return false;
 }
 
 } // namespace spatial::ui

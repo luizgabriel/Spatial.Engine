@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <fstream>
+#include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/Search.h>
 #include <string>
 
@@ -165,12 +166,12 @@ void SceneEditorSystem::onDrawGui()
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::EntityName, const ecs::Transform,
 													   const render::TextureView, tags::IsEditorEntity>();
-	const auto* cameraTransform = mRegistry.getComponentIfExists<const ecs::Transform>(cameraEntity);
+	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =
 		cameraTransform ? (cameraTransform->position + cameraTransform->getForwardVector() * 10.0f) : math::float3{};
-	const auto* cameraRenderTextureView = mRegistry.getComponentIfExists<const render::TextureView>(cameraEntity);
-	auto* perspectiveCamera = mRegistry.getComponentIfExists<ecs::PerspectiveCamera>(cameraEntity);
-	auto* orthographicCamera = mRegistry.getComponentIfExists<ecs::OrthographicCamera>(cameraEntity);
+	const auto* cameraRenderTextureView = mRegistry.tryGetComponent<const render::TextureView>(cameraEntity);
+	auto* perspectiveCamera = mRegistry.tryGetComponent<ecs::PerspectiveCamera>(cameraEntity);
+	auto* orthographicCamera = mRegistry.tryGetComponent<ecs::OrthographicCamera>(cameraEntity);
 
 	{
 		auto style = ui::WindowPaddingStyle{};
@@ -204,14 +205,16 @@ void SceneEditorSystem::onDrawGui()
 	}
 
 	ui::Window::show("Scene Tree", [&]() {
-		ui::Popup::show("Scene Graph Popup", [&]() {
-			ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
-			ui::SceneOptionsMenu::viewOptionsMenu(showDebugEntities);
-		});
-
 		static std::string search;
 		ui::Search::searchText(search);
 		ui::SceneTree::displayTree(mRegistry, selectedEntity, showDebugEntities, search);
+
+		ui::Popup::show("Scene Graph Popup", [&]() {
+			ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+			ui::SceneOptionsMenu::addChildMenu(mRegistry, selectedEntity, createEntityPosition);
+			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+			ui::SceneOptionsMenu::viewOptionsMenu(showDebugEntities);
+		});
 	});
 
 	ui::Window::show("Materials Manager", [&]() {

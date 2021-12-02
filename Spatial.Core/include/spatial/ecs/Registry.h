@@ -110,25 +110,18 @@ class Registry
 		mRegistry.remove<Component>(begin, end);
 	}
 
-	template <typename Component>
-	void addComponent(Entity entity)
-	{
-		assert(isValid(entity));
-		mRegistry.emplace<Component>(entity);
-	}
-
-	template <typename Component>
-	Component& addComponent(Entity entity, Component&& component)
-	{
-		assert(isValid(entity));
-		return mRegistry.emplace<Component>(entity, std::forward<Component>(component));
-	}
-
 	template <typename Component, typename... Args>
-	Component& addComponent(Entity entity, Args&&... args)
+	decltype(auto) addComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
 		return mRegistry.emplace<Component>(entity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component, typename... Args>
+	decltype(auto) getOrAddComponent(Entity entity, Args&&... args)
+	{
+		assert(isValid(entity));
+		return mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename... Component>
@@ -165,13 +158,13 @@ class Registry
 	}
 
 	template <typename Component>
-	const Component* getComponentIfExists(Entity entity) const
+	const Component* tryGetComponent(Entity entity) const
 	{
 		return isValid(entity) ? mRegistry.template try_get<const Component>(entity) : nullptr;
 	}
 
 	template <typename Component>
-	Component* getComponentIfExists(Entity entity)
+	Component* tryGetComponent(Entity entity)
 	{
 		return isValid(entity) ? mRegistry.template try_get<Component>(entity) : nullptr;
 	}

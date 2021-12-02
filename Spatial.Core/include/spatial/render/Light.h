@@ -19,11 +19,11 @@ class Light
 
 	Light(filament::Engine& engine, utils::Entity entity, Type type = Type::POINT);
 
-	Light(const Light& other) = delete;
-	Light& operator=(const Light& other) = delete;
-
 	Light(Light&& other) noexcept;
 	Light& operator=(Light&& other) noexcept;
+
+	Light(const Light& other) = delete;
+	Light& operator=(const Light& other) = delete;
 
 	~Light();
 

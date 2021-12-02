@@ -32,23 +32,16 @@ class EntityHandle
 		mRegistry.destroy(mEntity);
 	}
 
-	bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return mRegistry.isValid(mEntity);
-	}
-
-	template <typename Component>
-	void add()
-	{
-		assert(isValid());
-		mRegistry.addComponent<Component>(mEntity);
 	}
 
 	template <typename Component>
 	Component& add(Component&& component)
 	{
 		assert(isValid());
-		return mRegistry.addComponent<Component>(mEntity, std::move(component));
+		return mRegistry.addComponent<Component>(mEntity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>

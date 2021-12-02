@@ -9,18 +9,21 @@ Menu::Menu(const std::string_view name)
 	mOpened = ImGui::BeginMenu(name.data());
 }
 
-bool Menu::item(const std::string_view name)
+bool Menu::item(const std::string_view name) const
 {
 	if (!isOpen())
 		return false;
-	return ImGui::MenuItem(name.data());
+
+	return itemButton(name.data());
 }
 
-bool Menu::item(const std::string_view name, const std::string_view shortcut)
+
+bool Menu::item(const std::string_view name, const std::string_view shortcut) const
 {
 	if (!isOpen())
 		return false;
-	return ImGui::MenuItem(name.data(), shortcut.data());
+
+	return itemButton(name.data(), shortcut.data());
 }
 
 Menu::~Menu()
@@ -29,9 +32,19 @@ Menu::~Menu()
 		ImGui::EndMenu();
 }
 
-bool Menu::isOpen()
+bool Menu::isOpen() const
 {
 	return mOpened;
+}
+
+bool Menu::itemButton(std::string_view name)
+{
+	return ImGui::MenuItem(name.data());
+}
+
+bool Menu::itemButton(std::string_view name, std::string_view shortcut)
+{
+	return ImGui::MenuItem(name.data(), shortcut.data());
 }
 
 } // namespace spatial::ui

@@ -10,6 +10,7 @@ add_custom_command(
 add_executable(Spatial.Core.Tests
 	Application.test.cpp
 	RegistrySerialization.test.cpp
+	RegistryRelation.test.cpp
 	DesktopWindowContext.test.cpp
 	RenderingSystem.test.cpp
 	main.cpp)

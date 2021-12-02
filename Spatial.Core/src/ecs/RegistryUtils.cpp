@@ -50,7 +50,7 @@ std::optional<UUID> findUUIDFromEntityName(const ecs::Registry& registry, std::s
 {
 	const auto entity = findEntityFromName(registry, name);
 	if (registry.isValid(entity)) {
-		const auto* component = registry.getComponentIfExists<UUID>(entity);
+		const auto* component = registry.tryGetComponent<UUID>(entity);
 		return component ? std::optional{*component} : std::nullopt;
 	}
 

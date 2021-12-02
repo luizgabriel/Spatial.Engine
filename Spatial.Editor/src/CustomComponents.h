@@ -134,7 +134,9 @@ class OpenProjectModal
 class SceneOptionsMenu
 {
   public:
-	static bool createEntitiesMenu(ecs::Registry& mRegistry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
+	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition, bool addAsChild = false);
+	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
+	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
 	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
