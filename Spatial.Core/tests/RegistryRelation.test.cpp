@@ -123,3 +123,82 @@ TEST(RegistryRelation, ChildrenLoop)
 
 	ASSERT_EQ(n, 100);
 }
+
+TEST(RegistryRelation, RemoveOneChild)
+{
+	auto registry = ecs::Registry{};
+
+	auto parentEntity = registry.createEntity();
+	auto child1Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child2Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child3Entity = ecs::Parent::createChild(registry, parentEntity);
+
+	ecs::Child::remove(registry, child1Entity);
+
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child1Entity));
+
+	const auto& parent = registry.getComponent<ecs::Parent>(parentEntity);
+	ASSERT_EQ(parent.childrenCount, 2);
+
+	const auto& child2 = registry.getComponent<ecs::Child>(child2Entity);
+	const auto& child3 = registry.getComponent<ecs::Child>(child3Entity);
+
+	ASSERT_FALSE(registry.isValid(child2.previous));
+	ASSERT_EQ(child2.next, child3Entity);
+
+	ASSERT_EQ(child3.previous, child2Entity);
+	ASSERT_FALSE(registry.isValid(child3.next));
+}
+
+
+TEST(RegistryRelation, RemoveSecondChild)
+{
+	auto registry = ecs::Registry{};
+
+	auto parentEntity = registry.createEntity();
+	auto child1Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child2Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child3Entity = ecs::Parent::createChild(registry, parentEntity);
+
+	ecs::Child::remove(registry, child2Entity);
+
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child1Entity));
+
+	const auto& parent = registry.getComponent<ecs::Parent>(parentEntity);
+	ASSERT_EQ(parent.childrenCount, 2);
+
+	const auto& child1 = registry.getComponent<ecs::Child>(child1Entity);
+	const auto& child3 = registry.getComponent<ecs::Child>(child3Entity);
+
+	ASSERT_FALSE(registry.isValid(child1.previous));
+	ASSERT_EQ(child1.next, child3Entity);
+
+	ASSERT_EQ(child3.previous, child1Entity);
+	ASSERT_FALSE(registry.isValid(child3.next));
+}
+
+TEST(RegistryRelation, RemoveThirdChild)
+{
+	auto registry = ecs::Registry{};
+
+	auto parentEntity = registry.createEntity();
+	auto child1Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child2Entity = ecs::Parent::createChild(registry, parentEntity);
+	auto child3Entity = ecs::Parent::createChild(registry, parentEntity);
+
+	ecs::Child::remove(registry, child3Entity);
+
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child1Entity));
+
+	const auto& parent = registry.getComponent<ecs::Parent>(parentEntity);
+	ASSERT_EQ(parent.childrenCount, 2);
+
+	const auto& child1 = registry.getComponent<ecs::Child>(child1Entity);
+	const auto& child2 = registry.getComponent<ecs::Child>(child2Entity);
+
+	ASSERT_FALSE(registry.isValid(child1.previous));
+	ASSERT_EQ(child1.next, child2Entity);
+
+	ASSERT_EQ(child2.previous, child1Entity);
+	ASSERT_FALSE(registry.isValid(child2.next));
+}

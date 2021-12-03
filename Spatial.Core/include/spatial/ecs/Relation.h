@@ -16,7 +16,7 @@ struct Child
 	{
 	}
 
-	static void destroy(Registry& registry, Entity childEntity);
+	static void remove(Registry& registry, Entity childEntity);
 };
 
 struct Parent

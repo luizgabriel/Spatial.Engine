@@ -29,24 +29,6 @@ void Parent::addChild(Registry& registry, Entity parentEntity, Entity childEntit
 	parent.last = childEntity;
 }
 
-Entity Parent::createChild(Registry& registry, Entity parentEntity)
-{
-	auto newChild = registry.createEntity();
-	Parent::addChild(registry, parentEntity, newChild);
-
-	return newChild;
-}
-
-void Child::destroy(Registry& registry, Entity childEntity)
-{
-	//TODO: As each child work as a linked list. When deleting, we need to update the siblings and the parent.
-}
-
-void Parent::destroyChildren(Registry& registry, Entity parentEntity)
-{
-	//TODO: We need a way to remove all children from the parent
-}
-
 std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
 {
 	const auto* parent = registry.tryGetComponent<const ecs::Parent>(parentEntity);
@@ -61,5 +43,45 @@ std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentE
 	return children;
 }
 
+Entity Parent::createChild(Registry& registry, Entity parentEntity)
+{
+	auto newChild = registry.createEntity();
+	Parent::addChild(registry, parentEntity, newChild);
+
+	return newChild;
+}
+
+void Child::remove(Registry& registry, Entity childEntity)
+{
+	const auto& child = registry.getComponent<const Child>(childEntity);
+	auto& parent = registry.getComponent<ecs::Parent>(child.parent);
+	parent.childrenCount--;
+
+	auto* previousChild = registry.tryGetComponent<Child>(child.previous);
+	auto* nextChild = registry.tryGetComponent<Child>(child.next);
+
+	if (previousChild) {
+		previousChild->next = child.next;
+	}
+
+	if (nextChild) {
+		nextChild->previous = child.previous;
+	}
+
+	if (parent.first == childEntity) {
+		parent.first = child.next;
+	}
+
+	if (parent.last == childEntity) {
+		parent.last = child.previous;
+	}
+
+	registry.removeComponent<Child>(childEntity);
+}
+
+void Parent::destroyChildren(Registry& registry, Entity parentEntity)
+{
+	//TODO: We need a way to remove all children from the parent
+}
 
 } // namespace spatial::ecs
