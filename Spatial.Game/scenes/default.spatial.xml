@@ -138,7 +138,7 @@
 	<value39>0</value39>
 	<value40>
 		<fieldOfView>60</fieldOfView>
-		<aspectRatio>1.3729977116704806</aspectRatio>
+		<aspectRatio>1.2946635730858469</aspectRatio>
 		<near>0.10000000000000001</near>
 		<far>10000</far>
 	</value40>
@@ -209,19 +209,21 @@
 		<defaultMaterial>4</defaultMaterial>
 	</value57>
 	<value58>0</value58>
-	<value59>2</value59>
-	<value60>2</value60>
-	<value61>4</value61>
-	<value62>6</value62>
-	<value63>0</value63>
-	<value64>1</value64>
-	<value65>3</value65>
-	<value66>5</value66>
-	<value67>6</value67>
-	<value68>7</value68>
-	<value69>2</value69>
-	<value70>2</value70>
-	<value71>
+	<value59>0</value59>
+	<value60>0</value60>
+	<value61>2</value61>
+	<value62>2</value62>
+	<value63>4</value63>
+	<value64>6</value64>
+	<value65>0</value65>
+	<value66>1</value66>
+	<value67>3</value67>
+	<value68>5</value68>
+	<value69>6</value69>
+	<value70>7</value70>
+	<value71>2</value71>
+	<value72>2</value72>
+	<value73>
 		<baseColor>
 			<x>0.054560907185077667</x>
 			<y>0.70656371116638184</y>
@@ -230,9 +232,9 @@
 		<roughness>0.38999998569488525</roughness>
 		<metallic>0.80000001192092896</metallic>
 		<reflectance>0.67000001668930054</reflectance>
-	</value71>
-	<value72>4</value72>
-	<value73>
+	</value73>
+	<value74>4</value74>
+	<value75>
 		<baseColor>
 			<x>1</x>
 			<y>0</y>
@@ -241,14 +243,14 @@
 		<roughness>0.80000001192092896</roughness>
 		<metallic>0.80000001192092896</metallic>
 		<reflectance>0.10000000149011612</reflectance>
-	</value73>
-	<value74>1</value74>
-	<value75>0</value75>
-	<value76>
+	</value75>
+	<value76>1</value76>
+	<value77>0</value77>
+	<value78>
 		<velocity>10</velocity>
 		<sensitivity>0.5</sensitivity>
-	</value76>
-	<value77>1</value77>
-	<value78>0</value78>
+	</value78>
+	<value79>1</value79>
+	<value80>0</value80>
 </cereal>
 

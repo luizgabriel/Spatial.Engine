@@ -28,6 +28,7 @@ add_library(Spatial.Core
 	include/spatial/ecs/Mesh.h
 	include/spatial/ecs/Tags.h
 	include/spatial/ecs/EntityBuilder.h
+	include/spatial/ecs/Relation.h
 	include/spatial/ecs/UpdateSystem.h
 
 	include/spatial/render/Engine.h
@@ -58,6 +59,7 @@ add_library(Spatial.Core
 	include/spatial/serialization/BoundingBox.h
 	include/spatial/serialization/Registry.h
 	include/spatial/serialization/FileSystem.h
+	include/spatial/serialization/Relation.h
 
 	include/spatial/resources/Math.h
 	include/spatial/resources/BoundingBox.h

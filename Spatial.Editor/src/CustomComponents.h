@@ -165,4 +165,10 @@ class EditorDragAndDrop
 	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
 };
 
+class CameraView
+{
+  public:
+	static void image(ecs::Registry& registry, ecs::Entity cameraEntity, math::float2 imageSize);
+};
+
 } // namespace spatial::ui

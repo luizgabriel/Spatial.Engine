@@ -1,5 +1,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Relation.h>
+#include <vector>
+#include <deque>
 
 namespace spatial::ecs
 {
@@ -34,5 +36,30 @@ Entity Parent::createChild(Registry& registry, Entity parentEntity)
 
 	return newChild;
 }
+
+void Child::destroy(Registry& registry, Entity childEntity)
+{
+	//TODO: As each child work as a linked list. When deleting, we need to update the siblings and the parent.
+}
+
+void Parent::destroyChildren(Registry& registry, Entity parentEntity)
+{
+	//TODO: We need a way to remove all children from the parent
+}
+
+std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
+{
+	const auto* parent = registry.tryGetComponent<const ecs::Parent>(parentEntity);
+	if (!parent || parent->childrenCount == 0) return {};
+
+	auto children = std::vector<Entity>(parent->childrenCount);
+
+	Parent::forEachChild(registry, parentEntity, [&](auto entity){
+		children.template emplace_back(entity);
+	});
+
+	return children;
+}
+
 
 } // namespace spatial::ecs

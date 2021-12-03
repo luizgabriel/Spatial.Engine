@@ -151,17 +151,30 @@ void SceneEditorSystem::onDrawGui()
 {
 	auto dockSpace = ui::DockSpace{"Spatial"};
 
-	static fs::path currentPath{""};
+	static fs::path currentScenePath{""};
+	static fs::path currentFolder{""};
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
 
-	auto mainMenu = ui::EditorMainMenu{mRootPath, currentPath};
-	mIsReloadSceneFlagEnabled = mainMenu.onOpenScene();
-	isSaveSceneFlagEnabled = mainMenu.onSaveScene();
+	auto mainMenu = ui::EditorMainMenu{mRootPath, currentScenePath};
+	if (mainMenu.onOpenProject()) {
+		currentFolder = "";
+	}
+
 	if (mainMenu.onOpenScene() || mainMenu.onNewScene())
 	{
 		mIsClearSceneFlagEnabled = true;
-		mScenePath = currentPath;
+		mScenePath = currentScenePath;
+	}
+
+	if (mainMenu.onSaveScene()) {
+		mScenePath = currentScenePath;
+		isSaveSceneFlagEnabled = true;
+	}
+
+	if (mainMenu.onOpenScene()) {
+		mScenePath = currentScenePath;
+		mIsReloadSceneFlagEnabled = true;
 	}
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::EntityName, const ecs::Transform,
@@ -169,22 +182,13 @@ void SceneEditorSystem::onDrawGui()
 	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =
 		cameraTransform ? (cameraTransform->position + cameraTransform->getForwardVector() * 10.0f) : math::float3{};
-	const auto* cameraRenderTextureView = mRegistry.tryGetComponent<const render::TextureView>(cameraEntity);
-	auto* perspectiveCamera = mRegistry.tryGetComponent<ecs::PerspectiveCamera>(cameraEntity);
-	auto* orthographicCamera = mRegistry.tryGetComponent<ecs::OrthographicCamera>(cameraEntity);
 
 	{
 		auto style = ui::WindowPaddingStyle{};
 		auto window = ui::Window{"Scene View"};
 
 		const auto imageSize = window.getSize() - math::float2{0, 24};
-		const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
-
-		if (perspectiveCamera)
-			perspectiveCamera->aspectRatio = aspectRatio;
-
-		if (orthographicCamera)
-			orthographicCamera->setAspectRatio(aspectRatio);
+		ui::CameraView::image(mRegistry, cameraEntity, imageSize);
 
 		{
 			auto style2 = ui::WindowPaddingStyle{4};
@@ -192,9 +196,6 @@ void SceneEditorSystem::onDrawGui()
 			if (popup.isOpen())
 				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
 		}
-
-		if (cameraRenderTextureView)
-			ui::image(cameraRenderTextureView->getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 
 		// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
 		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
@@ -231,7 +232,7 @@ void SceneEditorSystem::onDrawGui()
 	});
 
 	ui::Window::show("Assets Explorer", [&]() {
-		ui::AssetsExplorer::displayFiles(mRootPath, currentPath, mIconTexture.get());
+		ui::AssetsExplorer::displayFiles(mRootPath, currentFolder, mIconTexture.get());
 	});
 }
 

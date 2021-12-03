@@ -9,6 +9,7 @@
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
+#include <spatial/render/TextureView.h>
 
 namespace spatial::ui
 {
@@ -707,13 +708,34 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	if (!registry.isValid(selectedEntity)) return false;
 
 	auto* name = registry.tryGetComponent<ecs::EntityName>(selectedEntity);
+	bool changed = false;
 	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
 	{
+		ecs::Parent::destroyChildren(registry, selectedEntity);
 		registry.destroy(selectedEntity);
 		selectedEntity = ecs::NullEntity;
+		changed = true;
 	}
 
-	return false;
+	return changed;
+}
+
+void CameraView::image(ecs::Registry& registry, ecs::Entity cameraEntity, math::float2 imageSize)
+{
+	const auto* cameraRenderTextureView = registry.tryGetComponent<const render::TextureView>(cameraEntity);
+	auto* perspectiveCamera = registry.tryGetComponent<ecs::PerspectiveCamera>(cameraEntity);
+	auto* orthographicCamera = registry.tryGetComponent<ecs::OrthographicCamera>(cameraEntity);
+
+	const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
+
+	if (perspectiveCamera)
+		perspectiveCamera->aspectRatio = aspectRatio;
+
+	if (orthographicCamera)
+		orthographicCamera->setAspectRatio(aspectRatio);
+
+	if (cameraRenderTextureView)
+		ui::image(cameraRenderTextureView->getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 }
 
 } // namespace spatial::ui
