@@ -33,11 +33,6 @@ struct Parent
 
 	static void addChild(Registry& registry, Entity parentEntity, Entity childEntity);
 
-	/**
-	 * We need a way
-	 * @param registry
-	 * @param parentEntity
-	 */
 	static void destroyChildren(Registry& registry, Entity parentEntity);
 
 	static std::vector<Entity> getChildren(const Registry& registry, Entity parentEntity);
