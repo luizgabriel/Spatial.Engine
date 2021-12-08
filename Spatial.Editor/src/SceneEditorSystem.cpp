@@ -157,7 +157,8 @@ void SceneEditorSystem::onDrawGui()
 	static bool showDebugEntities{false};
 
 	auto mainMenu = ui::EditorMainMenu{mRootPath, currentScenePath};
-	if (mainMenu.onOpenProject()) {
+	if (mainMenu.onOpenProject())
+	{
 		currentFolder = "";
 	}
 
@@ -167,12 +168,14 @@ void SceneEditorSystem::onDrawGui()
 		mScenePath = currentScenePath;
 	}
 
-	if (mainMenu.onSaveScene()) {
+	if (mainMenu.onSaveScene())
+	{
 		mScenePath = currentScenePath;
 		isSaveSceneFlagEnabled = true;
 	}
 
-	if (mainMenu.onOpenScene()) {
+	if (mainMenu.onOpenScene())
+	{
 		mScenePath = currentScenePath;
 		mIsReloadSceneFlagEnabled = true;
 	}
@@ -200,6 +203,10 @@ void SceneEditorSystem::onDrawGui()
 		// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
 		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
 			mWindow.warpMouse(mWindow.getSize() * .5f);
+
+		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+			mEditorCameraController.disable();
+		}
 
 		mIsReloadSceneFlagEnabled |= ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity);
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity, createEntityPosition);
@@ -231,9 +238,8 @@ void SceneEditorSystem::onDrawGui()
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
 	});
 
-	ui::Window::show("Assets Explorer", [&]() {
-		ui::AssetsExplorer::displayFiles(mRootPath, currentFolder, mIconTexture.get());
-	});
+	ui::Window::show("Assets Explorer",
+					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, currentFolder, mIconTexture.get()); });
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
