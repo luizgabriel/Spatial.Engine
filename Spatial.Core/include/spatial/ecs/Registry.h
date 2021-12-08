@@ -140,6 +140,12 @@ class Registry
 
 	void destroy(Entity entity);
 
+	template <typename It>
+	void destroy(It first, It last)
+	{
+		mRegistry.template destroy<It>(first, last);
+	}
+
 	operator const entt::registry&() const
 	{
 		return mRegistry;

@@ -374,6 +374,7 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 							std::string_view search)
 {
 	bool changed = false;
+	ImGui::Text("Entities Count: %zu", registry.getEntitiesCount());
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
 	{
@@ -410,6 +411,7 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 
 		ImGui::EndTable();
 	}
+
 
 	return changed;
 }
@@ -711,7 +713,13 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	bool changed = false;
 	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
 	{
-		ecs::Parent::destroyChildren(registry, selectedEntity);
+		if (registry.hasAnyComponent<ecs::Child>(selectedEntity))
+			ecs::Child::remove(registry, selectedEntity);
+
+		if (registry.hasAnyComponent<ecs::Parent>(selectedEntity)) {
+			ecs::Parent::destroyChildren(registry, selectedEntity);
+		}
+
 		registry.destroy(selectedEntity);
 		selectedEntity = ecs::NullEntity;
 		changed = true;

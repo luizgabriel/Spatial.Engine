@@ -1,7 +1,7 @@
+#include <deque>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Relation.h>
 #include <vector>
-#include <deque>
 
 namespace spatial::ecs
 {
@@ -31,14 +31,10 @@ void Parent::addChild(Registry& registry, Entity parentEntity, Entity childEntit
 
 std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
 {
-	const auto* parent = registry.tryGetComponent<const ecs::Parent>(parentEntity);
-	if (!parent || parent->childrenCount == 0) return {};
+	const auto& parent = registry.getComponent<const Parent>(parentEntity);
+	auto children = std::vector<Entity>(parent.childrenCount);
 
-	auto children = std::vector<Entity>(parent->childrenCount);
-
-	Parent::forEachChild(registry, parentEntity, [&](auto entity){
-		children.template emplace_back(entity);
-	});
+	Parent::forEachChild(registry, parentEntity, [&](auto entity) { children.template emplace_back(entity); });
 
 	return children;
 }
@@ -54,34 +50,72 @@ Entity Parent::createChild(Registry& registry, Entity parentEntity)
 void Child::remove(Registry& registry, Entity childEntity)
 {
 	const auto& child = registry.getComponent<const Child>(childEntity);
-	auto& parent = registry.getComponent<ecs::Parent>(child.parent);
+	auto& parent = registry.getComponent<Parent>(child.parent);
 	parent.childrenCount--;
 
 	auto* previousChild = registry.tryGetComponent<Child>(child.previous);
 	auto* nextChild = registry.tryGetComponent<Child>(child.next);
 
-	if (previousChild) {
+	if (previousChild)
 		previousChild->next = child.next;
-	}
 
-	if (nextChild) {
+	if (nextChild)
 		nextChild->previous = child.previous;
-	}
 
-	if (parent.first == childEntity) {
+	if (parent.first == childEntity)
 		parent.first = child.next;
-	}
 
-	if (parent.last == childEntity) {
+	if (parent.last == childEntity)
 		parent.last = child.previous;
-	}
 
 	registry.removeComponent<Child>(childEntity);
 }
 
+void Parent::remove(Registry& registry, Entity parentEntity)
+{
+	Parent::forEachChild(registry, parentEntity, [&](auto child) { registry.removeComponent<Child>(child); });
+
+	registry.removeComponent<Parent>(parentEntity);
+}
+
+bool Parent::isChild(const Registry& registry, Entity parentEntity, Entity targetEntity)
+{
+	auto stack = std::deque<Entity>{parentEntity};
+
+	while (!stack.empty())
+	{
+		auto currentEntity = stack.back();
+		stack.pop_back();
+
+		if (currentEntity == targetEntity && parentEntity != targetEntity)
+			return true;
+
+		if (registry.hasAnyComponent<Parent>(currentEntity))
+			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
+	}
+
+	return false;
+}
+
 void Parent::destroyChildren(Registry& registry, Entity parentEntity)
 {
-	//TODO: We need a way to remove all children from the parent
+	auto stack = std::deque<Entity>{parentEntity};
+
+	while (!stack.empty())
+	{
+		auto currentEntity = stack.back();
+		stack.pop_back();
+
+		if (registry.hasAnyComponent<Parent>(currentEntity)) {
+			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
+		}
+
+		if (currentEntity != parentEntity) {
+			registry.destroy(currentEntity);
+		}
+	}
+
+	registry.removeComponent<Parent>(parentEntity);
 }
 
 } // namespace spatial::ecs

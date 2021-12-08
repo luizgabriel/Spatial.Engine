@@ -202,3 +202,77 @@ TEST(RegistryRelation, RemoveThirdChild)
 	ASSERT_EQ(child2.previous, child1Entity);
 	ASSERT_FALSE(registry.isValid(child2.next));
 }
+
+TEST(RegistryRelation, IsChild)
+{
+	auto registry = ecs::Registry{};
+
+	auto e1 = registry.createEntity();
+	auto e2 = ecs::Parent::createChild(registry, e1);
+	auto e3 = ecs::Parent::createChild(registry, e2);
+	auto e4 = ecs::Parent::createChild(registry, e3);
+	auto e5 = ecs::Parent::createChild(registry, e1);
+	auto e6 = registry.createEntity();
+
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e1));
+
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e2, e1));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e3));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e3, e1));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e2, e3));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e3, e2));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e3, e4));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e4, e3));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e4));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e4, e1));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e5));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e5, e1));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e2, e5));
+
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e6));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e6, e1));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e6, e3));
+
+	ecs::Child::remove(registry, e2);
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e2, e3));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e3));
+}
+
+TEST(RegistryRelation, RemoveParent)
+{
+	auto registry = ecs::Registry{};
+
+	auto e1 = registry.createEntity();
+	auto e2 = ecs::Parent::createChild(registry, e1);
+	auto e3 = ecs::Parent::createChild(registry, e1);
+
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e3));
+
+	ecs::Parent::remove(registry, e1);
+
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Parent>(e1));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e3));
+}
+
+TEST(RegistryRelation, DestroyChildren)
+{
+	auto registry = ecs::Registry{};
+
+	auto e1 = registry.createEntity();
+	auto e2 = ecs::Parent::createChild(registry, e1);
+	auto e3 = ecs::Parent::createChild(registry, e1);
+
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_TRUE(ecs::Parent::isChild(registry, e1, e3));
+
+	ecs::Parent::destroyChildren(registry, e1);
+
+	ASSERT_FALSE(registry.isValid(e2));
+	ASSERT_FALSE(registry.isValid(e3));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e2));
+	ASSERT_FALSE(ecs::Parent::isChild(registry, e1, e3));
+}
