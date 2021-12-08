@@ -374,7 +374,6 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 							std::string_view search)
 {
 	bool changed = false;
-	ImGui::Text("Entities Count: %zu", registry.getEntitiesCount());
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
 	{
