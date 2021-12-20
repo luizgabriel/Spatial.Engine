@@ -24,4 +24,4 @@ auto& operator>>(RenderingSystem& render, Listener& listener)
 	return render;
 }
 
-}
+} // namespace spatial

@@ -6,12 +6,13 @@ namespace spatial::ui
 
 MenuBar::MenuBar()
 {
-	ImGui::BeginMainMenuBar();
+	mIsOpen = ImGui::BeginMainMenuBar();
 }
 
 MenuBar::~MenuBar()
 {
-	ImGui::EndMainMenuBar();
+	if (mIsOpen)
+		ImGui::EndMainMenuBar();
 }
 
 } // namespace spatial::ui

@@ -1,6 +1,7 @@
 #include <spatial/ecs/EntityBuilder.h>
-#include <spatial/ecs/EntityName.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Name.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Tags.h>
 
 namespace spatial::ecs
@@ -16,7 +17,7 @@ EntityBuilder::EntityBuilder(Registry& registry, Entity entity) : mRegistry{regi
 
 EntityBuilder& EntityBuilder::withName(std::string name)
 {
-	with<ecs::EntityName>(std::move(name));
+	with<ecs::Name>(std::move(name));
 	return *this;
 }
 
@@ -60,9 +61,24 @@ SunLightEntityBuilder EntityBuilder::asSunLight()
 	return {mRegistry, mEntity};
 }
 
-MeshEntityBuilder EntityBuilder::asMesh(std::filesystem::path path)
+MeshEntityBuilder EntityBuilder::asMesh()
 {
-	return {mRegistry, mEntity, std::move(path)};
+	return {mRegistry, mEntity};
+}
+
+IndirectLightEntityBuilder EntityBuilder::asIndirectLight()
+{
+	return {mRegistry, mEntity};
+}
+
+SceneViewEntityBuilder EntityBuilder::asSceneView()
+{
+	return {mRegistry, mEntity};
+}
+
+SkyBoxColorEntityBuilder EntityBuilder::asSkyBoxColor()
+{
+	return {mRegistry, mEntity};
 }
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
@@ -90,7 +106,7 @@ TransformEntityBuilder& TransformEntityBuilder::withRotation(math::float3 rotati
 PerspectiveCameraEntityBuilder::PerspectiveCameraEntityBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
 PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withFieldOfView(double fieldOfView)
@@ -116,7 +132,7 @@ PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withClippingPlan
 OrthographicCameraEntityBuilder::OrthographicCameraEntityBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
 OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withProjection(double left, double right,
@@ -140,7 +156,7 @@ OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withClippingPl
 
 CustomCameraEntityBuilder::CustomCameraEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
 CustomCameraEntityBuilder& CustomCameraEntityBuilder::withProjection(math::mat4 projectionMatrix)
@@ -159,7 +175,7 @@ CustomCameraEntityBuilder& CustomCameraEntityBuilder::withClippingPlanes(double 
 
 PointLightEntityBuilder::PointLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
 PointLightEntityBuilder& PointLightEntityBuilder::withFalloff(float falloff)
@@ -176,18 +192,18 @@ PointLightEntityBuilder& PointLightEntityBuilder::withIntensity(float intensity)
 
 PointLightEntityBuilder& PointLightEntityBuilder::withColor(math::float3 color)
 {
-	getComponent().color = std::move(color);
+	getComponent().color = color;
 	return *this;
 }
 
 SpotLightEntityBuilder::SpotLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
 SpotLightEntityBuilder& SpotLightEntityBuilder::withDirection(math::float3 direction)
 {
-	getComponent().direction = std::move(direction);
+	getComponent().direction = direction;
 	return *this;
 }
 
@@ -220,13 +236,13 @@ SpotLightEntityBuilder& SpotLightEntityBuilder::withIntensity(float intensity)
 
 SpotLightEntityBuilder& SpotLightEntityBuilder::withColor(math::float3 color)
 {
-	getComponent().color = std::move(color);
+	getComponent().color = color;
 	return *this;
 }
 
 DirectionalLightEntityBuilder::DirectionalLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
 DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withIntensity(float intensity)
@@ -255,7 +271,7 @@ DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withCastShadows(bo
 
 SunLightEntityBuilder::SunLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsRenderable>();
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
 SunLightEntityBuilder& SunLightEntityBuilder::withIntensity(float intensity)
@@ -294,11 +310,35 @@ SunLightEntityBuilder& SunLightEntityBuilder::withCastShadows(bool castShadows)
 	return *this;
 }
 
-MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath)
-	: Base(registry, entity)
+IndirectLightEntityBuilder::IndirectLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
+}
+
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIntensity(float intensity)
+{
+	auto& component = getComponent();
+	component.intensity = intensity;
+	return *this;
+}
+
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexturePath(std::filesystem::path path)
+{
+	auto& component = getComponent();
+	component.reflectionsTexturePath = std::move(path);
+	return *this;
+}
+
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath(std::filesystem::path path)
+{
+	auto& component = getComponent();
+	component.irradianceValuesPath = std::move(path);
+	return *this;
+}
+
+MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>();
-	getComponent().resourcePath = resourcePath;
 }
 
 MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
@@ -322,6 +362,56 @@ MeshEntityBuilder& MeshEntityBuilder::withMaterial(Entity materialEntity)
 {
 	auto& component = getComponent();
 	component.defaultMaterial = materialEntity;
+	return *this;
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withPath(std::filesystem::path resourcePath)
+{
+	auto& component = getComponent();
+	component.resourcePath = std::move(resourcePath);
+	return *this;
+}
+
+SceneViewEntityBuilder::SceneViewEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+}
+
+SceneViewEntityBuilder& SceneViewEntityBuilder::withCamera(ecs::Entity cameraEntity)
+{
+	ecs::Parent::addChild(mRegistry, mEntity, cameraEntity);
+	getComponent().camera = cameraEntity;
+	return *this;
+}
+
+SceneViewEntityBuilder& SceneViewEntityBuilder::withSkyBox(ecs::Entity skyboxEntity)
+{
+	ecs::Parent::addChild(mRegistry, mEntity, skyboxEntity);
+	getComponent().skybox = skyboxEntity;
+	return *this;
+}
+
+SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
+{
+	ecs::Parent::addChild(mRegistry, mEntity, indirectLightEntity);
+	getComponent().indirectLight = indirectLightEntity;
+	return *this;
+}
+
+SkyBoxColorEntityBuilder::SkyBoxColorEntityBuilder(Registry& registry, Entity entity)
+	: BasicEntityBuilder(registry, entity)
+{
+	with<tags::IsSkyBox>();
+}
+
+SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withColor(math::float4 color)
+{
+	getComponent().color = color;
+	return *this;
+}
+
+SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withIntensity(float intensity)
+{
+	getComponent().intensity = intensity;
 	return *this;
 }
 

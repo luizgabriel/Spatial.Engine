@@ -1,5 +1,5 @@
-#include <spatial/resources/Math.h>
 #include <spatial/resources/FilameshFile.h>
+#include <spatial/resources/Math.h>
 #include <sstream>
 
 using namespace std;
@@ -89,7 +89,7 @@ FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size)
 {
 	auto filamesh = FilameshFile{};
 
-	const auto s = std::string{reinterpret_cast<const char *>(data), size};
+	const auto s = std::string{reinterpret_cast<const char*>(data), size};
 	auto stream = std::istringstream{s};
 	stream >> filamesh;
 

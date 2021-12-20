@@ -9,4 +9,4 @@ std::istream& operator>>(std::istream& stream, filament::Box& box)
 	return stream >> box.center >> box.halfExtent;
 }
 
-} // namespace std
+} // namespace spatial

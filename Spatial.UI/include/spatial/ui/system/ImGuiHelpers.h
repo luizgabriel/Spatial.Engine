@@ -2,10 +2,10 @@
 
 #include <filament/IndexBuffer.h>
 #include <filament/VertexBuffer.h>
-#include <spatial/render/Resources.h>
-#include <string_view>
-#include <string>
 #include <imgui.h>
+#include <spatial/render/Resources.h>
+#include <string>
+#include <string_view>
 
 namespace spatial::ui
 {
@@ -47,4 +47,4 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 	return {data, nVecBytes, callback, nullptr};
 }
 
-} // namespace spatial
+} // namespace spatial::ui

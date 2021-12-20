@@ -36,4 +36,4 @@ void serialize(Archive& ar, spatial::ecs::CustomCamera& camera)
 	ar(make_nvp("far", camera.far));
 }
 
-} // namespace spatial
+} // namespace cereal

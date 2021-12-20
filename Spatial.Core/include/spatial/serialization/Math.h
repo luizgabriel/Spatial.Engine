@@ -44,4 +44,4 @@ void serialize(Archive& ar, spatial::math::mat4_t<T>& mat)
 	ar(make_nvp("r3", mat[3]));
 }
 
-}
+} // namespace cereal

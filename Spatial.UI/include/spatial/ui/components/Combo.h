@@ -19,4 +19,4 @@ class Combo
 	bool mIsOpen;
 };
 
-}
+} // namespace spatial::ui

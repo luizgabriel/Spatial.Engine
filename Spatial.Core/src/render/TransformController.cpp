@@ -1,4 +1,4 @@
-#include <spatial/ecs/EntityName.h>
+#include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Transform.h>
@@ -7,8 +7,7 @@
 namespace spatial::render
 {
 
-TransformController::TransformController(filament::Engine& engine)
-	: mEngine{engine}
+TransformController::TransformController(filament::Engine& engine) : mEngine{engine}
 {
 }
 
@@ -30,9 +29,7 @@ void TransformController::createTransforms(ecs::Registry& registry) const
 void TransformController::updateTransforms(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<ecs::Transform, Transform>();
-	view.each([](const auto& data, auto& transform) {
-		transform.setMatrix(data.getMatrix());
-	});
+	view.each([](const auto& data, auto& transform) { transform.setMatrix(data.getMatrix()); });
 }
 
 void TransformController::clearRemovedTransforms(ecs::Registry& registry)

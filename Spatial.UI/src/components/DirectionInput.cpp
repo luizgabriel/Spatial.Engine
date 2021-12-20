@@ -1,6 +1,6 @@
 #include <imgui.h>
-#include <spatial/ui/components/VectorInput.h>
 #include <spatial/ui/components/DirectionInput.h>
+#include <spatial/ui/components/VectorInput.h>
 
 namespace spatial::ui
 {
@@ -313,4 +313,4 @@ bool directionInput(const std::string_view label, math::float3& dir, float size,
 	return changed;
 }
 
-}
+} // namespace spatial::ui

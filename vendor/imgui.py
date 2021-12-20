@@ -2,7 +2,6 @@ import os
 
 from conans import ConanFile, CMake, tools
 
-
 CMAKE_FILE_DATA = """
 cmake_minimum_required(VERSION 2.8.11)
 project(imgui CXX)

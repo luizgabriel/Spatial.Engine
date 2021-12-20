@@ -20,4 +20,4 @@ void serialize(Archive& ar, spatial::ecs::Mesh& mesh)
 	ar(make_nvp("defaultMaterial", mesh.defaultMaterial));
 }
 
-}
+} // namespace cereal

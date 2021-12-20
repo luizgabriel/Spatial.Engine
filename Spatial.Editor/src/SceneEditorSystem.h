@@ -2,8 +2,8 @@
 
 #include <imgui.h>
 
-#include "EditorCameraController.h"
 #include "EditorCamera.h"
+#include "EditorCameraController.h"
 #include "Settings.h"
 
 #include <filament/Viewport.h>
@@ -12,6 +12,7 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
 #include <spatial/render/CameraController.h>
+#include <spatial/render/IndirectLightController.h>
 #include <spatial/render/LightController.h>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/MeshController.h>
@@ -30,13 +31,7 @@ class SceneEditorSystem
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 
-	render::Scene mEditorScene;
-
 	render::Material mDefaultMaterial;
-	render::Texture mIblTexture;
-	render::Texture mSkyboxTexture;
-	render::IndirectLight mSkyboxLight;
-	render::Skybox mSkybox;
 	render::Texture mIconTexture;
 
 	// TODO: Handle multiple scenes
@@ -53,6 +48,7 @@ class SceneEditorSystem
 	render::CameraController mCameraController;
 	render::LightController mLightController;
 	render::MeshController mMeshController;
+	render::IndirectLightController mIndirectLightController;
 
 	std::filesystem::path mRootPath;
 	std::filesystem::path mScenePath;
@@ -62,10 +58,7 @@ class SceneEditorSystem
 	bool isSaveSceneFlagEnabled;
 
   public:
-	SceneEditorSystem(
-		filament::Engine& engine,
-		desktop::Window& window
-	);
+	SceneEditorSystem(filament::Engine& engine, desktop::Window& window);
 
 	void onStart();
 
@@ -80,7 +73,6 @@ class SceneEditorSystem
 	void onRender(filament::Renderer& renderer) const;
 
 	void setRootPath(const std::filesystem::path& path);
-
 };
 
 } // namespace spatial::editor

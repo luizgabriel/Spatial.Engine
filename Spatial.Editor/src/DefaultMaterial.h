@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/common/Math.h>
 #include <filament/MaterialInstance.h>
+#include <spatial/common/Math.h>
 
 namespace spatial::editor
 {
@@ -16,4 +16,4 @@ struct DefaultMaterial
 	void setParameters(filament::MaterialInstance& instance) const;
 };
 
-}
+} // namespace spatial::editor

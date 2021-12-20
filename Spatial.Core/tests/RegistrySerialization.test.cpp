@@ -10,10 +10,10 @@ using namespace spatial;
 TEST(Registry, EmptySerialization)
 {
 	auto registry = ecs::Registry{};
-	auto ss = std::stringstream {};
+	auto ss = std::stringstream{};
 
 	{
-		auto archive = XMLOutputArchive { ss };
+		auto archive = XMLOutputArchive{ss};
 		ecs::serialize(archive, registry);
 	}
 
@@ -31,10 +31,10 @@ TEST(Registry, SimpleSerialization)
 	e1.add(ecs::Transform{math::float3{5.0f}});
 	e1.add(ecs::PointLight{});
 
-	auto ss = std::stringstream {};
+	auto ss = std::stringstream{};
 
 	{
-		auto archive = XMLOutputArchive { ss };
+		auto archive = XMLOutputArchive{ss};
 		ecs::serialize(archive, registry);
 	}
 
@@ -48,7 +48,8 @@ TEST(Registry, SimpleSerialization)
 	ASSERT_NE(output.find("<intensity>"), std::string::npos);
 }
 
-struct CustomComponent {
+struct CustomComponent
+{
 	int answer{42};
 
 	template <typename Archive>
@@ -66,10 +67,10 @@ TEST(Registry, CustomComponentSerialization)
 	e1.add(ecs::PointLight{});
 	e1.add(CustomComponent{});
 
-	auto ss = std::stringstream {};
+	auto ss = std::stringstream{};
 
 	{
-		auto archive = XMLOutputArchive { ss };
+		auto archive = XMLOutputArchive{ss};
 		ecs::serialize<CustomComponent>(archive, registry);
 	}
 

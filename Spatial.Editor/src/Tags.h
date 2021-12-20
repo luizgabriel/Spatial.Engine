@@ -7,4 +7,8 @@ struct IsEditorEntity
 {
 };
 
+struct IsEditorView
+{
+};
+
 } // namespace spatial::editor::tags

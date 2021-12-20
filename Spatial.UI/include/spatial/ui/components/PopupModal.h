@@ -19,4 +19,4 @@ class PopupModal
 	bool mOpened{false};
 };
 
-}
+} // namespace spatial::ui

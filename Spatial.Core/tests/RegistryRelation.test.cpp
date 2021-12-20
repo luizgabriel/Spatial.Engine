@@ -150,7 +150,6 @@ TEST(RegistryRelation, RemoveOneChild)
 	ASSERT_FALSE(registry.isValid(child3.next));
 }
 
-
 TEST(RegistryRelation, RemoveSecondChild)
 {
 	auto registry = ecs::Registry{};

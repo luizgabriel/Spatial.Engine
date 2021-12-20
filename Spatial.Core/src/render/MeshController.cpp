@@ -1,4 +1,6 @@
+#include "spatial/resources/ResourceLoader.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <fstream>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/render/Entity.h>
@@ -7,20 +9,12 @@
 #include <spatial/render/ResourceLoaders.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
-#include <fstream>
 
 namespace spatial::render
 {
 
-auto gLogger = createDefaultLogger();
-
 MeshController::MeshController(filament::Engine& engine)
-	: mEngine{engine},
-	  mRoot{},
-	  mVertexBuffers{},
-	  mIndexBuffers{},
-	  mMeshGeometries{},
-	  mBoundingBoxes{}
+	: mEngine{engine}, mRoot{}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
 {
 }
 
@@ -110,10 +104,8 @@ bool MeshController::hasMeshData(MeshId resourceId) const
 
 void MeshController::clearDeletedOrDirtyMeshes(ecs::Registry& registry)
 {
-	{
-		auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
-		registry.removeComponent<Renderable>(view.begin(), view.end());
-	}
+	auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
+	registry.removeComponent<Renderable>(view.begin(), view.end());
 }
 
 void MeshController::setRootPath(const std::filesystem::path& root)
@@ -121,33 +113,43 @@ void MeshController::setRootPath(const std::filesystem::path& root)
 	mRoot = root;
 }
 
+tl::expected<FilameshFile, ResourceError> toFilamesh(std::istream&& istream)
+{
+	try
+	{
+		auto filamesh = FilameshFile{};
+		istream >> filamesh;
+		return filamesh;
+	}
+	catch (const std::ios::failure& e)
+	{
+		return tl::make_unexpected(ResourceError::ParseError);
+	}
+}
+
 void MeshController::populateMeshesDatabase(ecs::Registry& registry)
 {
+	using namespace boost::algorithm;
+
 	registry.getEntities<const ecs::Mesh>().each([this](auto& mesh) {
 		const auto resourceId = mesh.getResourceId();
 
 		if (hasMeshData(resourceId))
 			return;
 
-		const auto path = mRoot / mesh.resourcePath;
-
-		if (!boost::algorithm::ends_with(path.string(), ".filamesh") || !std::filesystem::exists(path))
+		if (!ends_with(mesh.resourcePath.string(), ".filamesh"))
 			return;
 
-		auto fs = std::ifstream{path};
-		if (!fs)
+		auto result = makeAbsolutePath(mRoot, mesh.resourcePath)
+						  .and_then(validateResourcePath)
+						  .and_then(openFileReadStream)
+						  .and_then(toFilamesh)
+						  .map_error(logResourceError);
+
+		if (!result.has_value())
 			return;
 
-		try
-		{
-			auto filamesh = FilameshFile{};
-			fs >> filamesh;
-			load(resourceId, filamesh);
-		}
-		catch (const std::ios::failure& e)
-		{
-			gLogger.error(fmt::format("Could not load filamesh file: {0}\n Reason: ", path.c_str(), e.what()));
-		}
+		load(resourceId, result.value());
 	});
 }
 

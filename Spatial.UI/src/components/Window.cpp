@@ -16,7 +16,8 @@ Window::~Window()
 
 math::float2 Window::getSize() const
 {
-	if (!mIsOpen) return {.0f};
+	if (!mIsOpen)
+		return {.0f};
 	auto size = ImGui::GetWindowSize();
 	return {size.x, size.y};
 }

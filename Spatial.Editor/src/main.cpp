@@ -1,6 +1,6 @@
 #include "SceneEditorSystem.h"
-#include "Settings.h"
 #include "Serialization.h"
+#include "Settings.h"
 
 #include <assets/generated.h>
 #include <spatial/core/Application.h>
@@ -15,7 +15,6 @@
 #include <spatial/ui/system/UserInterfaceUtils.h>
 
 using namespace spatial;
-
 
 int main(int argc, char* argv[])
 {
@@ -33,8 +32,7 @@ int main(int argc, char* argv[])
 	ui.getRenderer().addFont(ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE);
 	ui.getRenderer().createFontTextureAtlas();
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine(),
-											window};
+	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window};
 	editor.setRootPath(config.projectFolder);
 
 	// Connect all Systems to the Application Main Loop

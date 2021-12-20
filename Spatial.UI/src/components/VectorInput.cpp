@@ -36,7 +36,6 @@ bool buttonInput(const std::string_view label, float& value, float resetValue, f
 	return changed;
 }
 
-
 bool vec2Input(const std::string_view label, math::float2& v, float resetValue, float speed, float min, float max,
 			   const std::string_view format)
 {

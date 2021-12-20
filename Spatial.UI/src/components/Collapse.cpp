@@ -9,9 +9,10 @@ Collapse::Collapse(const std::string_view name, bool defaultOpen)
 {
 	spacing(2);
 	mRendered = ImGui::CollapsingHeader(name.data(), &mOpened,
-									   defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
+										defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None);
 
-	if (mRendered) {
+	if (mRendered)
+	{
 		ImGui::Indent();
 		ImGui::PushID(name.data());
 	}
@@ -19,7 +20,8 @@ Collapse::Collapse(const std::string_view name, bool defaultOpen)
 
 Collapse::~Collapse()
 {
-	if (mRendered) {
+	if (mRendered)
+	{
 		ImGui::PopID();
 		ImGui::Unindent();
 	}

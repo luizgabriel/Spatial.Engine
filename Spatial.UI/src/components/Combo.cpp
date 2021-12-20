@@ -1,5 +1,5 @@
-#include <spatial/ui/components/Combo.h>
 #include <imgui.h>
+#include <spatial/ui/components/Combo.h>
 
 namespace spatial::ui
 {
@@ -11,7 +11,8 @@ Combo::Combo(std::string_view name, std::string_view selectedItem)
 
 Combo::~Combo()
 {
-	if (mIsOpen) ImGui::EndCombo();
+	if (mIsOpen)
+		ImGui::EndCombo();
 }
 
 bool Combo::isOpen() const
@@ -28,4 +29,4 @@ bool Combo::item(std::string_view name, bool isSelected)
 	return click;
 }
 
-}
+} // namespace spatial::ui

@@ -22,4 +22,4 @@ void serialize(Archive& ar, spatial::ecs::Child& child)
 	ar(make_nvp("previous", child.previous));
 }
 
-}
+} // namespace cereal

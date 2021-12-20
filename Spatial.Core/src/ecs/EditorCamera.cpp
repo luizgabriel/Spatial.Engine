@@ -33,4 +33,4 @@ math::float3 Transform::getEulerAnglesRotation() const noexcept
 	return rotation * math::rad2deg;
 }
 
-}
+} // namespace spatial::ecs

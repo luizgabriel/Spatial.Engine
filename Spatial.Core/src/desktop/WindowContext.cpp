@@ -1,8 +1,8 @@
 #include <boost/locale.hpp>
-#include <sstream>
 #include <spatial/common/Key.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
+#include <sstream>
 
 #if defined(SPATIAL_PLATFORM_OSX)
 #define GLFW_EXPOSE_NATIVE_COCOA
@@ -12,7 +12,6 @@
 #define GLFW_EXPOSE_NATIVE_X11
 #endif
 #include <GLFW/glfw3native.h>
-
 
 namespace spatial::desktop
 {
@@ -46,7 +45,7 @@ void PlatformContext::setupCallbacks(GLFWwindow* window)
 
 	glfwSetCharCallback(window, [](auto* win, unsigned int codepoint) {
 		auto ss = std::wstringstream{};
-	  	ss << static_cast<wchar_t>(codepoint);
+		ss << static_cast<wchar_t>(codepoint);
 
 		sEventQueue.enqueue<TextEvent>(boost::locale::conv::utf_to_utf<char>(ss.str()));
 	});
@@ -77,9 +76,8 @@ void PlatformContext::setupCallbacks(GLFWwindow* window)
 		sEventQueue.enqueue<WindowResizedEvent>(math::int2{width, height}, math::int2{fbw, fbh});
 	});
 
-	glfwSetCursorPosCallback(window, [](auto* win, double xPos, double yPos) {
-	  sEventQueue.enqueue<MouseMovedEvent>(xPos, yPos);
-	});
+	glfwSetCursorPosCallback(
+		window, [](auto* win, double xPos, double yPos) { sEventQueue.enqueue<MouseMovedEvent>(xPos, yPos); });
 }
 
 void PlatformContext::onStartFrame(float)
@@ -94,8 +92,7 @@ void PlatformContext::onStartFrame(float)
 	sEventQueue.update();
 }
 
-Window PlatformContext::createWindow(std::uint16_t width, std::uint16_t height,
-											std::string_view title) const noexcept
+Window PlatformContext::createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept
 {
 	auto window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
 	setupCallbacks(window);
@@ -340,4 +337,4 @@ KeyAction mapActionFromCode(int action) noexcept
 	}
 }
 
-} // namespace spatial
+} // namespace spatial::desktop

@@ -33,4 +33,4 @@ Registry::VersionType Registry::getVersion(Entity entity) noexcept
 	return entt::registry::version(entity);
 }
 
-} // namespace spatial
+} // namespace spatial::ecs

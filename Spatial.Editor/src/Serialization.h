@@ -1,11 +1,22 @@
 #pragma once
 
-#include "EditorCamera.h"
 #include "DefaultMaterial.h"
+#include "EditorCamera.h"
+#include "Tags.h"
 
 #include <cereal/cereal.hpp>
 #include <magic_enum.hpp>
+#include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Math.h>
+#include <spatial/serialization/Registry.h>
+#include <spatial/resources/ResourceLoader.h>
+
+namespace spatial::editor
+{
+
+tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream);
+
+} // namespace spatial
 
 namespace cereal
 {
@@ -26,4 +37,4 @@ void serialize(Archive& ar, spatial::editor::DefaultMaterial& material)
 	ar(cereal::make_nvp("reflectance", material.reflectance));
 }
 
-}
+} // namespace cereal

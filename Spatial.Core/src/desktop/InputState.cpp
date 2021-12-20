@@ -3,11 +3,7 @@
 namespace spatial::desktop
 {
 
-InputState::InputState()
-	: mKeyPressed{},
-	  mKeyReleased{},
-	  mLastMousePosition{.0f, .0f},
-	  mCurrentMousePosition{.0f, .0f}
+InputState::InputState() : mKeyPressed{}, mKeyReleased{}, mLastMousePosition{.0f, .0f}, mCurrentMousePosition{.0f, .0f}
 {
 }
 
@@ -98,4 +94,4 @@ bool InputState::released(Key key) const
 	return mKeyReleased.test(static_cast<size_t>(key));
 }
 
-} // namespace spatial
+} // namespace spatial::desktop

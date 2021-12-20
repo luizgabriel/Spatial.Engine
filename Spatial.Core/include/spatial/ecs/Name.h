@@ -9,7 +9,7 @@
 namespace spatial::ecs
 {
 
-struct EntityName
+struct Name
 {
 	std::string name;
 

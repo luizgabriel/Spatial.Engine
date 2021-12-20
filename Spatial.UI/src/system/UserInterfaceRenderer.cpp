@@ -147,7 +147,7 @@ void ImGuiRenderer::setViewport(const math::float2& windowSize, const math::floa
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
 	mCamera.setOrthographicProjection(0.0, static_cast<double>(frameBufferSize.x / dpiScaleX),
-									 static_cast<double>(frameBufferSize.y / dpiScaleY), 0.0, 0.0, 1.0);
+									  static_cast<double>(frameBufferSize.y / dpiScaleY), 0.0, 0.0, 1.0);
 
 	const auto scaleX = windowSize.x > 0 ? frameBufferSize.x / windowSize.x : 0;
 	const auto scaleY = windowSize.y > 0 ? frameBufferSize.y / windowSize.y : 0;

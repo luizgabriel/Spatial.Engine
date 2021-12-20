@@ -1,5 +1,5 @@
-#include <spatial/ui/components/styles/BorderlessWindowStyle.h>
 #include <imgui.h>
+#include <spatial/ui/components/styles/BorderlessWindowStyle.h>
 
 namespace spatial::ui
 {
@@ -16,4 +16,4 @@ BorderlessWindowStyle::~BorderlessWindowStyle()
 	ImGui::PopStyleVar(3);
 }
 
-}
+} // namespace spatial::ui

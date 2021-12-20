@@ -10,4 +10,4 @@ class BorderlessWindowStyle
 	~BorderlessWindowStyle();
 };
 
-}
+} // namespace spatial::ui

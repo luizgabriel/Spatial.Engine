@@ -81,8 +81,6 @@ class Light
 
 	[[nodiscard]] bool isShadowCaster() const noexcept;
 
-
-
   private:
 	Manager& mManager;
 	utils::Entity mEntity;

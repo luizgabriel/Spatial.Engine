@@ -18,7 +18,7 @@ void disconnect(desktop::InputSystem& system, Listener& listener)
 }
 
 template <typename Listener>
-desktop::InputSystem& operator >>(desktop::InputSystem& system, Listener& listener)
+desktop::InputSystem& operator>>(desktop::InputSystem& system, Listener& listener)
 {
 	connect(system, listener);
 	return system;
