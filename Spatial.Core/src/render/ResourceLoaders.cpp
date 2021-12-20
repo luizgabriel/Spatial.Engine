@@ -33,8 +33,8 @@ Texture createTexture(filament::Engine& engine, math::int2 dimensions, fl::Textu
 	return Texture{engine, texture};
 }
 
-Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size,
-					  filament::Texture::Usage usage, filament::Texture::Sampler sampler)
+Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size, filament::Texture::Usage usage,
+					  filament::Texture::Sampler sampler)
 {
 	int width, height, n;
 	const auto* imageData = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &n, 4);

@@ -14,4 +14,4 @@ void serialize(Archive& ar, filament::Box& box)
 	ar(cereal::make_nvp("halfExtent", box.halfExtent));
 }
 
-}
+} // namespace cereal

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/resources/BoundingBox.h>
 #include <spatial/common/Math.h>
+#include <spatial/resources/BoundingBox.h>
 
 #include <cstdint>
 #include <istream>
@@ -63,7 +63,3 @@ std::istream& operator>>(std::istream& stream, spatial::FilameshFile& filamesh);
 FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size);
 
 } // namespace spatial
-
-
-
-

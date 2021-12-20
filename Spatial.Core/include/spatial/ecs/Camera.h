@@ -40,7 +40,7 @@ struct OrthographicCamera
 
 	constexpr OrthographicCamera() = default;
 
-	void setAspectRatio(double aspectRatio) noexcept
+	constexpr void setAspectRatio(double aspectRatio) noexcept
 	{
 		left = -aspectRatio;
 		right = aspectRatio;
@@ -55,9 +55,7 @@ struct PerspectiveCamera
 	double near{0.1};
 	double far{10000.0};
 
-	constexpr PerspectiveCamera()
-	{
-	}
+	constexpr PerspectiveCamera() = default;
 
 	constexpr PerspectiveCamera(double fieldOfView, double aspectRatio, double near, double far)
 		: fieldOfView{fieldOfView}, aspectRatio{aspectRatio}, near{near}, far{far}

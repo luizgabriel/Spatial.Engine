@@ -16,8 +16,8 @@ bool Popup::isOpen() const
 
 Popup::~Popup()
 {
-	if (mOpen) ImGui::EndPopup();
+	if (mOpen)
+		ImGui::EndPopup();
 }
 
-
-}
+} // namespace spatial::ui

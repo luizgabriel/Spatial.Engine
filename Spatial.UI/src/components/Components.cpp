@@ -1,3 +1,6 @@
+#include "spatial/ecs/SceneView.h"
+#include "spatial/ui/components/SceneView.h"
+#include "spatial/render/TextureView.h"
 #include <array>
 #include <imgui.h>
 #include <spatial/ecs/EntityHandle.h>
@@ -5,8 +8,8 @@
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
-#include <spatial/ui/components/VectorInput.h>
 #include <spatial/ui/components/Search.h>
+#include <spatial/ui/components/VectorInput.h>
 
 namespace spatial::ui
 {
@@ -34,7 +37,8 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 
 bool inputText(const std::string_view label, std::string& value)
 {
-	if (label[0] != '#') {
+	if (label[0] != '#')
+	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("%s", label.data());
 		ImGui::SameLine();
@@ -42,10 +46,22 @@ bool inputText(const std::string_view label, std::string& value)
 
 	ImGui::PushID(label.data());
 	const auto changed = ImGui::InputText("##", value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
-							&inputTextCallback, &value);
+										  &inputTextCallback, &value);
 	ImGui::PopID();
 
 	return changed;
+}
+
+bool inputPath(const std::string_view label, std::filesystem::path& path)
+{
+	auto value = path.string();
+	if (ui::inputText(label, value))
+	{
+		path = std::filesystem::path{value};
+		return true;
+	}
+
+	return false;
 }
 
 template <>
@@ -103,9 +119,7 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
 	bool changed = false;
 
-	std::string resourcePath = mesh.resourcePath.string();
-	changed |= ui::inputText("Resource", resourcePath);
-	mesh.resourcePath = resourcePath;
+	changed |= ui::inputPath("Resource", mesh.resourcePath);
 
 	spacing(3);
 
@@ -124,18 +138,18 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	spacing(3);
 
-	if (ImGui::TreeNodeEx("Geometry Configuration", ImGuiTreeNodeFlags_SpanFullWidth)) {
+	if (ImGui::TreeNodeEx("Geometry Configuration", ImGuiTreeNodeFlags_SpanFullWidth))
+	{
 		spacing(3);
 
-		changed |= ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
-		changed |= ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
+		changed |=
+			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
+		changed |=
+			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
 		ImGui::TreePop();
 
 		spacing(3);
 	}
-
-	if (changed && !registry.hasAnyComponent<ecs::tags::IsMeshDirty>(entity))
-		registry.addComponent<ecs::tags::IsMeshDirty>(entity);
 }
 
 template <>
@@ -191,6 +205,54 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 	ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
 	ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
 	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+}
+
+template <>
+void componentInput<ecs::SkyBoxColor>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& skybox = registry.getComponent<ecs::SkyBoxColor>(entity);
+
+	ImGui::ColorEdit3("Color", &skybox.color.r);
+	ImGui::DragFloat("Intensity", &skybox.intensity, 1.0f, .0f, 100000.0f);
+}
+
+template <>
+void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
+
+	Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
+
+	Search::searchEntity<ecs::tags::IsSkyBox>("SkyBox", registry, sceneView.skybox);
+	if (ImGui::TreeNodeEx("SkyBox Properties", ImGuiTreeNodeFlags_SpanFullWidth))
+	{
+		spacing(3);
+		if (registry.hasAllComponents<ecs::SkyBoxColor>(sceneView.skybox))
+			ui::componentInput<ecs::SkyBoxColor>(registry, sceneView.skybox);
+		spacing(3);
+		ImGui::TreePop();
+	}
+
+	Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
+	if (ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth))
+	{
+		spacing(3);
+		if (registry.hasAllComponents<ecs::PerspectiveCamera>(sceneView.camera))
+			ui::componentInput<ecs::PerspectiveCamera>(registry, sceneView.camera);
+		if (registry.hasAllComponents<ecs::OrthographicCamera>(sceneView.camera))
+			ui::componentInput<ecs::OrthographicCamera>(registry, sceneView.camera);
+		if (registry.hasAllComponents<ecs::CustomCamera>(sceneView.camera))
+			ui::componentInput<ecs::CustomCamera>(registry, sceneView.camera);
+		spacing(3);
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth))
+	{
+		if (registry.hasAllComponents<render::TextureView>(entity))
+			SceneView::image(registry, entity, {ImGui::GetContentRegionAvailWidth(), 100});
+		ImGui::TreePop();
+	}
 }
 
 void image(const filament::Texture& texture, math::float2 size, math::float4 uv)

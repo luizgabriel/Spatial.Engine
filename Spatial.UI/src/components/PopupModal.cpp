@@ -1,5 +1,5 @@
-#include <spatial/ui/components/PopupModal.h>
 #include <imgui.h>
+#include <spatial/ui/components/PopupModal.h>
 
 namespace spatial::ui
 {
@@ -25,4 +25,4 @@ void PopupModal::close()
 	ImGui::CloseCurrentPopup();
 }
 
-}
+} // namespace spatial::ui

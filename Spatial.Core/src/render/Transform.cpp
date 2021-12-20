@@ -16,9 +16,7 @@ Transform::~Transform()
 		mManager.destroy(mEntity);
 }
 
-Transform::Transform(Transform&& other) noexcept
-	: mManager{other.mManager},
-	  mEntity{std::exchange(other.mEntity, {})}
+Transform::Transform(Transform&& other) noexcept : mManager{other.mManager}, mEntity{std::exchange(other.mEntity, {})}
 {
 }
 
@@ -53,4 +51,4 @@ Transform::Instance Transform::getInstance() const noexcept
 	return mManager.getInstance(mEntity);
 }
 
-} // namespace spatial
+} // namespace spatial::render

@@ -5,6 +5,7 @@
 #include <filament/IndexBuffer.h>
 #include <filament/IndirectLight.h>
 #include <filament/Material.h>
+#include <filament/RenderTarget.h>
 #include <filament/Renderer.h>
 #include <filament/Scene.h>
 #include <filament/Skybox.h>
@@ -12,7 +13,6 @@
 #include <filament/TextureSampler.h>
 #include <filament/VertexBuffer.h>
 #include <filament/View.h>
-#include <filament/RenderTarget.h>
 
 #include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>

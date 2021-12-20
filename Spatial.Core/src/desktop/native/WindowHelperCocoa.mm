@@ -1,5 +1,5 @@
-#include <spatial/desktop/native/CocoaHelper.h>
 #include <Cocoa/Cocoa.h>
+#include <spatial/desktop/native/CocoaHelper.h>
 
 void* cocoaGetContentViewFromWindow(void* id)
 {

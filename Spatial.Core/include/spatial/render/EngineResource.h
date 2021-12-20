@@ -26,8 +26,7 @@ class EngineResource
 	EngineResource(const EngineResource&) = delete;
 	EngineResource& operator=(const EngineResource&) = delete;
 
-	EngineResource(EngineResource&& other) noexcept
-		: mEngine{other.mEngine}, mResource{other.release()}
+	EngineResource(EngineResource&& other) noexcept : mEngine{other.mEngine}, mResource{other.release()}
 	{
 	}
 

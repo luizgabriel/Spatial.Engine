@@ -13,13 +13,12 @@ namespace spatial::render
 class CameraController
 {
   public:
-	explicit CameraController(filament::Engine& engine, filament::Scene& scene);
+	explicit CameraController(filament::Engine& engine);
 
 	void onUpdateFrame(ecs::Registry& registry) const;
 
   private:
 	filament::Engine& mEngine;
-	filament::Scene& mScene;
 
 	void update(const ecs::PerspectiveCamera& data, Camera& camera) const;
 

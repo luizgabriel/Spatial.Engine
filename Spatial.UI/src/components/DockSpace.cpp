@@ -31,4 +31,4 @@ DockSpace::~DockSpace()
 	ImGui::End(); // DockSpace
 }
 
-}
+} // namespace spatial::ui

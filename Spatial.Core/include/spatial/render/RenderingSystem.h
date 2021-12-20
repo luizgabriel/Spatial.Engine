@@ -24,7 +24,7 @@ class RenderingSystem
 
 	void onEndFrame();
 
-    const auto& getEngine() const
+	const auto& getEngine() const
 	{
 		return *mEngine.get();
 	}
@@ -51,4 +51,4 @@ class RenderingSystem
 	Signal<filament::Renderer&> mOnRenderSignal;
 };
 
-} // namespace spatial::render
+} // namespace spatial

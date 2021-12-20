@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string_view>
 #include <filesystem>
 #include <optional>
+#include <string_view>
 
 namespace spatial::ui
 {
@@ -35,5 +35,4 @@ class DragAndDropTarget
 	bool mStarted;
 };
 
-
-}
+} // namespace spatial::ui

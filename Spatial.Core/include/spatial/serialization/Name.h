@@ -1,13 +1,13 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <spatial/ecs/EntityName.h>
+#include <spatial/ecs/Name.h>
 
 namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::EntityName& node)
+void serialize(Archive& ar, spatial::ecs::Name& node)
 {
 	ar(make_nvp("name", node.name));
 }
@@ -27,5 +27,4 @@ void load(Archive& ar, spatial::ecs::UUID& id)
 		id = spatial::ecs::UUID::fromString(uuid);
 }
 
-
-} // namespace spatial
+} // namespace cereal

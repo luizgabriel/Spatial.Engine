@@ -1,6 +1,6 @@
+#include <imgui.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <string>
-#include <imgui.h>
 
 namespace spatial::ui
 {
@@ -43,13 +43,14 @@ bool DragAndDropTarget::isStarted() const
 	return mStarted;
 }
 
-
 std::optional<std::filesystem::path> DragAndDropTarget::getPathPayload(std::string_view name) const
 {
-	if (!mStarted) return std::nullopt;
+	if (!mStarted)
+		return std::nullopt;
 
 	const auto* payload = ImGui::AcceptDragDropPayload(name.data());
-	if (!payload) return std::nullopt;
+	if (!payload)
+		return std::nullopt;
 
 	const auto* data = reinterpret_cast<char*>(payload->Data);
 	auto value = std::string{};
@@ -58,4 +59,4 @@ std::optional<std::filesystem::path> DragAndDropTarget::getPathPayload(std::stri
 	return std::filesystem::path{std::move(value)};
 }
 
-}
+} // namespace spatial::ui

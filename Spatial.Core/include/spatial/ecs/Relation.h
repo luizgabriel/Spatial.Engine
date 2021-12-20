@@ -36,7 +36,8 @@ struct Parent
 	static Entity createChild(Registry& registry, Entity parentEntity);
 
 	/**
-	 * @description Add childEntity as Child of parentEntity by adding the Child Component and updating the Parent attributes
+	 * @description Add childEntity as Child of parentEntity by adding the Child Component and updating the Parent
+	 * attributes
 	 */
 	static void addChild(Registry& registry, Entity parentEntity, Entity childEntity);
 
@@ -51,7 +52,8 @@ struct Parent
 	static void remove(Registry& registry, Entity parentEntity);
 
 	/**
-	 * @description Removes the Parent component and Destroys every single child of the parentEntity even if any child is also parent of other children
+	 * @description Removes the Parent component and Destroys every single child of the parentEntity even if any child
+	 * is also parent of other children
 	 */
 	static void destroyChildren(Registry& registry, Entity parentEntity);
 

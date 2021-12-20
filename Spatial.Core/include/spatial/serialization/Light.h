@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <spatial/serialization/Math.h>
 #include <spatial/ecs/Light.h>
+#include <spatial/serialization/Math.h>
 
 namespace cereal
 {
@@ -46,4 +46,4 @@ void serialize(Archive& ar, spatial::ecs::SunLight& light)
 	ar(make_nvp("castShadows", light.castShadows));
 }
 
-}
+} // namespace cereal

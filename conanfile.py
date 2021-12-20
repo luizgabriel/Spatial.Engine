@@ -25,6 +25,7 @@ class SpatialEngineConan(ConanFile):
         "entt/3.7.0",
         "cereal/1.3.0",
         "magic_enum/0.7.3",
+        "tl-expected/20190710",
 
         # Remember to run 'setup.py' to make this dependencies available
         "imgui/docking@vendor/stable",  # Installed with vendor/imgui.py

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/common/Math.h>
 #include <spatial/common/Key.h>
+#include <spatial/common/Math.h>
 #include <utility>
 
 namespace spatial
@@ -27,8 +27,7 @@ struct KeyEvent
 	Key key;
 	KeyAction action;
 
-	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::UnknownAction)
-		: key{key}, action{action}
+	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::UnknownAction) : key{key}, action{action}
 	{
 	}
 };

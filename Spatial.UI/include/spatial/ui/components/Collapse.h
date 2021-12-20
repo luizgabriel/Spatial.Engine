@@ -8,12 +8,20 @@ namespace spatial::ui
 class Collapse
 {
   public:
-	Collapse(const std::string_view name, bool defaultOpen = true);
+	explicit Collapse(const std::string_view name, bool defaultOpen = true);
 	~Collapse();
 
-	bool isOpen() const;
+	[[nodiscard]] bool isOpen() const;
 
-	bool onClose() const;
+	[[nodiscard]] bool onClose() const;
+
+	template <typename Function>
+	static void show(const std::string_view name, Function func)
+	{
+		auto collapse = Collapse{name};
+		if (collapse.isOpen())
+			std::invoke(std::forward<Function>(func));
+	}
 
   private:
 	bool mOpened{true};

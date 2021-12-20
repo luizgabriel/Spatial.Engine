@@ -3,12 +3,12 @@
 #include <entt/entity/snapshot.hpp>
 #include <spatial/ecs/Tags.h>
 #include <spatial/serialization/Camera.h>
-#include <spatial/serialization/EntityName.h>
 #include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Light.h>
 #include <spatial/serialization/Mesh.h>
-#include <spatial/serialization/Transform.h>
+#include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
+#include <spatial/serialization/Transform.h>
 
 namespace spatial::ecs
 {
@@ -18,7 +18,7 @@ void serialize(Archive& ar, const Registry& registry)
 {
 	auto snapshot = entt::snapshot{registry};
 	snapshot.entities(ar);
-	snapshot.component<ecs::EntityName>(ar);
+	snapshot.component<ecs::Name>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
 	snapshot.component<ecs::OrthographicCamera>(ar);
@@ -36,7 +36,6 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
-
 }
 
 template <typename... CustomComponent, typename Archive>
@@ -44,7 +43,7 @@ void deserialize(Archive& ar, Registry& registry)
 {
 	auto snapshot = entt::snapshot_loader{registry};
 	snapshot.entities(ar);
-	snapshot.component<ecs::EntityName>(ar);
+	snapshot.component<ecs::Name>(ar);
 	snapshot.component<ecs::Transform>(ar);
 	snapshot.component<ecs::PerspectiveCamera>(ar);
 	snapshot.component<ecs::OrthographicCamera>(ar);

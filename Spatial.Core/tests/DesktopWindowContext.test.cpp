@@ -1,5 +1,5 @@
-#include <spatial/desktop/Window.h>
 #include <gtest/gtest.h>
+#include <spatial/desktop/Window.h>
 
 using namespace spatial;
 

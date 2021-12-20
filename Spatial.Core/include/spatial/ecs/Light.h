@@ -1,6 +1,8 @@
 #pragma once
 
+#include <filesystem>
 #include <spatial/common/Math.h>
+#include <spatial/common/StringHelpers.h>
 
 namespace spatial::ecs
 {
@@ -41,4 +43,21 @@ struct SunLight
 	bool castShadows{true};
 };
 
-} // namespace spatial
+struct IndirectLight
+{
+	std::filesystem::path reflectionsTexturePath{};
+	std::filesystem::path irradianceValuesPath{};
+	float intensity{30000.0f};
+
+	auto getReflectionsTextureResourceId() const
+	{
+		return HashedString{reflectionsTexturePath.c_str()}.value();
+	}
+
+	auto getIrradianceValuesResourceId() const
+	{
+		return HashedString{irradianceValuesPath.c_str()}.value();
+	}
+};
+
+} // namespace spatial::ecs

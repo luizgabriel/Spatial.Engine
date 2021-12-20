@@ -76,7 +76,8 @@ class Registry
 	Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
 		auto view = mRegistry.view<const Component...>(std::move(excludes));
-		for (auto entity : view) {
+		for (auto entity : view)
+		{
 			return entity;
 		}
 

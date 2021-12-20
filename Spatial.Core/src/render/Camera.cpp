@@ -7,8 +7,7 @@ Camera::Camera(filament::Engine& engine) : Camera(engine, {})
 {
 }
 
-Camera::Camera(filament::Engine& engine, utils::Entity entity)
-	: mEngine{engine}, mEntity{entity}
+Camera::Camera(filament::Engine& engine, utils::Entity entity) : mEngine{engine}, mEntity{entity}
 {
 	if (!entity.isNull())
 		engine.createCamera(entity);
@@ -27,8 +26,7 @@ void Camera::reset()
 	mEntity = utils::Entity{};
 }
 
-Camera::Camera(Camera&& other) noexcept
-	: mEngine{other.mEngine}, mEntity{other.release()}
+Camera::Camera(Camera&& other) noexcept : mEngine{other.mEngine}, mEntity{other.release()}
 {
 }
 
@@ -67,9 +65,9 @@ void Camera::setPerspectiveProjection(double fovInDegrees, double aspect, double
 }
 
 void Camera::setOrthographicProjection(double left, double right, double bottom, double top, double near,
-									  double far) noexcept
+									   double far) noexcept
 {
-	getInstance()->setProjection(filament::Camera::Projection::ORTHO, left,right, bottom, top, near, far);
+	getInstance()->setProjection(filament::Camera::Projection::ORTHO, left, right, bottom, top, near, far);
 }
 
 void Camera::setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept
@@ -98,4 +96,4 @@ utils::Entity Camera::release()
 	return std::exchange(mEntity, {});
 }
 
-} // namespace spatial
+} // namespace spatial::render

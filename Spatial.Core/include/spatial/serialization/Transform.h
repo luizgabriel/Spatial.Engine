@@ -15,4 +15,4 @@ void serialize(Archive& ar, spatial::ecs::Transform& transform)
 	ar(make_nvp("scale", transform.scale));
 }
 
-}
+} // namespace cereal

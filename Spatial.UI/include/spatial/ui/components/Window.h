@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string_view>
 #include <spatial/common/Math.h>
+#include <string_view>
 
 namespace spatial::ui
 {
@@ -26,9 +26,8 @@ class Window
 	static void show(const std::string_view name, Function func)
 	{
 		auto window = Window{name};
-		if (window.isOpen()) {
+		if (window.isOpen())
 			std::invoke(std::forward<Function>(func));
-		}
 	}
 
   private:

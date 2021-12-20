@@ -1,4 +1,3 @@
-
 <h1 align="center">
   <br>
   <a href="https://github.com/luizgabriel/Spatial.Engine"><img src="https://i.imgur.com/tkJzpLU.png" alt="Spatial Engine" width="500"></a>
@@ -21,7 +20,7 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
   </a>
 
   <img src="https://img.shields.io/badge/code%20quality-A-brightgreen" />
-  
+
   <a href="https://github.com/luizgabriel/Spatial.Engine/pulls">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=shields" />
   </a>
@@ -40,23 +39,25 @@ Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/
 ## Key Features
 
 * Cross platform
-  - Windows, macOS and Linux ready.
+    - Windows, macOS and Linux ready.
 * Easy installation
-  - All dependencies are resolved by [Conan](https://conan.io)
+    - All dependencies are resolved by [Conan](https://conan.io)
 * Google Filament Rendering Engine Support
-  - This engines makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
+    - This engines makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
 * Full Entity-Component-System
-  - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
+    - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
 * Serialization System
-  - Open and Save  XML/JSON/binary scene files built in the editor.
+    - Open and Save XML/JSON/binary scene files built in the editor.
 * Docking UI
-  - Integrated [ImGui](https://github.com/ocornut/imgui) interface
+    - Integrated [ImGui](https://github.com/ocornut/imgui) interface
 * Beautiful Code and Modern C++
-  - Do you like reading beautiful code? I do too.
+    - Do you like reading beautiful code? I do too.
 
 ## Inspiration
 
-This project was heavly inspired by the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and I encourage you to take a look at his amazing YouTube channel.
+This project was heavly inspired by
+the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and I
+encourage you to take a look at his amazing YouTube channel.
 
 ## Bibliography
 

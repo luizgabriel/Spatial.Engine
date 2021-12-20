@@ -35,4 +35,4 @@ class InputSystem
 	Signal<const InputState&> mOnChangeStateSignal;
 };
 
-} // namespace spatial
+} // namespace spatial::desktop

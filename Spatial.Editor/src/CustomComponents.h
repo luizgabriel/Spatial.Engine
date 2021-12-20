@@ -2,8 +2,8 @@
 
 #include <filesystem>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/Popup.h>
@@ -28,7 +28,8 @@ class EntityProperties
 	static bool displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
 
 	template <typename Component>
-	static bool displayComponent(const std::string_view componentName, ecs::Registry& registry, ecs::Entity selectedEntity)
+	static bool displayComponent(const std::string_view componentName, ecs::Registry& registry,
+								 ecs::Entity selectedEntity)
 	{
 		auto isOpen = false;
 
@@ -44,7 +45,8 @@ class EntityProperties
 			}
 		}
 
-		if (isOpen) {
+		if (isOpen)
+		{
 			componentInput<Component>(registry, selectedEntity);
 		}
 
@@ -52,21 +54,9 @@ class EntityProperties
 	}
 };
 
-class EditorMainMenu
+struct EditorMainMenu
 {
-  public:
-	explicit EditorMainMenu(std::filesystem::path& rootPath, std::filesystem::path& scenePath);
-
-	bool onOpenProject();
-
-	bool onNewScene();
-
-	bool onOpenScene();
-
-	bool onSaveScene();
-
-  private:
-	enum class MainMenuOption
+	enum class FileMenuAction
 	{
 		Unknown,
 		OpenProject,
@@ -75,8 +65,8 @@ class EditorMainMenu
 		SaveScene,
 	};
 
-	MenuBar mMenuBar;
-	MainMenuOption mSelectedOption{MainMenuOption::Unknown};
+	static bool fileMenu(std::filesystem::path& rootPath, std::filesystem::path& currentPath, std::filesystem::path& scenePath, bool& clearSceneFlag, bool& saveSceneFlag, bool& reloadSceneFlag);
+	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
 class NewSceneModal
@@ -134,10 +124,10 @@ class OpenProjectModal
 class SceneOptionsMenu
 {
   public:
-	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition, bool addAsChild = false);
+	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								   math::float3 createEntitiesPosition, bool addAsChild = false);
 	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
 	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
 class SceneTree
@@ -163,12 +153,6 @@ class EditorDragAndDrop
 	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
 
 	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
-};
-
-class CameraView
-{
-  public:
-	static void image(ecs::Registry& registry, ecs::Entity cameraEntity, math::float2 imageSize);
 };
 
 } // namespace spatial::ui

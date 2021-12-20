@@ -3,30 +3,15 @@
 #include "Tags.h"
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/SceneView.h>
 
 using namespace spatial::math;
 
 namespace spatial::editor
 {
 
-void createCamera(ecs::Registry& registry)
+void EditorCameraController::beforeUpdateEntities(ecs::Registry&)
 {
-	ecs::build(registry)
-		.withName("Editor Camera")
-		.with(EditorCamera{.5f, 10.0f})
-		.with<tags::IsEditorEntity>()
-		.asTransform()
-		.withPosition({3.0f, 3.0f, 20.0f})
-		.asPerspectiveCamera()
-		.withFieldOfView(60.0)
-		.withAspectRatio(19.0 / 6.0);
-}
-
-void EditorCameraController::beforeUpdateEntities(ecs::Registry& registry)
-{
-	if (!registry.hasAnyEntity<EditorCamera>())
-		createCamera(registry);
-
 	if (mEnabled && mJustStarted < 11)
 		mJustStarted++;
 }

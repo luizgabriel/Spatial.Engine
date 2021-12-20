@@ -1,16 +1,17 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
 
+using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::ByRef;
 using ::testing::Invoke;
-using ::testing::_;
 
 using namespace spatial;
 
-struct RenderingSystemMockListener {
+struct RenderingSystemMockListener
+{
 	MOCK_METHOD1(onRender, void(filament::Renderer&));
 };
 

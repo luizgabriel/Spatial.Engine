@@ -37,17 +37,18 @@ bool imguiIsMinimized()
 
 render::VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, uint32_t capacity)
 {
-	return render::VertexBuffer{engine, fl::VertexBuffer::Builder()
-									.vertexCount(capacity)
-									.bufferCount(1)
-									.attribute(fl::VertexAttribute::POSITION, 0,
-											   fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
-									.attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2,
-											   sizeof(fl::math::float2), sizeof(ImDrawVert))
-									.attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
-											   2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
-									.normalized(fl::VertexAttribute::COLOR)
-									.build(engine)};
+	return render::VertexBuffer{
+		engine,
+		fl::VertexBuffer::Builder()
+			.vertexCount(capacity)
+			.bufferCount(1)
+			.attribute(fl::VertexAttribute::POSITION, 0, fl::VertexBuffer::AttributeType::FLOAT2, 0, sizeof(ImDrawVert))
+			.attribute(fl::VertexAttribute::UV0, 0, fl::VertexBuffer::AttributeType::FLOAT2, sizeof(fl::math::float2),
+					   sizeof(ImDrawVert))
+			.attribute(fl::VertexAttribute::COLOR, 0, fl::VertexBuffer::AttributeType::UBYTE4,
+					   2 * sizeof(fl::math::float2), sizeof(ImDrawVert))
+			.normalized(fl::VertexAttribute::COLOR)
+			.build(engine)};
 }
 
 render::IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, uint32_t capacity)
@@ -65,7 +66,7 @@ void imguiAddFont(const uint8_t* data, size_t size)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
-		io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), 16.0f, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), 16.0f, &config);
 #pragma clang diagnostic pop
 }
 
@@ -78,7 +79,8 @@ render::Texture imguiCreateTextureAtlas(fl::Engine& engine)
 	io.Fonts->GetTexDataAsRGBA32(&imageData, &width, &height, &bpp);
 
 	auto textureSize = width * height * bpp;
-	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE};
+	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::RGBA,
+												 fl::Texture::Type::UBYTE};
 	const auto texture = fl::Texture::Builder()
 							 .width(static_cast<uint32_t>(width))
 							 .height(static_cast<uint32_t>(height))
@@ -92,4 +94,4 @@ render::Texture imguiCreateTextureAtlas(fl::Engine& engine)
 	return render::createResource(engine, texture);
 }
 
-} // namespace spatial
+} // namespace spatial::ui

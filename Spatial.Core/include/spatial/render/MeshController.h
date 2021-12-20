@@ -1,13 +1,13 @@
 #pragma once
 
 #include <filament/Engine.h>
+#include <list>
 #include <spatial/common/StringHelpers.h>
-#include <spatial/ecs/EntityName.h>
+#include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
 #include <unordered_map>
-#include <list>
 
 namespace spatial::render
 {
@@ -16,7 +16,8 @@ class MeshController
 {
   public:
 	using MeshId = uint32_t;
-	struct MeshGeometry {
+	struct MeshGeometry
+	{
 		std::uint32_t offset;
 		std::uint32_t count;
 	};

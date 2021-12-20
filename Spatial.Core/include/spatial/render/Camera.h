@@ -31,7 +31,7 @@ class Camera
 
 	[[nodiscard]] bool isValid() const noexcept
 	{
-		return !mEntity.isNull();
+		return mEntity && !mEntity.isNull();
 	}
 
 	void lookAt(const math::float3& eye, const math::float3& center) noexcept;
@@ -40,17 +40,15 @@ class Camera
 
 	void setPerspectiveProjection(double fovInDegrees, double aspect, double near, double far) noexcept;
 
-	void setOrthographicProjection(
-					   double left, double right,
-					   double bottom, double top,
-					   double near, double far) noexcept;
+	void setOrthographicProjection(double left, double right, double bottom, double top, double near,
+								   double far) noexcept;
 
 	void setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept;
 
 	void setCustomProjection(math::mat4 const& projection, double near, double far) noexcept;
 
-	void setCustomProjection(math::mat4 const& projection, math::mat4 const& projectionForCulling,
-							 double near, double far) noexcept;
+	void setCustomProjection(math::mat4 const& projection, math::mat4 const& projectionForCulling, double near,
+							 double far) noexcept;
 
 	void setScaling(math::double2 scaling) noexcept;
 

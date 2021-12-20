@@ -11,7 +11,19 @@ struct IsRenderable
 {
 };
 
-struct IsMeshDirty
+struct IsCamera
+{
+};
+
+struct IsLight
+{
+};
+
+struct IsMainView
+{
+};
+
+struct IsSkyBox
 {
 };
 

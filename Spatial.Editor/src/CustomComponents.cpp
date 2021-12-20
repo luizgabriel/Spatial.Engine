@@ -5,11 +5,11 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/render/TextureView.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
-#include <spatial/render/TextureView.h>
 
 namespace spatial::ui
 {
@@ -54,6 +54,12 @@ bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs:
 
 	changed |= displayComponent<ecs::Mesh>("Mesh", registry, selectedEntity);
 
+	changed |= displayComponent<ecs::SkyBoxColor>("SkyBox Color", registry, selectedEntity);
+
+	//changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
+
+	changed |= displayComponent<ecs::SceneView>("Scene View", registry, selectedEntity);
+
 	return changed;
 }
 
@@ -88,9 +94,9 @@ bool EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 {
 	bool changed = false;
 
-	if (registry.hasAllComponents<ecs::EntityName>(selectedEntity))
+	if (registry.hasAllComponents<ecs::Name>(selectedEntity))
 	{
-		auto& name = registry.getComponent<ecs::EntityName>(selectedEntity);
+		auto& name = registry.getComponent<ecs::Name>(selectedEntity);
 
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 		changed = inputText("##Name", name.name);
@@ -148,98 +154,6 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity selectedEntity
 			EntityProperties::addComponentMenu(registry, selectedEntity);
 		}
 	}
-}
-
-EditorMainMenu::EditorMainMenu(std::filesystem::path& rootPath, std::filesystem::path& scenePath) : mMenuBar{}
-{
-	auto openAction = MainMenuOption::Unknown;
-
-	{
-		auto menu = ui::Menu{"File"};
-		if (menu.item("Open Project", "CTRL+SHIFT+O"))
-			openAction = MainMenuOption::OpenProject;
-
-		if (menu.item("New Scene", "CTRL+N"))
-			openAction = MainMenuOption::NewScene;
-
-		if (menu.item("Open Scene", "CTRL+O"))
-			openAction = MainMenuOption::OpenScene;
-
-		if (menu.item("Save Scene", "CTRL+S"))
-			openAction = MainMenuOption::SaveScene;
-	}
-
-	if (openAction != MainMenuOption::Unknown)
-	{
-		const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		const ImVec2 size = ImGui::GetWindowSize();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		ImGui::SetNextWindowSize(ImVec2(size.x / 2, size.y / 2));
-	}
-
-	switch (openAction)
-	{
-	case MainMenuOption::OpenProject:
-		ui::OpenProjectModal::open();
-		break;
-	case MainMenuOption::SaveScene:
-		ui::SaveSceneModal::open();
-		break;
-	case MainMenuOption::OpenScene:
-		ui::OpenSceneModal::open();
-		break;
-	case MainMenuOption::NewScene:
-		ui::NewSceneModal::open();
-		break;
-	case MainMenuOption::Unknown:
-		break;
-	}
-
-	mSelectedOption = MainMenuOption::Unknown;
-
-	{
-		auto modal = ui::OpenProjectModal{rootPath};
-		if (modal.onConfirm())
-			mSelectedOption = MainMenuOption::OpenProject;
-	}
-
-	{
-		auto modal = ui::SaveSceneModal{scenePath};
-		if (modal.onConfirm())
-			mSelectedOption = MainMenuOption::SaveScene;
-	}
-
-	{
-		auto modal = ui::OpenSceneModal{scenePath};
-		if (modal.onConfirm())
-			mSelectedOption = MainMenuOption::OpenScene;
-	}
-
-	{
-		auto modal = ui::NewSceneModal{};
-		if (modal.onConfirm())
-			mSelectedOption = MainMenuOption::NewScene;
-	}
-}
-
-bool EditorMainMenu::onOpenProject()
-{
-	return mSelectedOption == MainMenuOption::OpenProject;
-}
-
-bool EditorMainMenu::onNewScene()
-{
-	return mSelectedOption == MainMenuOption::NewScene;
-}
-
-bool EditorMainMenu::onOpenScene()
-{
-	return mSelectedOption == MainMenuOption::OpenScene;
-}
-
-bool EditorMainMenu::onSaveScene()
-{
-	return mSelectedOption == MainMenuOption::SaveScene;
 }
 
 NewSceneModal::NewSceneModal() : mModal{"New Scene"}
@@ -400,24 +314,23 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::EntityName>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
+			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
-				.getEntities<const ecs::EntityName>(
+				.getEntities<const ecs::Name>(
 					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
 	}
 
-
 	return changed;
 }
 
 bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity)
 {
-	const auto& name = registry.getComponent<ecs::EntityName>(entity);
+	const auto& name = registry.getComponent<ecs::Name>(entity);
 
 	ImGui::TableNextRow();
 	ImGui::TableNextColumn();
@@ -464,8 +377,8 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
 		ImGui::TableHeadersRow();
 
-		registry.getEntities<const ecs::EntityName, const ecs::tags::IsMaterial>().each([&](ecs::Entity entity,
-																							const auto& name) {
+		registry.getEntities<const ecs::Name, const ecs::tags::IsMaterial>().each([&](ecs::Entity entity,
+																					  const auto& name) {
 			if (!boost::algorithm::contains(name.c_str(), search))
 				return;
 
@@ -539,7 +452,8 @@ bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedE
 							 .withName(result->stem().string())
 							 .asTransform()
 							 .withPosition(createEntityPosition)
-							 .asMesh(result.value());
+							 .asMesh()
+							 .withPath(result.value());
 
 		return true;
 	}
@@ -571,7 +485,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Cube")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh("editor://meshes/cube.filamesh")
+						.asMesh()
+						.withPath("editor://meshes/cube.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -583,7 +498,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Plane")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh("editor://meshes/plane.filamesh")
+						.asMesh()
+						.withPath("editor://meshes/plane.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -595,7 +511,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Sphere")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh("editor://meshes/sphere.filamesh")
+						.asMesh()
+						.withPath("editor://meshes/sphere.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -607,7 +524,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Cylinder")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh("editor://meshes/cylinder.filamesh")
+						.asMesh()
+						.withPath("editor://meshes/cylinder.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -646,7 +564,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 	if (menu.item("Perspective Camera"))
 	{
 		newEntity = ecs::build(registry)
-						.withName(fmt::format("Perspective Camera"))
+						.withName("Perspective Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asPerspectiveCamera();
@@ -656,12 +574,14 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 	if (menu.item("Orthographic Camera"))
 	{
 		newEntity = ecs::build(registry)
-						.withName(fmt::format("Orthographic Camera"))
+						.withName("Orthographic Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asOrthographicCamera();
 		changed = true;
 	}
+
+	ImGui::Separator();
 
 	if (registry.isValid(newEntity))
 	{
@@ -674,7 +594,135 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 	return changed;
 }
 
-bool SceneOptionsMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
+
+bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+									math::float3 createEntitiesPosition)
+{
+	if (!registry.isValid(selectedEntity))
+		return false;
+
+	auto* name = registry.tryGetComponent<ecs::Name>(selectedEntity);
+	auto menu = Menu{name ? fmt::format("Add Child to \"{}\"", name->c_str()) : "Add Child"};
+
+	if (!menu.isOpen())
+		return false;
+	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition, true);
+}
+
+bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	if (!registry.isValid(selectedEntity))
+		return false;
+
+	auto* name = registry.tryGetComponent<ecs::Name>(selectedEntity);
+	bool changed = false;
+	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
+	{
+		if (registry.hasAnyComponent<ecs::Child>(selectedEntity))
+			ecs::Child::remove(registry, selectedEntity);
+
+		if (registry.hasAnyComponent<ecs::Parent>(selectedEntity))
+			ecs::Parent::destroyChildren(registry, selectedEntity);
+
+		registry.destroy(selectedEntity);
+		selectedEntity = ecs::NullEntity;
+		changed = true;
+	}
+
+	return changed;
+}
+
+bool EditorMainMenu::fileMenu(std::filesystem::path& rootPath, std::filesystem::path& currentPath, std::filesystem::path& scenePath, bool& clearSceneFlag, bool& saveSceneFlag, bool& reloadSceneFlag)
+{
+	bool changed = false;
+	auto action = FileMenuAction::Unknown;
+
+	{
+		auto menu = ui::Menu{"File"};
+		if (menu.item("Open Project", "CTRL+SHIFT+O"))
+			action = FileMenuAction::OpenProject;
+
+		if (menu.item("New Scene", "CTRL+N"))
+			action = FileMenuAction::NewScene;
+
+		if (menu.item("Open Scene", "CTRL+O"))
+			action = FileMenuAction::OpenScene;
+
+		if (menu.item("Save Scene", "CTRL+S"))
+			action = FileMenuAction::SaveScene;
+	}
+
+	if (action != FileMenuAction::Unknown)
+	{
+		const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		const ImVec2 size = ImGui::GetWindowSize();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowSize(ImVec2(size.x / 2, size.y / 2));
+	}
+
+	switch (action)
+	{
+	case FileMenuAction::OpenProject:
+		ui::OpenProjectModal::open();
+		break;
+	case FileMenuAction::SaveScene:
+		ui::SaveSceneModal::open();
+		break;
+	case FileMenuAction::OpenScene:
+		ui::OpenSceneModal::open();
+		break;
+	case FileMenuAction::NewScene:
+		ui::NewSceneModal::open();
+		break;
+	case FileMenuAction::Unknown:
+		break;
+	}
+
+	static std::filesystem::path currentProjectFolder = "";
+	static std::filesystem::path currentScenePath = "";
+
+	{
+		auto modal = ui::OpenProjectModal{currentProjectFolder};
+		if (modal.onConfirm()) {
+			rootPath = currentProjectFolder;
+			currentPath = "";
+			currentScenePath = "scenes/scene.spatial.xml";
+			scenePath = currentScenePath;
+			clearSceneFlag = true;
+			changed = true;
+		}
+	}
+
+	{
+		auto modal = ui::SaveSceneModal{currentScenePath};
+		if (modal.onConfirm()) {
+			scenePath = currentScenePath;
+			saveSceneFlag = true;
+			changed = true;
+		}
+	}
+
+	{
+		auto modal = ui::OpenSceneModal{scenePath};
+		if (modal.onConfirm()) {
+			scenePath = currentScenePath;
+			reloadSceneFlag = true;
+		}
+
+	}
+
+	{
+		auto modal = ui::NewSceneModal{};
+		if (modal.onConfirm()) {
+			clearSceneFlag = true;
+			changed = true;
+		}
+	}
+
+	return changed;
+}
+
+bool EditorMainMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
 {
 	auto menu = Menu{"View"};
 	if (!menu.isOpen())
@@ -689,60 +737,6 @@ bool SceneOptionsMenu::viewOptionsMenu(bool& isEditorEntitiesShowing)
 	}
 
 	return changed;
-}
-
-bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-									math::float3 createEntitiesPosition)
-{
-	if (!registry.isValid(selectedEntity))
-		return false;
-
-	auto* name = registry.tryGetComponent<ecs::EntityName>(selectedEntity);
-	auto menu = Menu{name ? fmt::format("Add Child to \"{}\"", name->c_str()) : "Add Child"};
-
-	if (!menu.isOpen()) return false;
-	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition, true);
-}
-
-bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
-{
-	if (!registry.isValid(selectedEntity)) return false;
-
-	auto* name = registry.tryGetComponent<ecs::EntityName>(selectedEntity);
-	bool changed = false;
-	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
-	{
-		if (registry.hasAnyComponent<ecs::Child>(selectedEntity))
-			ecs::Child::remove(registry, selectedEntity);
-
-		if (registry.hasAnyComponent<ecs::Parent>(selectedEntity)) {
-			ecs::Parent::destroyChildren(registry, selectedEntity);
-		}
-
-		registry.destroy(selectedEntity);
-		selectedEntity = ecs::NullEntity;
-		changed = true;
-	}
-
-	return changed;
-}
-
-void CameraView::image(ecs::Registry& registry, ecs::Entity cameraEntity, math::float2 imageSize)
-{
-	const auto* cameraRenderTextureView = registry.tryGetComponent<const render::TextureView>(cameraEntity);
-	auto* perspectiveCamera = registry.tryGetComponent<ecs::PerspectiveCamera>(cameraEntity);
-	auto* orthographicCamera = registry.tryGetComponent<ecs::OrthographicCamera>(cameraEntity);
-
-	const auto aspectRatio = static_cast<double>(imageSize.x) / static_cast<double>(imageSize.y);
-
-	if (perspectiveCamera)
-		perspectiveCamera->aspectRatio = aspectRatio;
-
-	if (orthographicCamera)
-		orthographicCamera->setAspectRatio(aspectRatio);
-
-	if (cameraRenderTextureView)
-		ui::image(cameraRenderTextureView->getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 }
 
 } // namespace spatial::ui

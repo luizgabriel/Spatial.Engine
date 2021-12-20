@@ -4,12 +4,10 @@
 #include <image/KtxUtility.h>
 #include <sstream>
 
-namespace fl = filament;
-
 namespace spatial::render
 {
 
-Texture createKtxTexture(fl::Engine& engine, const uint8_t* data, uint32_t size)
+Texture createKtxTexture(filament::Engine& engine, const uint8_t* data, uint32_t size)
 {
 	using namespace std;
 
@@ -17,66 +15,75 @@ Texture createKtxTexture(fl::Engine& engine, const uint8_t* data, uint32_t size)
 	return Texture{engine, image::ktx::createTexture(&engine, ktxBundle, true)};
 }
 
+std::istream& operator>>(std::istream& istream, bands_t& bands)
+{
+	istream >> std::skipws;
+
+	char c;
+	for (auto& band : bands)
+	{
+		while (!istream.eof() && istream >> c && c != '(')
+			;
+
+		istream >> band.r;
+		istream >> c;
+		istream >> band.g;
+		istream >> c;
+		istream >> band.b;
+	}
+
+	return istream;
+}
+
 bands_t parseShFile(const uint8_t* data, uint32_t size)
 {
 	auto bands = bands_t{};
 	auto stream = std::stringstream{};
 	std::copy(data, data + size, std::ostream_iterator<char>(stream));
-
-	stream >> std::skipws;
-
-	char c;
-	for (auto& band : bands)
-	{
-		while (!stream.eof() && stream >> c && c != '(')
-			;
-
-		stream >> band.r;
-		stream >> c;
-		stream >> band.g;
-		stream >> c;
-		stream >> band.b;
-	}
-
+	stream >> bands;
 	return bands;
 }
 
-Skybox createSkybox(fl::Engine& engine, fl::math::float4 color)
+Skybox createSkybox(filament::Engine& engine, filament::math::float4 color)
 {
-	auto resource = fl::Skybox::Builder().color(color).build(engine);
+	auto resource = filament::Skybox::Builder().color(color).build(engine);
 
 	return createResource(engine, resource);
 }
 
-Skybox createSkybox(fl::Engine& engine, fl::Texture& skybox, bool showSun)
+Skybox createSkybox(filament::Engine& engine, filament::Texture& skybox, bool showSun)
 {
-	auto resource = fl::Skybox::Builder().environment(&skybox).showSun(showSun).build(engine);
+	auto resource = filament::Skybox::Builder().environment(&skybox).showSun(showSun).build(engine);
 
 	return createResource(engine, resource);
 }
 
-IndirectLight createImageBasedLight(fl::Engine& engine, fl::Texture& cubemap, const bands_t& bands, float intensity)
-{
-	auto light =
-		fl::IndirectLight::Builder().reflections(&cubemap).irradiance(3, &bands[0]).intensity(intensity).build(engine);
-
-	return createResource(engine, light);
-}
-
-IndirectLight createImageBasedLight(fl::Engine& engine, fl::Texture& cubemap, fl::Texture& irradianceCubemap,
+IndirectLight createImageBasedLight(filament::Engine& engine, const filament::Texture& cubeMap, const bands_t& bands,
 									float intensity)
 {
-	auto light = fl::IndirectLight::Builder()
-					 .reflections(&cubemap)
-					 .irradiance(&irradianceCubemap)
+	auto light = filament::IndirectLight::Builder()
+					 .reflections(&cubeMap)
+					 .irradiance(3, &bands[0])
 					 .intensity(intensity)
 					 .build(engine);
 
 	return createResource(engine, light);
 }
 
-IndirectLight createImageBasedLight(filament::Engine& engine, filament::Texture& cubemap,
-									const uint8_t* data, uint32_t size, float intensity)
+IndirectLight createImageBasedLight(filament::Engine& engine, const filament::Texture& cubeMap,
+									const filament::Texture& irradianceCubeMap, float intensity)
+{
+	auto light = filament::IndirectLight::Builder()
+					 .reflections(&cubeMap)
+					 .irradiance(&irradianceCubeMap)
+					 .intensity(intensity)
+					 .build(engine);
+
+	return createResource(engine, light);
+}
+
+IndirectLight createImageBasedLight(filament::Engine& engine, const filament::Texture& cubemap, const uint8_t* data,
+									uint32_t size, float intensity)
 {
 	const auto bands = parseShFile(data, size);
 	return createImageBasedLight(engine, cubemap, bands, intensity);

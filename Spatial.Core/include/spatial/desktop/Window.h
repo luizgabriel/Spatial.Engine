@@ -3,8 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/common/Key.h>
-#include <spatial/common/Signal.h>
 #include <spatial/common/Math.h>
+#include <spatial/common/Signal.h>
 #include <string_view>
 #include <type_traits>
 
@@ -82,4 +82,4 @@ class PlatformContext
 	static void setupCallbacks(GLFWwindow* window);
 };
 
-} // namespace spatial
+} // namespace spatial::desktop

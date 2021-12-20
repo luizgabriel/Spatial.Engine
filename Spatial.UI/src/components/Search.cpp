@@ -1,5 +1,5 @@
-#include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/Search.h>
 
 namespace spatial::ui
 {

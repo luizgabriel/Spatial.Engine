@@ -2,14 +2,14 @@
 #include <imgui.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/Icons.h>
 #include <spatial/ui/components/DragAndDrop.h>
+#include <spatial/ui/components/Icons.h>
 
 namespace spatial::ui
 {
 
-bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath,
-								  std::filesystem::path& selectedPath, const filament::Texture* icon)
+bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
+								  const filament::Texture* icon)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
@@ -30,7 +30,8 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath,
 		if (entry.is_directory())
 		{
 			ImGui::PushID(path.c_str());
-			if (icon ? imageButton(*icon, size, gIcons.folder.uv()) : ImGui::Button("Directory", ImVec2(size.x, size.y)))
+			if (icon ? imageButton(*icon, size, gIcons.folder.uv())
+					 : ImGui::Button("Directory", ImVec2(size.x, size.y)))
 			{
 				selectedPath = path;
 				selected = true;
@@ -41,7 +42,8 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath,
 		if (entry.is_regular_file())
 		{
 			const auto filename = entry.path().filename().string();
-			if (starts_with(filename, ".")) continue;
+			if (starts_with(filename, "."))
+				continue;
 
 			const auto fileButton = [&](const math::float4& uv) {
 				ImGui::PushID(filename.data());
@@ -67,9 +69,8 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath,
 
 			{
 				auto dnd = DragAndDropSource{};
-				if (dnd.isStarted()) {
+				if (dnd.isStarted())
 					dnd.setPayload(DND_SELECTED_FILE, std::filesystem::relative(path, rootPath));
-				}
 			}
 		}
 

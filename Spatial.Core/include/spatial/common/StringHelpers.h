@@ -1,9 +1,9 @@
 #pragma once
 
+#include <entt/core/hashed_string.hpp>
 #include <span>
 #include <string_view>
 #include <vector>
-#include <entt/core/hashed_string.hpp>
 
 namespace spatial
 {

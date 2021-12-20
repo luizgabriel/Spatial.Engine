@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bitset>
-#include <spatial/common/Math.h>
 #include <spatial/common/Key.h>
+#include <spatial/common/Math.h>
 
 namespace spatial::desktop
 {
@@ -63,4 +63,4 @@ class InputState
 	float axis(Key positive, Key negative) const;
 };
 
-} // namespace spatial
+} // namespace spatial::desktop

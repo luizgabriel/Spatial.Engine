@@ -17,7 +17,6 @@ bool Menu::item(const std::string_view name) const
 	return itemButton(name.data());
 }
 
-
 bool Menu::item(const std::string_view name, const std::string_view shortcut) const
 {
 	if (!isOpen())

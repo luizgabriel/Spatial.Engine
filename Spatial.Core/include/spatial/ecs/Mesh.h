@@ -13,7 +13,7 @@ struct Mesh
 {
 	constexpr static uint8_t MAX_GEOMETRIES = 16;
 
-	//TODO: Use a resource UUID instead of the direct path
+	// TODO: Use a resource UUID instead of the direct path
 	std::filesystem::path resourcePath;
 
 	bool castShadows{false};
@@ -25,8 +25,7 @@ struct Mesh
 
 	Entity defaultMaterial{ecs::NullEntity};
 
-	explicit Mesh(std::filesystem::path resourcePath = {})
-		: resourcePath{std::move(resourcePath)}
+	explicit Mesh(std::filesystem::path resourcePath = {}) : resourcePath{std::move(resourcePath)}
 	{
 	}
 

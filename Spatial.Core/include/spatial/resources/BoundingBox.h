@@ -1,6 +1,6 @@
 #include <filament/Box.h>
-#include <spatial/common/Math.h>
 #include <istream>
+#include <spatial/common/Math.h>
 
 namespace spatial
 {
@@ -8,5 +8,3 @@ namespace spatial
 std::istream& operator>>(std::istream& stream, filament::Box& box);
 
 }
-
-

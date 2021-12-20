@@ -1,14 +1,16 @@
 #pragma once
 
-#include "EntityHandle.h"
-#include "EntityName.h"
-#include "Mesh.h"
-#include "Tags.h"
+#include "SkyBox.h"
 #include <spatial/common/Math.h>
 #include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Camera.h>
+#include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
+#include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/ecs/Transform.h>
 
 namespace spatial::ecs
@@ -24,16 +26,21 @@ class PointLightEntityBuilder;
 class SpotLightEntityBuilder;
 class DirectionalLightEntityBuilder;
 class SunLightEntityBuilder;
+class IndirectLightEntityBuilder;
 
 template <typename MaterialComponent>
 class MaterialEntityBuilder;
 
 class MeshEntityBuilder;
 
+class SceneViewEntityBuilder;
+
+class SkyBoxColorEntityBuilder;
+
 class EntityBuilder
 {
   public:
-	EntityBuilder(Registry& registry);
+	explicit EntityBuilder(Registry& registry);
 
 	EntityBuilder(Registry& registry, Entity entity);
 
@@ -70,8 +77,12 @@ class EntityBuilder
 	SpotLightEntityBuilder asSpotLight();
 	DirectionalLightEntityBuilder asDirectionalLight();
 	SunLightEntityBuilder asSunLight();
+	IndirectLightEntityBuilder asIndirectLight();
+	SceneViewEntityBuilder asSceneView();
 
-	MeshEntityBuilder asMesh(std::filesystem::path path);
+	MeshEntityBuilder asMesh();
+
+	SkyBoxColorEntityBuilder asSkyBoxColor();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -104,7 +115,7 @@ template <typename Component>
 class BasicEntityBuilder : public EntityBuilder
 {
   public:
-	BasicEntityBuilder(Registry& registry, Entity entity): EntityBuilder(registry, entity)
+	BasicEntityBuilder(Registry& registry, Entity entity) : EntityBuilder(registry, entity)
 	{
 		with(Component{});
 	}
@@ -217,6 +228,18 @@ class SunLightEntityBuilder : public BasicEntityBuilder<SunLight>
 	SunLightEntityBuilder& withCastShadows(bool castShadows);
 };
 
+class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
+{
+  public:
+	using Base = BasicEntityBuilder<IndirectLight>;
+
+	IndirectLightEntityBuilder(Registry& registry, Entity entity);
+
+	IndirectLightEntityBuilder& withIntensity(float intensity);
+	IndirectLightEntityBuilder& withReflectionsTexturePath(std::filesystem::path path);
+	IndirectLightEntityBuilder& withIrradianceValuesPath(std::filesystem::path path);
+};
+
 template <typename MaterialComponent>
 class MaterialEntityBuilder : public EntityBuilder
 {
@@ -228,7 +251,8 @@ class MaterialEntityBuilder : public EntityBuilder
 		this->template with<MaterialComponent>(std::forward<Args>(args)...);
 	}
 
-	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params) : EntityBuilder(registry, entity)
+	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params)
+		: EntityBuilder(registry, entity)
 	{
 		this->with<ecs::tags::IsMaterial>();
 		this->template with<MaterialComponent>(std::move(params));
@@ -240,13 +264,34 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
   public:
 	using Base = BasicEntityBuilder<Mesh>;
 
-	MeshEntityBuilder(Registry& registry, Entity entity, std::filesystem::path resourcePath);
+	MeshEntityBuilder(Registry& registry, Entity entity);
 
+	MeshEntityBuilder& withPath(std::filesystem::path resourcePath);
 	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
-
 	MeshEntityBuilder& withMaterial(Entity materialEntity);
-
 	MeshEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
+};
+
+class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
+{
+  public:
+	using Base = BasicEntityBuilder<SceneView>;
+
+	SceneViewEntityBuilder(Registry& registry, Entity entity);
+	SceneViewEntityBuilder& withCamera(ecs::Entity cameraEntity);
+	SceneViewEntityBuilder& withSkyBox(ecs::Entity skyboxEntity);
+	SceneViewEntityBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
+};
+
+class SkyBoxColorEntityBuilder : public BasicEntityBuilder<SkyBoxColor>
+{
+  public:
+	using Base = BasicEntityBuilder<SceneView>;
+
+	SkyBoxColorEntityBuilder(Registry& registry, Entity entity);
+
+	SkyBoxColorEntityBuilder& withIntensity(float intensity);
+	SkyBoxColorEntityBuilder& withColor(math::float4 color);
 };
 
 } // namespace spatial::ecs

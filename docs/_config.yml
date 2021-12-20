@@ -5,7 +5,7 @@ description: >-
   This projects uses C++17 and modern cmake features.
 baseurl: "/Spatial.Engine"
 url: "https://luizgabriel.github.io"
-github_username:  luizgabriel
+github_username: luizgabriel
 
 # Build settings
 remote_theme: pmarsceill/just-the-docs
