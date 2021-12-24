@@ -37,6 +37,8 @@ class SceneViewEntityBuilder;
 
 class SkyBoxColorEntityBuilder;
 
+class SkyBoxEntityBuilder;
+
 class EntityBuilder
 {
   public:
@@ -83,6 +85,8 @@ class EntityBuilder
 	MeshEntityBuilder asMesh();
 
 	SkyBoxColorEntityBuilder asSkyBoxColor();
+
+	SkyBoxEntityBuilder asSkyBox();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -290,8 +294,17 @@ class SkyBoxColorEntityBuilder : public BasicEntityBuilder<SkyBoxColor>
 
 	SkyBoxColorEntityBuilder(Registry& registry, Entity entity);
 
-	SkyBoxColorEntityBuilder& withIntensity(float intensity);
 	SkyBoxColorEntityBuilder& withColor(math::float4 color);
+};
+
+class SkyBoxEntityBuilder : public BasicEntityBuilder<SkyBoxTexture>
+{
+  public:
+	using Base = BasicEntityBuilder<SkyBoxTexture>;
+
+	SkyBoxEntityBuilder(Registry& registry, Entity entity);
+
+	SkyBoxEntityBuilder& withTexture(const std::filesystem::path& path);
 };
 
 } // namespace spatial::ecs

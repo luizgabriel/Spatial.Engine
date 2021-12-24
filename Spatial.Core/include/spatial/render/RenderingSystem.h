@@ -12,10 +12,10 @@ class RenderingSystem
   public:
 	using Backend = filament::backend::Backend;
 
-	RenderingSystem(void* nativeWindowHandle);
+	explicit RenderingSystem(void* nativeWindowHandle);
 
 	template <typename WindowImpl>
-	RenderingSystem(WindowImpl& window) : RenderingSystem(window.getNativeHandle())
+	explicit RenderingSystem(WindowImpl& window) : RenderingSystem(window.getNativeHandle())
 	{
 	}
 
@@ -24,7 +24,7 @@ class RenderingSystem
 
 	void onEndFrame();
 
-	const auto& getEngine() const
+	[[nodiscard]] const auto& getEngine() const
 	{
 		return *mEngine.get();
 	}
@@ -32,11 +32,6 @@ class RenderingSystem
 	auto& getEngine()
 	{
 		return *mEngine.get();
-	}
-
-	auto& getRenderer()
-	{
-		return mRenderer.ref();
 	}
 
 	auto& getOnRenderSignal()

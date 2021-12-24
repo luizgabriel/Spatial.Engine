@@ -29,7 +29,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Tags.h
         include/spatial/ecs/EntityBuilder.h
         include/spatial/ecs/Relation.h
-        include/spatial/ecs/UpdateSystem.h
+        include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SkyBox.h
         include/spatial/ecs/SceneView.h
 
@@ -51,6 +51,7 @@ add_library(Spatial.Core
         include/spatial/render/MeshController.h
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
+        include/spatial/render/SkyBoxController.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -104,6 +105,7 @@ add_library(Spatial.Core
         src/render/SceneController.cpp
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
+        src/render/SkyBoxController.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp

@@ -24,7 +24,8 @@ math::float2 Window::getSize() const
 
 void Window::setSize(const math::float2& size)
 {
-	ImGui::SetWindowSize(ImVec2(size.x, size.y));
+	if (isOpen())
+		ImGui::SetWindowSize(ImVec2(size.x, size.y));
 }
 
 math::float2 Window::getPosition() const
@@ -35,12 +36,13 @@ math::float2 Window::getPosition() const
 
 void Window::setPosition(const math::float2& size)
 {
-	ImGui::SetWindowPos(ImVec2(size.x, size.y));
+	if (isOpen())
+		ImGui::SetWindowPos(ImVec2(size.x, size.y));
 }
 
 bool Window::isFocused() const
 {
-	return ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+	return isOpen() && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 }
 
 bool Window::isOpen() const

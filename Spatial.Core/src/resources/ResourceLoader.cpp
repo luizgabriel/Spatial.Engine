@@ -10,12 +10,12 @@ namespace spatial
 tl::expected<std::filesystem::path, ResourceError> makeAbsolutePath(const std::filesystem::path& rootPath,
 																	const std::filesystem::path& resourcePath)
 {
-	auto finalPath = (rootPath / resourcePath).lexically_normal();
+	const auto finalPath = (rootPath / resourcePath).lexically_normal();
 
 	auto [rootEnd, nothing] = std::mismatch(rootPath.begin(), rootPath.end(), finalPath.begin());
 
 	if (rootEnd != rootPath.end())
-		return tl::unexpected(ResourceError::UnauthorizedPath);
+		return tl::make_unexpected(ResourceError::UnauthorizedPath);
 
 	return finalPath;
 }
@@ -23,19 +23,19 @@ tl::expected<std::filesystem::path, ResourceError> makeAbsolutePath(const std::f
 tl::expected<std::filesystem::path, ResourceError> validateResourcePath(std::filesystem::path&& resourceAbsolutePath)
 {
 	if (!std::filesystem::exists(resourceAbsolutePath))
-		return tl::unexpected(ResourceError::NotFound);
+		return tl::make_unexpected(ResourceError::NotFound);
 
 	if (!std::filesystem::is_regular_file(resourceAbsolutePath))
-		return tl::unexpected(ResourceError::NotAFile);
+		return tl::make_unexpected(ResourceError::NotAFile);
 
-	return std::filesystem::path{std::move(resourceAbsolutePath)};
+	return resourceAbsolutePath;
 }
 
 tl::expected<std::ifstream, ResourceError> openFileReadStream(const std::filesystem::path& resourceAbsolutePath)
 {
 	auto ifs = std::ifstream{resourceAbsolutePath};
 	if (!ifs)
-		return tl::unexpected(ResourceError::OpenFailed);
+		return tl::make_unexpected(ResourceError::OpenFailed);
 
 	return ifs;
 }
@@ -44,7 +44,7 @@ tl::expected<std::ofstream, ResourceError> openFileWriteStream(const std::filesy
 {
 	auto ofs = std::ofstream{resourceAbsolutePath};
 	if (!ofs)
-		return tl::unexpected(ResourceError::OpenFailed);
+		return tl::make_unexpected(ResourceError::OpenFailed);
 
 	return ofs;
 }

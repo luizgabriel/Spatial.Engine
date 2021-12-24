@@ -81,6 +81,11 @@ SkyBoxColorEntityBuilder EntityBuilder::asSkyBoxColor()
 	return {mRegistry, mEntity};
 }
 
+SkyBoxEntityBuilder EntityBuilder::asSkyBox()
+{
+	return {mRegistry, mEntity};
+}
+
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 }
@@ -400,7 +405,7 @@ SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity in
 SkyBoxColorEntityBuilder::SkyBoxColorEntityBuilder(Registry& registry, Entity entity)
 	: BasicEntityBuilder(registry, entity)
 {
-	with<tags::IsSkyBox>();
+	with<tags::IsSkyBox>().with<tags::IsMaterial>();
 }
 
 SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withColor(math::float4 color)
@@ -409,9 +414,14 @@ SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withColor(math::float4 color
 	return *this;
 }
 
-SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withIntensity(float intensity)
+SkyBoxEntityBuilder::SkyBoxEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
 {
-	getComponent().intensity = intensity;
+	with<tags::IsSkyBox>().with<tags::IsMaterial>();
+}
+
+SkyBoxEntityBuilder& SkyBoxEntityBuilder::withTexture(const std::filesystem::path& path)
+{
+	getComponent().texturePath = path;
 	return *this;
 }
 

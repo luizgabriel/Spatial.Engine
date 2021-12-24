@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/common/StringHelpers.h>
 
 namespace spatial::ecs
 {
@@ -10,14 +11,21 @@ namespace spatial::ecs
 struct SkyBoxColor
 {
 	math::float4 color{.0f};
-	float intensity{30000};
 };
 
 struct SkyBoxTexture
 {
-	std::filesystem::path texturePath{};
+	std::filesystem::path texturePath;
 	bool showSun{true};
-	float intensity{30000};
+
+	explicit SkyBoxTexture(std::filesystem::path texturePath = {}) : texturePath{std::move(texturePath)}
+	{
+	}
+
+	[[nodiscard]] uint32_t getResourceId() const
+	{
+		return HashedString{texturePath.c_str()}.value();
+	}
 };
 
 } // namespace spatial::ecs
