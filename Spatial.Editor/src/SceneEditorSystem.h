@@ -5,6 +5,7 @@
 #include "EditorCamera.h"
 #include "EditorCameraController.h"
 #include "Settings.h"
+#include "Jobs.h"
 
 #include <filament/Viewport.h>
 #include <spatial/common/Math.h>
@@ -19,6 +20,7 @@
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
+#include <spatial/render/SkyBoxController.h>
 
 namespace fl = filament;
 
@@ -34,10 +36,6 @@ class SceneEditorSystem
 	render::Material mDefaultMaterial;
 	render::Texture mIconTexture;
 
-	// TODO: Handle multiple scenes
-	// std::vector<ecs::Registry> mOpenedScenes;
-	// std::size_t mCurrentSelectedScene;
-
 	ecs::Registry mRegistry;
 
 	EditorCameraController mEditorCameraController;
@@ -49,13 +47,13 @@ class SceneEditorSystem
 	render::LightController mLightController;
 	render::MeshController mMeshController;
 	render::IndirectLightController mIndirectLightController;
+	render::SkyBoxController mSkyboxController;
+
+	EventQueue mJobQueue;
 
 	std::filesystem::path mRootPath;
 	std::filesystem::path mScenePath;
-
-	bool mIsReloadSceneFlagEnabled;
-	bool mIsClearSceneFlagEnabled;
-	bool isSaveSceneFlagEnabled;
+	std::filesystem::path mCurrentPath;
 
   public:
 	SceneEditorSystem(filament::Engine& engine, desktop::Window& window);
@@ -73,6 +71,19 @@ class SceneEditorSystem
 	void onRender(filament::Renderer& renderer) const;
 
 	void setRootPath(const std::filesystem::path& path);
+	void setScenePath(const std::filesystem::path& path);
+
+	void clearScene();
+	void loadScene();
+	void saveScene();
+
+	friend class EventQueue;
+
+  private:
+	void onEvent(const ClearSceneEvent& event);
+	void onEvent(const LoadSceneEvent& event);
+	void onEvent(const SaveSceneEvent& event);
+	void onEvent(const OpenProjectEvent& event);
 };
 
 } // namespace spatial::editor

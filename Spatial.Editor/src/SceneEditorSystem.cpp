@@ -7,6 +7,7 @@
 
 #include <assets/generated.h>
 
+#include <spatial/common/EventQueue.h>
 #include <spatial/core/Logger.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/ResourceLoaders.h>
@@ -52,13 +53,12 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mLightController{mEngine},
 	  mMeshController{mEngine},
 	  mIndirectLightController{mEngine},
+	  mSkyboxController{mEngine},
 
-	  mRootPath{},
-	  mScenePath{"scenes/default.spatial.xml"},
+	  mJobQueue{},
 
-	  mIsReloadSceneFlagEnabled{false},
-	  mIsClearSceneFlagEnabled{false},
-	  isSaveSceneFlagEnabled{false}
+	  mRootPath{}
+
 {
 	auto materialInstance = toShared(render::createMaterialInstance(mEngine, mDefaultMaterial.ref()));
 	materialInstance->setParameter("baseColor", math::float3{1.0f});
@@ -67,6 +67,11 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	materialInstance->setParameter("reflectance", .1f);
 
 	mMeshController.setDefaultMaterialInstance(materialInstance);
+
+	mJobQueue.connect<OpenProjectEvent>(*this);
+	mJobQueue.connect<ClearSceneEvent>(*this);
+	mJobQueue.connect<LoadSceneEvent>(*this);
+	mJobQueue.connect<SaveSceneEvent>(*this);
 }
 
 void SceneEditorSystem::onStart()
@@ -88,44 +93,8 @@ void SceneEditorSystem::onStart()
 
 void SceneEditorSystem::onStartFrame(float)
 {
-	if (mIsClearSceneFlagEnabled)
-	{
-		mRegistry = ecs::Registry{};
-		mIsClearSceneFlagEnabled = false;
-	}
+	mJobQueue.update();
 
-	if (mIsReloadSceneFlagEnabled)
-	{
-		auto result = makeAbsolutePath(mRootPath, mScenePath)
-						  .and_then(validateResourcePath)
-						  .and_then(openFileReadStream)
-						  .and_then(parseRegistry)
-						  .map_error(logResourceError);
-
-		if (!result.has_value())
-			return;
-
-		mRegistry = std::move(result.value());
-		mIsReloadSceneFlagEnabled = false;
-	}
-
-	if (isSaveSceneFlagEnabled)
-	{
-		auto result = makeAbsolutePath(mRootPath, mScenePath)
-						  .and_then(validateResourcePath)
-						  .and_then(openFileWriteStream)
-						  .map_error(logResourceError);
-		if (!result.has_value()) return;
-
-		auto xml = XMLOutputArchive{result.value()};
-		ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
-
-		isSaveSceneFlagEnabled = false;
-	}
-}
-
-void SceneEditorSystem::onUpdateFrame(float delta)
-{
 	auto editorSceneViewEntity = mRegistry.getFirstEntity<ecs::SceneView, tags::IsEditorView>();
 	if (!mRegistry.isValid(editorSceneViewEntity))
 	{
@@ -144,18 +113,22 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 							.withFieldOfView(60.0)
 							.withAspectRatio(19.0 / 6.0))
 			.withSkyBox(ecs::build(mRegistry)
-							.withName("Default SkyBox")
+							.withName("Editor SkyBox")
 							.with<tags::IsEditorEntity>()
 							.asSkyBoxColor()
 							.withColor({0.5f, 0.5f, 0.5f, 1.0f}));
 	}
+}
 
+void SceneEditorSystem::onUpdateFrame(float delta)
+{
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 	mSceneController.onUpdateFrame(mRegistry);
 	mTransformController.onUpdateFrame(mRegistry);
 	mCameraController.onUpdateFrame(mRegistry);
 	mLightController.onUpdateFrame(mRegistry);
 	mIndirectLightController.onUpdateFrame(mRegistry);
+	mSkyboxController.onUpdateFrame(mRegistry);
 	mMeshController.onUpdateFrame(mRegistry, delta);
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
 }
@@ -166,11 +139,18 @@ void SceneEditorSystem::onDrawGui()
 
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
-	static std::filesystem::path currentFolder;
 
 	ui::MenuBar::show([this]() {
-		ui::EditorMainMenu::fileMenu(mRootPath, currentFolder, mScenePath, mIsClearSceneFlagEnabled, isSaveSceneFlagEnabled, mIsReloadSceneFlagEnabled);
+		ui::EditorMainMenu::fileMenu();
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
+
+		ui::OpenProjectModal::onConfirm(mCurrentPath, [this](const auto& path) {
+			mJobQueue.enqueue<OpenProjectEvent>(path);
+		});
+
+		ui::OpenSceneModal::onConfirm(mScenePath, [this](const auto& path) {
+			mJobQueue.enqueue<LoadSceneEvent>(path);
+		});
 	});
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
@@ -200,7 +180,9 @@ void SceneEditorSystem::onDrawGui()
 		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
 			mEditorCameraController.disable();
 
-		mIsReloadSceneFlagEnabled |= ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity);
+		if (ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity))
+			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
+
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity, createEntityPosition);
 	}
 
@@ -221,7 +203,7 @@ void SceneEditorSystem::onDrawGui()
 
 		static std::string search;
 		ui::Search::searchText(search);
-		ui::MaterialsManager::list(mRegistry, selectedEntity, search);
+		ui::MaterialsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
 	});
 
 	ui::Window::show("Properties", [&]() {
@@ -230,7 +212,7 @@ void SceneEditorSystem::onDrawGui()
 	});
 
 	ui::Window::show("Assets Explorer",
-					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, currentFolder, mIconTexture.get()); });
+					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, mCurrentPath, mIconTexture.get()); });
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
@@ -246,14 +228,75 @@ void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 		mEditorCameraController.disable();
 }
 
+void SceneEditorSystem::setScenePath(const std::filesystem::path& path)
+{
+	mScenePath = path;
+}
+
+void SceneEditorSystem::clearScene()
+{
+	mRegistry = ecs::Registry{};
+}
+
+void SceneEditorSystem::loadScene()
+{
+	auto result = makeAbsolutePath(mRootPath, mScenePath)
+					  .and_then(validateResourcePath)
+					  .and_then(openFileReadStream)
+					  .and_then(parseRegistry)
+					  .map_error(logResourceError);
+
+	if (result.has_value())
+		mRegistry = std::move(result.value());
+}
+
+void SceneEditorSystem::saveScene()
+{
+	auto result = makeAbsolutePath(mRootPath, mScenePath)
+					  .and_then(validateResourcePath)
+					  .and_then(openFileWriteStream)
+					  .map_error(logResourceError);
+
+	if (result.has_value())
+	{
+		auto xml = XMLOutputArchive{result.value()};
+		ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
+	}
+}
+
 void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 {
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
 
 	mRootPath = path;
+	mCurrentPath = path;
 	mMeshController.setRootPath(mRootPath);
 	mIndirectLightController.setRootPath(mRootPath);
+}
+
+void SceneEditorSystem::onEvent(const ClearSceneEvent&)
+{
+	clearScene();
+}
+
+void SceneEditorSystem::onEvent(const LoadSceneEvent& event)
+{
+	setScenePath(event.path);
+	loadScene();
+}
+
+void SceneEditorSystem::onEvent(const SaveSceneEvent& event)
+{
+	setScenePath(event.path);
+	saveScene();
+}
+
+void SceneEditorSystem::onEvent(const OpenProjectEvent& event)
+{
+	clearScene();
+	setRootPath(event.path);
+	setScenePath("scenes/scene.default.xml");
 }
 
 } // namespace spatial::editor

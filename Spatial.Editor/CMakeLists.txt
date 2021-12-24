@@ -9,6 +9,7 @@ add_executable(Spatial.Editor
         src/EditorCameraController.h
         src/EditorCameraController.cpp
         src/EditorCamera.h
+        src/Jobs.h
         src/DefaultMaterial.h
         src/DefaultMaterial.cpp
         src/Serialization.h
@@ -17,7 +18,7 @@ add_executable(Spatial.Editor
         src/CustomComponents.cpp
         src/EditorSettings.cpp
         src/Settings.h
-        ${SPATIAL_EDITOR_MACOS_ICON} src/Serialization.cpp)
+        ${SPATIAL_EDITOR_MACOS_ICON})
 
 # set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 

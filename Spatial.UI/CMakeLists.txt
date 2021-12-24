@@ -17,6 +17,10 @@ add_library(Spatial.UI
         include/spatial/ui/components/DirectionInput.h
         include/spatial/ui/components/VectorInput.h
         include/spatial/ui/components/DragAndDrop.h
+        include/spatial/ui/components/Popup.h
+        include/spatial/ui/components/Search.h
+        include/spatial/ui/components/Combo.h
+        include/spatial/ui/components/SceneView.h
 
         include/spatial/ui/components/Icons.h
 
@@ -39,11 +43,13 @@ add_library(Spatial.UI
         src/components/AssetsExplorer.cpp
         src/components/VectorInput.cpp
         src/components/DragAndDrop.cpp
-
         src/components/DirectionInput.cpp
+        src/components/Popup.cpp
+        src/components/Combo.cpp
+        src/components/SceneView.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
-        src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/Popup.h src/components/Popup.cpp include/spatial/ui/components/Search.h src/components/Search.cpp include/spatial/ui/components/Combo.h src/components/Combo.cpp include/spatial/ui/components/SceneView.h src/components/SceneView.cpp)
+        src/components/styles/WindowPaddingStyle.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

@@ -56,7 +56,7 @@ bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs:
 
 	changed |= displayComponent<ecs::SkyBoxColor>("SkyBox Color", registry, selectedEntity);
 
-	//changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
+	// changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
 
 	changed |= displayComponent<ecs::SceneView>("Scene View", registry, selectedEntity);
 
@@ -314,12 +314,15 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
+			registry
+				.getEntities<const ecs::Name>(
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::tags::IsSkyBox, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::Child>)
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::tags::IsSkyBox,
+										   ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -364,7 +367,8 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search)
+bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+							bool showEditorEntities)
 {
 	bool changed = false;
 
@@ -377,8 +381,7 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
 		ImGui::TableHeadersRow();
 
-		registry.getEntities<const ecs::Name, const ecs::tags::IsMaterial>().each([&](ecs::Entity entity,
-																					  const auto& name) {
+		const auto actionFn = [&](ecs::Entity entity, const auto& name) {
 			if (!boost::algorithm::contains(name.c_str(), search))
 				return;
 
@@ -393,7 +396,19 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 				selectedEntity = entity;
 				changed |= true;
 			}
-		});
+		};
+
+		if (showEditorEntities)
+		{
+			registry.getEntities<const ecs::Name, const ecs::tags::IsMaterial>().each(actionFn);
+		}
+		else
+		{
+			registry
+				.getEntities<const ecs::Name, const ecs::tags::IsMaterial>(
+					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
+				.each(actionFn);
+		}
 
 		ImGui::EndTable();
 	}
@@ -421,6 +436,28 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 				changed = true;
 			}
 		}
+
+		{
+			auto menu = ui::Menu{"Create SkyBox"};
+
+			if (menu.item("Color SkyBox"))
+			{
+				selectedEntity = ecs::build(registry)
+									 .withName(fmt::format("Color SkyBox {0}", newMaterialsCount++))
+									 .asSkyBoxColor()
+									 .withColor({.0f, .0f, .0f, 1.0f});
+				changed = true;
+			}
+
+			if (menu.item("Texture SkyBox"))
+			{
+				selectedEntity = ecs::build(registry)
+									 .withName(fmt::format("Texture SkyBox {0}", newMaterialsCount++))
+									 .asSkyBox()
+									 .withTexture("editor://textures/default_skybox.ktx");
+				changed = true;
+			}
+		}
 	}
 
 	return changed;
@@ -430,7 +467,7 @@ bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity&
 {
 	auto dnd = DragAndDropTarget{};
 	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
-	if (result && boost::algorithm::ends_with(result->filename().string(), ".xml"))
+	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".xml"))
 	{
 		selectedEntity = ecs::NullEntity;
 		scenePath = result.value();
@@ -446,7 +483,7 @@ bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedE
 	auto dnd = DragAndDropTarget{};
 	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
 
-	if (result && boost::algorithm::ends_with(result->filename().string(), ".filamesh"))
+	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
 	{
 		selectedEntity = ecs::build(registry)
 							 .withName(result->stem().string())
@@ -473,7 +510,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (menu.item("Empty"))
 	{
-		newEntity = ecs::build(registry).withName(fmt::format("Empty Entity")).with<ecs::tags::IsRenderable>();
+		newEntity = ecs::build(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
@@ -594,7 +631,6 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 	return changed;
 }
 
-
 bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 									math::float3 createEntitiesPosition)
 {
@@ -619,12 +655,12 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	if (Menu::itemButton(name ? fmt::format("Remove \"{}\"", name->c_str()) : "Remove Entity"))
 	{
 		if (registry.hasAnyComponent<ecs::Child>(selectedEntity))
-			ecs::Child::remove(registry, selectedEntity);
+			ecs::Child::remove(registry, selectedEntity); // TODO: Should dispatch a job
 
 		if (registry.hasAnyComponent<ecs::Parent>(selectedEntity))
-			ecs::Parent::destroyChildren(registry, selectedEntity);
+			ecs::Parent::destroyChildren(registry, selectedEntity); // TODO: Should dispatch a job
 
-		registry.destroy(selectedEntity);
+		registry.destroy(selectedEntity); // TODO: Should dispatch a job
 		selectedEntity = ecs::NullEntity;
 		changed = true;
 	}
@@ -632,7 +668,7 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool EditorMainMenu::fileMenu(std::filesystem::path& rootPath, std::filesystem::path& currentPath, std::filesystem::path& scenePath, bool& clearSceneFlag, bool& saveSceneFlag, bool& reloadSceneFlag)
+bool EditorMainMenu::fileMenu()
 {
 	bool changed = false;
 	auto action = FileMenuAction::Unknown;
@@ -680,44 +716,6 @@ bool EditorMainMenu::fileMenu(std::filesystem::path& rootPath, std::filesystem::
 
 	static std::filesystem::path currentProjectFolder = "";
 	static std::filesystem::path currentScenePath = "";
-
-	{
-		auto modal = ui::OpenProjectModal{currentProjectFolder};
-		if (modal.onConfirm()) {
-			rootPath = currentProjectFolder;
-			currentPath = "";
-			currentScenePath = "scenes/scene.spatial.xml";
-			scenePath = currentScenePath;
-			clearSceneFlag = true;
-			changed = true;
-		}
-	}
-
-	{
-		auto modal = ui::SaveSceneModal{currentScenePath};
-		if (modal.onConfirm()) {
-			scenePath = currentScenePath;
-			saveSceneFlag = true;
-			changed = true;
-		}
-	}
-
-	{
-		auto modal = ui::OpenSceneModal{scenePath};
-		if (modal.onConfirm()) {
-			scenePath = currentScenePath;
-			reloadSceneFlag = true;
-		}
-
-	}
-
-	{
-		auto modal = ui::NewSceneModal{};
-		if (modal.onConfirm()) {
-			clearSceneFlag = true;
-			changed = true;
-		}
-	}
 
 	return changed;
 }

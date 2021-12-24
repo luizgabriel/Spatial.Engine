@@ -107,14 +107,10 @@ void Parent::destroyChildren(Registry& registry, Entity parentEntity)
 		stack.pop_back();
 
 		if (registry.hasAnyComponent<Parent>(currentEntity))
-		{
 			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
-		}
 
 		if (currentEntity != parentEntity)
-		{
 			registry.destroy(currentEntity);
-		}
 	}
 
 	registry.removeComponent<Parent>(parentEntity);

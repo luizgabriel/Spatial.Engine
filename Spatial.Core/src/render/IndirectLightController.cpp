@@ -63,6 +63,7 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		if (mBands.find(irradianceValuesId) == mBands.end())
 		{
 			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath)
+							  .and_then(validateResourcePath)
 							  .and_then(openFileReadStream)
 							  .and_then(toBandsData)
 							  .map_error(logResourceError);

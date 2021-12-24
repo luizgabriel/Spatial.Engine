@@ -6,10 +6,10 @@ namespace spatial::ecs
 {
 
 template <typename... Components>
-class UpdateSystem
+class UpdateController
 {
   public:
-	virtual ~UpdateSystem() = default;
+	virtual ~UpdateController() = default;
 
 	void onUpdateFrame(Registry& registry, float delta)
 	{

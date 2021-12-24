@@ -65,7 +65,7 @@ struct EditorMainMenu
 		SaveScene,
 	};
 
-	static bool fileMenu(std::filesystem::path& rootPath, std::filesystem::path& currentPath, std::filesystem::path& scenePath, bool& clearSceneFlag, bool& saveSceneFlag, bool& reloadSceneFlag);
+	static bool fileMenu();
 	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
@@ -89,6 +89,14 @@ class OpenSceneModal
 	bool onConfirm();
 
 	static void open();
+
+	template <typename Function>
+	static void onConfirm(std::filesystem::path& openPath, Function func)
+	{
+		auto modal = OpenSceneModal{openPath};
+		if (modal.onConfirm())
+			std::invoke(std::forward<Function>(func), std::as_const(openPath));
+	}
 
   private:
 	PopupModal mModal;
@@ -115,6 +123,14 @@ class OpenProjectModal
 	bool onConfirm();
 
 	static void open();
+
+	template <typename Function>
+	static void onConfirm(std::filesystem::path& openPath, Function func)
+	{
+		auto modal = OpenProjectModal{openPath};
+		if (modal.onConfirm())
+			std::invoke(std::forward<Function>(func), std::as_const(openPath));
+	}
 
   private:
 	PopupModal mModal;
@@ -144,14 +160,13 @@ class MaterialsManager
 {
   public:
 	static bool popup(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "");
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "", bool showEditorEntities = false);
 };
 
 class EditorDragAndDrop
 {
   public:
 	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
-
 	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
 };
 

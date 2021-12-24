@@ -7,7 +7,6 @@
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
 #include <spatial/render/ResourceLoaders.h>
-#include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
 
 namespace spatial::render
@@ -131,13 +130,13 @@ void MeshController::populateMeshesDatabase(ecs::Registry& registry)
 {
 	using namespace boost::algorithm;
 
-	registry.getEntities<const ecs::Mesh>().each([this](auto& mesh) {
+	registry.getEntities<const ecs::Mesh>().each([this](const auto& mesh) {
 		const auto resourceId = mesh.getResourceId();
 
 		if (hasMeshData(resourceId))
 			return;
 
-		if (!ends_with(mesh.resourcePath.string(), ".filamesh"))
+		if (!ends_with(mesh.resourcePath.c_str(), ".filamesh"))
 			return;
 
 		auto result = makeAbsolutePath(mRoot, mesh.resourcePath)

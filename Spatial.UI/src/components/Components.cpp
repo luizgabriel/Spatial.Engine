@@ -1,6 +1,6 @@
 #include "spatial/ecs/SceneView.h"
-#include "spatial/ui/components/SceneView.h"
 #include "spatial/render/TextureView.h"
+#include "spatial/ui/components/SceneView.h"
 #include <array>
 #include <imgui.h>
 #include <spatial/ecs/EntityHandle.h>
@@ -213,7 +213,6 @@ void componentInput<ecs::SkyBoxColor>(ecs::Registry& registry, ecs::Entity entit
 	auto& skybox = registry.getComponent<ecs::SkyBoxColor>(entity);
 
 	ImGui::ColorEdit3("Color", &skybox.color.r);
-	ImGui::DragFloat("Intensity", &skybox.intensity, 1.0f, .0f, 100000.0f);
 }
 
 template <>
@@ -221,10 +220,13 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
 
+	ImGui::DragInt2("Size", &sceneView.size.x);
+
 	Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
 
 	Search::searchEntity<ecs::tags::IsSkyBox>("SkyBox", registry, sceneView.skybox);
-	if (ImGui::TreeNodeEx("SkyBox Properties", ImGuiTreeNodeFlags_SpanFullWidth))
+	if (registry.hasAnyComponent<ecs::tags::IsSkyBox>(sceneView.camera)
+		&& ImGui::TreeNodeEx("SkyBox Properties", ImGuiTreeNodeFlags_SpanFullWidth))
 	{
 		spacing(3);
 		if (registry.hasAllComponents<ecs::SkyBoxColor>(sceneView.skybox))
@@ -234,7 +236,8 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 	}
 
 	Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
-	if (ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth))
+	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
+		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth))
 	{
 		spacing(3);
 		if (registry.hasAllComponents<ecs::PerspectiveCamera>(sceneView.camera))
@@ -247,10 +250,10 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth))
+	if (registry.hasAllComponents<render::TextureView>(entity)
+		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth))
 	{
-		if (registry.hasAllComponents<render::TextureView>(entity))
-			SceneView::image(registry, entity, {ImGui::GetContentRegionAvailWidth(), 100});
+		SceneView::image(registry, entity, {ImGui::GetContentRegionAvailWidth(), 100});
 		ImGui::TreePop();
 	}
 }
