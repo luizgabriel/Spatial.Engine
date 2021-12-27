@@ -22,12 +22,15 @@ void IndirectLightController::loadIrradianceValues(ResourceId resourceId, const 
 	mBands.emplace(resourceId, bands);
 }
 
-tl::expected<bands_t, ResourceError> toBandsData(std::istream&& istream)
+tl::expected<bands_t, ResourceError> toBandsData(const std::filesystem::path& path)
 {
+	auto ifs = std::ifstream{path};
+	if (!ifs) return tl::make_unexpected(ResourceError::OpenFailed);
+
 	try
 	{
 		auto bands = bands_t{};
-		istream >> bands;
+		ifs >> bands;
 		return bands;
 	}
 	catch (const std::ios::failure& e)
@@ -52,7 +55,7 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 			if (!result.has_value())
 				return;
 
-			auto& value = result.value();
+			const auto& value = result.value();
 			loadTexture(reflectionsTextureId, &value[0], value.size());
 		}
 	});
@@ -64,7 +67,6 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		{
 			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath)
 							  .and_then(validateResourcePath)
-							  .and_then(openFileReadStream)
 							  .and_then(toBandsData)
 							  .map_error(logResourceError);
 

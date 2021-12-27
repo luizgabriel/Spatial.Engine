@@ -4,6 +4,7 @@
 #include <string>
 #include <tl/expected.hpp>
 #include <vector>
+#include <fstream>
 
 namespace spatial
 {

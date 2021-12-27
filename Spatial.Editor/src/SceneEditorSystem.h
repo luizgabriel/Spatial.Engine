@@ -77,7 +77,7 @@ class SceneEditorSystem
 	void loadScene();
 	void saveScene();
 
-	friend class EventQueue;
+	friend class spatial::EventQueue;
 
   private:
 	void onEvent(const ClearSceneEvent& event);
