@@ -47,6 +47,7 @@ add_library(Spatial.UI
         src/components/Popup.cpp
         src/components/Combo.cpp
         src/components/SceneView.cpp
+        src/components/Search.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
         src/components/styles/WindowPaddingStyle.cpp)

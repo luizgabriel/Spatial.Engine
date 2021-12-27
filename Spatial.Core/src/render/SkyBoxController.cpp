@@ -21,9 +21,7 @@ void SkyBoxController::onUpdateFrame(ecs::Registry& registry)
 		});
 
 	registry.getEntities<const ecs::SkyBoxColor, Skybox>().each(
-		[&](const ecs::SkyBoxColor& component, Skybox& skybox) {
-			skybox->setColor(component.color);
-		});
+		[&](const ecs::SkyBoxColor& component, Skybox& skybox) { skybox->setColor(component.color); });
 
 	registry.getEntities<const ecs::SkyBoxTexture>().each([&, this](const auto& component) {
 		using namespace boost::algorithm;
@@ -34,17 +32,15 @@ void SkyBoxController::onUpdateFrame(ecs::Registry& registry)
 		if (!ends_with(component.texturePath.c_str(), ".ktx"))
 			return;
 
-		/*
-		 auto result = makeAbsolutePath(mRootPath, component.texturePath)
+		auto result = makeAbsolutePath(mRootPath, component.texturePath)
 						  .and_then(validateResourcePath)
 						  .and_then(openFileReadStream)
 						  .transform(toVectorData)
-						  .and_then([&](const auto& data) { return createTexture(data); })
+						  .and_then([this](auto&& data) { return createTexture(std::forward<decltype(data)>(data)); })
 						  .map_error(logResourceError);
 
 		if (result.has_value())
 			mTextures.emplace(component.getResourceId(), std::move(result.value()));
-		 */
 	});
 
 	registry.getEntities<const ecs::SkyBoxTexture>(ecs::ExcludeComponents<Skybox>)
@@ -72,6 +68,11 @@ tl::expected<Texture, ResourceError> SkyBoxController::createTexture(const std::
 	{
 		return tl::make_unexpected(ResourceError::ParseError);
 	}
+}
+
+void SkyBoxController::loadTexture(SkyBoxController::ResourceId resourceId, const uint8_t* data, const size_t size)
+{
+	mTextures.emplace(resourceId, createKtxTexture(mEngine, data, size));
 }
 
 } // namespace spatial::render

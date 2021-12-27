@@ -19,6 +19,8 @@ class SkyBoxController
 
 	void setRootPath(const std::filesystem::path& rootPath);
 
+	void loadTexture(ResourceId resourceId, const uint8_t* data, const size_t size);
+
   private:
 	filament::Engine& mEngine;
 	std::filesystem::path mRootPath;

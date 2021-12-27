@@ -89,6 +89,9 @@ void SceneEditorSystem::onStart()
 										 ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE);
 	mIndirectLightController.loadIrradianceValues("editor://textures/default_skybox/sh.txt"_hs,
 												  render::parseShFile(ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE));
+
+	mSkyboxController.loadTexture("editor://textures/default_skybox/texture.ktx"_hs, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX,
+								  ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE);
 }
 
 void SceneEditorSystem::onStartFrame(float)
@@ -103,6 +106,11 @@ void SceneEditorSystem::onStartFrame(float)
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsEditorView>()
 			.asSceneView()
+			.withIndirectLight(ecs::build(mRegistry)
+								   .withName("Indirect Light Editor SkyBox")
+								   .asIndirectLight()
+								   .withReflectionsTexturePath("editor://textures/default_skybox/ibl.ktx")
+								   .withIrradianceValuesPath("editor://textures/default_skybox/sh.txt"))
 			.withCamera(ecs::build(mRegistry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
@@ -115,8 +123,8 @@ void SceneEditorSystem::onStartFrame(float)
 			.withSkyBox(ecs::build(mRegistry)
 							.withName("Editor SkyBox")
 							.with<tags::IsEditorEntity>()
-							.asSkyBoxColor()
-							.withColor({0.5f, 0.5f, 0.5f, 1.0f}));
+							.asSkyBox()
+							.withTexture("editor://textures/default_skybox/texture.ktx"));
 	}
 }
 
@@ -144,13 +152,11 @@ void SceneEditorSystem::onDrawGui()
 		ui::EditorMainMenu::fileMenu();
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
 
-		ui::OpenProjectModal::onConfirm(mCurrentPath, [this](const auto& path) {
-			mJobQueue.enqueue<OpenProjectEvent>(path);
-		});
+		ui::OpenProjectModal::onConfirm(mCurrentPath,
+										[this](const auto& path) { mJobQueue.enqueue<OpenProjectEvent>(path); });
 
-		ui::OpenSceneModal::onConfirm(mScenePath, [this](const auto& path) {
-			mJobQueue.enqueue<LoadSceneEvent>(path);
-		});
+		ui::OpenSceneModal::onConfirm(mScenePath,
+									  [this](const auto& path) { mJobQueue.enqueue<LoadSceneEvent>(path); });
 	});
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
