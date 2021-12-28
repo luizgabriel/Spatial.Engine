@@ -103,6 +103,16 @@ void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
 	ImGui::InputFloat("Halo size", &light.haloSize);
 }
 
+template <>
+void componentInput<ecs::IndirectLight>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
+
+	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	ui::inputPath("Reflections Texture", light.reflectionsTexturePath.relativePath);
+	ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
 template <>
@@ -119,8 +129,8 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	spacing(3);
 
-	changed |= ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
-	changed |= ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
+	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
 
 	spacing(3);
 
@@ -174,6 +184,9 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 				auto childrenToDestroy = std::vector<ecs::Entity>{};
 
 				ecs::Parent::forEachChild(registry, entity, [&](ecs::Entity child) {
+					if (!registry.hasAllComponents<ecs::MeshMaterial>(child))
+						return;
+
 					auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(child);
 
 					ImGui::PushID((int)child);
@@ -188,7 +201,7 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 					ImGui::TableNextColumn();
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-					changed |= ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
+					ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
 																			   meshMaterial.materialEntity);
 
 					ImGui::TableNextColumn();
@@ -316,7 +329,7 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 	if (registry.hasAllComponents<render::TextureView>(entity)
 		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		SceneView::image(registry, entity, {ImGui::GetContentRegionAvailWidth(), 100});
+		SceneView::image(registry, entity, {ImGui::GetWindowContentRegionWidth(), 100});
 		ImGui::TreePop();
 	}
 }

@@ -8,7 +8,6 @@
 #include <assets/generated.h>
 
 #include <spatial/common/EventQueue.h>
-#include <spatial/core/Logger.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/SkyboxResources.h>
 #include <spatial/serialization/Archives.h>
@@ -129,7 +128,7 @@ void SceneEditorSystem::onStartFrame(float)
 			.with<tags::IsEditorView>()
 			.asSceneView()
 			.withIndirectLight(ecs::build(mRegistry)
-								   .withName("Indirect Light Editor SkyBox")
+								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
 								   .withReflectionsTexturePath("editor://textures/default_skybox/ibl.ktx")
@@ -156,9 +155,8 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mIndirectLightController.onUpdateFrame(mRegistry);
 
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(), [this](const auto& res) {
-		return findResource(res);
-	});
+	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(),
+													  [this](const auto& res) { return findResource(res); });
 
 	mMeshController.onUpdateFrame(mRegistry);
 }
@@ -174,11 +172,17 @@ void SceneEditorSystem::onDrawGui()
 		ui::EditorMainMenu::fileMenu();
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
 
-		ui::OpenProjectModal::onConfirm(mCurrentPath,
-										[this](const auto& path) { mJobQueue.enqueue<OpenProjectEvent>(path); });
+		if (ui::OpenProjectModal::show(mRootPath))
+			mJobQueue.enqueue<OpenProjectEvent>(mRootPath);
 
-		ui::OpenSceneModal::onConfirm(mScenePath,
-									  [this](const auto& path) { mJobQueue.enqueue<LoadSceneEvent>(path); });
+		if (ui::NewSceneModal::show())
+			mJobQueue.enqueue<ClearSceneEvent>();
+
+		if (ui::OpenSceneModal::show(mScenePath))
+			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
+
+		if (ui::SaveSceneModal::show(mScenePath))
+			mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
 	});
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
@@ -246,7 +250,7 @@ void SceneEditorSystem::onDrawGui()
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
 {
-	mRegistry.getEntities<const render::TextureView, const tags::IsEditorEntity>().each(
+	mRegistry.getEntities<const render::TextureView, const tags::IsEditorView>().each(
 		[&](const auto& textureView) { renderer.render(textureView.getView().get()); });
 }
 
@@ -289,7 +293,8 @@ void SceneEditorSystem::saveScene()
 	if (result.has_value())
 	{
 		auto xml = XMLOutputArchive{result.value()};
-		ecs::serialize<DefaultMaterial, SkyBoxMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh, tags::IsEditorView>(xml, mRegistry);
+		ecs::serialize<DefaultMaterial, SkyBoxMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh,
+					   tags::IsEditorView>(xml, mRegistry);
 	}
 }
 

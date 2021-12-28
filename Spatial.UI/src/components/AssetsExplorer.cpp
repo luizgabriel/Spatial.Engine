@@ -19,7 +19,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 
 	displayPathHeader(rootPath, selectedPath, icon);
 
-	ImGui::Columns(8);
+	ImGui::Columns(6);
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 50.0f, 100.0f)};
