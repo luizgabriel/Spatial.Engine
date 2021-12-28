@@ -31,6 +31,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Relation.h
         include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SceneView.h
+        include/spatial/ecs/Resource.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -68,6 +69,7 @@ add_library(Spatial.Core
         include/spatial/resources/FilameshFile.h
         include/spatial/resources/ResourceLoader.h
         include/spatial/resources/ResourceFinder.h
+        include/spatial/resources/ResourceError.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -105,7 +107,7 @@ add_library(Spatial.Core
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp include/spatial/resources/ResourceError.h include/spatial/ecs/Resource.h)
+        src/resources/ResourceLoader.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
