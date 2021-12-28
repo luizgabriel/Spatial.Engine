@@ -16,11 +16,11 @@ SceneController::SceneController(filament::Engine& engine) : mEngine{engine}
 void SceneController::onUpdateFrame(ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::SceneView>(ecs::ExcludeComponents<Scene>).each([&](ecs::Entity entity, const auto&) {
-		registry.addComponent<Scene>(entity, createScene(mEngine));
+		registry.addComponent(entity, createScene(mEngine));
 	});
 
 	registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>).each([&](ecs::Entity entity) {
-		const auto& renderable = registry.addComponent<Entity>(entity, createEntity(mEngine));
+		const auto& renderable = registry.addComponent(entity, createEntity(mEngine));
 
 		registry.getEntities<Scene>().each([&](auto& scene) { scene->addEntity(renderable.get()); });
 	});
