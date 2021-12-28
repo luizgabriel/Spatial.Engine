@@ -11,4 +11,11 @@ void DefaultMaterial::apply(filament::MaterialInstance& instance) const
 	instance.setParameter("reflectance", reflectance);
 }
 
+void GridMaterial::apply(filament::MaterialInstance& instance) const
+{
+	instance.setParameter("color", color);
+	instance.setParameter("scale", scale);
+	instance.setParameter("thickness", thickness);
+}
+
 } // namespace spatial::editor

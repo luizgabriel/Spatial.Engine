@@ -45,4 +45,13 @@ void serialize(Archive& ar, spatial::editor::SkyBoxMaterial& material)
 	ar(cereal::make_nvp("color", material.color));
 }
 
+
+template <typename Archive>
+void serialize(Archive& ar, spatial::editor::GridMaterial& material)
+{
+	ar(cereal::make_nvp("color", material.color));
+	ar(cereal::make_nvp("scale", material.scale));
+	ar(cereal::make_nvp("thickness", material.thickness));
+}
+
 } // namespace cereal

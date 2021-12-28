@@ -34,6 +34,7 @@ class SceneEditorSystem
 
 	render::Material mDefaultMaterial;
 	render::Material mSkyBoxMaterial;
+	render::Material mGridMaterial;
 
 	ecs::Registry mRegistry;
 
