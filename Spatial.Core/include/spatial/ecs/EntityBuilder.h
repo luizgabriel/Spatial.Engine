@@ -34,8 +34,6 @@ class MeshEntityBuilder;
 
 class SceneViewEntityBuilder;
 
-class SkyBoxColorEntityBuilder;
-
 class EntityBuilder
 {
   public:
@@ -80,8 +78,6 @@ class EntityBuilder
 	SceneViewEntityBuilder asSceneView();
 
 	MeshEntityBuilder asMesh();
-
-	SkyBoxColorEntityBuilder asSkyBoxColor();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -280,7 +276,6 @@ class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
 
 	SceneViewEntityBuilder(Registry& registry, Entity entity);
 	SceneViewEntityBuilder& withCamera(ecs::Entity cameraEntity);
-	SceneViewEntityBuilder& withSkyBox(ecs::Entity skyboxEntity);
 	SceneViewEntityBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
 };
 
