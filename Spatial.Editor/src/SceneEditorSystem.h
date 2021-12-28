@@ -20,7 +20,6 @@
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
-#include <spatial/render/SkyBoxController.h>
 
 namespace fl = filament;
 
@@ -34,7 +33,7 @@ class SceneEditorSystem
 	desktop::Window& mWindow;
 
 	render::Material mDefaultMaterial;
-	render::Texture mIconTexture;
+	render::Material mSkyBoxMaterial;
 
 	ecs::Registry mRegistry;
 
@@ -47,9 +46,10 @@ class SceneEditorSystem
 	render::LightController mLightController;
 	render::MeshController mMeshController;
 	render::IndirectLightController mIndirectLightController;
-	render::SkyBoxController mSkyboxController;
 
 	EventQueue mJobQueue;
+
+	std::unordered_map<uint32_t, render::Texture> mTextures;
 
 	std::filesystem::path mRootPath;
 	std::filesystem::path mScenePath;

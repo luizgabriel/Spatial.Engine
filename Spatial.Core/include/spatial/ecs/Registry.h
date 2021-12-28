@@ -119,6 +119,13 @@ class Registry
 	}
 
 	template <typename Component, typename... Args>
+	decltype(auto) addOrReplace(Entity entity, Args&&... args)
+	{
+		assert(isValid(entity));
+		return mRegistry.template emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component, typename... Args>
 	decltype(auto) getOrAddComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));

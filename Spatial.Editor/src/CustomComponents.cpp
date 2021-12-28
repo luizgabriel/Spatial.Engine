@@ -1,5 +1,5 @@
 #include "CustomComponents.h"
-#include "DefaultMaterial.h"
+#include "Materials.h"
 #include "EditorCamera.h"
 #include "Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -34,6 +34,16 @@ void componentInput<editor::EditorCamera>(ecs::Registry& registry, ecs::Entity e
 	ImGui::DragFloat("Sensitivity", &data.sensitivity);
 }
 
+template <>
+void componentInput<editor::SkyBoxMaterial>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
+
+	ImGui::Checkbox("Show Sun", &data.showSun);
+	ImGui::ColorPicker4("Color", &data.color.r);
+	ui::inputPath("Cubemap Texture", data.skybox.relativePath);
+}
+
 bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
 {
 	bool changed = false;
@@ -54,7 +64,7 @@ bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs:
 
 	changed |= displayComponent<ecs::Mesh>("Mesh", registry, selectedEntity);
 
-	changed |= displayComponent<ecs::SkyBoxColor>("SkyBox Color", registry, selectedEntity);
+	changed |= displayComponent<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
 
 	// changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
 
@@ -69,6 +79,7 @@ bool EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ec
 
 	changed |= displayComponent<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
 	changed |= displayComponent<editor::DefaultMaterial>("Default Material", registry, selectedEntity);
+	changed |= displayComponent<editor::SkyBoxMaterial>("SkyBox Material", registry, selectedEntity);
 
 	return changed;
 }
@@ -316,12 +327,12 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		if (showDebugEntities)
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::tags::IsSkyBox, ecs::Child>)
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::tags::IsSkyBox,
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity,
 										   ecs::Child>)
 				.each(onEachNodeFn);
 
@@ -440,21 +451,11 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 		{
 			auto menu = ui::Menu{"Create SkyBox"};
 
-			if (menu.item("Color SkyBox"))
+			if (menu.item("Default SkyBox"))
 			{
 				selectedEntity = ecs::build(registry)
-									 .withName(fmt::format("Color SkyBox {0}", newMaterialsCount++))
-									 .asSkyBoxColor()
-									 .withColor({.0f, .0f, .0f, 1.0f});
-				changed = true;
-			}
-
-			if (menu.item("Texture SkyBox"))
-			{
-				selectedEntity = ecs::build(registry)
-									 .withName(fmt::format("Texture SkyBox {0}", newMaterialsCount++))
-									 .asSkyBox()
-									 .withTexture("editor://textures/default_skybox.ktx");
+									 .withName("Default SkyBox")
+									 .asMaterial<editor::SkyBoxMaterial>();
 				changed = true;
 			}
 		}

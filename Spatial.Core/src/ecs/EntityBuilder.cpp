@@ -3,6 +3,7 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Tags.h>
+#include <fmt/format.h>
 
 namespace spatial::ecs
 {
@@ -72,16 +73,6 @@ IndirectLightEntityBuilder EntityBuilder::asIndirectLight()
 }
 
 SceneViewEntityBuilder EntityBuilder::asSceneView()
-{
-	return {mRegistry, mEntity};
-}
-
-SkyBoxColorEntityBuilder EntityBuilder::asSkyBoxColor()
-{
-	return {mRegistry, mEntity};
-}
-
-SkyBoxEntityBuilder EntityBuilder::asSkyBox()
 {
 	return {mRegistry, mEntity};
 }
@@ -363,17 +354,31 @@ MeshEntityBuilder& MeshEntityBuilder::withSubMesh(std::uint8_t offset, std::uint
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withMaterial(Entity materialEntity)
+MeshEntityBuilder& MeshEntityBuilder::withPath(const std::filesystem::path& resourcePath)
 {
-	auto& component = getComponent();
-	component.defaultMaterial = materialEntity;
+	getComponent().meshResource.relativePath = resourcePath;
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withPath(std::filesystem::path resourcePath)
+MeshEntityBuilder& MeshEntityBuilder::withCulling(bool culling)
 {
-	auto& component = getComponent();
-	component.resourcePath = std::move(resourcePath);
+	getComponent().culling = culling;
+	return *this;
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withPriority(uint8_t priority)
+{
+	getComponent().priority = priority;
+	return *this;
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withMaterialAt(uint32_t primitiveIndex, Entity materialEntity)
+{
+	auto materialInstanceEntity = mRegistry.createEntity();
+	mRegistry.addComponent<ecs::Name>(materialInstanceEntity, fmt::format("Primitive {}", primitiveIndex));
+	mRegistry.addComponent<ecs::MeshMaterial>(materialInstanceEntity, primitiveIndex, materialEntity);
+	ecs::Parent::addChild(mRegistry, mEntity, materialInstanceEntity);
+
 	return *this;
 }
 
@@ -388,40 +393,10 @@ SceneViewEntityBuilder& SceneViewEntityBuilder::withCamera(ecs::Entity cameraEnt
 	return *this;
 }
 
-SceneViewEntityBuilder& SceneViewEntityBuilder::withSkyBox(ecs::Entity skyboxEntity)
-{
-	ecs::Parent::addChild(mRegistry, mEntity, skyboxEntity);
-	getComponent().skybox = skyboxEntity;
-	return *this;
-}
-
 SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
 	ecs::Parent::addChild(mRegistry, mEntity, indirectLightEntity);
 	getComponent().indirectLight = indirectLightEntity;
-	return *this;
-}
-
-SkyBoxColorEntityBuilder::SkyBoxColorEntityBuilder(Registry& registry, Entity entity)
-	: BasicEntityBuilder(registry, entity)
-{
-	with<tags::IsSkyBox>().with<tags::IsMaterial>();
-}
-
-SkyBoxColorEntityBuilder& SkyBoxColorEntityBuilder::withColor(math::float4 color)
-{
-	getComponent().color = color;
-	return *this;
-}
-
-SkyBoxEntityBuilder::SkyBoxEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
-{
-	with<tags::IsSkyBox>().with<tags::IsMaterial>();
-}
-
-SkyBoxEntityBuilder& SkyBoxEntityBuilder::withTexture(const std::filesystem::path& path)
-{
-	getComponent().texturePath = path;
 	return *this;
 }
 

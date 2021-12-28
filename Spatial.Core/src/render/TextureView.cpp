@@ -1,5 +1,5 @@
 #include <filament/Viewport.h>
-#include <spatial/render/ResourceLoaders.h>
+#include <spatial/render/Resources.h>
 #include <spatial/render/TextureView.h>
 
 namespace spatial::render

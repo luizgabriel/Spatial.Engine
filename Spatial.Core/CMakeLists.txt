@@ -30,14 +30,12 @@ add_library(Spatial.Core
         include/spatial/ecs/EntityBuilder.h
         include/spatial/ecs/Relation.h
         include/spatial/ecs/UpdateController.h
-        include/spatial/ecs/SkyBox.h
         include/spatial/ecs/SceneView.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
         include/spatial/render/Entity.h
         include/spatial/render/RenderingSystem.h
-        include/spatial/render/ResourceLoaders.h
         include/spatial/render/Resources.h
         include/spatial/render/SkyboxResources.h
         include/spatial/resources/FilameshFile.h
@@ -51,7 +49,6 @@ add_library(Spatial.Core
         include/spatial/render/MeshController.h
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
-        include/spatial/render/SkyBoxController.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -70,6 +67,7 @@ add_library(Spatial.Core
         include/spatial/resources/BoundingBox.h
         include/spatial/resources/FilameshFile.h
         include/spatial/resources/ResourceLoader.h
+        include/spatial/resources/ResourceFinder.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -92,7 +90,6 @@ add_library(Spatial.Core
         src/render/Engine.cpp
         src/render/Entity.cpp
         src/render/RenderingSystem.cpp
-        src/render/ResourceLoaders.cpp
         src/render/SkyboxResources.cpp
         src/render/Camera.cpp
         src/render/Transform.cpp
@@ -105,11 +102,10 @@ add_library(Spatial.Core
         src/render/SceneController.cpp
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
-        src/render/SkyBoxController.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp)
+        src/resources/ResourceLoader.cpp include/spatial/resources/ResourceError.h include/spatial/ecs/Resource.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

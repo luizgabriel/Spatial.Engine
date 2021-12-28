@@ -3,13 +3,11 @@
 
 #include <spatial/common/Math.h>
 
-#include <spatial/render/ResourceLoaders.h>
+#include <spatial/render/Resources.h>
 #include <spatial/render/SkyboxResources.h>
 
-#include <filament/IndexBuffer.h>
 #include <filament/RenderableManager.h>
 #include <filament/TextureSampler.h>
-#include <filament/VertexBuffer.h>
 #include <filament/Viewport.h>
 
 namespace fl = filament;

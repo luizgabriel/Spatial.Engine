@@ -10,7 +10,7 @@ add_executable(Spatial.Editor
         src/EditorCameraController.cpp
         src/EditorCamera.h
         src/Jobs.h
-        src/DefaultMaterial.h
+        src/Materials.h
         src/DefaultMaterial.cpp
         src/Serialization.h
         src/Serialization.cpp

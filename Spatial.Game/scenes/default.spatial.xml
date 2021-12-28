@@ -166,9 +166,9 @@
     <value49>4</value49>
     <value50>1</value50>
     <value51>
-        <resourcePath>
+        <meshResource>
             <value0>meshes/space_ship.filamesh</value0>
-        </resourcePath>
+        </meshResource>
         <receiveShadows>true</receiveShadows>
         <castShadows>true</castShadows>
         <partsCount>0</partsCount>
@@ -177,9 +177,9 @@
     </value51>
     <value52>3</value52>
     <value53>
-        <resourcePath>
+        <meshResource>
             <value0>editor://meshes/cube.filamesh</value0>
-        </resourcePath>
+        </meshResource>
         <receiveShadows>true</receiveShadows>
         <castShadows>true</castShadows>
         <partsCount>1</partsCount>
@@ -188,9 +188,9 @@
     </value53>
     <value54>5</value54>
     <value55>
-        <resourcePath>
+        <meshResource>
             <value0>editor://meshes/plane.filamesh</value0>
-        </resourcePath>
+        </meshResource>
         <receiveShadows>true</receiveShadows>
         <castShadows>false</castShadows>
         <partsCount>1</partsCount>
@@ -199,9 +199,9 @@
     </value55>
     <value56>7</value56>
     <value57>
-        <resourcePath>
+        <meshResource>
             <value0>editor://meshes/sphere.filamesh</value0>
-        </resourcePath>
+        </meshResource>
         <receiveShadows>true</receiveShadows>
         <castShadows>true</castShadows>
         <partsCount>1</partsCount>

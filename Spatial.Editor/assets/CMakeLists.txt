@@ -12,12 +12,15 @@ add_custom_command(
 find_program(MATC_COMMAND matc)
 add_custom_command(
         OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/materials/skybox.filamat
         ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat
         ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
         DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/materials/skybox.mat
         ${CMAKE_CURRENT_SOURCE_DIR}/materials/default.mat
         ${CMAKE_CURRENT_SOURCE_DIR}/materials/ui_blit.mat
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/materials/
+        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/skybox.filamat materials/skybox.mat
         COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat materials/default.mat
         COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat materials/ui_blit.mat
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -42,6 +45,7 @@ add_custom_target(Spatial.Editor.Materials SOURCES
 set(SPATIAL_EDITOR_RESOURCE_FILES
         textures/icons.png
         fonts/Roboto_Medium.ttf
+        ${CMAKE_CURRENT_BINARY_DIR}/materials/skybox.filamat
         ${CMAKE_CURRENT_BINARY_DIR}/materials/default.filamat
         ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat
         ${CMAKE_CURRENT_BINARY_DIR}/textures/default_skybox/sh.txt

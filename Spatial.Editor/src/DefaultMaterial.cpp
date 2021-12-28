@@ -1,9 +1,9 @@
-#include "DefaultMaterial.h"
+#include "Materials.h"
 
 namespace spatial::editor
 {
 
-void DefaultMaterial::setParameters(filament::MaterialInstance& instance) const
+void DefaultMaterial::apply(filament::MaterialInstance& instance) const
 {
 	instance.setParameter("baseColor", baseColor);
 	instance.setParameter("metallic", metallic);

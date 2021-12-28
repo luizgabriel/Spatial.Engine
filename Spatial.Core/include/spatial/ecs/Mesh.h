@@ -5,34 +5,28 @@
 #include <filesystem>
 #include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/ecs/Resource.h>
 
 namespace spatial::ecs
 {
 
 struct Mesh
 {
-	constexpr static uint8_t MAX_GEOMETRIES = 16;
-
-	// TODO: Use a resource UUID instead of the direct path
-	std::filesystem::path resourcePath;
+	ecs::Resource<ecs::ResourceType::FilaMesh> meshResource{};
 
 	bool castShadows{false};
 	bool receiveShadows{false};
 	bool culling{false};
 
-	size_t partsCount{0};
-	size_t partsOffset{0};
+	size_t partsCount{};
+	size_t partsOffset{};
+	uint8_t priority{};
+};
 
-	Entity defaultMaterial{ecs::NullEntity};
-
-	explicit Mesh(std::filesystem::path resourcePath = {}) : resourcePath{std::move(resourcePath)}
-	{
-	}
-
-	[[nodiscard]] uint32_t getResourceId() const
-	{
-		return HashedString{resourcePath.c_str()}.value();
-	}
+struct MeshMaterial
+{
+	uint32_t primitiveIndex{0};
+	Entity materialEntity{ecs::NullEntity};
 };
 
 } // namespace spatial::ecs

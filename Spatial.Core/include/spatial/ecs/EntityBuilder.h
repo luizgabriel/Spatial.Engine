@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SkyBox.h"
 #include <spatial/common/Math.h>
 #include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Camera.h>
@@ -36,8 +35,6 @@ class MeshEntityBuilder;
 class SceneViewEntityBuilder;
 
 class SkyBoxColorEntityBuilder;
-
-class SkyBoxEntityBuilder;
 
 class EntityBuilder
 {
@@ -85,8 +82,6 @@ class EntityBuilder
 	MeshEntityBuilder asMesh();
 
 	SkyBoxColorEntityBuilder asSkyBoxColor();
-
-	SkyBoxEntityBuilder asSkyBox();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -270,10 +265,12 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
 
 	MeshEntityBuilder(Registry& registry, Entity entity);
 
-	MeshEntityBuilder& withPath(std::filesystem::path resourcePath);
+	MeshEntityBuilder& withPath(const std::filesystem::path& resourcePath);
 	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
-	MeshEntityBuilder& withMaterial(Entity materialEntity);
+	MeshEntityBuilder& withMaterialAt(uint32_t primitiveIndex, Entity materialEntity);
 	MeshEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
+	MeshEntityBuilder& withCulling(bool culling);
+	MeshEntityBuilder& withPriority(uint8_t priority);
 };
 
 class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
@@ -285,26 +282,6 @@ class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
 	SceneViewEntityBuilder& withCamera(ecs::Entity cameraEntity);
 	SceneViewEntityBuilder& withSkyBox(ecs::Entity skyboxEntity);
 	SceneViewEntityBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
-};
-
-class SkyBoxColorEntityBuilder : public BasicEntityBuilder<SkyBoxColor>
-{
-  public:
-	using Base = BasicEntityBuilder<SceneView>;
-
-	SkyBoxColorEntityBuilder(Registry& registry, Entity entity);
-
-	SkyBoxColorEntityBuilder& withColor(math::float4 color);
-};
-
-class SkyBoxEntityBuilder : public BasicEntityBuilder<SkyBoxTexture>
-{
-  public:
-	using Base = BasicEntityBuilder<SkyBoxTexture>;
-
-	SkyBoxEntityBuilder(Registry& registry, Entity entity);
-
-	SkyBoxEntityBuilder& withTexture(const std::filesystem::path& path);
 };
 
 } // namespace spatial::ecs

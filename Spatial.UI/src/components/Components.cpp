@@ -119,7 +119,7 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
 	bool changed = false;
 
-	changed |= ui::inputPath("Resource", mesh.resourcePath);
+	changed |= ui::inputPath("Resource", mesh.meshResource.relativePath);
 
 	spacing(3);
 
@@ -133,8 +133,6 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 	spacing(3);
 
 	const size_t smallStep = 1, largeStep = 5;
-
-	changed |= Search::searchEntity<ecs::tags::IsMaterial>("Default Material", registry, mesh.defaultMaterial);
 
 	spacing(3);
 
@@ -150,6 +148,18 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 		spacing(3);
 	}
+}
+
+template <>
+void componentInput<ecs::MeshMaterial>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
+	bool changed = false;
+	float smallStep = 1;
+	float largeStep = 1;
+
+	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep, &largeStep, "%lu");
+	changed |= ui::Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, meshMaterial.materialEntity);
 }
 
 template <>
@@ -208,14 +218,6 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 }
 
 template <>
-void componentInput<ecs::SkyBoxColor>(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& skybox = registry.getComponent<ecs::SkyBoxColor>(entity);
-
-	ImGui::ColorEdit3("Color", &skybox.color.r);
-}
-
-template <>
 void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
@@ -223,17 +225,6 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 	ImGui::DragInt2("Size", &sceneView.size.x);
 
 	Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
-
-	Search::searchEntity<ecs::tags::IsSkyBox>("SkyBox", registry, sceneView.skybox);
-	if (registry.hasAnyComponent<ecs::tags::IsSkyBox>(sceneView.camera)
-		&& ImGui::TreeNodeEx("SkyBox Properties", ImGuiTreeNodeFlags_SpanFullWidth))
-	{
-		spacing(3);
-		if (registry.hasAllComponents<ecs::SkyBoxColor>(sceneView.skybox))
-			ui::componentInput<ecs::SkyBoxColor>(registry, sceneView.skybox);
-		spacing(3);
-		ImGui::TreePop();
-	}
 
 	Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
 	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)

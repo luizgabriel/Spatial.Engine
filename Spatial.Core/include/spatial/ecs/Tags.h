@@ -23,8 +23,4 @@ struct IsMainView
 {
 };
 
-struct IsSkyBox
-{
-};
-
 } // namespace spatial::ecs::tags

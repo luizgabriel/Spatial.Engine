@@ -43,9 +43,9 @@ class Renderable
 
 	void setScreenSpaceContactShadows(bool enable) noexcept;
 
-	bool isShadowCaster() const noexcept;
+	[[nodiscard]] bool isShadowCaster() const noexcept;
 
-	bool isShadowReceiver() const noexcept;
+	[[nodiscard]] bool isShadowReceiver() const noexcept;
 
 	void setBones(Bone const* transforms, std::size_t boneCount = 1, std::size_t offset = 0) noexcept;
 
@@ -62,17 +62,17 @@ class Renderable
 
 	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, size_t offset, size_t count) noexcept;
 
-	const filament::Box& getAxisAlignedBoundingBox() const noexcept;
+	[[nodiscard]] const filament::Box& getAxisAlignedBoundingBox() const noexcept;
 
-	std::uint8_t getLayerMask() const noexcept;
+	[[nodiscard]] std::uint8_t getLayerMask() const noexcept;
 
-	std::size_t getPrimitiveCount() const noexcept;
+	[[nodiscard]] std::size_t getPrimitiveCount() const noexcept;
 
 	void setBlendOrderAt(std::size_t primitiveIndex, uint16_t order) noexcept;
 
-	filament::AttributeBitset getEnabledAttributesAt(std::size_t primitiveIndex) const noexcept;
+	[[nodiscard]] filament::AttributeBitset getEnabledAttributesAt(std::size_t primitiveIndex) const noexcept;
 
-	bool isValid() const noexcept;
+	[[nodiscard]] bool isValid() const noexcept;
 
 	[[nodiscard]] utils::Entity release() noexcept;
 
