@@ -25,8 +25,13 @@ struct Mesh
 
 struct MeshMaterial
 {
-	uint32_t primitiveIndex{0};
-	Entity materialEntity{ecs::NullEntity};
+	uint32_t primitiveIndex;
+	Entity materialEntity;
+
+	constexpr MeshMaterial(uint32_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
+		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
+	{
+	}
 };
 
 } // namespace spatial::ecs

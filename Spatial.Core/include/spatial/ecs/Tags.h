@@ -19,6 +19,10 @@ struct IsLight
 {
 };
 
+struct IsRenderableDirty
+{
+};
+
 struct IsMainView
 {
 };

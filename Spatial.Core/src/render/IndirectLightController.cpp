@@ -42,11 +42,11 @@ tl::expected<bands_t, ResourceError> toBandsData(const std::filesystem::path& pa
 void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 {
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
-		auto reflectionsTextureId = component.getReflectionsTextureResourceId();
+		auto reflectionsTextureId = component.reflectionsTexturePath.getId();
 
 		if (mTextures.find(reflectionsTextureId) == mTextures.end())
 		{
-			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath)
+			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath.relativePath)
 							  .and_then(validateResourcePath)
 							  .and_then(openFileReadStream)
 							  .transform(toVectorData)
@@ -61,11 +61,11 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 	});
 
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
-		auto irradianceValuesId = component.getIrradianceValuesResourceId();
+		auto irradianceValuesId = component.irradianceValuesPath.getId();
 
 		if (mBands.find(irradianceValuesId) == mBands.end())
 		{
-			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath)
+			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath.relativePath)
 							  .and_then(validateResourcePath)
 							  .and_then(toBandsData)
 							  .map_error(logResourceError);
@@ -79,17 +79,19 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 	registry.getEntities<ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
 		.each([&](ecs::Entity entity, ecs::IndirectLight& component) {
-			if (mTextures.find(component.getReflectionsTextureResourceId()) == mTextures.end())
+			const auto reflectionsId = component.reflectionsTexturePath.getId();
+
+			if (mTextures.find(reflectionsId) == mTextures.end())
 				return;
 
-			const auto& reflectionsTexture = mTextures.at(component.getReflectionsTextureResourceId());
+			const auto& reflectionsTexture = mTextures.at(reflectionsId);
 
 			auto builder =
 				filament::IndirectLight::Builder().intensity(component.intensity).reflections(reflectionsTexture.get());
 
-			if (mBands.find(component.getIrradianceValuesResourceId()) != mBands.end())
+			if (mBands.find(reflectionsId) != mBands.end())
 			{
-				const auto& irradianceBands = mBands.at(component.getIrradianceValuesResourceId());
+				const auto& irradianceBands = mBands.at(reflectionsId);
 				builder = builder.irradiance(3, &irradianceBands[0]);
 			}
 

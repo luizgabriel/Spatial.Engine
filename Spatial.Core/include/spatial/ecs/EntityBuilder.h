@@ -235,8 +235,8 @@ class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
 	IndirectLightEntityBuilder(Registry& registry, Entity entity);
 
 	IndirectLightEntityBuilder& withIntensity(float intensity);
-	IndirectLightEntityBuilder& withReflectionsTexturePath(std::filesystem::path path);
-	IndirectLightEntityBuilder& withIrradianceValuesPath(std::filesystem::path path);
+	IndirectLightEntityBuilder& withReflectionsTexturePath(const std::filesystem::path& path);
+	IndirectLightEntityBuilder& withIrradianceValuesPath(const std::filesystem::path& path);
 };
 
 template <typename MaterialComponent>

@@ -1,3 +1,4 @@
+#include "spatial/ecs/Relation.h"
 #include "spatial/ecs/SceneView.h"
 #include "spatial/render/TextureView.h"
 #include "spatial/ui/components/SceneView.h"
@@ -37,19 +38,8 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 
 bool inputText(const std::string_view label, std::string& value)
 {
-	if (label[0] != '#')
-	{
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("%s", label.data());
-		ImGui::SameLine();
-	}
-
-	ImGui::PushID(label.data());
-	const auto changed = ImGui::InputText("##", value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
-										  &inputTextCallback, &value);
-	ImGui::PopID();
-
-	return changed;
+	return ImGui::InputText(label.data(), value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
+							&inputTextCallback, &value);
 }
 
 bool inputPath(const std::string_view label, std::filesystem::path& path)
@@ -113,6 +103,8 @@ void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
 	ImGui::InputFloat("Halo size", &light.haloSize);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
 template <>
 void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 {
@@ -127,8 +119,8 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 	spacing(3);
 
-	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
-	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	changed |= ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
+	changed |= ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
 
 	spacing(3);
 
@@ -148,18 +140,98 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 		spacing(3);
 	}
+
+	if (ImGui::TreeNodeEx("Materials", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		spacing(3);
+
+		const auto* parent = registry.tryGetComponent<ecs::Parent>(entity);
+		const auto childrenCount = parent != nullptr ? parent->childrenCount : 0;
+
+		if (ImGui::Button("Add Slot"))
+		{
+			auto child =
+				ecs::build(registry).withName(fmt::format("Primitive {}", childrenCount)).with(ecs::MeshMaterial{});
+			ecs::Parent::addChild(registry, entity, child);
+			mesh.partsCount = std::max(mesh.partsCount, childrenCount + 1);
+			changed = true;
+		}
+
+		static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
+											 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
+											 | ImGuiTableFlags_NoBordersInBody;
+
+		if (ImGui::BeginTable("MaterialsTable", 3, flags))
+		{
+
+			ImGui::TableSetupColumn("Primitive Index");
+			ImGui::TableSetupColumn("Material", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Actions");
+			ImGui::TableHeadersRow();
+
+			if (parent)
+			{
+				auto childrenToDestroy = std::vector<ecs::Entity>{};
+
+				ecs::Parent::forEachChild(registry, entity, [&](ecs::Entity child) {
+					auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(child);
+
+					ImGui::PushID((int)child);
+
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U32, &meshMaterial.primitiveIndex,
+												  &smallStep, &largeStep, "%lu");
+
+					ImGui::TableNextColumn();
+
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					changed |= ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
+																			   meshMaterial.materialEntity);
+
+					ImGui::TableNextColumn();
+
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					if (ImGui::Button("Remove"))
+						childrenToDestroy.emplace_back(child);
+
+					ImGui::PopID();
+				});
+
+				for (auto child : childrenToDestroy)
+				{
+					ecs::Child::remove(registry, child);
+					registry.destroy(child);
+					mesh.partsCount = std::max(0ul, mesh.partsCount - 1);
+					changed = true;
+				}
+			}
+
+			ImGui::EndTable();
+		}
+
+		spacing(3);
+
+		ImGui::TreePop();
+	}
+
+	if (changed)
+		registry.addComponent<ecs::tags::IsRenderableDirty>(entity);
 }
+#pragma clang diagnostic pop
 
 template <>
 void componentInput<ecs::MeshMaterial>(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
-	bool changed = false;
 	float smallStep = 1;
 	float largeStep = 1;
 
-	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep, &largeStep, "%lu");
-	changed |= ui::Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, meshMaterial.materialEntity);
+	ImGui::InputScalar("Primitive Index", ImGuiDataType_U32, &meshMaterial.primitiveIndex, &smallStep, &largeStep,
+					   "%lu");
+	ui::Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, meshMaterial.materialEntity);
 }
 
 template <>
@@ -228,7 +300,7 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 
 	Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
 	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
-		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth))
+		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		spacing(3);
 		if (registry.hasAllComponents<ecs::PerspectiveCamera>(sceneView.camera))
@@ -242,7 +314,7 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 	}
 
 	if (registry.hasAllComponents<render::TextureView>(entity)
-		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth))
+		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		SceneView::image(registry, entity, {ImGui::GetContentRegionAvailWidth(), 100});
 		ImGui::TreePop();

@@ -37,4 +37,12 @@ void serialize(Archive& ar, spatial::editor::DefaultMaterial& material)
 	ar(cereal::make_nvp("reflectance", material.reflectance));
 }
 
+template <typename Archive>
+void serialize(Archive& ar, spatial::editor::SkyBoxMaterial& material)
+{
+	ar(cereal::make_nvp("skybox", material.skybox.relativePath));
+	ar(cereal::make_nvp("showSun", material.showSun));
+	ar(cereal::make_nvp("color", material.color));
+}
+
 } // namespace cereal
