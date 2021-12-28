@@ -45,9 +45,10 @@ class EntityProperties
 			}
 		}
 
-		if (isOpen)
-		{
+		if (isOpen) {
+			spacing(3);
 			componentInput<Component>(registry, selectedEntity);
+			spacing(3);
 		}
 
 		return isOpen;

@@ -31,7 +31,7 @@ struct SkyBoxMaterial
 		instance.setParameter("color", color);
 
 		const auto* texture = finder(skybox);
-		instance.setParameter("constantColor", texture != nullptr);
+		instance.setParameter("constantColor", texture == nullptr);
 
 		const auto* dummy = finder(ecs::Resource<ecs::ResourceType::CubeMapTexture>{"engine://dummy_cubemap"});
 		assert(dummy != nullptr);

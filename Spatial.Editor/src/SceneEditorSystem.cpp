@@ -59,22 +59,6 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mRootPath{}
 
 {
-	mTextures.emplace("editor://textures/icons.png"_hs,
-					  render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE));
-	mTextures.emplace(
-		"editor://textures/default_skybox/texture.ktx"_hs,
-		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
-
-	mTextures.emplace("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-
-	auto materialInstance = toShared(render::createMaterialInstance(mEngine, mDefaultMaterial.ref()));
-	materialInstance->setParameter("baseColor", math::float3{1.0f});
-	materialInstance->setParameter("metallic", .1f);
-	materialInstance->setParameter("roughness", 1.0f);
-	materialInstance->setParameter("reflectance", .1f);
-
-	mMeshController.setDefaultMaterialInstance(materialInstance);
-
 	mJobQueue.connect<OpenProjectEvent>(*this);
 	mJobQueue.connect<ClearSceneEvent>(*this);
 	mJobQueue.connect<LoadSceneEvent>(*this);
@@ -83,6 +67,14 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 void SceneEditorSystem::onStart()
 {
+	mTextures.emplace("editor://textures/icons.png"_hs,
+					  render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE));
+	mTextures.emplace(
+		"editor://textures/default_skybox/texture.ktx"_hs,
+		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
+
+	mTextures.emplace("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
+
 	mMeshController.load("editor://meshes/cube.filamesh"_hs,
 						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
 	mMeshController.load("editor://meshes/sphere.filamesh"_hs,
@@ -109,7 +101,7 @@ void SceneEditorSystem::onStartFrame(float)
 			.withName("Default SkyBox")
 			.asMaterial<SkyBoxMaterial>({
 				false,
-				{.0f},
+				{math::float3{.0f}, 1.0f},
 				{"editor://textures/default_skybox/texture.ktx"},
 			});
 	}
@@ -138,6 +130,7 @@ void SceneEditorSystem::onStartFrame(float)
 			.asSceneView()
 			.withIndirectLight(ecs::build(mRegistry)
 								   .withName("Indirect Light Editor SkyBox")
+								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
 								   .withReflectionsTexturePath("editor://textures/default_skybox/ibl.ktx")
 								   .withIrradianceValuesPath("editor://textures/default_skybox/sh.txt"))
@@ -163,9 +156,8 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mIndirectLightController.onUpdateFrame(mRegistry);
 
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(), [this](const auto& resource) {
-		auto it = std::as_const(mTextures).find(resource.getId());
-		return (it != mTextures.end()) ? it->second.get() : nullptr;
+	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(), [this](const auto& res) {
+		return findResource(res);
 	});
 
 	mMeshController.onUpdateFrame(mRegistry);
@@ -297,7 +289,7 @@ void SceneEditorSystem::saveScene()
 	if (result.has_value())
 	{
 		auto xml = XMLOutputArchive{result.value()};
-		ecs::serialize<DefaultMaterial, EditorCamera, tags::IsEditorEntity>(xml, mRegistry);
+		ecs::serialize<DefaultMaterial, SkyBoxMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh, tags::IsEditorView>(xml, mRegistry);
 	}
 }
 

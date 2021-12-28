@@ -318,17 +318,15 @@ IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIntensity(float inte
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexturePath(std::filesystem::path path)
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexturePath(const std::filesystem::path& path)
 {
-	auto& component = getComponent();
-	component.reflectionsTexturePath = std::move(path);
+	getComponent().reflectionsTexturePath.relativePath = path;
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath(std::filesystem::path path)
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath(const std::filesystem::path& path)
 {
-	auto& component = getComponent();
-	component.irradianceValuesPath = std::move(path);
+	getComponent().irradianceValuesPath.relativePath = path;
 	return *this;
 }
 

@@ -3,6 +3,7 @@
 #include "EditorCamera.h"
 #include "Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/TextureView.h>
@@ -40,7 +41,8 @@ void componentInput<editor::SkyBoxMaterial>(ecs::Registry& registry, ecs::Entity
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 
 	ImGui::Checkbox("Show Sun", &data.showSun);
-	ImGui::ColorPicker4("Color", &data.color.r);
+	ImGui::DragFloat("Color Alpha", &data.color.a, .01f, .0f, 1.0f);
+	ImGui::ColorEdit4("Color", &data.color.r);
 	ui::inputPath("Cubemap Texture", data.skybox.relativePath);
 }
 
@@ -298,6 +300,8 @@ void OpenProjectModal::open()
 bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities,
 							std::string_view search)
 {
+	using namespace boost::algorithm;
+
 	bool changed = false;
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
@@ -317,8 +321,11 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Visibility", ImGuiTableColumnFlags_WidthFixed, 18.0f);
 		ImGui::TableHeadersRow();
 
+		auto lowerCaseSearch = std::string{search};
+		to_lower(lowerCaseSearch);
+
 		const auto onEachNodeFn = [&](ecs::Entity entity, const auto& name) {
-			if (!boost::algorithm::contains(name.name, search))
+			if (!boost::algorithm::contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
 			changed |= displayNode(registry, entity, selectedEntity);
@@ -381,6 +388,8 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
 							bool showEditorEntities)
 {
+	using namespace boost::algorithm;
+
 	bool changed = false;
 
 	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
@@ -392,8 +401,11 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
 		ImGui::TableHeadersRow();
 
+		auto lowerCaseSearch = std::string{search};
+		to_lower(lowerCaseSearch);
+
 		const auto actionFn = [&](ecs::Entity entity, const auto& name) {
-			if (!boost::algorithm::contains(name.c_str(), search))
+			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
 			ImGui::TableNextRow();
@@ -467,7 +479,7 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
 {
 	auto dnd = DragAndDropTarget{};
-	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
+	const auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
 	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".xml"))
 	{
 		selectedEntity = ecs::NullEntity;

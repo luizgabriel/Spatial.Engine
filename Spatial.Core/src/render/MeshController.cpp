@@ -1,4 +1,5 @@
 #include "spatial/ecs/Relation.h"
+#include "spatial/ecs/Tags.h"
 #include <array>
 #include <boost/algorithm/string/predicate.hpp>
 #include <filament/Engine.h>
@@ -14,11 +15,14 @@
 namespace spatial::render
 {
 
-static constexpr std::array<math::float4, 3> sFullScreenTriangleVertices = {math::float4{-1.0f, -1.0f, 1.0f, 1.0f},
-																			math::float4{3.0f, -1.0f, 1.0f, 1.0f},
-																			math::float4{-1.0f, 3.0f, 1.0f, 1.0f}};
+static constexpr math::float3 sFullScreenTriangleVertices[3] = {
+	{ -1.0f, -1.0f, 1.0f },
+	{  3.0f, -1.0f, 1.0f },
+	{ -1.0f,  3.0f, 1.0f }
+};
 
-static constexpr std::array<uint16_t, 3> sFullScreenTriangleIndices = {0, 1, 2};
+// these must be static because only a pointer is copied to the render stream
+static const uint16_t sFullScreenTriangleIndices[3] = { 0, 1, 2 };
 
 MeshController::MeshController(filament::Engine& engine)
 	: mEngine{engine}, mRoot{}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
@@ -26,10 +30,10 @@ MeshController::MeshController(filament::Engine& engine)
 	auto* vb = filament::VertexBuffer::Builder()
 				   .vertexCount(3)
 				   .bufferCount(1)
-				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT4, 0)
+				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
 				   .build(mEngine);
 
-	vb->setBufferAt(mEngine, 0, {sFullScreenTriangleVertices.data(), sizeof(sFullScreenTriangleVertices)});
+	vb->setBufferAt(mEngine, 0, {sFullScreenTriangleVertices, sizeof(sFullScreenTriangleVertices)});
 
 	mVertexBuffers.emplace("engine://fullscreen"_hs, render::VertexBuffer{mEngine, vb});
 
@@ -37,11 +41,11 @@ MeshController::MeshController(filament::Engine& engine)
 				   .indexCount(3)
 				   .bufferType(filament::IndexBuffer::IndexType::USHORT)
 				   .build(mEngine);
-	ib->setBuffer(mEngine, {sFullScreenTriangleIndices.data(), sizeof(sFullScreenTriangleIndices)});
+	ib->setBuffer(mEngine, {sFullScreenTriangleIndices, sizeof(sFullScreenTriangleIndices)});
 
 	mIndexBuffers.emplace("engine://fullscreen"_hs, render::IndexBuffer{mEngine, ib});
 
-	mMeshGeometries.emplace("engine://fullscreen"_hs, std::vector<MeshGeometry>{MeshGeometry{0, vb->getVertexCount()}});
+	mMeshGeometries.emplace("engine://fullscreen"_hs, std::vector<MeshGeometry>{MeshGeometry{0, ib->getIndexCount()}});
 }
 
 void MeshController::load(MeshId resourceId, const FilameshFile& filamesh)
@@ -66,7 +70,7 @@ void MeshController::onUpdateFrame(ecs::Registry& registry)
 	populateMeshesDatabase(registry);
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
-	clearDeletedOrDirtyMeshes(registry);
+	clearDirtyRenderables(registry);
 }
 
 void MeshController::createRenderableMeshes(ecs::Registry& registry)
@@ -80,20 +84,8 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 
 			const auto& parts = mMeshGeometries.at(resourceId);
 			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
-			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
-		});
-}
+			auto& renderable = registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
 
-void MeshController::updateMeshGeometries(ecs::Registry& registry)
-{
-	registry.getEntities<const ecs::Mesh, Renderable>().each(
-		[&, this](ecs::Entity entity, const auto& mesh, auto& renderable) {
-			const auto resourceId = mesh.meshResource.getId();
-
-			if (!hasMeshData(resourceId))
-				return;
-
-			const auto& parts = mMeshGeometries.at(resourceId);
 			auto& vertexBuffer = mVertexBuffers.at(resourceId);
 			auto& indexBuffer = mIndexBuffers.at(resourceId);
 
@@ -106,28 +98,28 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			renderable.setCulling(mesh.culling);
 			renderable.setPriority(mesh.priority);
 
-			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
-
 			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 			{
 				const auto& geometry = parts[std::min(mesh.partsOffset + i, parts.size() - 1)];
 				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
 										 geometry.offset, geometry.count);
-				renderable.setMaterialInstanceAt(i, mDefaultMaterialInstance.get());
 			}
+		});
+}
 
-			if (registry.template hasAllComponents<ecs::Parent>(entity))
-			{
-				ecs::Parent::forEachChild(registry, entity, [&](ecs::Entity child) {
-					const auto* meshMaterial = registry.tryGetComponent<const ecs::MeshMaterial>(child);
-					if (meshMaterial != nullptr)
-					{
-						const auto& materialInstance =
-							registry.getComponent<const MaterialInstance>(meshMaterial->materialEntity);
-						renderable.setMaterialInstanceAt(meshMaterial->primitiveIndex, materialInstance.get());
-					}
-				});
-			}
+void MeshController::updateMeshGeometries(ecs::Registry& registry)
+{
+	registry.getEntities<const ecs::MeshMaterial, const ecs::Child>().each(
+		[&](const auto& meshMaterial, const ecs::Child& child) {
+			if (!registry.hasAllComponents<Renderable, ecs::Mesh>(child.parent))
+				return;
+
+			auto& renderable = registry.getComponent<Renderable>(child.parent);
+			const auto& mesh = registry.getComponent<const ecs::Mesh>(child.parent);
+
+			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialEntity);
+			if (material != nullptr)
+				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
 		});
 }
 
@@ -138,10 +130,13 @@ bool MeshController::hasMeshData(MeshId resourceId) const
 		   && mMeshGeometries.find(resourceId) != mMeshGeometries.end();
 }
 
-void MeshController::clearDeletedOrDirtyMeshes(ecs::Registry& registry)
+void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<Renderable>(ecs::ExcludeComponents<ecs::Mesh>);
-	registry.removeComponent<Renderable>(view.begin(), view.end());
+	auto d1 = registry.getEntities<ecs::tags::IsRenderableDirty, Renderable>();
+	registry.removeComponent<Renderable>(d1.begin(), d1.end());
+
+	auto d2 = registry.getEntities<ecs::tags::IsRenderableDirty>();
+	registry.removeComponent<ecs::tags::IsRenderableDirty>(d2.begin(), d2.end());
 }
 
 void MeshController::setRootPath(const std::filesystem::path& root)
@@ -173,11 +168,6 @@ void MeshController::populateMeshesDatabase(ecs::Registry& registry)
 
 		load(resourceId, result.value());
 	});
-}
-
-void MeshController::setDefaultMaterialInstance(const SharedMaterialInstance& defaultMaterialInstance)
-{
-	mDefaultMaterialInstance = defaultMaterialInstance;
 }
 
 } // namespace spatial::render

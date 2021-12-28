@@ -30,8 +30,6 @@ class MeshController
 
 	void setRootPath(const std::filesystem::path& root);
 
-	void setDefaultMaterialInstance(const SharedMaterialInstance& mDefaultMaterialInstance);
-
   private:
 	filament::Engine& mEngine;
 	std::filesystem::path mRoot;
@@ -40,13 +38,10 @@ class MeshController
 	std::unordered_map<MeshId, std::vector<MeshGeometry>> mMeshGeometries;
 	std::unordered_map<MeshId, filament::Box> mBoundingBoxes;
 
-	SharedMaterialInstance mDefaultMaterialInstance;
-
 	void populateMeshesDatabase(ecs::Registry& registry);
-
 	void createRenderableMeshes(ecs::Registry& registry);
 	void updateMeshGeometries(ecs::Registry& registry);
-	void clearDeletedOrDirtyMeshes(ecs::Registry& registry);
+	void clearDirtyRenderables(ecs::Registry& registry);
 
 	[[nodiscard]] bool hasMeshData(MeshId resourceId) const;
 };
