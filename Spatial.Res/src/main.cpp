@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <argh.h>
+#include <filesystem>
 #include <fmt/format.h>
 #include <fstream>
 #include <iostream>

@@ -11,7 +11,6 @@ struct SceneView
 	math::int2 size{1280, 720};
 	Entity camera{ecs::NullEntity};
 	Entity indirectLight{ecs::NullEntity};
-	Entity skybox{ecs::NullEntity};
 };
 
 } // namespace spatial::ecs

@@ -18,13 +18,13 @@ class MeshController
 	using MeshId = uint32_t;
 	struct MeshGeometry
 	{
-		std::uint32_t offset;
-		std::uint32_t count;
+		size_t offset;
+		size_t count;
 	};
 
 	explicit MeshController(filament::Engine& engine);
 
-	void onUpdateFrame(ecs::Registry& registry, float delta);
+	void onUpdateFrame(ecs::Registry& registry);
 
 	void load(MeshId resourceId, const FilameshFile& filamesh);
 

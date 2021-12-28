@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DefaultMaterial.h"
+#include "Materials.h"
 #include "EditorCamera.h"
 #include "Tags.h"
 

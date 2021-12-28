@@ -37,10 +37,6 @@ void SceneController::onUpdateFrame(ecs::Registry& registry)
 
 	registry.getEntities<const ecs::SceneView, Scene>().each(
 		[&](const ecs::SceneView& component, render::Scene& scene) {
-			auto* skybox = registry.tryGetComponent<Skybox>(component.skybox);
-			if (skybox)
-				scene->setSkybox(skybox->get());
-
 			auto* indirectLight = registry.tryGetComponent<IndirectLight>(component.indirectLight);
 			if (indirectLight)
 				scene->setIndirectLight(indirectLight->get());

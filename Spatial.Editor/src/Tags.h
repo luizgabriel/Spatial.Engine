@@ -11,4 +11,8 @@ struct IsEditorView
 {
 };
 
+struct IsSkyBoxMesh
+{
+};
+
 } // namespace spatial::editor::tags

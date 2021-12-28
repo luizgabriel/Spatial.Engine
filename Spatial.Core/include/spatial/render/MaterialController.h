@@ -14,15 +14,15 @@ class MaterialController
 	{
 	}
 
-	template <typename MaterialComponent>
-	void onUpdateFrame(ecs::Registry& registry, const filament::Material& material)
+	template <typename MaterialComponent, typename... Args>
+	void onUpdateFrame(ecs::Registry& registry, const filament::Material& material, Args&&... args)
 	{
 		auto toBeAdded = registry.getEntities<MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>);
 		for (auto entity : toBeAdded)
 			registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material));
 
 		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
-			[](const auto& data, auto& materialInstance) { data.setParameters(materialInstance.ref()); });
+			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref(), std::forward<Args>(args)...); });
 
 		// Clear Removed materials
 		auto toBeRemoved = registry.getEntities<MaterialInstance>(ecs::ExcludeComponents<MaterialComponent>);

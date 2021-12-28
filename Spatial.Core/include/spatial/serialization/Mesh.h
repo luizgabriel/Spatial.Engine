@@ -12,12 +12,18 @@ namespace cereal
 template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::Mesh& mesh)
 {
-	ar(make_nvp("resourcePath", mesh.resourcePath));
+	ar(make_nvp("resourcePath", mesh.meshResource.relativePath));
 	ar(make_nvp("receiveShadows", mesh.receiveShadows));
 	ar(make_nvp("castShadows", mesh.castShadows));
 	ar(make_nvp("partsCount", mesh.partsCount));
 	ar(make_nvp("partsOffset", mesh.partsOffset));
-	ar(make_nvp("defaultMaterial", mesh.defaultMaterial));
+}
+
+template <typename Archive>
+void serialize(Archive& ar, spatial::ecs::MeshMaterial& meshMaterial)
+{
+	ar(make_nvp("primitiveIndex", meshMaterial.primitiveIndex));
+	ar(make_nvp("materialEntity", meshMaterial.materialEntity));
 }
 
 } // namespace cereal

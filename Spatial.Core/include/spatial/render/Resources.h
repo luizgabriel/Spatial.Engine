@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <string_view>
+#include <spatial/resources/FilameshFile.h>
 
 namespace spatial::render
 {
@@ -79,8 +80,24 @@ Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
 Entity createEntity(filament::Engine& engine) noexcept;
 
 MaterialInstance createMaterialInstance(filament::Engine& engine, const filament::Material& material,
-										const std::string_view = {nullptr, 0}) noexcept;
+										std::string_view = {}) noexcept;
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
+
+Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size);
+
+Texture createTexture(filament::Engine& engine, math::int2 dimensions, filament::Texture::InternalFormat format,
+					  filament::Texture::Usage usage = filament::Texture::Usage::DEFAULT,
+					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
+
+Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size,
+					  filament::Texture::Usage usage = filament::Texture::Usage::DEFAULT,
+					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
+
+Texture createDummyCubemap(filament::Engine& engine);
+
+VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
+
+IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
 } // namespace spatial::render
