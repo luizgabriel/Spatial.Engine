@@ -68,7 +68,7 @@ bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs:
 
 	changed |= displayComponent<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
 
-	// changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
+	changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
 
 	changed |= displayComponent<ecs::SceneView>("Scene View", registry, selectedEntity);
 
@@ -153,6 +153,11 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity sel
 
 	if (!registry.hasAnyComponent<ecs::CustomCamera>(selectedEntity) && menu.item("Custom Camera"))
 		registry.addComponent<ecs::CustomCamera>(selectedEntity);
+
+	ImGui::Separator();
+
+	if (!registry.hasAnyComponent<ecs::SceneView>(selectedEntity) && menu.item("View"))
+		registry.addComponent<ecs::SceneView>(selectedEntity);
 }
 
 void EntityProperties::popup(ecs::Registry& registry, ecs::Entity selectedEntity)
@@ -325,7 +330,7 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		to_lower(lowerCaseSearch);
 
 		const auto onEachNodeFn = [&](ecs::Entity entity, const auto& name) {
-			if (!boost::algorithm::contains(to_lower_copy(name.name), lowerCaseSearch))
+			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
 			changed |= displayNode(registry, entity, selectedEntity);
@@ -633,6 +638,14 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	ImGui::Separator();
 
+	if (menu.item("Scene View"))
+	{
+		newEntity = ecs::build(registry)
+						.withName("Scene View")
+						.asSceneView();
+		changed = true;
+	}
+
 	if (registry.isValid(newEntity))
 	{
 		if (registry.isValid(selectedEntity) && addAsChild)
@@ -707,6 +720,7 @@ bool EditorMainMenu::fileMenu()
 		const ImVec2 size = ImGui::GetWindowSize();
 		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 		ImGui::SetNextWindowSize(ImVec2(size.x / 2, size.y / 2));
+		changed = true;
 	}
 
 	switch (action)

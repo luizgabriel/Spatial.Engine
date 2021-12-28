@@ -9,6 +9,7 @@
 #include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
 #include <spatial/serialization/Transform.h>
+#include <spatial/serialization/SceneView.h>
 
 namespace spatial::ecs
 {
@@ -29,9 +30,11 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::IndirectLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
+	snapshot.component<ecs::MeshMaterial>(ar);
 	snapshot.component<ecs::UUID>(ar);
 	snapshot.component<ecs::Parent>(ar);
 	snapshot.component<ecs::Child>(ar);
+	snapshot.component<ecs::SceneView>(ar);
 
 	snapshot.component<ecs::tags::IsMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);
@@ -57,13 +60,20 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::DirectionalLight>(ar);
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
+	snapshot.component<ecs::IndirectLight>(ar);
 	snapshot.component<ecs::Mesh>(ar);
+	snapshot.component<ecs::MeshMaterial>(ar);
 	snapshot.component<ecs::UUID>(ar);
 	snapshot.component<ecs::Parent>(ar);
 	snapshot.component<ecs::Child>(ar);
+	snapshot.component<ecs::SceneView>(ar);
 
 	snapshot.component<ecs::tags::IsMaterial>(ar);
 	snapshot.component<ecs::tags::IsRenderable>(ar);
+	snapshot.component<ecs::tags::IsCamera>(ar);
+	snapshot.component<ecs::tags::IsLight>(ar);
+	snapshot.component<ecs::tags::IsRenderableDirty>(ar);
+	snapshot.component<ecs::tags::IsMainView>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
 

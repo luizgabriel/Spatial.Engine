@@ -1,11 +1,7 @@
-#include "spatial/ecs/Relation.h"
-#include "spatial/ecs/Tags.h"
-#include <array>
 #include <boost/algorithm/string/predicate.hpp>
-#include <filament/Engine.h>
-#include <fstream>
-#include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
@@ -16,13 +12,10 @@ namespace spatial::render
 {
 
 static constexpr math::float3 sFullScreenTriangleVertices[3] = {
-	{ -1.0f, -1.0f, 1.0f },
-	{  3.0f, -1.0f, 1.0f },
-	{ -1.0f,  3.0f, 1.0f }
-};
+	{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}};
 
 // these must be static because only a pointer is copied to the render stream
-static const uint16_t sFullScreenTriangleIndices[3] = { 0, 1, 2 };
+static const uint16_t sFullScreenTriangleIndices[3] = {0, 1, 2};
 
 MeshController::MeshController(filament::Engine& engine)
 	: mEngine{engine}, mRoot{}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
@@ -32,10 +25,9 @@ MeshController::MeshController(filament::Engine& engine)
 				   .bufferCount(1)
 				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
 				   .build(mEngine);
-
 	vb->setBufferAt(mEngine, 0, {sFullScreenTriangleVertices, sizeof(sFullScreenTriangleVertices)});
 
-	mVertexBuffers.emplace("engine://fullscreen"_hs, render::VertexBuffer{mEngine, vb});
+	mVertexBuffers.emplace("engine://fullscreen"_hs, VertexBuffer{mEngine, vb});
 
 	auto* ib = filament::IndexBuffer::Builder()
 				   .indexCount(3)
@@ -43,7 +35,7 @@ MeshController::MeshController(filament::Engine& engine)
 				   .build(mEngine);
 	ib->setBuffer(mEngine, {sFullScreenTriangleIndices, sizeof(sFullScreenTriangleIndices)});
 
-	mIndexBuffers.emplace("engine://fullscreen"_hs, render::IndexBuffer{mEngine, ib});
+	mIndexBuffers.emplace("engine://fullscreen"_hs, IndexBuffer{mEngine, ib});
 
 	mMeshGeometries.emplace("engine://fullscreen"_hs, std::vector<MeshGeometry>{MeshGeometry{0, ib->getIndexCount()}});
 }
@@ -84,7 +76,21 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 
 			const auto& parts = mMeshGeometries.at(resourceId);
 			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
-			auto& renderable = registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
+			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
+		});
+}
+
+void MeshController::updateMeshGeometries(ecs::Registry& registry)
+{
+	registry.getEntities<const Entity, const ecs::Mesh, Renderable>()
+		.each([&](ecs::Entity e, const auto& entity, const auto& mesh, auto& renderable) {
+			const auto resourceId = mesh.meshResource.getId();
+
+			if (!hasMeshData(resourceId))
+				return;
+
+			const auto& parts = mMeshGeometries.at(resourceId);
+			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
 
 			auto& vertexBuffer = mVertexBuffers.at(resourceId);
 			auto& indexBuffer = mIndexBuffers.at(resourceId);
@@ -105,10 +111,7 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 										 geometry.offset, geometry.count);
 			}
 		});
-}
 
-void MeshController::updateMeshGeometries(ecs::Registry& registry)
-{
 	registry.getEntities<const ecs::MeshMaterial, const ecs::Child>().each(
 		[&](const auto& meshMaterial, const ecs::Child& child) {
 			if (!registry.hasAllComponents<Renderable, ecs::Mesh>(child.parent))

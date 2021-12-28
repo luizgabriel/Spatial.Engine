@@ -78,6 +78,12 @@ class NewSceneModal
 
 	static void open();
 
+	static bool show()
+	{
+		auto modal = NewSceneModal{};
+		return modal.onConfirm();
+	}
+
   private:
 	PopupModal mModal;
 	bool mIsConfirmed{false};
@@ -91,12 +97,10 @@ class OpenSceneModal
 
 	static void open();
 
-	template <typename Function>
-	static void onConfirm(std::filesystem::path& openPath, Function func)
+	static bool show(std::filesystem::path& openPath)
 	{
 		auto modal = OpenSceneModal{openPath};
-		if (modal.onConfirm())
-			std::invoke(std::forward<Function>(func), std::as_const(openPath));
+		return modal.onConfirm();
 	}
 
   private:
@@ -112,6 +116,12 @@ class SaveSceneModal
 
 	static void open();
 
+	static bool show(std::filesystem::path& savePath)
+	{
+		auto modal = SaveSceneModal{savePath};
+		return modal.onConfirm();
+	}
+
   private:
 	PopupModal mModal;
 	bool mConfirmed;
@@ -125,12 +135,10 @@ class OpenProjectModal
 
 	static void open();
 
-	template <typename Function>
-	static void onConfirm(std::filesystem::path& openPath, Function func)
+	static bool show(std::filesystem::path& openPath)
 	{
 		auto modal = OpenProjectModal{openPath};
-		if (modal.onConfirm())
-			std::invoke(std::forward<Function>(func), std::as_const(openPath));
+		return modal.onConfirm();
 	}
 
   private:

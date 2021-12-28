@@ -9,8 +9,8 @@ tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream)
 	try
 	{
 		auto archive = XMLInputArchive{std::ref(istream)};
-		ecs::deserialize<editor::DefaultMaterial, editor::EditorCamera, editor::tags::IsEditorEntity>(archive,
-																									  registry);
+		ecs::deserialize<DefaultMaterial, SkyBoxMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh,
+						 tags::IsEditorView>(archive, registry);
 	}
 	catch (const std::exception& e)
 	{
