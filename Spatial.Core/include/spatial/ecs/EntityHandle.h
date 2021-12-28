@@ -43,6 +43,12 @@ class EntityHandle
 	}
 
 	template <typename Component>
+	auto add(Component&& component)
+	{
+		return mRegistry.addComponent<Component>(mEntity, std::forward<Component>(component));
+	}
+
+	template <typename Component>
 	Component& get()
 	{
 		assert(isValid());

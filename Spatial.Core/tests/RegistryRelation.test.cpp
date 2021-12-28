@@ -84,7 +84,7 @@ TEST(RegistryRelation, ThreeChildren)
 	const auto& child2 = registry.getComponent<const ecs::Child>(child2Entity);
 	const auto& child3 = registry.getComponent<const ecs::Child>(child3Entity);
 
-	ASSERT_EQ(parent.childrenCount, 2);
+	ASSERT_EQ(parent.childrenCount, 3);
 	ASSERT_TRUE(registry.isValid(parent.first));
 	ASSERT_TRUE(registry.isValid(parent.last));
 	ASSERT_EQ(parent.first, child1Entity);
@@ -99,7 +99,7 @@ TEST(RegistryRelation, ThreeChildren)
 	ASSERT_EQ(child1.next, child2Entity);
 	ASSERT_EQ(child2.previous, child1Entity);
 	ASSERT_EQ(child2.next, child3Entity);
-	ASSERT_EQ(child2.previous, child2Entity);
+	ASSERT_EQ(child2.previous, child1Entity);
 	ASSERT_EQ(child3.previous, child2Entity);
 }
 
@@ -161,7 +161,7 @@ TEST(RegistryRelation, RemoveSecondChild)
 
 	ecs::Child::remove(registry, child2Entity);
 
-	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child1Entity));
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child2Entity));
 
 	const auto& parent = registry.getComponent<ecs::Parent>(parentEntity);
 	ASSERT_EQ(parent.childrenCount, 2);
@@ -187,7 +187,7 @@ TEST(RegistryRelation, RemoveThirdChild)
 
 	ecs::Child::remove(registry, child3Entity);
 
-	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child1Entity));
+	ASSERT_FALSE(registry.hasAnyComponent<ecs::Child>(child3Entity));
 
 	const auto& parent = registry.getComponent<ecs::Parent>(parentEntity);
 	ASSERT_EQ(parent.childrenCount, 2);

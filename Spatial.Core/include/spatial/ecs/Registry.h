@@ -111,6 +111,13 @@ class Registry
 		mRegistry.remove<Component>(begin, end);
 	}
 
+	template <typename Component>
+	decltype(auto) addComponent(Entity entity, Component&& component)
+	{
+		assert(isValid(entity));
+		return mRegistry.emplace<Component>(entity, std::forward<Component>(component));
+	}
+
 	template <typename Component, typename... Args>
 	decltype(auto) addComponent(Entity entity, Args&&... args)
 	{
@@ -125,11 +132,25 @@ class Registry
 		return mRegistry.template emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
 	}
 
+	template <typename Component>
+	decltype(auto) addOrReplace(Entity entity, Component&& component)
+	{
+		assert(isValid(entity));
+		return mRegistry.template emplace_or_replace<Component>(entity, std::forward<Component>(component));
+	}
+
 	template <typename Component, typename... Args>
 	decltype(auto) getOrAddComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
 		return mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component>
+	decltype(auto) getOrAddComponent(Entity entity, Component&& component)
+	{
+		assert(isValid(entity));
+		return mRegistry.get_or_emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename... Component>
