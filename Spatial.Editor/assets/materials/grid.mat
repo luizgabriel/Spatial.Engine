@@ -1,0 +1,48 @@
+material {
+    name : Grid,
+    parameters : [
+        {
+           type : float2,
+           name : scale
+        },
+        {
+           type : float,
+           name : thickness
+        },
+        {
+           type : float3,
+           name : color
+        }
+    ],
+    requires : [ uv0 ],
+    shadingModel : unlit,
+    culling : none,
+    doubleSided : true,
+    blending : multiply
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+
+        vec2 uv = getUV0() * materialParams.scale;
+        vec2 uv2 = fract(8.0*uv + 0.5) - 0.5; // add and subtract half a unit to get centered lines
+        vec2 uv3 = fract(1.0*uv + 0.5) - 0.5;
+
+        float d2 = materialParams.thickness;
+        float d3 = 2.0 * materialParams.thickness / 8.0;
+
+        // background
+        vec3 color = vec3(1.0, 1.0, 1.0);
+
+        // thick lines every 8x8
+        if (abs(uv3.x) < d3 || abs(uv3.y) < d3)
+            color = materialParams.color;
+
+        // thin lin every 1x1
+        if (abs(uv2.x) < d2|| abs(uv2.y) < d2)
+            color = materialParams.color;
+
+        material.baseColor.rgb = color;
+    }
+}

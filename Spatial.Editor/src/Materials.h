@@ -18,6 +18,15 @@ struct DefaultMaterial
 	void apply(filament::MaterialInstance& instance) const;
 };
 
+struct GridMaterial
+{
+	math::float3 color{.5f, .5f, .5f};
+	math::float2 scale{10.0f};
+	float thickness{0.01f};
+
+	void apply(filament::MaterialInstance& instance) const;
+};
+
 struct SkyBoxMaterial
 {
 	bool showSun{false};

@@ -15,4 +15,8 @@ struct IsSkyBoxMesh
 {
 };
 
+struct IsGridPlane
+{
+};
+
 } // namespace spatial::editor::tags

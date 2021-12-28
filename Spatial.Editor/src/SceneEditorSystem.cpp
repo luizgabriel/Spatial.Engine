@@ -39,6 +39,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mDefaultMaterial{render::createMaterial(mEngine, ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE)},
 	  mSkyBoxMaterial{render::createMaterial(mEngine, ASSETS_SKYBOX_FILAMAT, ASSETS_SKYBOX_FILAMAT_SIZE)},
+	  mGridMaterial{render::createMaterial(mEngine, ASSETS_GRID_FILAMAT, ASSETS_GRID_FILAMAT_SIZE)},
 
 	  mRegistry{},
 
@@ -93,8 +94,7 @@ void SceneEditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
 
-	auto skyBoxMaterialEntity = mRegistry.getFirstEntity<SkyBoxMaterial>();
-	if (!mRegistry.isValid(skyBoxMaterialEntity))
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<SkyBoxMaterial>()))
 	{
 		ecs::build(mRegistry)
 			.withName("Default SkyBox")
@@ -103,6 +103,24 @@ void SceneEditorSystem::onStartFrame(float)
 				{math::float3{.0f}, 1.0f},
 				{"editor://textures/default_skybox/texture.ktx"},
 			});
+	}
+
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<GridMaterial>()))
+	{
+		ecs::build(mRegistry).withName("Grid Material").with<tags::IsEditorEntity>().asMaterial<GridMaterial>();
+	}
+
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsGridPlane>()))
+	{
+		ecs::build(mRegistry)
+			.withName("Grid Plane")
+			.with<tags::IsEditorEntity>()
+			.with<tags::IsGridPlane>()
+			.asTransform()
+			.withScale({100.0f})
+			.asMesh()
+			.withPath("editor://meshes/plane.filamesh")
+			.withMaterialAt(0, mRegistry.getFirstEntity<GridMaterial>());
 	}
 
 	auto skyboxMeshEntity = mRegistry.getFirstEntity<tags::IsSkyBoxMesh>();
@@ -119,8 +137,7 @@ void SceneEditorSystem::onStartFrame(float)
 			.withPriority(0x7);
 	}
 
-	auto editorViewEntity = mRegistry.getFirstEntity<tags::IsEditorView>();
-	if (!mRegistry.isValid(editorViewEntity))
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsEditorView>()))
 	{
 		ecs::build(mRegistry)
 			.withName("Editor View")
@@ -157,6 +174,7 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
 	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(),
 													  [this](const auto& res) { return findResource(res); });
+	mMaterialController.onUpdateFrame<GridMaterial>(mRegistry, mGridMaterial.ref());
 
 	mMeshController.onUpdateFrame(mRegistry);
 }
@@ -293,7 +311,7 @@ void SceneEditorSystem::saveScene()
 	if (result.has_value())
 	{
 		auto xml = XMLOutputArchive{result.value()};
-		ecs::serialize<DefaultMaterial, SkyBoxMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh,
+		ecs::serialize<DefaultMaterial, SkyBoxMaterial, GridMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh,
 					   tags::IsEditorView>(xml, mRegistry);
 	}
 }

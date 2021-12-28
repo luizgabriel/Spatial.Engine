@@ -46,6 +46,17 @@ void componentInput<editor::SkyBoxMaterial>(ecs::Registry& registry, ecs::Entity
 	ui::inputPath("Cubemap Texture", data.skybox.relativePath);
 }
 
+template <>
+void componentInput<editor::GridMaterial>(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& data = registry.getComponent<editor::GridMaterial>(entity);
+
+	ImGui::ColorEdit3("Color", &data.color.r);
+
+	ImGui::DragFloat("Thickness", &data.thickness, 0.001f, .0f, 1.0f);
+	ImGui::DragFloat2("Scale", &data.scale.x, 0.01f, .0f, 100.0f);
+}
+
 bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
 {
 	bool changed = false;
@@ -82,6 +93,7 @@ bool EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ec
 	changed |= displayComponent<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
 	changed |= displayComponent<editor::DefaultMaterial>("Default Material", registry, selectedEntity);
 	changed |= displayComponent<editor::SkyBoxMaterial>("SkyBox Material", registry, selectedEntity);
+	changed |= displayComponent<editor::GridMaterial>("Grid Material", registry, selectedEntity);
 
 	return changed;
 }
