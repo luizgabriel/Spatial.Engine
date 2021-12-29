@@ -497,7 +497,7 @@ bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity&
 {
 	auto dnd = DragAndDropTarget{};
 	const auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
-	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".xml"))
+	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".spatial.json"))
 	{
 		selectedEntity = ecs::NullEntity;
 		scenePath = result.value();

@@ -117,7 +117,8 @@ void SceneEditorSystem::onStartFrame(float)
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsGridPlane>()
 			.asTransform()
-			.withScale({100.0f})
+			.withScale({100.0f, 1.0f, 100.0f})
+			.withPosition({.0f, -0.01f, .0f})
 			.asMesh()
 			.withPath("editor://meshes/plane.filamesh")
 			.withMaterialAt(0, mRegistry.getFirstEntity<GridMaterial>());
@@ -304,16 +305,11 @@ void SceneEditorSystem::loadScene()
 void SceneEditorSystem::saveScene()
 {
 	auto result = makeAbsolutePath(mRootPath, mScenePath)
-					  .and_then(validateResourcePath)
 					  .and_then(openFileWriteStream)
 					  .map_error(logResourceError);
 
 	if (result.has_value())
-	{
-		auto xml = XMLOutputArchive{result.value()};
-		ecs::serialize<DefaultMaterial, SkyBoxMaterial, GridMaterial, EditorCamera, tags::IsEditorEntity, tags::IsSkyBoxMesh,
-					   tags::IsEditorView>(xml, mRegistry);
-	}
+		writeRegistry(mRegistry, std::move(result.value()));
 }
 
 void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
@@ -348,7 +344,7 @@ void SceneEditorSystem::onEvent(const OpenProjectEvent& event)
 {
 	clearScene();
 	setRootPath(event.path);
-	setScenePath("scenes/scene.default.xml");
+	setScenePath("scenes/default.spatial.json");
 }
 
 } // namespace spatial::editor

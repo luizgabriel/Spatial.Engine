@@ -15,6 +15,7 @@ namespace spatial::editor
 {
 
 tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream);
+void writeRegistry(const ecs::Registry& registry, std::ostream&& ostream);
 
 } // namespace spatial
 
