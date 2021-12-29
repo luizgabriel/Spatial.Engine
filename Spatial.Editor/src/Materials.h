@@ -22,7 +22,7 @@ struct GridMaterial
 {
 	math::float3 color{.5f, .5f, .5f};
 	math::float2 scale{10.0f};
-	float thickness{0.01f};
+	float thickness{0.015f};
 
 	void apply(filament::MaterialInstance& instance) const;
 };

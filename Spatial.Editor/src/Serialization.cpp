@@ -8,7 +8,7 @@ tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream)
 	auto registry = ecs::Registry{};
 	try
 	{
-		auto archive = JsonInputArchive{std::ref(istream)};
+		auto archive = JsonInputArchive{istream};
 		ecs::deserialize<DefaultMaterial, SkyBoxMaterial, GridMaterial, EditorCamera, tags::IsEditorEntity,
 						 tags::IsSkyBoxMesh, tags::IsEditorView>(archive, registry);
 	}
