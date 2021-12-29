@@ -26,11 +26,11 @@ fragment {
         prepareMaterial(material);
 
         vec2 uv = getUV0() * materialParams.scale;
-        vec2 uv2 = fract(8.0*uv + 0.5) - 0.5; // add and subtract half a unit to get centered lines
+        vec2 uv2 = fract(10.0*uv + 0.5) - 0.5; // add and subtract half a unit to get centered lines
         vec2 uv3 = fract(1.0*uv + 0.5) - 0.5;
 
         float d2 = materialParams.thickness;
-        float d3 = 2.0 * materialParams.thickness / 8.0;
+        float d3 = materialParams.thickness / 4.0;
 
         // background
         vec3 color = vec3(1.0, 1.0, 1.0);
