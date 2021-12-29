@@ -60,7 +60,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 				fileButton(gIcons.jsFile.uv());
 			else if (ends_with(filename, ".exr"))
 				fileButton(gIcons.exrFile.uv());
-			else if (ends_with(filename, ".spatial.xml"))
+			else if (ends_with(filename, ".spatial.json"))
 				fileButton(gIcons.sceneFile.uv());
 			else if (ends_with(filename, ".filamesh") || ends_with(filename, ".obj"))
 				fileButton(gIcons.meshFile.uv());
