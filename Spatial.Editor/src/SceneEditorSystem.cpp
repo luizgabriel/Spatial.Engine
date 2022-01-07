@@ -30,8 +30,6 @@ using namespace spatial::math;
 namespace spatial::editor
 {
 
-const auto gIconsTextureResource = Resource<ResourceType::ImageTexture>("editor://textures/icons.png");
-
 SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
 	: mEngine{engine},
 	  mWindow{window},
@@ -41,6 +39,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mColorMaterial{render::createMaterial(mEngine, ASSETS_COLOR_FILAMAT, ASSETS_COLOR_FILAMAT_SIZE)},
 	  mSkyBoxMaterial{render::createMaterial(mEngine, ASSETS_SKYBOX_FILAMAT, ASSETS_SKYBOX_FILAMAT_SIZE)},
 	  mGridMaterial{render::createMaterial(mEngine, ASSETS_GRID_FILAMAT, ASSETS_GRID_FILAMAT_SIZE)},
+	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
 	  mRegistry{},
 
@@ -55,8 +54,6 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 	  mJobQueue{},
 
-	  mTextures{},
-
 	  mRootPath{}
 
 {
@@ -64,19 +61,16 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	mJobQueue.connect<ClearSceneEvent>(*this);
 	mJobQueue.connect<LoadSceneEvent>(*this);
 	mJobQueue.connect<SaveSceneEvent>(*this);
-	mJobQueue.connect<LoadResourceEvent<ResourceType::ImageTexture>>(*this);
 }
 
 void SceneEditorSystem::onStart()
 {
-	mTextures.emplace(gIconsTextureResource.getId(),
-					  render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE));
-	mTextures.emplace(
+	mMaterialController.load(
 		"editor://textures/default_skybox/texture.ktx"_hs,
 		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
 
-	mTextures.emplace("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-	mTextures.emplace("engine://dummy_texture"_hs, render::createDummyTexture(mEngine));
+	mMaterialController.load("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
+	mMaterialController.load("engine://dummy_texture"_hs, render::createDummyTexture(mEngine));
 
 	mMeshController.load("editor://meshes/cube.filamesh"_hs,
 						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
@@ -96,6 +90,7 @@ void SceneEditorSystem::onStart()
 void SceneEditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
+	mMaterialController.onStartFrame();
 
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<SkyBoxMaterial>()))
 		ecs::build(mRegistry)
@@ -166,8 +161,8 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 
 	mMaterialController.onUpdateFrame<GridMaterial>(mRegistry, mGridMaterial.ref());
 	mMaterialController.onUpdateFrame<ColorMaterial>(mRegistry, mColorMaterial.ref());
-	mMaterialController.onUpdateFrame<StandardLitMaterial>(mRegistry, mStandardLitMaterial.ref(), [this](const auto& res) { return findResource(res); });
-	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(), [this](const auto& res) { return findResource(res); });
+	mMaterialController.onUpdateFrameWithFinder<StandardOpaqueMaterial>(mRegistry, mStandardLitMaterial.ref());
+	mMaterialController.onUpdateFrameWithFinder<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref());
 
 	mMeshController.onUpdateFrame(mRegistry);
 }
@@ -179,8 +174,8 @@ void SceneEditorSystem::onDrawGui()
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
 
-	ui::MenuBar::show([this]() {
-		ui::EditorMainMenu::fileMenu();
+	ui::MenuBar::show([&]() {
+		ui::EditorMainMenu::fileMenu(mIconTexture.ref());
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
 
 		if (ui::OpenProjectModal::show(mRootPath))
@@ -204,7 +199,7 @@ void SceneEditorSystem::onDrawGui()
 	{
 		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView>();
 		auto style = ui::WindowPaddingStyle{};
-		auto window = ui::Window{"Scene View"};
+		auto window = ui::Window{"Scene View", ui::WindowFlags::NoTitleBar | ui::WindowFlags::NoScrollbar};
 
 		const auto imageSize = window.getSize() - math::float2{0, 24};
 		ui::SceneView::image(mRegistry, sceneView, imageSize);
@@ -252,13 +247,11 @@ void SceneEditorSystem::onDrawGui()
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
-		ui::EntityProperties::displayEntityEditorComponents(mRegistry, selectedEntity, gIconsTextureResource,
-															[this](const auto& res) { return findResource(res); });
+		ui::EntityProperties::displayEntityEditorComponents(mRegistry, selectedEntity, mIconTexture.ref(), mMaterialController.getFinder());
 	});
 
-	const auto& iconTexture = mTextures.at(gIconsTextureResource.getId());
 	ui::Window::show("Assets Explorer",
-					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, mCurrentPath, iconTexture.get()); });
+					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, mCurrentPath, mIconTexture.ref()); });
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
@@ -313,6 +306,7 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 	mCurrentPath = path;
 	mMeshController.setRootPath(mRootPath);
 	mIndirectLightController.setRootPath(mRootPath);
+	mMaterialController.setRootPath(mRootPath);
 }
 
 void SceneEditorSystem::onEvent(const ClearSceneEvent&)
@@ -337,22 +331,6 @@ void SceneEditorSystem::onEvent(const OpenProjectEvent& event)
 	clearScene();
 	setRootPath(event.path);
 	setScenePath("scenes/default.spatial.json");
-}
-
-void SceneEditorSystem::onEvent(const LoadResourceEvent<ResourceType::ImageTexture>& event)
-{
-	auto result =
-		makeAbsolutePath(mRootPath, event.texture.relativePath)
-			.and_then(validateResourcePath)
-			.and_then([](auto&& res) { return validateExtensions(std::move(res), {".png", ".jpg"}); })
-			.and_then(openFileReadStream)
-			.transform(toVectorData)
-			.transform([this](auto&& data) { return render::createTexture(mEngine, data.data(), data.size()); })
-			.map_error(logResourceError);
-
-	if (result.has_value()) {
-		mTextures.emplace(event.texture.getId(), std::move(result.value()));
-	}
 }
 
 } // namespace spatial::editor

@@ -40,16 +40,16 @@ int inputTextCallback(ImGuiInputTextCallbackData* data)
 	return 1;
 };
 
-bool inputText(const std::string_view label, std::string& value)
+bool inputText(const std::string_view label, std::string& value, std::string_view placeholder)
 {
-	return ImGui::InputText(label.data(), value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackResize,
-							&inputTextCallback, &value);
+	return ImGui::InputTextWithHint(label.data(), placeholder.data(), value.data(), value.size() + 1,
+									ImGuiInputTextFlags_CallbackResize, &inputTextCallback, &value);
 }
 
-bool inputPath(const std::string_view label, std::filesystem::path& path)
+bool inputPath(const std::string_view label, std::filesystem::path& path, std::string_view placeholder)
 {
 	auto value = path.string();
-	if (ui::inputText(label, value))
+	if (ui::inputText(label, value, placeholder))
 	{
 		path = std::filesystem::path{value};
 		return true;
@@ -168,15 +168,9 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 	{
 		spacing(3);
 
-		const auto* parent = registry.tryGetComponent<ecs::Parent>(entity);
-		const auto childrenCount = parent != nullptr ? parent->childrenCount : 0;
-
 		if (ImGui::Button("Add Slot"))
 		{
-			auto child =
-				ecs::build(registry).withName(fmt::format("Primitive {}", childrenCount)).with(ecs::MeshMaterial{});
-			ecs::Parent::addChild(registry, entity, child);
-			mesh.partsCount = std::max(mesh.partsCount, childrenCount + 1);
+			ecs::Mesh::addMaterial(registry, entity, ecs::NullEntity);
 			changed = true;
 		}
 
@@ -192,9 +186,9 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 			ImGui::TableSetupColumn("Actions");
 			ImGui::TableHeadersRow();
 
-			if (parent)
+			if (registry.hasAllComponents<ecs::Parent>(entity))
 			{
-				auto childrenToDestroy = std::vector<ecs::Entity>{};
+				ecs::Entity childToDestroy = ecs::NullEntity;
 
 				ecs::Parent::forEachChild(registry, entity, [&](ecs::Entity child) {
 					if (!registry.hasAllComponents<ecs::MeshMaterial>(child))
@@ -224,15 +218,15 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 					if (ImGui::Button("Remove"))
-						childrenToDestroy.emplace_back(child);
+						childToDestroy = child;
 
 					ImGui::PopID();
 				});
 
-				for (auto child : childrenToDestroy)
+				if (registry.isValid(childToDestroy))
 				{
-					ecs::Child::remove(registry, child);
-					registry.destroy(child);
+					ecs::Child::remove(registry, childToDestroy);
+					registry.destroy(childToDestroy);
 					mesh.partsCount = std::max(0ul, mesh.partsCount - 1);
 					changed = true;
 				}

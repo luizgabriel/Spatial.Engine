@@ -1,6 +1,9 @@
 #pragma once
 
+#include "EditorCamera.h"
+#include "Materials.h"
 #include <filesystem>
+#include <imgui.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
@@ -9,21 +12,20 @@
 #include <spatial/ui/components/Popup.h>
 #include <spatial/ui/components/PopupModal.h>
 #include <spatial/ui/components/Window.h>
-#include <spatial/ui/components/ResourceSelector.h>
-#include "Materials.h"
-#include "EditorCamera.h"
+#include <string_view>
 
 namespace spatial::ui
 {
 
 template <typename Component, typename... Args>
-static void componentCollapse(const std::string_view componentName, ecs::Registry& registry,
-					 ecs::Entity entity, Args&&... args)
+static void componentCollapse(const std::string_view componentName, ecs::Registry& registry, ecs::Entity entity,
+							  Args&&... args)
 {
 	if (registry.hasAllComponents<Component>(entity))
 	{
 		auto collapse = Collapse{componentName};
-		if (collapse.isOpen()) {
+		if (collapse.isOpen())
+		{
 			spacing(3);
 			componentInput<Component>(registry, entity, std::forward<Args>(args)...);
 			spacing(3);
@@ -34,7 +36,6 @@ static void componentCollapse(const std::string_view componentName, ecs::Registr
 	}
 }
 
-
 class EntityProperties
 {
   public:
@@ -42,15 +43,8 @@ class EntityProperties
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
-	template <typename Finder>
-	static void displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity entity, const Resource<ResourceType::ImageTexture>& iconsTexture, Finder finder)
-	{
-		componentCollapse<editor::EditorCamera>("Editor Camera", registry, entity);
-		componentCollapse<editor::ColorMaterial>("Color Material", registry, entity);
-		componentCollapse<editor::SkyBoxMaterial>("SkyBox Material", registry, entity, iconsTexture, finder);
-		componentCollapse<editor::GridMaterial>("Grid Material", registry, entity);
-		componentCollapse<editor::StandardLitMaterial>("Standard Lit Material", registry, entity, iconsTexture, finder);
-	}
+	static void displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity entity,
+											  const filament::Texture& icons, const render::ImageTextureFinder& finder);
 
   private:
 	static void addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity);
@@ -71,7 +65,7 @@ struct EditorMainMenu
 		SaveScene,
 	};
 
-	static bool fileMenu();
+	static bool fileMenu(const filament::Texture& icons);
 	static bool viewOptionsMenu(bool& mShowEditorEntities);
 };
 
@@ -174,7 +168,8 @@ class MaterialsManager
 {
   public:
 	static bool popup(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "", bool showEditorEntities = false);
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "",
+					 bool showEditorEntities = false);
 };
 
 class EditorDragAndDrop
@@ -202,54 +197,17 @@ struct ComponentInputImpl<editor::GridMaterial>
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
-template <typename Finder>
-struct ComponentInputImpl<editor::SkyBoxMaterial, const Resource<ResourceType::ImageTexture>&, Finder>
+template <>
+struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>
 {
-	static void draw(ecs::Registry& registry, ecs::Entity entity, const Resource<ResourceType::ImageTexture>& iconsTexture, Finder finder)
-	{
-		auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
-
-		ImGui::Checkbox("Show Sun", &data.showSun);
-		ImGui::DragFloat("Color Alpha", &data.color.a, .01f, .0f, 1.0f);
-		ImGui::ColorEdit4("Color", &data.color.r);
-
-		ui::cubemapTextureInput("Cubemap Texture", data.skybox, finder(data.skybox), *finder(iconsTexture));
-	}
+	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons);
 };
 
-template <typename Finder>
-struct ComponentInputImpl<editor::StandardLitMaterial, const Resource<ResourceType::ImageTexture>&, Finder>
+template <>
+struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const render::ImageTextureFinder&>
 {
-	static void draw(ecs::Registry& registry, ecs::Entity entity, const Resource<ResourceType::ImageTexture>& iconsTexture, Finder finder)
-	{
-		auto& icons = *finder(iconsTexture);
-
-		auto& data = registry.getComponent<editor::StandardLitMaterial>(entity);
-		ImGui::ColorEdit3("Base Color", &data.baseColor.r);
-		ui::imageTextureInput("Albedo Texture", data.albedo, finder(data.albedo), icons);
-
-		ui::separator(2);
-
-		ImGui::DragFloat2("Tiling", &data.tiling.x, .01f);
-		ImGui::DragFloat2("Offset", &data.offset.x, .01f);
-
-		ui::separator(2);
-
-		ui::imageTextureInput("Metallic Texture Map", data.metallicMap, finder(data.metallicMap), icons);
-		ImGui::Columns(2, "Metallic Texture Map", false);
-		ImGui::NextColumn();
-		ImGui::SliderFloat("Metallic", &data.metallic, .0f, 1.0f, "%.2f");
-		ImGui::Columns(1);
-
-		ui::separator(2);
-
-		ui::imageTextureInput("Roughness Texture Map", data.roughnessMap, finder(data.roughnessMap), icons);
-		ImGui::Columns(2, "Roughness Texture Map", false);
-		ImGui::NextColumn();
-		ImGui::SliderFloat("Roughness", &data.roughness, .0f, 1.0f, "%.2f");
-		ImGui::Columns(1);
-
-	}
+	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
+					 const render::ImageTextureFinder& finder);
 };
 
 } // namespace spatial::ui

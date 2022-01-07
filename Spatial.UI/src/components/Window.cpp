@@ -4,9 +4,10 @@
 namespace spatial::ui
 {
 
-Window::Window(const std::string_view name)
+Window::Window(const std::string_view name, WindowFlags flags)
 {
-	mIsOpen = ImGui::Begin(name.data(), nullptr, ImGuiWindowFlags_None);
+	const auto imFlags = static_cast<ImGuiWindowFlags>(flags) | ImGuiWindowFlags_AlwaysAutoResize;
+	mIsOpen = ImGui::Begin(name.data(), nullptr, imFlags);
 }
 
 Window::~Window()
@@ -48,6 +49,12 @@ bool Window::isFocused() const
 bool Window::isOpen() const
 {
 	return mIsOpen;
+}
+
+WindowFlags operator|(WindowFlags l, WindowFlags r)
+{
+	using utype_t = std::underlying_type_t<WindowFlags>;
+	return static_cast<WindowFlags>(static_cast<utype_t>(l) | static_cast<utype_t>(r));
 }
 
 } // namespace spatial::ui

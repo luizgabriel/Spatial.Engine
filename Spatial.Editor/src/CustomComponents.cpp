@@ -4,14 +4,14 @@
 #include "Tags.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <imgui.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/Icons.h>
+#include <spatial/ui/components/MaterialInputs.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
-#include <spatial/ui/components/ResourceSelector.h>
 
 namespace spatial::ui
 {
@@ -41,6 +41,74 @@ void ComponentInputImpl<editor::GridMaterial>::draw(ecs::Registry& registry, ecs
 	ImGui::ColorEdit3("Color", &data.color.r);
 	ImGui::DragFloat("Thickness", &data.thickness, 0.001f, .0f, 1.0f);
 	ImGui::DragFloat2("Scale", &data.scale.x, 0.01f, .0f, 100.0f);
+}
+
+void ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(ecs::Registry& registry,
+																				ecs::Entity entity,
+																				const filament::Texture& icons)
+{
+
+	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
+
+	ui::cubemapInput("Cubemap", data.color, data.skybox, icons);
+
+	ImGui::Checkbox("Show Sun", &data.showSun);
+}
+
+void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&,
+						const render::ImageTextureFinder&>::draw(ecs::Registry& registry, ecs::Entity entity,
+																 const filament::Texture& icons,
+																 const render::ImageTextureFinder& finder)
+
+{
+	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
+	ui::albedoInput("Albedo", data.baseColor, data.albedo, finder(data.albedo), icons);
+
+	ui::separator(2);
+
+	ImGui::DragFloat2("Tiling", &data.tiling.x, .01f, .01f);
+	ImGui::DragFloat2("Offset", &data.offset.x, .01f);
+
+	ui::separator(1);
+
+	ui::mapInput("Metallic", data.metallic, data.metallicMap, finder(data.metallicMap), icons);
+
+	ui::separator(1);
+
+	ui::mapInput("Roughness", data.roughness, data.roughnessMap, finder(data.roughnessMap), icons);
+
+	ui::separator(1);
+
+	ui::mapInput("Reflectance", data.reflectance, data.reflectanceMap, finder(data.reflectanceMap), icons);
+
+	ui::separator(1);
+
+	ui::mapInput("Ambient Occlusion", data.ambientOcclusionMap, finder(data.ambientOcclusionMap), icons);
+
+	ui::separator(1);
+
+	ui::mapInput("Normal", data.normalMap, finder(data.normalMap), icons, Icons::normalMap.uv());
+
+	ui::separator(1);
+
+	ImGui::Checkbox("Use CleatCoat", &data.useClearCoat);
+	if (data.useClearCoat)
+	{
+		ImGui::SliderFloat("Clear Coat", &data.clearCoat, .0f, 1.0f);
+		ImGui::SliderFloat("Clear Coat Roughness", &data.clearCoatRoughness, .0f, 1.0f);
+	}
+
+	ui::separator(1);
+
+	ImGui::Checkbox("Use Anisotropy", &data.useAnisotropy);
+	if (data.useClearCoat)
+	{
+		ImGui::SliderFloat("Anisotropy", &data.anisotropy, .0f, 1.0f);
+		ui::mapInput("Anisotropy Direction", data.anisotropyDirectionMap, finder(data.anisotropyDirectionMap), icons,
+					 Icons::normalMap.uv());
+	}
+
+	ui::separator(1);
 }
 
 bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity)
@@ -141,6 +209,16 @@ void EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs:
 	componentCollapse<ecs::Mesh>("Mesh", registry, selectedEntity);
 	componentCollapse<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
 	componentCollapse<ecs::SceneView>("Scene View", registry, selectedEntity);
+}
+void EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity entity,
+													 const filament::Texture& icons,
+													 const render::ImageTextureFinder& finder)
+{
+	componentCollapse<editor::EditorCamera>("Editor Camera", registry, entity);
+	componentCollapse<editor::ColorMaterial>("Color Material", registry, entity);
+	componentCollapse<editor::SkyBoxMaterial>("SkyBox Material", registry, entity, icons);
+	componentCollapse<editor::GridMaterial>("Grid Material", registry, entity);
+	componentCollapse<editor::StandardOpaqueMaterial>("Standard Lit Material", registry, entity, icons, finder);
 }
 
 NewSceneModal::NewSceneModal() : mModal{"New Scene"}
@@ -393,16 +471,12 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showEditorEntities)
-		{
 			registry.getEntities<const ecs::Name, const ecs::tags::IsMaterial>().each(actionFn);
-		}
 		else
-		{
 			registry
 				.getEntities<const ecs::Name, const ecs::tags::IsMaterial>(
 					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
 				.each(actionFn);
-		}
 
 		ImGui::EndTable();
 	}
@@ -415,24 +489,23 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 	bool changed = false;
 
 	auto popup = ui::Popup{"Materials Window Popup"};
+	ecs::Entity createdEntity = ecs::NullEntity;
+
 	if (popup.isOpen())
 	{
 		{
 			auto menu = ui::Menu{"Create Material"};
 
-			if (menu.item("Color Material"))
+			if (menu.item("Standard Opaque"))
 			{
-				selectedEntity = ecs::build(registry)
-									 .withName("Color Material")
-									 .asMaterial<editor::ColorMaterial>();
+				createdEntity =
+					ecs::build(registry).withName("Standard Opaque").asMaterial<editor::StandardOpaqueMaterial>();
 				changed = true;
 			}
 
-			if (menu.item("Standard Lit"))
+			if (menu.item("Color Material"))
 			{
-				selectedEntity = ecs::build(registry)
-									 .withName("Standard Lit")
-									 .asMaterial<editor::StandardLitMaterial>();
+				createdEntity = ecs::build(registry).withName("Color Material").asMaterial<editor::ColorMaterial>();
 				changed = true;
 			}
 		}
@@ -442,10 +515,18 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 
 			if (menu.item("Default SkyBox"))
 			{
-				selectedEntity = ecs::build(registry).withName("Default SkyBox").asMaterial<editor::SkyBoxMaterial>();
+				createdEntity = ecs::build(registry).withName("Default SkyBox").asMaterial<editor::SkyBoxMaterial>();
 				changed = true;
 			}
 		}
+
+		if (registry.hasAllComponents<ecs::Mesh>(selectedEntity) && changed)
+		{
+			ecs::Mesh::addMaterial(registry, selectedEntity, createdEntity);
+		}
+
+		if (changed)
+			selectedEntity = createdEntity;
 	}
 
 	return changed;
@@ -662,10 +743,14 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool EditorMainMenu::fileMenu()
+bool EditorMainMenu::fileMenu(const filament::Texture& icons)
 {
 	bool changed = false;
 	auto action = FileMenuAction::Unknown;
+
+	ImGui::SetCursorPosY(1.5f);
+	ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
+	ImGui::SetCursorPosY(0.0f);
 
 	{
 		auto menu = ui::Menu{"File"};

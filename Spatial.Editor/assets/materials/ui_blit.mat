@@ -2,8 +2,8 @@ material {
     name : uiBlit,
     parameters : [
         {
-            type : sampler2d,
-            name : albedo
+            type      : sampler2d,
+            name      : albedo
         }
     ],
     requires : [

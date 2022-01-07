@@ -14,7 +14,7 @@ struct Icon
 
 	[[nodiscard]] constexpr auto uv() const
 	{
-		const auto offset = math::float2{0.1, 0.12};
+		const auto offset = math::float2{1.0f / 8.0f};
 		return math::float4{pos * offset, (pos + math::float2{1, 1}) * offset};
 	}
 };
@@ -31,6 +31,12 @@ struct Icons
 	constexpr static Icon ktxFile= Icon{{5, 1}};
 	constexpr static Icon sceneFile = Icon{{6, 0}};
 	constexpr static Icon jsFile = Icon{{7, 0}};
+	constexpr static Icon logo = Icon{{0, 2}};
+	constexpr static Icon picture = Icon{{3, 1}};
+	constexpr static Icon bwPicture = Icon{{4, 2}};
+	constexpr static Icon picker = Icon{{3, 2}};
+	constexpr static Icon cubemap = Icon{{1, 1}};
+	constexpr static Icon normalMap = Icon{{5, 2}};
 	Icons() = delete;
 };
 

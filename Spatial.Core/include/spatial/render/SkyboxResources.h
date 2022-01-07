@@ -9,7 +9,7 @@
 namespace spatial::render
 {
 
-Texture createKtxTexture(filament::Engine& engine, const uint8_t* data, uint32_t size);
+Texture createKtxTexture(filament::Engine& engine, const uint8_t* data, size_t size);
 
 using bands_t = std::array<filament::math::float3, 9>;
 

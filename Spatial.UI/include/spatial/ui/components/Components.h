@@ -21,9 +21,9 @@
 namespace spatial::ui
 {
 
-bool inputText(std::string_view label, std::string& value);
+bool inputText(std::string_view label, std::string& value, std::string_view placeholder = "");
 
-bool inputPath(std::string_view label, std::filesystem::path& path);
+bool inputPath(std::string_view label, std::filesystem::path& path, std::string_view placeholder = "");
 
 void spacing(std::uint32_t times = 1);
 

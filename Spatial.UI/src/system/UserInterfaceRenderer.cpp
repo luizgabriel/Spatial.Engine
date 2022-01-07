@@ -46,7 +46,7 @@ void ImGuiRenderer::setMaterial(const uint8_t* data, size_t size)
 void ImGuiRenderer::addFont(const uint8_t* data, size_t size)
 {
 	ImGui::SetCurrentContext(mImguiContext);
-	ui::imguiAddFont(data, size);
+	ui::imguiAddFont(data, size, 15.0f);
 }
 
 void ImGuiRenderer::setupEngineTheme()
@@ -147,8 +147,8 @@ void ImGuiRenderer::setViewport(const math::float2& windowSize, const math::floa
 	mCamera.setOrthographicProjection(0.0, static_cast<double>(frameBufferSize.x / dpiScaleX),
 									  static_cast<double>(frameBufferSize.y / dpiScaleY), 0.0, 0.0, 1.0);
 
-	const auto scaleX = windowSize.x > 0 ? frameBufferSize.x / windowSize.x : 0;
-	const auto scaleY = windowSize.y > 0 ? frameBufferSize.y / windowSize.y : 0;
+	const auto scaleX = windowSize.x > 0 ? dpiScaleX : 0;
+	const auto scaleY = windowSize.y > 0 ? dpiScaleY : 0;
 
 	ImGui::SetCurrentContext(mImguiContext);
 	ui::imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);

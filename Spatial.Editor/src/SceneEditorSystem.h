@@ -36,6 +36,7 @@ class SceneEditorSystem
 	render::Material mColorMaterial;
 	render::Material mSkyBoxMaterial;
 	render::Material mGridMaterial;
+	render::Texture mIconTexture;
 
 	ecs::Registry mRegistry;
 
@@ -50,8 +51,6 @@ class SceneEditorSystem
 	render::IndirectLightController mIndirectLightController;
 
 	EventQueue mJobQueue;
-
-	std::unordered_map<uint32_t, render::Texture> mTextures;
 
 	std::filesystem::path mRootPath;
 	std::filesystem::path mScenePath;
@@ -86,21 +85,7 @@ class SceneEditorSystem
 	void onEvent(const LoadSceneEvent& event);
 	void onEvent(const SaveSceneEvent& event);
 	void onEvent(const OpenProjectEvent& event);
-	void onEvent(const LoadResourceEvent<ResourceType::ImageTexture>& event);
 
-	template <ResourceType type, typename = std::enable_if_t<type == ResourceType::CubeMapTexture || type == ResourceType::ImageTexture>>
-	const filament::Texture* findResource(const Resource<type>& resource)
-	{
-		if (resource.isEmpty())
-			return nullptr;
-
-		auto it = std::as_const(mTextures).find(resource.getId());
-		const auto* texture = (it != mTextures.end()) ? it->second.get() : nullptr;
-		if (texture == nullptr)
-			mJobQueue.enqueue(LoadResourceEvent{resource});
-
-		return texture;
-	}
 };
 
 } // namespace spatial::editor

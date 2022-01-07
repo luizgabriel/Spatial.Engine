@@ -4,7 +4,7 @@ material {
     requires : [ uv0 ],
     parameters : [
         {
-            type : float4,
+            type : float3,
             name : baseColor
         },
         {
@@ -100,7 +100,7 @@ fragment {
         prepareMaterial(material);
         vec2 uv = (getUV0() * materialParams.tilingOffset.xy) + materialParams.tilingOffset.zw;
 
-        material.baseColor = texture(materialParams_albedo, uv) * materialParams.baseColor;
+        material.baseColor.rgb = texture(materialParams_albedo, uv).rgb * materialParams.baseColor;
         material.metallic = texture(materialParams_metallicMap, uv).r * materialParams.metallic;
         material.roughness = texture(materialParams_roughnessMap, uv).r * materialParams.roughness;
         material.reflectance = texture(materialParams_reflectanceMap, uv).r * materialParams.reflectance;

@@ -58,7 +58,7 @@ render::IndexBuffer imguiCreateIndexBuffer(fl::Engine& engine, uint32_t capacity
 		fl::IndexBuffer::Builder().indexCount(capacity).bufferType(fl::IndexBuffer::IndexType::USHORT).build(engine)};
 }
 
-void imguiAddFont(const uint8_t* data, size_t size)
+void imguiAddFont(const uint8_t* data, size_t size, float fontSize)
 {
 	auto& io = ImGui::GetIO();
 	auto config = ImFontConfig{};
@@ -66,7 +66,7 @@ void imguiAddFont(const uint8_t* data, size_t size)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
-	io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), 16.0f, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), fontSize, &config);
 #pragma clang diagnostic pop
 }
 

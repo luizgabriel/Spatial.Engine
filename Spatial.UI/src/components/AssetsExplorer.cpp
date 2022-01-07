@@ -9,7 +9,7 @@ namespace spatial::ui
 {
 
 bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
-								  const filament::Texture* icon)
+								  const filament::Texture& icon)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
@@ -22,16 +22,17 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 	ImGui::Columns(6, "AssetsExplorer", false);
 
 	bool selected = false;
-	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 50.0f, 100.0f)};
+	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 30.0f, 50.0f)};
 	for (const auto& entry : directory_iterator{rootPath / selectedPath})
 	{
 		const auto& path = entry.path();
 
+		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 5.0f);
+
 		if (entry.is_directory())
 		{
 			ImGui::PushID(path.c_str());
-			if (icon ? imageButton(*icon, size, Icons::folder.uv())
-					 : ImGui::Button("Directory", ImVec2(size.x, size.y)))
+			if (imageButton(icon, size, Icons::folder.uv()))
 			{
 				selectedPath = path;
 				selected = true;
@@ -47,7 +48,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 
 			const auto fileButton = [&](const math::float4& uv) {
 				ImGui::PushID(filename.data());
-				if (icon ? imageButton(*icon, size, uv) : ImGui::Button("File"))
+				if (imageButton(icon, size, uv))
 					selected = true;
 				ImGui::PopID();
 			};
@@ -60,6 +61,8 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 				fileButton(Icons::jsFile.uv());
 			else if (ends_with(filename, ".exr"))
 				fileButton(Icons::exrFile.uv());
+			else if (ends_with(filename, ".ktx"))
+				fileButton(Icons::ktxFile.uv());
 			else if (ends_with(filename, ".spatial.json"))
 				fileButton(Icons::sceneFile.uv());
 			else if (ends_with(filename, ".filamesh") || ends_with(filename, ".obj"))
@@ -74,6 +77,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 			}
 		}
 
+		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 4.0f);
 		ImGui::TextWrapped("%s", path.filename().c_str());
 		ImGui::NextColumn();
 	}
@@ -84,7 +88,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 }
 
 bool AssetsExplorer::displayPathHeader(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
-									   const filament::Texture* icon)
+									   const filament::Texture& icon)
 {
 	bool changed = false;
 	auto fullPath = (rootPath / selectedPath).lexically_normal();
@@ -92,7 +96,7 @@ bool AssetsExplorer::displayPathHeader(const std::filesystem::path& rootPath, st
 	if (fullPath != rootPath)
 	{
 		ImGui::PushID("BackButton");
-		changed = icon ? imageButton(*icon, math::float2{20}, Icons::back.uv()) : ImGui::Button("Back");
+		changed = imageButton(icon, math::float2{20}, Icons::back.uv());
 		if (changed)
 			selectedPath = selectedPath.parent_path();
 		ImGui::PopID();

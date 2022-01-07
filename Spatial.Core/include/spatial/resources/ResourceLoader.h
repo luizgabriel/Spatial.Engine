@@ -13,6 +13,15 @@
 namespace spatial
 {
 
+template <ResourceType type>
+struct LoadResourceEvent
+{
+	Resource<type> texture;
+	LoadResourceEvent(Resource<type> resource) : texture{std::move(resource)}
+	{
+	}
+};
+
 tl::expected<std::filesystem::path, ResourceError> makeAbsolutePath(const std::filesystem::path& rootPath,
 																	const std::filesystem::path& resourcePath);
 

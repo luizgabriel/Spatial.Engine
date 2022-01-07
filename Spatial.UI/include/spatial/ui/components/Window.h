@@ -6,10 +6,18 @@
 namespace spatial::ui
 {
 
+enum class WindowFlags {
+	None = 0,
+	NoTitleBar = 1 << 0,
+	NoScrollbar = 1 << 3,
+};
+
+WindowFlags operator|(WindowFlags l, WindowFlags r);
+
 class Window
 {
   public:
-	explicit Window(const std::string_view name);
+	explicit Window(std::string_view name, WindowFlags flags = WindowFlags::None);
 	~Window();
 
 	[[nodiscard]] math::float2 getSize() const;
@@ -27,10 +35,10 @@ class Window
 	{
 		auto window = Window{name};
 		if (window.isOpen())
-			std::invoke(std::forward<Function>(func));
+			func();
 	}
 
-  private:
+  protected:
 	bool mIsOpen;
 };
 

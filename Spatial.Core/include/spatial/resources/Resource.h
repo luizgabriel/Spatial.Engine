@@ -12,7 +12,8 @@ enum ResourceType
 	ImageTexture,
 	CubeMapTexture,
 	FilaMesh,
-	Script
+	Script,
+	IrradianceValues,
 };
 
 template <ResourceType t>

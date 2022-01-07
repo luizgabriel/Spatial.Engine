@@ -52,39 +52,39 @@ struct SkyBoxMaterial
 	}
 };
 
-struct StandardLitMaterial
+struct StandardOpaqueMaterial
 {
-	math::float4 baseColor{1.0f};
-	Resource<ResourceType::ImageTexture> albedo{};
+	math::float3 baseColor{1.0f};
+	Resource<ImageTexture> albedo{};
 
 	math::float2 tiling{1.0f};
 	math::float2 offset{.0f};
 
 	float metallic{.0f};
-	Resource<ResourceType::ImageTexture> metallicMap{};
+	Resource<ImageTexture> metallicMap{};
 
 	float roughness{1.0f};
-	Resource<ResourceType::ImageTexture> roughnessMap{};
+	Resource<ImageTexture> roughnessMap{};
 
 	float reflectance{.0f};
-	Resource<ResourceType::ImageTexture> reflectanceMap{};
+	Resource<ImageTexture> reflectanceMap{};
 
 	bool useClearCoat{false};
-	float clearCoat{1.0f};
+	float clearCoat{.0f};
 	float clearCoatRoughness{.0f};
 
 	bool useAnisotropy{false};
 	float anisotropy{.5f};
-	Resource<ResourceType::ImageTexture> anisotropyDirectionMap{};
+	Resource<ImageTexture> anisotropyDirectionMap{};
 
-	Resource<ResourceType::ImageTexture> ambientOcclusionMap{};
+	Resource<ImageTexture> ambientOcclusionMap{};
 
-	Resource<ResourceType::ImageTexture> normalMap{};
+	Resource<ImageTexture> normalMap{};
 
-	Resource<ResourceType::ImageTexture> bentNormalMap{};
+	Resource<ImageTexture> bentNormalMap{};
 
 	math::float4 emissive{.0f};
-	Resource<ResourceType::ImageTexture> emissiveMap;
+	Resource<ImageTexture> emissiveMap;
 
 	template <typename Finder, typename = std::enable_if_t<render::is_image_texture_finder_v<Finder>>>
 	void apply(filament::MaterialInstance& instance, const Finder& finder) const

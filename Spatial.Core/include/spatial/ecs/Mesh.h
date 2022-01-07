@@ -1,14 +1,21 @@
 #pragma once
 
-#include <array>
-#include <filament/Box.h>
-#include <filesystem>
-#include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/resources/Resource.h>
 
 namespace spatial::ecs
 {
+
+struct MeshMaterial
+{
+	size_t primitiveIndex;
+	Entity materialEntity;
+
+	constexpr explicit MeshMaterial(size_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
+		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
+	{
+	}
+};
 
 struct Mesh
 {
@@ -21,17 +28,9 @@ struct Mesh
 	size_t partsCount{};
 	size_t partsOffset{};
 	uint8_t priority{};
-};
 
-struct MeshMaterial
-{
-	size_t primitiveIndex;
-	Entity materialEntity;
-
-	constexpr explicit MeshMaterial(size_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
-		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
-	{
-	}
+	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity);
+	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity, size_t primitiveIndex);
 };
 
 } // namespace spatial::ecs

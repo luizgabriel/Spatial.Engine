@@ -18,7 +18,7 @@ using is_cubemap_texture_finder = is_resource_finder<T, ResourceType::CubeMapTex
 template <typename T>
 constexpr auto is_cubemap_texture_finder_v = is_cubemap_texture_finder<T>::value;
 
-using ImageTextureResourceFinder = ResourceFinder<ResourceType::ImageTexture, const filament::Texture*>;
-using CubeMapTextureResourceFinder = ResourceFinder<ResourceType::CubeMapTexture, const filament::Texture*>;
+using ImageTextureFinder = ResourceFinder<ResourceType::ImageTexture, const filament::Texture*>;
+using CubeMapTextureFinder = ResourceFinder<ResourceType::CubeMapTexture, const filament::Texture*>;
 
 } // namespace spatial::render

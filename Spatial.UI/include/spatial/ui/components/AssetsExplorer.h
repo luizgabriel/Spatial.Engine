@@ -17,14 +17,14 @@ class AssetsExplorer
 	static constexpr auto DND_SELECTED_FILE = "SELECTED_ASSET_PATH";
 
 	static bool displayFiles(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
-							 const filament::Texture* icon = nullptr);
+							 const filament::Texture& icon);
 
   private:
 	ui::Window mWindow;
 	static filament::Texture* sIconTexture;
 
 	static bool displayPathHeader(const std::filesystem::path& rootPath, std::filesystem::path& selectedPath,
-								  const filament::Texture* icon = nullptr);
+								  const filament::Texture& icon);
 };
 
 } // namespace spatial::ui
