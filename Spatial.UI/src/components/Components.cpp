@@ -1,14 +1,13 @@
-#include "spatial/ecs/Relation.h"
-#include "spatial/ecs/SceneView.h"
-#include "spatial/render/TextureView.h"
-#include "spatial/ui/components/SceneView.h"
 #include <array>
 #include <imgui.h>
-#include <spatial/ecs/EntityHandle.h>
+#include <spatial/ecs/Relation.h>
+#include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Tags.h>
+#include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
+#include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/VectorInput.h>
 
@@ -18,9 +17,14 @@ namespace spatial::ui
 void spacing(std::uint32_t times)
 {
 	for (std::uint32_t i = 0; i < times; i++)
-	{
 		ImGui::Spacing();
-	}
+}
+
+void separator(std::uint32_t spacing)
+{
+	ui::spacing(spacing);
+	ImGui::Separator();
+	ui::spacing(spacing);
 }
 
 int inputTextCallback(ImGuiInputTextCallbackData* data)
@@ -54,8 +58,23 @@ bool inputPath(const std::string_view label, std::filesystem::path& path)
 	return false;
 }
 
-template <>
-void componentInput<ecs::DirectionalLight>(ecs::Registry& registry, ecs::Entity entity)
+void image(const filament::Texture& texture, math::float2 size, math::float4 uv)
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+#pragma clang diagnostic pop
+}
+
+bool imageButton(const filament::Texture& texture, math::float2 size, math::float4 uv)
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+#pragma clang diagnostic pop
+}
+
+void ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::DirectionalLight>(entity);
 
@@ -66,8 +85,7 @@ void componentInput<ecs::DirectionalLight>(ecs::Registry& registry, ecs::Entity 
 	directionInput("Direction", light.direction);
 }
 
-template <>
-void componentInput<ecs::PointLight>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::PointLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::PointLight>(entity);
 
@@ -76,8 +94,7 @@ void componentInput<ecs::PointLight>(ecs::Registry& registry, ecs::Entity entity
 	ImGui::InputFloat("Falloff", &light.falloff);
 }
 
-template <>
-void componentInput<ecs::SpotLight>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::SpotLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::SpotLight>(entity);
 
@@ -91,8 +108,7 @@ void componentInput<ecs::SpotLight>(ecs::Registry& registry, ecs::Entity entity)
 	directionInput("Direction", light.direction);
 }
 
-template <>
-void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::SunLight>(entity);
 
@@ -103,8 +119,7 @@ void componentInput<ecs::SunLight>(ecs::Registry& registry, ecs::Entity entity)
 	ImGui::InputFloat("Halo size", &light.haloSize);
 }
 
-template <>
-void componentInput<ecs::IndirectLight>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 
@@ -113,12 +128,10 @@ void componentInput<ecs::IndirectLight>(ecs::Registry& registry, ecs::Entity ent
 	ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
-template <>
-void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
+
 	bool changed = false;
 
 	changed |= ui::inputPath("Resource", mesh.meshResource.relativePath);
@@ -189,20 +202,23 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 
 					auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(child);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
 					ImGui::PushID((int)child);
+#pragma clang diagnostic pop
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
-					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U32, &meshMaterial.primitiveIndex,
+					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex,
 												  &smallStep, &largeStep, "%lu");
 
 					ImGui::TableNextColumn();
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 					ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
-																			   meshMaterial.materialEntity);
+																	meshMaterial.materialEntity);
 
 					ImGui::TableNextColumn();
 
@@ -233,22 +249,18 @@ void componentInput<ecs::Mesh>(ecs::Registry& registry, ecs::Entity entity)
 	if (changed)
 		registry.addComponent<ecs::tags::IsRenderableDirty>(entity);
 }
-#pragma clang diagnostic pop
 
-template <>
-void componentInput<ecs::MeshMaterial>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
-	float smallStep = 1;
-	float largeStep = 1;
+	const size_t smallStep = 1, largeStep = 1;
 
-	ImGui::InputScalar("Primitive Index", ImGuiDataType_U32, &meshMaterial.primitiveIndex, &smallStep, &largeStep,
+	ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep, &largeStep,
 					   "%lu");
 	ui::Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, meshMaterial.materialEntity);
 }
 
-template <>
-void componentInput<ecs::Transform>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& transform = registry.getComponent<ecs::Transform>(entity);
 
@@ -261,8 +273,7 @@ void componentInput<ecs::Transform>(ecs::Registry& registry, ecs::Entity entity)
 	vec3Input("Scale", transform.scale);
 }
 
-template <>
-void componentInput<ecs::PerspectiveCamera>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::PerspectiveCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::PerspectiveCamera>(entity);
 
@@ -274,8 +285,7 @@ void componentInput<ecs::PerspectiveCamera>(ecs::Registry& registry, ecs::Entity
 	ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
 }
 
-template <>
-void componentInput<ecs::OrthographicCamera>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::OrthographicCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::OrthographicCamera>(entity);
 
@@ -288,8 +298,7 @@ void componentInput<ecs::OrthographicCamera>(ecs::Registry& registry, ecs::Entit
 	ImGui::InputDouble("Top", &camera.top);
 }
 
-template <>
-void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::CustomCamera>(entity);
 
@@ -302,8 +311,7 @@ void componentInput<ecs::CustomCamera>(ecs::Registry& registry, ecs::Entity enti
 	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
 }
 
-template <>
-void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
 
@@ -332,22 +340,6 @@ void componentInput<ecs::SceneView>(ecs::Registry& registry, ecs::Entity entity)
 		SceneView::image(registry, entity, {ImGui::GetWindowContentRegionWidth(), 100});
 		ImGui::TreePop();
 	}
-}
-
-void image(const filament::Texture& texture, math::float2 size, math::float4 uv)
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
-	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
-#pragma clang diagnostic pop
-}
-
-bool imageButton(const filament::Texture& texture, math::float2 size, math::float4 uv)
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
-	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
-#pragma clang diagnostic pop
 }
 
 } // namespace spatial::ui

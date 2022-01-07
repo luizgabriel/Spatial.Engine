@@ -12,11 +12,18 @@ if(CONAN_EXPORTED)
 	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 	conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 else()
-	conan_cmake_autodetect(CONAN_SETTINGS)
-	
 	if(CONAN_PROFILE)
-		conan_cmake_run(CONANFILE conanfile.py PROFILE ${CONAN_PROFILE} BUILD missing BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS)
+		conan_cmake_run(
+				CONANFILE conanfile.py
+				BUILD missing
+				PROFILE ${CONAN_PROFILE}
+				BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS)
 	else()
-		conan_cmake_run(CONANFILE conanfile.py BUILD missing BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS SETTINGS ${CONAN_SETTINGS})
+		conan_cmake_autodetect(CONAN_SETTINGS)
+		conan_cmake_run(
+				CONANFILE conanfile.py
+				BUILD missing
+				SETTINGS ${CONAN_SETTINGS}
+				BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS)
 	endif()
 endif()

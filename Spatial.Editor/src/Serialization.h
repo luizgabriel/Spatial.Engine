@@ -1,15 +1,14 @@
 #pragma once
 
-#include "Materials.h"
 #include "EditorCamera.h"
+#include "Materials.h"
 #include "Tags.h"
 
 #include <cereal/cereal.hpp>
-#include <magic_enum.hpp>
-#include <spatial/serialization/Archives.h>
+#include <spatial/ecs/Registry.h>
+#include <spatial/resources/ResourceError.h>
 #include <spatial/serialization/Math.h>
-#include <spatial/serialization/Registry.h>
-#include <spatial/resources/ResourceLoader.h>
+#include <tl/expected.hpp>
 
 namespace spatial::editor
 {
@@ -17,7 +16,7 @@ namespace spatial::editor
 tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream);
 void writeRegistry(const ecs::Registry& registry, std::ostream&& ostream);
 
-} // namespace spatial
+} // namespace spatial::editor
 
 namespace cereal
 {
@@ -30,7 +29,7 @@ void serialize(Archive& ar, spatial::editor::EditorCamera& camera)
 }
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::editor::DefaultMaterial& material)
+void serialize(Archive& ar, spatial::editor::ColorMaterial& material)
 {
 	ar(cereal::make_nvp("baseColor", material.baseColor));
 	ar(cereal::make_nvp("roughness", material.roughness));
@@ -45,7 +44,6 @@ void serialize(Archive& ar, spatial::editor::SkyBoxMaterial& material)
 	ar(cereal::make_nvp("showSun", material.showSun));
 	ar(cereal::make_nvp("color", material.color));
 }
-
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::GridMaterial& material)

@@ -21,6 +21,7 @@ add_library(Spatial.UI
         include/spatial/ui/components/Search.h
         include/spatial/ui/components/Combo.h
         include/spatial/ui/components/SceneView.h
+        include/spatial/ui/components/ResourceSelector.h
 
         include/spatial/ui/components/Icons.h
 
@@ -50,7 +51,7 @@ add_library(Spatial.UI
         src/components/Search.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
-        src/components/styles/WindowPaddingStyle.cpp)
+        src/components/styles/WindowPaddingStyle.cpp src/components/ResourceSelector.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

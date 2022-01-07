@@ -95,9 +95,13 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
 
 Texture createDummyCubemap(filament::Engine& engine);
+Texture createDummyTexture(filament::Engine& engine);
 
 VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
 IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
+
+VertexBuffer createFullScreenVertexBuffer(filament::Engine& engine);
+IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine);
 
 } // namespace spatial::render

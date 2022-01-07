@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <spatial/common/Math.h>
 #include <spatial/common/StringHelpers.h>
-#include <spatial/ecs/Resource.h>
+#include <spatial/resources/Resource.h>
 
 namespace spatial::ecs
 {
@@ -46,8 +46,8 @@ struct SunLight
 
 struct IndirectLight
 {
-	ecs::Resource<ecs::ResourceType::ImageTexture> reflectionsTexturePath{};
-	ecs::Resource<ecs::ResourceType::ImageTexture> irradianceValuesPath{};
+	Resource<ResourceType::ImageTexture> reflectionsTexturePath{};
+	Resource<ResourceType::ImageTexture> irradianceValuesPath{};
 	float intensity{30000.0f};
 };
 

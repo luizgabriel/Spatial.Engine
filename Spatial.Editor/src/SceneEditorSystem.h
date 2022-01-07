@@ -32,7 +32,8 @@ class SceneEditorSystem
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 
-	render::Material mDefaultMaterial;
+	render::Material mStandardLitMaterial;
+	render::Material mColorMaterial;
 	render::Material mSkyBoxMaterial;
 	render::Material mGridMaterial;
 
@@ -85,12 +86,20 @@ class SceneEditorSystem
 	void onEvent(const LoadSceneEvent& event);
 	void onEvent(const SaveSceneEvent& event);
 	void onEvent(const OpenProjectEvent& event);
+	void onEvent(const LoadResourceEvent<ResourceType::ImageTexture>& event);
 
-	template <ecs::ResourceType type, typename = std::enable_if_t<type == ecs::ResourceType::CubeMapTexture || type == ecs::ResourceType::ImageTexture>>
-	const auto* findResource(const ecs::Resource<type>& resource)
+	template <ResourceType type, typename = std::enable_if_t<type == ResourceType::CubeMapTexture || type == ResourceType::ImageTexture>>
+	const filament::Texture* findResource(const Resource<type>& resource)
 	{
+		if (resource.isEmpty())
+			return nullptr;
+
 		auto it = std::as_const(mTextures).find(resource.getId());
-		return (it != mTextures.end()) ? it->second.get() : nullptr;
+		const auto* texture = (it != mTextures.end()) ? it->second.get() : nullptr;
+		if (texture == nullptr)
+			mJobQueue.enqueue(LoadResourceEvent{resource});
+
+		return texture;
 	}
 };
 

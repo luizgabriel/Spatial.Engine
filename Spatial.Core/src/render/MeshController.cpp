@@ -11,33 +11,14 @@
 namespace spatial::render
 {
 
-static constexpr math::float3 sFullScreenTriangleVertices[3] = {
-	{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}};
-
-// these must be static because only a pointer is copied to the render stream
-static const uint16_t sFullScreenTriangleIndices[3] = {0, 1, 2};
-
 MeshController::MeshController(filament::Engine& engine)
 	: mEngine{engine}, mRoot{}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
 {
-	auto* vb = filament::VertexBuffer::Builder()
-				   .vertexCount(3)
-				   .bufferCount(1)
-				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
-				   .build(mEngine);
-	vb->setBufferAt(mEngine, 0, {sFullScreenTriangleVertices, sizeof(sFullScreenTriangleVertices)});
+	mVertexBuffers.emplace("engine://fullscreen"_hs, createFullScreenVertexBuffer(mEngine));
 
-	mVertexBuffers.emplace("engine://fullscreen"_hs, VertexBuffer{mEngine, vb});
-
-	auto* ib = filament::IndexBuffer::Builder()
-				   .indexCount(3)
-				   .bufferType(filament::IndexBuffer::IndexType::USHORT)
-				   .build(mEngine);
-	ib->setBuffer(mEngine, {sFullScreenTriangleIndices, sizeof(sFullScreenTriangleIndices)});
-
-	mIndexBuffers.emplace("engine://fullscreen"_hs, IndexBuffer{mEngine, ib});
-
+	auto ib = createFullScreenIndexBuffer(mEngine);
 	mMeshGeometries.emplace("engine://fullscreen"_hs, std::vector<MeshGeometry>{MeshGeometry{0, ib->getIndexCount()}});
+	mIndexBuffers.emplace("engine://fullscreen"_hs, std::move(ib));
 }
 
 void MeshController::load(MeshId resourceId, const FilameshFile& filamesh)

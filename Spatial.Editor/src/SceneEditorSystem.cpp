@@ -7,11 +7,8 @@
 
 #include <assets/generated.h>
 
-#include <spatial/common/EventQueue.h>
 #include <spatial/render/Camera.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/serialization/Archives.h>
-#include <spatial/serialization/Registry.h>
 
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
@@ -33,11 +30,15 @@ using namespace spatial::math;
 namespace spatial::editor
 {
 
+const auto gIconsTextureResource = Resource<ResourceType::ImageTexture>("editor://textures/icons.png");
+
 SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
 	: mEngine{engine},
 	  mWindow{window},
 
-	  mDefaultMaterial{render::createMaterial(mEngine, ASSETS_DEFAULT_FILAMAT, ASSETS_DEFAULT_FILAMAT_SIZE)},
+	  mStandardLitMaterial{
+		  render::createMaterial(mEngine, ASSETS_STANDARD_LIT_FILAMAT, ASSETS_STANDARD_LIT_FILAMAT_SIZE)},
+	  mColorMaterial{render::createMaterial(mEngine, ASSETS_COLOR_FILAMAT, ASSETS_COLOR_FILAMAT_SIZE)},
 	  mSkyBoxMaterial{render::createMaterial(mEngine, ASSETS_SKYBOX_FILAMAT, ASSETS_SKYBOX_FILAMAT_SIZE)},
 	  mGridMaterial{render::createMaterial(mEngine, ASSETS_GRID_FILAMAT, ASSETS_GRID_FILAMAT_SIZE)},
 
@@ -63,17 +64,19 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	mJobQueue.connect<ClearSceneEvent>(*this);
 	mJobQueue.connect<LoadSceneEvent>(*this);
 	mJobQueue.connect<SaveSceneEvent>(*this);
+	mJobQueue.connect<LoadResourceEvent<ResourceType::ImageTexture>>(*this);
 }
 
 void SceneEditorSystem::onStart()
 {
-	mTextures.emplace("editor://textures/icons.png"_hs,
+	mTextures.emplace(gIconsTextureResource.getId(),
 					  render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE));
 	mTextures.emplace(
 		"editor://textures/default_skybox/texture.ktx"_hs,
 		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
 
 	mTextures.emplace("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
+	mTextures.emplace("engine://dummy_texture"_hs, render::createDummyTexture(mEngine));
 
 	mMeshController.load("editor://meshes/cube.filamesh"_hs,
 						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
@@ -95,7 +98,6 @@ void SceneEditorSystem::onStartFrame(float)
 	mJobQueue.update();
 
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<SkyBoxMaterial>()))
-	{
 		ecs::build(mRegistry)
 			.withName("Default SkyBox")
 			.asMaterial<SkyBoxMaterial>({
@@ -103,15 +105,11 @@ void SceneEditorSystem::onStartFrame(float)
 				{math::float3{.0f}, 1.0f},
 				{"editor://textures/default_skybox/texture.ktx"},
 			});
-	}
 
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<GridMaterial>()))
-	{
 		ecs::build(mRegistry).withName("Grid Material").with<tags::IsEditorEntity>().asMaterial<GridMaterial>();
-	}
 
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsGridPlane>()))
-	{
 		ecs::build(mRegistry)
 			.withName("Grid Plane")
 			.with<tags::IsEditorEntity>()
@@ -122,11 +120,8 @@ void SceneEditorSystem::onStartFrame(float)
 			.asMesh()
 			.withPath("editor://meshes/plane.filamesh")
 			.withMaterialAt(0, mRegistry.getFirstEntity<GridMaterial>());
-	}
 
-	auto skyboxMeshEntity = mRegistry.getFirstEntity<tags::IsSkyBoxMesh>();
-	if (!mRegistry.isValid(skyboxMeshEntity))
-	{
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsSkyBoxMesh>()))
 		ecs::build(mRegistry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBoxMesh>()
@@ -136,10 +131,8 @@ void SceneEditorSystem::onStartFrame(float)
 			.withShadowOptions(false, false)
 			.withCulling(false)
 			.withPriority(0x7);
-	}
 
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsEditorView>()))
-	{
 		ecs::build(mRegistry)
 			.withName("Editor View")
 			.with<tags::IsEditorEntity>()
@@ -160,7 +153,6 @@ void SceneEditorSystem::onStartFrame(float)
 							.asPerspectiveCamera()
 							.withFieldOfView(60.0)
 							.withAspectRatio(19.0 / 6.0));
-	}
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
@@ -172,10 +164,10 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mLightController.onUpdateFrame(mRegistry);
 	mIndirectLightController.onUpdateFrame(mRegistry);
 
-	mMaterialController.onUpdateFrame<DefaultMaterial>(mRegistry, mDefaultMaterial.ref());
-	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(),
-													  [this](const auto& res) { return findResource(res); });
 	mMaterialController.onUpdateFrame<GridMaterial>(mRegistry, mGridMaterial.ref());
+	mMaterialController.onUpdateFrame<ColorMaterial>(mRegistry, mColorMaterial.ref());
+	mMaterialController.onUpdateFrame<StandardLitMaterial>(mRegistry, mStandardLitMaterial.ref(), [this](const auto& res) { return findResource(res); });
+	mMaterialController.onUpdateFrame<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref(), [this](const auto& res) { return findResource(res); });
 
 	mMeshController.onUpdateFrame(mRegistry);
 }
@@ -260,9 +252,11 @@ void SceneEditorSystem::onDrawGui()
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
+		ui::EntityProperties::displayEntityEditorComponents(mRegistry, selectedEntity, gIconsTextureResource,
+															[this](const auto& res) { return findResource(res); });
 	});
 
-	const auto& iconTexture = mTextures.at("editor://textures/icons.png"_hs);
+	const auto& iconTexture = mTextures.at(gIconsTextureResource.getId());
 	ui::Window::show("Assets Explorer",
 					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, mCurrentPath, iconTexture.get()); });
 }
@@ -304,9 +298,7 @@ void SceneEditorSystem::loadScene()
 
 void SceneEditorSystem::saveScene()
 {
-	auto result = makeAbsolutePath(mRootPath, mScenePath)
-					  .and_then(openFileWriteStream)
-					  .map_error(logResourceError);
+	auto result = makeAbsolutePath(mRootPath, mScenePath).and_then(openFileWriteStream).map_error(logResourceError);
 
 	if (result.has_value())
 		writeRegistry(mRegistry, std::move(result.value()));
@@ -345,6 +337,22 @@ void SceneEditorSystem::onEvent(const OpenProjectEvent& event)
 	clearScene();
 	setRootPath(event.path);
 	setScenePath("scenes/default.spatial.json");
+}
+
+void SceneEditorSystem::onEvent(const LoadResourceEvent<ResourceType::ImageTexture>& event)
+{
+	auto result =
+		makeAbsolutePath(mRootPath, event.texture.relativePath)
+			.and_then(validateResourcePath)
+			.and_then([](auto&& res) { return validateExtensions(std::move(res), {".png", ".jpg"}); })
+			.and_then(openFileReadStream)
+			.transform(toVectorData)
+			.transform([this](auto&& data) { return render::createTexture(mEngine, data.data(), data.size()); })
+			.map_error(logResourceError);
+
+	if (result.has_value()) {
+		mTextures.emplace(event.texture.getId(), std::move(result.value()));
+	}
 }
 
 } // namespace spatial::editor

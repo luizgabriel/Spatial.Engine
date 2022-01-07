@@ -21,35 +21,17 @@ struct Icon
 
 struct Icons
 {
-	Icon back;
-	Icon folder;
-	Icon unknownFile;
-	Icon meshFile;
-	Icon pngFile;
-	Icon jpgFile;
-	Icon exrFile;
-	Icon sceneFile;
-	Icon jsFile;
-
-	constexpr Icons(const Icon& back, const Icon& folder, const Icon& unknownFile, const Icon& meshFile,
-					const Icon& pngFile, const Icon& jpgFile, const Icon& exrFile, const Icon& sceneFile,
-					const Icon& jsFile)
-		: back(back),
-		  folder(folder),
-		  unknownFile(unknownFile),
-		  meshFile(meshFile),
-		  pngFile(pngFile),
-		  jpgFile(jpgFile),
-		  exrFile(exrFile),
-		  sceneFile(sceneFile),
-		  jsFile(jsFile)
-	{
-	}
-};
-
-constexpr auto gIcons = Icons{
-	Icon{{0, 1}}, Icon{{0, 0}}, Icon{{1, 0}}, Icon{{2, 0}}, Icon{{3, 0}},
-	Icon{{4, 0}}, Icon{{5, 0}}, Icon{{6, 0}}, Icon{{7, 0}},
+	constexpr static Icon back = Icon{{0, 1}};
+	constexpr static Icon folder = Icon{{0, 0}};
+	constexpr static Icon unknownFile = Icon{{1, 0}};
+	constexpr static Icon meshFile = Icon{{2, 0}};
+	constexpr static Icon pngFile = Icon{{3, 0}};
+	constexpr static Icon jpgFile = Icon{{4, 0}};
+	constexpr static Icon exrFile = Icon{{5, 0}};
+	constexpr static Icon ktxFile= Icon{{5, 1}};
+	constexpr static Icon sceneFile = Icon{{6, 0}};
+	constexpr static Icon jsFile = Icon{{7, 0}};
+	Icons() = delete;
 };
 
 } // namespace spatial::ui

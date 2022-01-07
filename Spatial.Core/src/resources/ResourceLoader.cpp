@@ -1,4 +1,4 @@
-#include "spatial/ecs/Resource.h"
+#include "spatial/resources/Resource.h"
 #include <fmt/format.h>
 #include <fstream>
 #include <magic_enum.hpp>
@@ -33,6 +33,16 @@ tl::expected<std::filesystem::path, ResourceError> validateResourcePath(std::fil
 		return tl::make_unexpected(ResourceError::NotAFile);
 
 	return resourceAbsolutePath;
+}
+
+tl::expected<std::filesystem::path, ResourceError> validateExtensions(std::filesystem::path&& resourceAbsolutePath, const std::vector<std::string>& extensions)
+{
+	for (auto& extension : extensions) {
+		if (resourceAbsolutePath.extension().compare(extension) == 0)
+			return resourceAbsolutePath;
+	}
+
+	return tl::make_unexpected(ResourceError::InvalidExtension);
 }
 
 tl::expected<std::ifstream, ResourceError> openFileReadStream(const std::filesystem::path& resourceAbsolutePath)

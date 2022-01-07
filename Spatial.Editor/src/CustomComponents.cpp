@@ -1,9 +1,9 @@
 #include "CustomComponents.h"
-#include "Materials.h"
 #include "EditorCamera.h"
+#include "Materials.h"
 #include "Tags.h"
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/TextureView.h>
@@ -11,14 +11,14 @@
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
+#include <spatial/ui/components/ResourceSelector.h>
 
 namespace spatial::ui
 {
 
-template <>
-void componentInput<editor::DefaultMaterial>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<editor::ColorMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
-	auto& material = registry.getComponent<editor::DefaultMaterial>(entity);
+	auto& material = registry.getComponent<editor::ColorMaterial>(entity);
 
 	ImGui::ColorEdit3("Color", &material.baseColor.r);
 	ImGui::DragFloat("Metallic", &material.metallic, 0.01f, .0f, 1.0f, "%.2f");
@@ -26,8 +26,7 @@ void componentInput<editor::DefaultMaterial>(ecs::Registry& registry, ecs::Entit
 	ImGui::DragFloat("Roughness", &material.roughness, 0.01f, .0f, 1.0f, "%.2f");
 }
 
-template <>
-void componentInput<editor::EditorCamera>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<editor::EditorCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& data = registry.getComponent<editor::EditorCamera>(entity);
 
@@ -35,72 +34,18 @@ void componentInput<editor::EditorCamera>(ecs::Registry& registry, ecs::Entity e
 	ImGui::DragFloat("Sensitivity", &data.sensitivity);
 }
 
-template <>
-void componentInput<editor::SkyBoxMaterial>(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
-
-	ImGui::Checkbox("Show Sun", &data.showSun);
-	ImGui::DragFloat("Color Alpha", &data.color.a, .01f, .0f, 1.0f);
-	ImGui::ColorEdit4("Color", &data.color.r);
-	ui::inputPath("Cubemap Texture", data.skybox.relativePath);
-}
-
-template <>
-void componentInput<editor::GridMaterial>(ecs::Registry& registry, ecs::Entity entity)
+void ComponentInputImpl<editor::GridMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& data = registry.getComponent<editor::GridMaterial>(entity);
 
 	ImGui::ColorEdit3("Color", &data.color.r);
-
 	ImGui::DragFloat("Thickness", &data.thickness, 0.001f, .0f, 1.0f);
 	ImGui::DragFloat2("Scale", &data.scale.x, 0.01f, .0f, 100.0f);
 }
 
-bool EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity)
 {
-	bool changed = false;
-
-	changed |= displayComponent<ecs::Transform>("Transform", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::PerspectiveCamera>("Perspective Camera", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::OrthographicCamera>("Orthographic Camera", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::CustomCamera>("Custom Camera", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::DirectionalLight>("Directional Light", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::SpotLight>("Spot Light", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::PointLight>("Point Light", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::Mesh>("Mesh", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
-
-	changed |= displayComponent<ecs::SceneView>("Scene View", registry, selectedEntity);
-
-	return changed;
-}
-
-bool EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
-{
-	bool changed = false;
-
-	changed |= displayComponent<editor::EditorCamera>("Editor Camera", registry, selectedEntity);
-	changed |= displayComponent<editor::DefaultMaterial>("Default Material", registry, selectedEntity);
-	changed |= displayComponent<editor::SkyBoxMaterial>("SkyBox Material", registry, selectedEntity);
-	changed |= displayComponent<editor::GridMaterial>("Grid Material", registry, selectedEntity);
-
-	return changed;
-}
-
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
-{
-	bool isValid = registry.isValid(selectedEntity);
+	bool isValid = registry.isValid(entity);
 	if (!isValid)
 	{
 		ImGui::Text("No entity selected.");
@@ -108,14 +53,13 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity se
 	}
 
 	bool changed = false;
-	changed |= displayEntityName(registry, selectedEntity);
-	changed |= displayEntityCoreComponents(registry, selectedEntity);
-	changed |= displayEntityEditorComponents(registry, selectedEntity);
+	displayEntityName(registry, entity);
+	displayEntityCoreComponents(registry, entity);
 
 	return changed;
 }
 
-bool EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity)
+void EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity)
 {
 	bool changed = false;
 
@@ -126,8 +70,6 @@ bool EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
 		changed = inputText("##Name", name.name);
 	}
-
-	return changed;
 }
 
 void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity)
@@ -172,18 +114,33 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity sel
 		registry.addComponent<ecs::SceneView>(selectedEntity);
 }
 
-void EntityProperties::popup(ecs::Registry& registry, ecs::Entity selectedEntity)
+void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
 {
-	if (!registry.isValid(selectedEntity))
+	if (!registry.isValid(entity))
 		return;
 
 	{
 		auto popup = ui::Popup{"Properties Popup"};
 		if (popup.isOpen())
 		{
-			EntityProperties::addComponentMenu(registry, selectedEntity);
+			EntityProperties::addComponentMenu(registry, entity);
 		}
 	}
+}
+
+void EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
+{
+	componentCollapse<ecs::Transform>("Transform", registry, selectedEntity);
+	componentCollapse<ecs::PerspectiveCamera>("Perspective Camera", registry, selectedEntity);
+	componentCollapse<ecs::OrthographicCamera>("Orthographic Camera", registry, selectedEntity);
+	componentCollapse<ecs::CustomCamera>("Custom Camera", registry, selectedEntity);
+	componentCollapse<ecs::DirectionalLight>("Directional Light", registry, selectedEntity);
+	componentCollapse<ecs::SpotLight>("Spot Light", registry, selectedEntity);
+	componentCollapse<ecs::PointLight>("Point Light", registry, selectedEntity);
+	componentCollapse<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
+	componentCollapse<ecs::Mesh>("Mesh", registry, selectedEntity);
+	componentCollapse<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
+	componentCollapse<ecs::SceneView>("Scene View", registry, selectedEntity);
 }
 
 NewSceneModal::NewSceneModal() : mModal{"New Scene"}
@@ -349,15 +306,12 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry
-				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
+			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity,
-										   ecs::Child>)
+					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -458,8 +412,6 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 
 bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
-	static auto newMaterialsCount = 1;
-
 	bool changed = false;
 
 	auto popup = ui::Popup{"Materials Window Popup"};
@@ -468,11 +420,19 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 		{
 			auto menu = ui::Menu{"Create Material"};
 
-			if (menu.item("Default Material"))
+			if (menu.item("Color Material"))
 			{
 				selectedEntity = ecs::build(registry)
-									 .withName(fmt::format("Default Material {0}", newMaterialsCount++))
-									 .asMaterial<editor::DefaultMaterial>();
+									 .withName("Color Material")
+									 .asMaterial<editor::ColorMaterial>();
+				changed = true;
+			}
+
+			if (menu.item("Standard Lit"))
+			{
+				selectedEntity = ecs::build(registry)
+									 .withName("Standard Lit")
+									 .asMaterial<editor::StandardLitMaterial>();
 				changed = true;
 			}
 		}
@@ -482,9 +442,7 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 
 			if (menu.item("Default SkyBox"))
 			{
-				selectedEntity = ecs::build(registry)
-									 .withName("Default SkyBox")
-									 .asMaterial<editor::SkyBoxMaterial>();
+				selectedEntity = ecs::build(registry).withName("Default SkyBox").asMaterial<editor::SkyBoxMaterial>();
 				changed = true;
 			}
 		}
@@ -652,9 +610,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (menu.item("Scene View"))
 	{
-		newEntity = ecs::build(registry)
-						.withName("Scene View")
-						.asSceneView();
+		newEntity = ecs::build(registry).withName("Scene View").asSceneView();
 		changed = true;
 	}
 

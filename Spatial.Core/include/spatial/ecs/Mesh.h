@@ -5,14 +5,14 @@
 #include <filesystem>
 #include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ecs/Resource.h>
+#include <spatial/resources/Resource.h>
 
 namespace spatial::ecs
 {
 
 struct Mesh
 {
-	ecs::Resource<ecs::ResourceType::FilaMesh> meshResource{};
+	Resource<ResourceType::FilaMesh> meshResource{};
 
 	bool castShadows{false};
 	bool receiveShadows{false};
@@ -25,10 +25,10 @@ struct Mesh
 
 struct MeshMaterial
 {
-	uint32_t primitiveIndex;
+	size_t primitiveIndex;
 	Entity materialEntity;
 
-	constexpr MeshMaterial(uint32_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
+	constexpr explicit MeshMaterial(size_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
 		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
 	{
 	}

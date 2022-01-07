@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.12.11"
+    version = "1.15.2"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"

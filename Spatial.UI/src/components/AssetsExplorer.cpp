@@ -19,7 +19,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 
 	displayPathHeader(rootPath, selectedPath, icon);
 
-	ImGui::Columns(6);
+	ImGui::Columns(6, "AssetsExplorer", false);
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 50.0f, 100.0f)};
@@ -30,7 +30,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 		if (entry.is_directory())
 		{
 			ImGui::PushID(path.c_str());
-			if (icon ? imageButton(*icon, size, gIcons.folder.uv())
+			if (icon ? imageButton(*icon, size, Icons::folder.uv())
 					 : ImGui::Button("Directory", ImVec2(size.x, size.y)))
 			{
 				selectedPath = path;
@@ -53,19 +53,19 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 			};
 
 			if (ends_with(filename, ".png"))
-				fileButton(gIcons.pngFile.uv());
+				fileButton(Icons::pngFile.uv());
 			else if (ends_with(filename, ".jpg"))
-				fileButton(gIcons.jpgFile.uv());
+				fileButton(Icons::jpgFile.uv());
 			else if (ends_with(filename, ".js"))
-				fileButton(gIcons.jsFile.uv());
+				fileButton(Icons::jsFile.uv());
 			else if (ends_with(filename, ".exr"))
-				fileButton(gIcons.exrFile.uv());
+				fileButton(Icons::exrFile.uv());
 			else if (ends_with(filename, ".spatial.json"))
-				fileButton(gIcons.sceneFile.uv());
+				fileButton(Icons::sceneFile.uv());
 			else if (ends_with(filename, ".filamesh") || ends_with(filename, ".obj"))
-				fileButton(gIcons.meshFile.uv());
+				fileButton(Icons::meshFile.uv());
 			else
-				fileButton(gIcons.unknownFile.uv());
+				fileButton(Icons::unknownFile.uv());
 
 			{
 				auto dnd = DragAndDropSource{};
@@ -92,7 +92,7 @@ bool AssetsExplorer::displayPathHeader(const std::filesystem::path& rootPath, st
 	if (fullPath != rootPath)
 	{
 		ImGui::PushID("BackButton");
-		changed = icon ? imageButton(*icon, math::float2{20}, gIcons.back.uv()) : ImGui::Button("Back");
+		changed = icon ? imageButton(*icon, math::float2{20}, Icons::back.uv()) : ImGui::Button("Back");
 		if (changed)
 			selectedPath = selectedPath.parent_path();
 		ImGui::PopID();

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 from conans import ConanFile, CMake, tools
 import os
@@ -49,45 +50,46 @@ class v8Conan(ConanFile):
         with tools.chdir("v8"):
             self.run("git checkout {}".format(self.version))
 
-    @staticmethod
-    def get_gn_profile(settings):
-        """return the profile defined somewhere in v8/infra/mb/mb_config.pyl which corresponds "nearly" to the one we need.. "nearly" as in "not even remotely"..
-        """
+    @property
+    def gn_build_type(self):
+        return str(self.settings.build_type).lower()
+
+    @property
+    def gn_arch(self):
         arch_map = {
             "x86_64": "x64",
+            "armv8": "arm64"
         }
 
-        return "{arch}.{build_type}".format(build_type=str(settings.build_type).lower(),
-                                            arch=arch_map.get(settings.arch, settings.arch))
+        arch = str(self.settings.arch)
+        return arch_map.get(arch, arch)
 
+    @property
+    def gn_profile(self):
+        return "{arch}.{build_type}".format(build_type=self.gn_build_type, arch=self.gn_arch)
 
-def _install_system_requirements_linux(self):
-    """some extra script must be executed on linux"""
-    os.environ["PATH"] += os.pathsep + os.path.join(self.source_folder, "depot_tools")
-    self.run("chmod +x v8/build/install-build-deps.sh")
-    self.run("v8/build/install-build-deps.sh --unsupported --no-arm --no-nacl "
-             "--no-backwards-compatible --no-chromeos-fonts --no-prompt "
-             + "--syms" if str(self.settings.build_type) == "Debug" else "--no-syms")
+    def _install_system_requirements_linux(self):
+        """some extra script must be executed on linux"""
+        os.environ["PATH"] += os.pathsep + os.path.join(self.source_folder, "depot_tools")
+        self.run("chmod +x v8/build/install-build-deps.sh")
+        self.run("v8/build/install-build-deps.sh --unsupported --no-arm --no-nacl "
+                 "--no-backwards-compatible --no-chromeos-fonts --no-prompt "
+                 + "--syms" if str(self.settings.build_type) == "Debug" else "--no-syms")
 
+    @property
+    def gn_settings(self):
+        is_debug = "debug" in self.gn_profile
 
-def build(self):
-    self._set_environment_vars()
-
-    if tools.os_info.is_linux:
-        self._install_system_requirements_linux()
-
-    # fix gn always detecting the runtime on its own:
-    if str(self.settings.compiler) == "Visual Studio" and str(self.settings.compiler.runtime) in ["MD", "MDd"]:
-        build_gn_file = os.path.join("v8", "build", "config", "win", "BUILD.gn")
-        print("replacing MT / MTd with MD / MDd in gn file." + build_gn_file)
-        tools.replace_in_file(file_path=build_gn_file, search="MT", replace="MD")
-
-    with tools.chdir("v8"):
-        arguments = ["v8_monolithic = true",
-                     "is_component_build = false",
-                     "v8_static_library = true",
-                     "treat_warnings_as_errors = false",
-                     "v8_use_external_startup_data = false"]
+        arguments = [
+            "is_debug = " + "true" if is_debug else "false",
+            "v8_monolithic = true",
+            "v8_enable_backtrace = " + "true" if is_debug else "false",
+            "is_component_build = false",
+            "v8_static_library = true",
+            "treat_warnings_as_errors = false",
+            "v8_use_external_startup_data = false",
+            "target_cpu = \"%s\"" % self.gn_arch,
+            "v8_target_cpu = \"%s\"" % self.gn_arch]
         # v8_enable_backtrace=false, v8_enable_i18n_support
 
         if tools.os_info.is_linux:
@@ -97,28 +99,36 @@ def build(self):
                           "use_glib = false",
                           "is_clang = " + "true" if "clang" in str(self.settings.compiler).lower() else "false"]
 
-        generator_call = 'tools/dev/v8gen.py {profile} -- "{gn_args}"'.format(
-            profile=self.get_gn_profile(self.settings),
-            gn_args=" ".join(arguments))
-        # maybe todo: absolute path..
-        if tools.os_info.is_windows:
-            # this is picking up the python shipped via depot_tools, since we got it in the path.
-            generator_call = "python " + generator_call
-        self.run("python --version")
-        self.run(generator_call)
-        self.run("ninja -C out.gn/{profile} v8_monolith".format(profile=self.get_gn_profile(self.settings)))
+        return arguments
 
+    def build(self):
+        self._set_environment_vars()
 
-def package(self):
-    self.copy(pattern="LICENSE*", dst="licenses", src="v8")
-    self.copy(pattern="*v8_monolith.a", dst="lib", keep_path=False)
-    self.copy(pattern="*v8_monolith.lib", dst="lib", keep_path=False)
-    self.copy(pattern="*.h", dst="include", src="v8/include", keep_path=True)
+        if tools.os_info.is_linux:
+            self._install_system_requirements_linux()
 
+        # fix gn always detecting the runtime on its own:
+        if str(self.settings.compiler) == "Visual Studio" and str(self.settings.compiler.runtime) in ["MD", "MDd"]:
+            build_gn_file = os.path.join("v8", "build", "config", "win", "BUILD.gn")
+            print("replacing MT / MTd with MD / MDd in gn file." + build_gn_file)
+            tools.replace_in_file(file_path=build_gn_file, search="MT", replace="MD")
 
-def package_info(self):
-    # fix issue on Windows and OSx not finding the KHR files
-    # self.cpp_info.includedirs.append(os.path.join("include", "MagnumExternal", "OpenGL"))
-    # builtLibs = tools.collect_libs(self)
-    self.cpp_info.libs = [
-        "v8_monolith"]  # sort_libs(correct_order=allLibs, libs=builtLibs, lib_suffix=suffix, reverse_result=True)
+        with tools.chdir("v8"):
+            tools.mkdir("out.gn/%s/" % self.gn_profile)
+            tools.save("out.gn/%s/args.gn" % self.gn_profile, "\n".join(self.gn_settings))
+            tools.save(".cipd_client_platform", "mac-arm64")
+
+            self.run('gn gen out.gn/{profile}'.format(profile=self.gn_profile))
+            self.run("ninja -C out.gn/{profile} v8_monolith".format(profile=self.gn_profile))
+
+    def package(self):
+        self.copy(pattern="LICENSE*", dst="licenses", src="v8")
+        self.copy(pattern="*v8_monolith.a", dst="lib", keep_path=False)
+        self.copy(pattern="*v8_monolith.lib", dst="lib", keep_path=False)
+        self.copy(pattern="*.h", dst="include", src="v8/include", keep_path=True)
+
+    def package_info(self):
+        # fix issue on Windows and OSx not finding the KHR files
+        # self.cpp_info.includedirs.append(os.path.join("include", "MagnumExternal", "OpenGL"))
+        # builtLibs = tools.collect_libs(self)
+        self.cpp_info.libs = ["v8_monolith"]

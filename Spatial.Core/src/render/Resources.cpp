@@ -157,24 +157,62 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 	return ib;
 }
 
+Texture createDummyTexture(fl::Engine& engine)
+{
+	auto texture = createTexture(engine, {1, 1}, fl::Texture::InternalFormat::RGBA8, fl::Texture::Usage::DEFAULT,
+								 fl::Texture::Sampler::SAMPLER_2D);
+
+	static const uint32_t pixel = 0xFFFFFFFF;
+	auto buffer = fl::Texture::PixelBufferDescriptor(&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE);
+
+	auto bufferDescriptor =
+		fl::Texture::PixelBufferDescriptor{&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE};
+
+	texture->setImage(engine, 0, std::move(bufferDescriptor));
+
+	return texture;
+}
+
 Texture createDummyCubemap(filament::Engine& engine)
 {
-	auto* texture = filament::Texture::Builder()
-						.width(1)
-						.height(1)
-						.levels(1)
-						.format(filament::Texture::InternalFormat::RGBA8)
-						.sampler(filament::Texture::Sampler::SAMPLER_CUBEMAP)
-						.build(engine);
+	auto texture = createTexture(engine, math::int2{1}, fl::Texture::InternalFormat::RGBA8, fl::Texture::Usage::DEFAULT,
+								 filament::Texture::Sampler::SAMPLER_CUBEMAP);
 
 	static const uint32_t pixel = 0;
 	auto buffer =
-		filament::Texture::PixelBufferDescriptor(&pixel, 4, // 4 bytes in 1 RGBA pixel
-												 filament::Texture::Format::RGBA, filament::Texture::Type::UBYTE);
+		filament::Texture::PixelBufferDescriptor(&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE);
 	const auto offsets = filament::Texture::FaceOffsets{};
 	texture->setImage(engine, 0, std::move(buffer), offsets);
 
-	return Texture{engine, texture};
+	return texture;
+}
+
+VertexBuffer createFullScreenVertexBuffer(filament::Engine& engine)
+{
+	static constexpr math::float3 sFullScreenTriangleVertices[3] = {
+		{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}};
+
+	auto* vb = filament::VertexBuffer::Builder()
+				   .vertexCount(3)
+				   .bufferCount(1)
+				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
+				   .build(engine);
+	vb->setBufferAt(engine, 0, {sFullScreenTriangleVertices, sizeof(sFullScreenTriangleVertices)});
+
+	return VertexBuffer{engine, vb};
+}
+
+IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine)
+{
+	static const uint16_t sFullScreenTriangleIndices[3] = {0, 1, 2};
+
+	auto* ib = filament::IndexBuffer::Builder()
+				   .indexCount(3)
+				   .bufferType(filament::IndexBuffer::IndexType::USHORT)
+				   .build(engine);
+	ib->setBuffer(engine, {sFullScreenTriangleIndices, sizeof(sFullScreenTriangleIndices)});
+
+	return IndexBuffer{engine, ib};
 }
 
 } // namespace spatial::render

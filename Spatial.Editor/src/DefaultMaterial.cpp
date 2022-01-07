@@ -3,7 +3,7 @@
 namespace spatial::editor
 {
 
-void DefaultMaterial::apply(filament::MaterialInstance& instance) const
+void ColorMaterial::apply(filament::MaterialInstance& instance) const
 {
 	instance.setParameter("baseColor", baseColor);
 	instance.setParameter("metallic", metallic);

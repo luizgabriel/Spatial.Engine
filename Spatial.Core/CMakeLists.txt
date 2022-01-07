@@ -31,7 +31,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Relation.h
         include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SceneView.h
-        include/spatial/ecs/Resource.h
+        include/spatial/ecs/Script.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -50,6 +50,7 @@ add_library(Spatial.Core
         include/spatial/render/MeshController.h
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
+        include/spatial/render/ResourceFinders.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -70,6 +71,10 @@ add_library(Spatial.Core
         include/spatial/resources/ResourceLoader.h
         include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
+        include/spatial/resources/Resource.h
+
+        #include/spatial/script/Isolate.h
+        #include/spatial/script/PlatformContext.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -105,6 +110,9 @@ add_library(Spatial.Core
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
 
+        #src/script/PlatformContext.cpp
+        #src/script/Isolate.cpp
+
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
         src/resources/ResourceLoader.cpp)
@@ -137,7 +145,7 @@ target_link_libraries(Spatial.Core
         CONAN_PKG::glfw
         CONAN_PKG::cereal
         CONAN_PKG::magic_enum
-        CONAN_PKG::v8
+        #CONAN_PKG::v8
         CONAN_PKG::tl-expected)
 
 find_package(OpenGL REQUIRED)

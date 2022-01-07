@@ -3,12 +3,13 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/ecs/Resource.h>
+#include <spatial/resources/Resource.h>
+#include <spatial/render/ResourceFinders.h>
 
 namespace spatial::editor
 {
 
-struct DefaultMaterial
+struct ColorMaterial
 {
 	math::float3 baseColor{1.0f};
 	float metallic{.8f};
@@ -31,9 +32,9 @@ struct SkyBoxMaterial
 {
 	bool showSun{false};
 	math::float4 color{.0f, .0f, .0f, 1.0f};
-	ecs::Resource<ecs::ResourceType::CubeMapTexture> skybox{};
+	Resource<ResourceType::CubeMapTexture> skybox{};
 
-	template <typename Finder>
+	template <typename Finder, typename = std::enable_if_t<render::is_cubemap_texture_finder_v<Finder>>>
 	void apply(filament::MaterialInstance& instance, const Finder& finder) const
 	{
 		instance.setParameter("showSun", showSun);
@@ -42,12 +43,96 @@ struct SkyBoxMaterial
 		const auto* texture = finder(skybox);
 		instance.setParameter("constantColor", texture == nullptr);
 
-		const auto* dummy = finder(ecs::Resource<ecs::ResourceType::CubeMapTexture>{"engine://dummy_cubemap"});
+		const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine://dummy_cubemap"});
 		assert(dummy != nullptr);
 
 		const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
 													  filament::TextureSampler::WrapMode::REPEAT};
 		instance.setParameter("skybox", texture == nullptr ? dummy : texture, sampler);
+	}
+};
+
+struct StandardLitMaterial
+{
+	math::float4 baseColor{1.0f};
+	Resource<ResourceType::ImageTexture> albedo{};
+
+	math::float2 tiling{1.0f};
+	math::float2 offset{.0f};
+
+	float metallic{.0f};
+	Resource<ResourceType::ImageTexture> metallicMap{};
+
+	float roughness{1.0f};
+	Resource<ResourceType::ImageTexture> roughnessMap{};
+
+	float reflectance{.0f};
+	Resource<ResourceType::ImageTexture> reflectanceMap{};
+
+	bool useClearCoat{false};
+	float clearCoat{1.0f};
+	float clearCoatRoughness{.0f};
+
+	bool useAnisotropy{false};
+	float anisotropy{.5f};
+	Resource<ResourceType::ImageTexture> anisotropyDirectionMap{};
+
+	Resource<ResourceType::ImageTexture> ambientOcclusionMap{};
+
+	Resource<ResourceType::ImageTexture> normalMap{};
+
+	Resource<ResourceType::ImageTexture> bentNormalMap{};
+
+	math::float4 emissive{.0f};
+	Resource<ResourceType::ImageTexture> emissiveMap;
+
+	template <typename Finder, typename = std::enable_if_t<render::is_image_texture_finder_v<Finder>>>
+	void apply(filament::MaterialInstance& instance, const Finder& finder) const
+	{
+		const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine://dummy_texture"});
+		assert(dummy != nullptr);
+
+		const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
+													  filament::TextureSampler::WrapMode::REPEAT};
+
+		instance.setParameter("baseColor", baseColor);
+		const auto* albedoTexture = finder(albedo);
+		instance.setParameter("albedo", albedoTexture != nullptr ? albedoTexture : dummy, sampler);
+		instance.setParameter("tilingOffset", math::float4{tiling, offset});
+
+		instance.setParameter("metallic", metallic);
+		const auto* metallicTexture = finder(metallicMap);
+		instance.setParameter("metallicMap", metallicTexture != nullptr ? metallicTexture : dummy, sampler);
+
+		instance.setParameter("roughness", roughness);
+		const auto* roughnessTexture = finder(roughnessMap);
+		instance.setParameter("roughnessMap", roughnessTexture != nullptr ? roughnessTexture : dummy, sampler);
+
+		instance.setParameter("reflectance", reflectance);
+		const auto* reflectanceTexture = finder(reflectanceMap);
+		instance.setParameter("reflectanceMap", reflectanceTexture != nullptr ? reflectanceTexture : dummy, sampler);
+
+		instance.setParameter("useClearCoat", useClearCoat);
+		instance.setParameter("clearCoat", clearCoat);
+		instance.setParameter("clearCoatRoughness", clearCoatRoughness);
+
+		instance.setParameter("useAnisotropy", useAnisotropy);
+		instance.setParameter("anisotropy", anisotropy);
+		const auto* anisotropyDirectionMapTexture = finder(anisotropyDirectionMap);
+		instance.setParameter("anisotropyDirectionMap", anisotropyDirectionMapTexture != nullptr ? anisotropyDirectionMapTexture : dummy, sampler);
+
+		const auto* ambientOcclusionMapTexture = finder(ambientOcclusionMap);
+		instance.setParameter("ambientOcclusionMap", ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummy, sampler);
+
+		const auto* normalMapTexture = finder(normalMap);
+		instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummy, sampler);
+
+		const auto* bentNormalMapTexture = finder(bentNormalMap);
+		instance.setParameter("bentNormalMap", bentNormalMapTexture != nullptr ? bentNormalMapTexture : dummy, sampler);
+
+		instance.setParameter("emissive", emissive);
+		const auto* emissiveMapTexture = finder(emissiveMap);
+		instance.setParameter("emissiveMap", emissiveMapTexture != nullptr ? emissiveMapTexture : dummy, sampler);
 	}
 };
 

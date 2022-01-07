@@ -1,5 +1,5 @@
 material {
-    name : AssimpDefaultMat,
+    name : Color,
     shadingModel : lit,
     parameters : [
         {

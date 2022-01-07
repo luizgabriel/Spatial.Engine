@@ -9,7 +9,8 @@ enum class ResourceError
 	NotFound,
 	NotAFile,
 	OpenFailed,
-	ParseError
+	ParseError,
+	InvalidExtension
 };
 
 }

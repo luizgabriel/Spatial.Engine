@@ -1,0 +1,123 @@
+material {
+    name : StandardLit,
+    shadingModel : lit,
+    requires : [ uv0 ],
+    parameters : [
+        {
+            type : float4,
+            name : baseColor
+        },
+        {
+            type : sampler2d,
+            name : albedo
+        },
+        {
+            type : float4,
+            name : tilingOffset
+        },
+
+        {
+            type : float,
+            name : metallic
+        },
+        {
+           type : sampler2d,
+           name : metallicMap
+        },
+
+        {
+            type : float,
+            name : roughness
+        },
+        {
+           type : sampler2d,
+           name : roughnessMap
+        },
+
+        {
+            type : float,
+            name : reflectance
+        },
+        {
+           type : sampler2d,
+           name : reflectanceMap
+        },
+
+        {
+            type : int,
+            name : useClearCoat
+        },
+        {
+            type : float,
+            name : clearCoat
+        },
+        {
+            type : float,
+            name : clearCoatRoughness
+        },
+
+        {
+            type : int,
+            name : useAnisotropy
+        },
+        {
+            type : float,
+            name : anisotropy
+        },
+        {
+            type : sampler2d,
+            name : anisotropyDirectionMap
+        },
+
+        {
+            type : sampler2d,
+            name : ambientOcclusionMap
+        },
+
+        {
+            type : sampler2d,
+            name : normalMap
+        },
+
+        {
+            type : sampler2d,
+            name : bentNormalMap
+        },
+
+        {
+            type : float4,
+            name : emissive
+        },
+        {
+            type : sampler2d,
+            name : emissiveMap
+        }
+    ]
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        vec2 uv = (getUV0() * materialParams.tilingOffset.xy) + materialParams.tilingOffset.zw;
+
+        material.baseColor = texture(materialParams_albedo, uv) * materialParams.baseColor;
+        material.metallic = texture(materialParams_metallicMap, uv).r * materialParams.metallic;
+        material.roughness = texture(materialParams_roughnessMap, uv).r * materialParams.roughness;
+        material.reflectance = texture(materialParams_reflectanceMap, uv).r * materialParams.reflectance;
+
+        if (materialParams.useClearCoat > 0) {
+            material.clearCoat = materialParams.clearCoat;
+            material.clearCoatRoughness = materialParams.clearCoatRoughness;
+        }
+
+        if (materialParams.useAnisotropy > 0) {
+            material.anisotropy = materialParams.anisotropy;
+            material.anisotropyDirection = texture(materialParams_anisotropyDirectionMap, uv).rgb;
+        }
+
+        material.ambientOcclusion = texture(materialParams_ambientOcclusionMap, uv).r;
+        material.normal = texture(materialParams_normalMap, uv).rgb;
+        material.bentNormal = texture(materialParams_bentNormalMap, uv).rgb;
+        material.emissive = texture(materialParams_emissiveMap, uv) * materialParams.emissive;
+    }
+}
