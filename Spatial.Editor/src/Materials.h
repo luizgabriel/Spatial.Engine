@@ -3,8 +3,8 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/resources/Resource.h>
 #include <spatial/render/ResourceFinders.h>
+#include <spatial/resources/Resource.h>
 
 namespace spatial::editor
 {
@@ -63,7 +63,7 @@ struct StandardOpaqueMaterial
 	float metallic{.0f};
 	Resource<ImageTexture> metallicMap{};
 
-	float roughness{1.0f};
+	float roughness{0.5f};
 	Resource<ImageTexture> roughnessMap{};
 
 	float reflectance{.0f};
@@ -74,7 +74,7 @@ struct StandardOpaqueMaterial
 	float clearCoatRoughness{.0f};
 
 	bool useAnisotropy{false};
-	float anisotropy{.5f};
+	float anisotropy{.0f};
 	Resource<ImageTexture> anisotropyDirectionMap{};
 
 	Resource<ImageTexture> ambientOcclusionMap{};
@@ -112,17 +112,20 @@ struct StandardOpaqueMaterial
 		const auto* reflectanceTexture = finder(reflectanceMap);
 		instance.setParameter("reflectanceMap", reflectanceTexture != nullptr ? reflectanceTexture : dummy, sampler);
 
-		instance.setParameter("useClearCoat", useClearCoat);
+		instance.setParameter("useClearCoat", useClearCoat ? 1 : -1);
 		instance.setParameter("clearCoat", clearCoat);
 		instance.setParameter("clearCoatRoughness", clearCoatRoughness);
 
-		instance.setParameter("useAnisotropy", useAnisotropy);
+		instance.setParameter("useAnisotropy", useAnisotropy? 1 : -1);
 		instance.setParameter("anisotropy", anisotropy);
 		const auto* anisotropyDirectionMapTexture = finder(anisotropyDirectionMap);
-		instance.setParameter("anisotropyDirectionMap", anisotropyDirectionMapTexture != nullptr ? anisotropyDirectionMapTexture : dummy, sampler);
+		instance.setParameter("anisotropyDirectionMap",
+							  anisotropyDirectionMapTexture != nullptr ? anisotropyDirectionMapTexture : dummy,
+							  sampler);
 
 		const auto* ambientOcclusionMapTexture = finder(ambientOcclusionMap);
-		instance.setParameter("ambientOcclusionMap", ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummy, sampler);
+		instance.setParameter("ambientOcclusionMap",
+							  ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummy, sampler);
 
 		const auto* normalMapTexture = finder(normalMap);
 		instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummy, sampler);

@@ -26,7 +26,7 @@ tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream)
 void writeRegistry(const ecs::Registry& registry, std::ostream&& ostream)
 {
 	auto archive = JsonOutputArchive{ostream};
-	ecs::serialize<ColorMaterial, SkyBoxMaterial, GridMaterial, EditorCamera, tags::IsEditorEntity,
+	ecs::serialize<ColorMaterial, SkyBoxMaterial, GridMaterial, StandardOpaqueMaterial, EditorCamera, tags::IsEditorEntity,
 				   tags::IsSkyBoxMesh, tags::IsEditorView, tags::IsGridPlane>(archive, registry);
 }
 

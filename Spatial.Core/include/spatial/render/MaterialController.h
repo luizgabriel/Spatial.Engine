@@ -12,7 +12,6 @@
 namespace spatial::render
 {
 
-
 class MaterialController
 {
   public:
@@ -26,44 +25,8 @@ class MaterialController
 
 	void onStartFrame();
 
-	constexpr auto getFinder()
-	{
-		return[this](const auto& res) { return findResource(res); };
-	}
-
-	template <typename MaterialComponent>
-	void onUpdateFrameWithFinder(ecs::Registry& registry, const filament::Material& material)
-	{
-		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
-			.each([&](ecs::Entity entity, const auto&) {
-				auto materialInstance = render::createMaterialInstance(mEngine, material);
-				registry.addComponent<MaterialInstance>(entity, std::move(materialInstance));
-			});
-
-		auto finder = getFinder();
-		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) {
-				data.apply(materialInstance.ref(), finder);
-			});
-	}
-
-	template <typename MaterialComponent>
-	void onUpdateFrame(ecs::Registry& registry, const filament::Material& material)
-	{
-		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
-			.each([&](ecs::Entity entity, const auto&) {
-				auto materialInstance = render::createMaterialInstance(mEngine, material);
-				registry.addComponent<MaterialInstance>(entity, std::move(materialInstance));
-			});
-
-		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) {
-				data.apply(materialInstance.ref());
-			});
-	}
-
 	template <ResourceType type, typename = std::enable_if_t<type == CubeMapTexture || type == ImageTexture>>
-	const filament::Texture* findResource(const Resource<type>& resource)
+	constexpr const filament::Texture* operator()(const Resource<type>& resource) const
 	{
 		if (resource.isEmpty())
 			return nullptr;
@@ -76,12 +39,38 @@ class MaterialController
 		return texture;
 	}
 
+	template <typename MaterialComponent>
+	void onUpdateFrameWithFinder(ecs::Registry& registry, const filament::Material& material)
+	{
+		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
+			.each([&](ecs::Entity entity, const auto&) {
+				auto materialInstance = render::createMaterialInstance(mEngine, material);
+				registry.addComponent<MaterialInstance>(entity, std::move(materialInstance));
+			});
+
+		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
+			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref(), *this); });
+	}
+
+	template <typename MaterialComponent>
+	void onUpdateFrame(ecs::Registry& registry, const filament::Material& material)
+	{
+		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
+			.each([&](ecs::Entity entity, const auto&) {
+				auto materialInstance = render::createMaterialInstance(mEngine, material);
+				registry.addComponent<MaterialInstance>(entity, std::move(materialInstance));
+			});
+
+		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
+			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref()); });
+	}
+
 	void setRootPath(const std::filesystem::path& rootPath);
 
   private:
 	filament::Engine& mEngine;
 	std::filesystem::path mRootPath;
-	EventQueue mJobQueue;
+	mutable EventQueue mJobQueue;
 	std::unordered_map<uint32_t, render::Texture> mTextures;
 };
 

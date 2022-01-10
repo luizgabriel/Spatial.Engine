@@ -116,11 +116,11 @@ bool MeshController::hasMeshData(MeshId resourceId) const
 
 void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 {
-	auto d1 = registry.getEntities<ecs::tags::IsRenderableDirty, Renderable>();
+	auto d1 = registry.getEntities<ecs::tags::IsMeshDirty, Renderable>();
 	registry.removeComponent<Renderable>(d1.begin(), d1.end());
 
-	auto d2 = registry.getEntities<ecs::tags::IsRenderableDirty>();
-	registry.removeComponent<ecs::tags::IsRenderableDirty>(d2.begin(), d2.end());
+	auto d2 = registry.getEntities<ecs::tags::IsMeshDirty>();
+	registry.removeComponent<ecs::tags::IsMeshDirty>(d2.begin(), d2.end());
 }
 
 void MeshController::setRootPath(const std::filesystem::path& root)

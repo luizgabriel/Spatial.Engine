@@ -5,53 +5,26 @@
 #include <filesystem>
 #include <imgui.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/DragAndDrop.h>
-#include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/Popup.h>
 #include <spatial/ui/components/PopupModal.h>
-#include <spatial/ui/components/Window.h>
 #include <string_view>
 
 namespace spatial::ui
 {
 
-template <typename Component, typename... Args>
-static void componentCollapse(const std::string_view componentName, ecs::Registry& registry, ecs::Entity entity,
-							  Args&&... args)
-{
-	if (registry.hasAllComponents<Component>(entity))
-	{
-		auto collapse = Collapse{componentName};
-		if (collapse.isOpen())
-		{
-			spacing(3);
-			componentInput<Component>(registry, entity, std::forward<Args>(args)...);
-			spacing(3);
-		}
-
-		if (collapse.onClose())
-			registry.removeComponent<Component>(entity);
-	}
-}
-
 class EntityProperties
 {
   public:
-	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity);
+	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
+								  const render::ImageTextureFinder& finder);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
-	static void displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity entity,
-											  const filament::Texture& icons, const render::ImageTextureFinder& finder);
-
   private:
-	static void addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static void addComponentMenu(ecs::Registry& registry, ecs::Entity entity);
 
 	static void displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
-
-	static void displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity);
 };
 
 struct EditorMainMenu
@@ -182,30 +155,35 @@ class EditorDragAndDrop
 template <>
 struct ComponentInputImpl<editor::ColorMaterial>
 {
+	static constexpr auto sName = "Color Material";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::EditorCamera>
 {
+	static constexpr auto sName = "Editor Camera";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::GridMaterial>
 {
+	static constexpr auto sName = "Grid Camera";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>
 {
+	static constexpr auto sName = "SkyBox Material";
 	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons);
 };
 
 template <>
 struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const render::ImageTextureFinder&>
 {
+	static constexpr auto sName = "Standard Opaque Material";
 	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
 					 const render::ImageTextureFinder& finder);
 };

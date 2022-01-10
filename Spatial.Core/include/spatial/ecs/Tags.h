@@ -19,11 +19,15 @@ struct IsLight
 {
 };
 
-struct IsRenderableDirty
+struct IsMeshDirty
 {
 };
 
 struct IsMainView
+{
+};
+
+struct CanDestroy
 {
 };
 

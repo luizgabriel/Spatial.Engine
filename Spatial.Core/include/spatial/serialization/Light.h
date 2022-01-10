@@ -3,6 +3,7 @@
 #include <cereal/cereal.hpp>
 #include <spatial/ecs/Light.h>
 #include <spatial/serialization/Math.h>
+#include <spatial/serialization/Resource.h>
 
 namespace cereal
 {
@@ -50,8 +51,8 @@ template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::IndirectLight& light)
 {
 	ar(make_nvp("intensity", light.intensity));
-	ar(make_nvp("reflectionsTexturePath", light.reflectionsTexturePath.relativePath));
-	ar(make_nvp("irradianceValuesPath", light.irradianceValuesPath.relativePath));
+	ar(make_nvp("reflectionsTexturePath", light.reflectionsTexturePath));
+	ar(make_nvp("irradianceValuesPath", light.irradianceValuesPath));
 }
 
 } // namespace cereal

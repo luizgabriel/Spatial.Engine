@@ -12,6 +12,7 @@
 #include <spatial/ui/components/MaterialInputs.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
+#include <spatial/ui/components/DragAndDrop.h>
 
 namespace spatial::ui
 {
@@ -89,6 +90,8 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 
 	ui::mapInput("Normal", data.normalMap, finder(data.normalMap), icons, Icons::normalMap.uv());
 
+	ui::mapInput("Bent Normals", data.bentNormalMap, finder(data.bentNormalMap), icons, Icons::normalMap.uv());
+
 	ui::separator(1);
 
 	ImGui::Checkbox("Use CleatCoat", &data.useClearCoat);
@@ -101,7 +104,7 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 	ui::separator(1);
 
 	ImGui::Checkbox("Use Anisotropy", &data.useAnisotropy);
-	if (data.useClearCoat)
+	if (data.useAnisotropy)
 	{
 		ImGui::SliderFloat("Anisotropy", &data.anisotropy, .0f, 1.0f);
 		ui::mapInput("Anisotropy Direction", data.anisotropyDirectionMap, finder(data.anisotropyDirectionMap), icons,
@@ -111,7 +114,7 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 	ui::separator(1);
 }
 
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity)
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons, const render::ImageTextureFinder& finder)
 {
 	bool isValid = registry.isValid(entity);
 	if (!isValid)
@@ -122,7 +125,24 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 
 	bool changed = false;
 	displayEntityName(registry, entity);
-	displayEntityCoreComponents(registry, entity);
+
+	componentCollapse<ecs::Transform>(registry, entity);
+	componentCollapse<ecs::PerspectiveCamera>(registry, entity);
+	componentCollapse<ecs::OrthographicCamera>(registry, entity);
+	componentCollapse<ecs::CustomCamera>(registry, entity);
+	componentCollapse<ecs::DirectionalLight>(registry, entity);
+	componentCollapse<ecs::SpotLight>(registry, entity);
+	componentCollapse<ecs::PointLight>(registry, entity);
+	componentCollapse<ecs::IndirectLight>(registry, entity);
+	componentCollapse<ecs::Mesh>(registry, entity);
+	componentCollapse<ecs::MeshMaterial>(registry, entity);
+	componentCollapse<ecs::SceneView>(registry, entity);
+
+	componentCollapse<editor::EditorCamera>(registry, entity);
+	componentCollapse<editor::ColorMaterial>(registry, entity);
+	componentCollapse<editor::SkyBoxMaterial>(registry, entity, icons);
+	componentCollapse<editor::GridMaterial>(registry, entity);
+	componentCollapse<editor::StandardOpaqueMaterial>(registry, entity, icons, finder);
 
 	return changed;
 }
@@ -140,46 +160,46 @@ void EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 	}
 }
 
-void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity selectedEntity)
+void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto menu = ui::Menu{"Add Component"};
 	if (!menu.isOpen())
 		return;
 
-	if (!registry.hasAnyComponent<ecs::Transform>(selectedEntity) && menu.item("Transform"))
-		registry.addComponent<ecs::Transform>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::Transform>(entity) && menu.item("Transform"))
+		registry.addComponent<ecs::Transform>(entity);
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::Mesh>(selectedEntity) && menu.item("Mesh"))
-		registry.addComponent<ecs::Mesh>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::Mesh>(entity) && menu.item("Mesh"))
+		registry.addComponent<ecs::Mesh>(entity);
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::DirectionalLight>(selectedEntity) && menu.item("Directional Light"))
-		registry.addComponent<ecs::DirectionalLight>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::DirectionalLight>(entity) && menu.item("Directional Light"))
+		registry.addComponent<ecs::DirectionalLight>(entity);
 
-	if (!registry.hasAnyComponent<ecs::SpotLight>(selectedEntity) && menu.item("Spot Light"))
-		registry.addComponent<ecs::SpotLight>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::SpotLight>(entity) && menu.item("Spot Light"))
+		registry.addComponent<ecs::SpotLight>(entity);
 
-	if (!registry.hasAnyComponent<ecs::PointLight>(selectedEntity) && menu.item("Point Light"))
-		registry.addComponent<ecs::PointLight>(selectedEntity);
-
-	ImGui::Separator();
-
-	if (!registry.hasAnyComponent<ecs::PerspectiveCamera>(selectedEntity) && menu.item("Perspective Camera"))
-		registry.addComponent<ecs::PerspectiveCamera>(selectedEntity);
-
-	if (!registry.hasAnyComponent<ecs::OrthographicCamera>(selectedEntity) && menu.item("Orthographic Camera"))
-		registry.addComponent<ecs::OrthographicCamera>(selectedEntity);
-
-	if (!registry.hasAnyComponent<ecs::CustomCamera>(selectedEntity) && menu.item("Custom Camera"))
-		registry.addComponent<ecs::CustomCamera>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::PointLight>(entity) && menu.item("Point Light"))
+		registry.addComponent<ecs::PointLight>(entity);
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::SceneView>(selectedEntity) && menu.item("View"))
-		registry.addComponent<ecs::SceneView>(selectedEntity);
+	if (!registry.hasAnyComponent<ecs::PerspectiveCamera>(entity) && menu.item("Perspective Camera"))
+		registry.addComponent<ecs::PerspectiveCamera>(entity);
+
+	if (!registry.hasAnyComponent<ecs::OrthographicCamera>(entity) && menu.item("Orthographic Camera"))
+		registry.addComponent<ecs::OrthographicCamera>(entity);
+
+	if (!registry.hasAnyComponent<ecs::CustomCamera>(entity) && menu.item("Custom Camera"))
+		registry.addComponent<ecs::CustomCamera>(entity);
+
+	ImGui::Separator();
+
+	if (!registry.hasAnyComponent<ecs::SceneView>(entity) && menu.item("Scene View"))
+		registry.addComponent<ecs::SceneView>(entity);
 }
 
 void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
@@ -187,38 +207,14 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
 	if (!registry.isValid(entity))
 		return;
 
+	if (registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
+		return;
+
 	{
 		auto popup = ui::Popup{"Properties Popup"};
 		if (popup.isOpen())
-		{
 			EntityProperties::addComponentMenu(registry, entity);
-		}
 	}
-}
-
-void EntityProperties::displayEntityCoreComponents(ecs::Registry& registry, ecs::Entity selectedEntity)
-{
-	componentCollapse<ecs::Transform>("Transform", registry, selectedEntity);
-	componentCollapse<ecs::PerspectiveCamera>("Perspective Camera", registry, selectedEntity);
-	componentCollapse<ecs::OrthographicCamera>("Orthographic Camera", registry, selectedEntity);
-	componentCollapse<ecs::CustomCamera>("Custom Camera", registry, selectedEntity);
-	componentCollapse<ecs::DirectionalLight>("Directional Light", registry, selectedEntity);
-	componentCollapse<ecs::SpotLight>("Spot Light", registry, selectedEntity);
-	componentCollapse<ecs::PointLight>("Point Light", registry, selectedEntity);
-	componentCollapse<ecs::IndirectLight>("Indirect Light", registry, selectedEntity);
-	componentCollapse<ecs::Mesh>("Mesh", registry, selectedEntity);
-	componentCollapse<ecs::MeshMaterial>("Mesh Material", registry, selectedEntity);
-	componentCollapse<ecs::SceneView>("Scene View", registry, selectedEntity);
-}
-void EntityProperties::displayEntityEditorComponents(ecs::Registry& registry, ecs::Entity entity,
-													 const filament::Texture& icons,
-													 const render::ImageTextureFinder& finder)
-{
-	componentCollapse<editor::EditorCamera>("Editor Camera", registry, entity);
-	componentCollapse<editor::ColorMaterial>("Color Material", registry, entity);
-	componentCollapse<editor::SkyBoxMaterial>("SkyBox Material", registry, entity, icons);
-	componentCollapse<editor::GridMaterial>("Grid Material", registry, entity);
-	componentCollapse<editor::StandardOpaqueMaterial>("Standard Lit Material", registry, entity, icons, finder);
 }
 
 NewSceneModal::NewSceneModal() : mModal{"New Scene"}

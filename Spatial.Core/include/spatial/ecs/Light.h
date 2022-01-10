@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <spatial/common/Math.h>
 #include <spatial/common/StringHelpers.h>
 #include <spatial/resources/Resource.h>

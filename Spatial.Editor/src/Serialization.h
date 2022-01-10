@@ -8,6 +8,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/resources/ResourceError.h>
 #include <spatial/serialization/Math.h>
+#include <spatial/serialization/Resource.h>
 #include <tl/expected.hpp>
 
 namespace spatial::editor
@@ -24,33 +25,59 @@ namespace cereal
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::EditorCamera& camera)
 {
-	ar(cereal::make_nvp("velocity", camera.velocity));
-	ar(cereal::make_nvp("sensitivity", camera.sensitivity));
+	ar(make_nvp("velocity", camera.velocity));
+	ar(make_nvp("sensitivity", camera.sensitivity));
 }
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::ColorMaterial& material)
 {
-	ar(cereal::make_nvp("baseColor", material.baseColor));
-	ar(cereal::make_nvp("roughness", material.roughness));
-	ar(cereal::make_nvp("metallic", material.metallic));
-	ar(cereal::make_nvp("reflectance", material.reflectance));
+	ar(make_nvp("baseColor", material.baseColor));
+	ar(make_nvp("roughness", material.roughness));
+	ar(make_nvp("metallic", material.metallic));
+	ar(make_nvp("reflectance", material.reflectance));
 }
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::SkyBoxMaterial& material)
 {
-	ar(cereal::make_nvp("skybox", material.skybox.relativePath));
-	ar(cereal::make_nvp("showSun", material.showSun));
-	ar(cereal::make_nvp("color", material.color));
+	ar(make_nvp("skybox", material.skybox));
+	ar(make_nvp("showSun", material.showSun));
+	ar(make_nvp("color", material.color));
 }
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::editor::GridMaterial& material)
 {
-	ar(cereal::make_nvp("color", material.color));
-	ar(cereal::make_nvp("scale", material.scale));
-	ar(cereal::make_nvp("thickness", material.thickness));
+	ar(make_nvp("color", material.color));
+	ar(make_nvp("scale", material.scale));
+	ar(make_nvp("thickness", material.thickness));
+}
+
+template <typename Archive>
+void serialize(Archive& ar, spatial::editor::StandardOpaqueMaterial& material)
+{
+	ar(make_nvp("baseColor", material.baseColor));
+	ar(make_nvp("albedo", material.albedo));
+	ar(make_nvp("tiling", material.tiling));
+	ar(make_nvp("offset", material.offset));
+	ar(make_nvp("metallic", material.metallic));
+	ar(make_nvp("metallicMap", material.metallicMap));
+	ar(make_nvp("roughness", material.roughness));
+	ar(make_nvp("roughnessMap", material.roughnessMap));
+	ar(make_nvp("reflectance", material.reflectance));
+	ar(make_nvp("reflectanceMap", material.reflectanceMap));
+	ar(make_nvp("useClearCoat", material.useClearCoat));
+	ar(make_nvp("clearCoat", material.clearCoat));
+	ar(make_nvp("clearCoatRoughness", material.clearCoatRoughness));
+	ar(make_nvp("useAnisotropy", material.useAnisotropy));
+	ar(make_nvp("anisotropy", material.anisotropy));
+	ar(make_nvp("anisotropyDirectionMap", material.anisotropyDirectionMap));
+	ar(make_nvp("ambientOcclusionMap", material.ambientOcclusionMap));
+	ar(make_nvp("normalMap", material.normalMap));
+	ar(make_nvp("bentNormalMap", material.bentNormalMap));
+	ar(make_nvp("emissive", material.emissive));
+	ar(make_nvp("emissiveMap", material.emissiveMap));
 }
 
 } // namespace cereal

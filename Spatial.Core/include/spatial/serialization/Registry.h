@@ -40,8 +40,9 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 	snapshot.component<ecs::tags::IsCamera>(ar);
 	snapshot.component<ecs::tags::IsLight>(ar);
-	snapshot.component<ecs::tags::IsRenderableDirty>(ar);
+	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
+	snapshot.component<ecs::tags::CanDestroy>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
 }
@@ -72,8 +73,9 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::tags::IsRenderable>(ar);
 	snapshot.component<ecs::tags::IsCamera>(ar);
 	snapshot.component<ecs::tags::IsLight>(ar);
-	snapshot.component<ecs::tags::IsRenderableDirty>(ar);
+	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
+	snapshot.component<ecs::tags::CanDestroy>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
 

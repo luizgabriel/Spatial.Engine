@@ -21,6 +21,7 @@
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
+#include <spatial/ui/components/MenuBar.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;
@@ -87,13 +88,10 @@ void SceneEditorSystem::onStart()
 												  render::parseShFile(ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE));
 }
 
-void SceneEditorSystem::onStartFrame(float)
+void createDefaultEditorEntities(ecs::Registry& registry)
 {
-	mJobQueue.update();
-	mMaterialController.onStartFrame();
-
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<SkyBoxMaterial>()))
-		ecs::build(mRegistry)
+	if (!registry.isValid(registry.getFirstEntity<SkyBoxMaterial>()))
+		ecs::build(registry)
 			.withName("Default SkyBox")
 			.asMaterial<SkyBoxMaterial>({
 				false,
@@ -101,11 +99,11 @@ void SceneEditorSystem::onStartFrame(float)
 				{"editor://textures/default_skybox/texture.ktx"},
 			});
 
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<GridMaterial>()))
-		ecs::build(mRegistry).withName("Grid Material").with<tags::IsEditorEntity>().asMaterial<GridMaterial>();
+	if (!registry.isValid(registry.getFirstEntity<GridMaterial>()))
+		ecs::build(registry).withName("Grid Material").with<tags::IsEditorEntity>().asMaterial<GridMaterial>();
 
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsGridPlane>()))
-		ecs::build(mRegistry)
+	if (!registry.isValid(registry.getFirstEntity<tags::IsGridPlane>()))
+		ecs::build(registry)
 			.withName("Grid Plane")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsGridPlane>()
@@ -114,32 +112,32 @@ void SceneEditorSystem::onStartFrame(float)
 			.withPosition({.0f, -0.01f, .0f})
 			.asMesh()
 			.withPath("editor://meshes/plane.filamesh")
-			.withMaterialAt(0, mRegistry.getFirstEntity<GridMaterial>());
+			.withMaterialAt(0, registry.getFirstEntity<GridMaterial>());
 
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsSkyBoxMesh>()))
-		ecs::build(mRegistry)
+	if (!registry.isValid(registry.getFirstEntity<tags::IsSkyBoxMesh>()))
+		ecs::build(registry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBoxMesh>()
 			.asMesh()
 			.withPath("engine://fullscreen")
-			.withMaterialAt(0, mRegistry.getFirstEntity<SkyBoxMaterial>())
+			.withMaterialAt(0, registry.getFirstEntity<SkyBoxMaterial>())
 			.withShadowOptions(false, false)
 			.withCulling(false)
 			.withPriority(0x7);
 
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsEditorView>()))
-		ecs::build(mRegistry)
+	if (!registry.isValid(registry.getFirstEntity<tags::IsEditorView>()))
+		ecs::build(registry)
 			.withName("Editor View")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsEditorView>()
 			.asSceneView()
-			.withIndirectLight(ecs::build(mRegistry)
+			.withIndirectLight(ecs::build(registry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
 								   .withReflectionsTexturePath("editor://textures/default_skybox/ibl.ktx")
 								   .withIrradianceValuesPath("editor://textures/default_skybox/sh.txt"))
-			.withCamera(ecs::build(mRegistry)
+			.withCamera(ecs::build(registry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
 							.with<tags::IsEditorEntity>()
@@ -148,6 +146,13 @@ void SceneEditorSystem::onStartFrame(float)
 							.asPerspectiveCamera()
 							.withFieldOfView(60.0)
 							.withAspectRatio(19.0 / 6.0));
+}
+
+void SceneEditorSystem::onStartFrame(float)
+{
+	mJobQueue.update();
+	mMaterialController.onStartFrame();
+	createDefaultEditorEntities(mRegistry);
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
@@ -246,8 +251,9 @@ void SceneEditorSystem::onDrawGui()
 
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
-		ui::EntityProperties::displayComponents(mRegistry, selectedEntity);
-		ui::EntityProperties::displayEntityEditorComponents(mRegistry, selectedEntity, mIconTexture.ref(), mMaterialController.getFinder());
+		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, mIconTexture.ref(), [&](const auto& res) {
+			return mMaterialController(res);
+		});
 	});
 
 	ui::Window::show("Assets Explorer",

@@ -241,7 +241,7 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 	}
 
 	if (changed)
-		registry.addComponent<ecs::tags::IsRenderableDirty>(entity);
+		registry.addComponent<ecs::tags::IsMeshDirty>(entity);
 }
 
 void ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)

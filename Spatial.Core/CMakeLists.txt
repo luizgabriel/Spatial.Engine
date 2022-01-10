@@ -64,6 +64,7 @@ add_library(Spatial.Core
         include/spatial/serialization/FileSystem.h
         include/spatial/serialization/Relation.h
         include/spatial/serialization/SkyBox.h
+        include/spatial/serialization/Resource.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
@@ -115,7 +116,7 @@ add_library(Spatial.Core
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp src/ecs/Mesh.cpp src/render/MaterialController.cpp)
+        src/resources/ResourceLoader.cpp src/ecs/Mesh.cpp src/render/MaterialController.cpp include/spatial/serialization/Resource.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
