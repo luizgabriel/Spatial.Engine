@@ -80,15 +80,18 @@ material {
 
 fragment {
     void material(inout MaterialInputs material) {
-        prepareMaterial(material);
         vec2 uv = (getUV0() * materialParams.tilingOffset.xy) + materialParams.tilingOffset.zw;
+
+        material.normal = texture(materialParams_normalMap, uv).rgb;
+
+        prepareMaterial(material);
 
         material.baseColor.rgb = texture(materialParams_albedo, uv).rgb * materialParams.baseColor;
         material.metallic = texture(materialParams_metallicMap, uv).r * materialParams.metallic;
         material.roughness = texture(materialParams_roughnessMap, uv).r * materialParams.roughness;
         material.reflectance = texture(materialParams_reflectanceMap, uv).r * materialParams.reflectance;
         material.ambientOcclusion = texture(materialParams_ambientOcclusionMap, uv).r;
-        material.normal = texture(materialParams_normalMap, uv).rgb;
+
         material.bentNormal = texture(materialParams_bentNormalMap, uv).rgb;
         material.emissive = texture(materialParams_emissiveMap, uv) * materialParams.emissive;
     }
