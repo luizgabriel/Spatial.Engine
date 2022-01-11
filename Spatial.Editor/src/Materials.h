@@ -3,8 +3,8 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/render/ResourceFinders.h>
 #include <spatial/resources/Resource.h>
+#include <spatial/render/ResourceFinders.h>
 
 namespace spatial::editor
 {
@@ -69,14 +69,6 @@ struct StandardOpaqueMaterial
 	float reflectance{.0f};
 	Resource<ImageTexture> reflectanceMap{};
 
-	bool useClearCoat{false};
-	float clearCoat{.0f};
-	float clearCoatRoughness{.0f};
-
-	bool useAnisotropy{false};
-	float anisotropy{.0f};
-	Resource<ImageTexture> anisotropyDirectionMap{};
-
 	Resource<ImageTexture> ambientOcclusionMap{};
 
 	Resource<ImageTexture> normalMap{};
@@ -86,57 +78,10 @@ struct StandardOpaqueMaterial
 	math::float4 emissive{.0f};
 	Resource<ImageTexture> emissiveMap;
 
-	template <typename Finder, typename = std::enable_if_t<render::is_image_texture_finder_v<Finder>>>
-	void apply(filament::MaterialInstance& instance, const Finder& finder) const
-	{
-		const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine://dummy_texture"});
-		assert(dummy != nullptr);
+	float height{1.0f};
+	Resource<ImageTexture> heightMap{};
 
-		const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
-													  filament::TextureSampler::WrapMode::REPEAT};
-
-		instance.setParameter("baseColor", baseColor);
-		const auto* albedoTexture = finder(albedo);
-		instance.setParameter("albedo", albedoTexture != nullptr ? albedoTexture : dummy, sampler);
-		instance.setParameter("tilingOffset", math::float4{tiling, offset});
-
-		instance.setParameter("metallic", metallic);
-		const auto* metallicTexture = finder(metallicMap);
-		instance.setParameter("metallicMap", metallicTexture != nullptr ? metallicTexture : dummy, sampler);
-
-		instance.setParameter("roughness", roughness);
-		const auto* roughnessTexture = finder(roughnessMap);
-		instance.setParameter("roughnessMap", roughnessTexture != nullptr ? roughnessTexture : dummy, sampler);
-
-		instance.setParameter("reflectance", reflectance);
-		const auto* reflectanceTexture = finder(reflectanceMap);
-		instance.setParameter("reflectanceMap", reflectanceTexture != nullptr ? reflectanceTexture : dummy, sampler);
-
-		instance.setParameter("useClearCoat", useClearCoat ? 1 : -1);
-		instance.setParameter("clearCoat", clearCoat);
-		instance.setParameter("clearCoatRoughness", clearCoatRoughness);
-
-		instance.setParameter("useAnisotropy", useAnisotropy? 1 : -1);
-		instance.setParameter("anisotropy", anisotropy);
-		const auto* anisotropyDirectionMapTexture = finder(anisotropyDirectionMap);
-		instance.setParameter("anisotropyDirectionMap",
-							  anisotropyDirectionMapTexture != nullptr ? anisotropyDirectionMapTexture : dummy,
-							  sampler);
-
-		const auto* ambientOcclusionMapTexture = finder(ambientOcclusionMap);
-		instance.setParameter("ambientOcclusionMap",
-							  ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummy, sampler);
-
-		const auto* normalMapTexture = finder(normalMap);
-		instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummy, sampler);
-
-		const auto* bentNormalMapTexture = finder(bentNormalMap);
-		instance.setParameter("bentNormalMap", bentNormalMapTexture != nullptr ? bentNormalMapTexture : dummy, sampler);
-
-		instance.setParameter("emissive", emissive);
-		const auto* emissiveMapTexture = finder(emissiveMap);
-		instance.setParameter("emissiveMap", emissiveMapTexture != nullptr ? emissiveMapTexture : dummy, sampler);
-	}
+	void apply(filament::MaterialInstance& instance, const render::ImageTextureFinder& finder) const;
 };
 
 } // namespace spatial::editor

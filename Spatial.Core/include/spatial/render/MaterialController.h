@@ -26,7 +26,7 @@ class MaterialController
 	void onStartFrame();
 
 	template <ResourceType type, typename = std::enable_if_t<type == CubeMapTexture || type == ImageTexture>>
-	constexpr const filament::Texture* operator()(const Resource<type>& resource) const
+	constexpr const filament::Texture* findResource(const Resource<type>& resource) const
 	{
 		if (resource.isEmpty())
 			return nullptr;
@@ -49,7 +49,9 @@ class MaterialController
 			});
 
 		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref(), *this); });
+			[&](const auto& data, auto& materialInstance) {
+				data.apply(materialInstance.ref(), [&](const auto& res) { return findResource(res); });
+			});
 	}
 
 	template <typename MaterialComponent>

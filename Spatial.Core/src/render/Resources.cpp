@@ -157,21 +157,6 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 	return ib;
 }
 
-Texture createDummyTexture(fl::Engine& engine)
-{
-	auto texture = createTexture(engine, {1, 1}, fl::Texture::InternalFormat::RGBA8, fl::Texture::Usage::DEFAULT,
-								 fl::Texture::Sampler::SAMPLER_2D);
-
-	static const uint32_t pixel = 0xFFFFFFFF;
-	auto buffer = fl::Texture::PixelBufferDescriptor(&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE);
-
-	auto bufferDescriptor =
-		fl::Texture::PixelBufferDescriptor{&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE};
-
-	texture->setImage(engine, 0, std::move(bufferDescriptor));
-
-	return texture;
-}
 
 Texture createDummyCubemap(filament::Engine& engine)
 {

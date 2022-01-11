@@ -80,7 +80,7 @@ void ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ec
 
 	ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	ImGui::ColorEdit3("Color", &light.color.r);
-	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
 
 	directionInput("Direction", light.direction);
 }

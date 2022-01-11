@@ -8,11 +8,11 @@
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
 #include <spatial/ui/components/MaterialInputs.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/Popup.h>
-#include <spatial/ui/components/DragAndDrop.h>
 
 namespace spatial::ui
 {
@@ -52,7 +52,6 @@ void ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 
 	ui::cubemapInput("Cubemap", data.color, data.skybox, icons);
-
 	ImGui::Checkbox("Show Sun", &data.showSun);
 }
 
@@ -64,6 +63,9 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
 	ui::albedoInput("Albedo", data.baseColor, data.albedo, finder(data.albedo), icons);
+	ui::inputHelp("The Albedo Property", "Defines the perceived color of an object."
+										 "The effect depends on the nature of the surface,"
+										 "controlled by the metallic property.");
 
 	ui::separator(2);
 
@@ -73,10 +75,20 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 	ui::separator(1);
 
 	ui::mapInput("Metallic", data.metallic, data.metallicMap, finder(data.metallicMap), icons);
+	ui::inputHelp(
+		"The Metallic Property",
+		"The metallic property defines whether the surface is a metallic (conductor) or a non-metallic (dielectric) "
+		"surface. This property should be used as a binary value, set to either 0 or 1. Intermediate values are only "
+		"truly useful to create transitions between different types of surfaces when using textures.");
 
 	ui::separator(1);
 
 	ui::mapInput("Roughness", data.roughness, data.roughnessMap, finder(data.roughnessMap), icons);
+	ui::inputHelp("The Roughness Property",
+				  "The roughness property controls the perceived smoothness of the surface. When roughness is set to "
+				  "0, the surface is perfectly smooth and highly glossy. The rougher a surface is, the “blurrier” the "
+				  "reflections are. This property is often called glossiness in other engines and tools, and is simply "
+				  "the opposite of the roughness (roughness = 1 - glossiness).");
 
 	ui::separator(1);
 
@@ -90,31 +102,17 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 
 	ui::mapInput("Normal", data.normalMap, finder(data.normalMap), icons, Icons::normalMap.uv());
 
+	ui::separator(1);
+
 	ui::mapInput("Bent Normals", data.bentNormalMap, finder(data.bentNormalMap), icons, Icons::normalMap.uv());
 
 	ui::separator(1);
 
-	ImGui::Checkbox("Use CleatCoat", &data.useClearCoat);
-	if (data.useClearCoat)
-	{
-		ImGui::SliderFloat("Clear Coat", &data.clearCoat, .0f, 1.0f);
-		ImGui::SliderFloat("Clear Coat Roughness", &data.clearCoatRoughness, .0f, 1.0f);
-	}
-
-	ui::separator(1);
-
-	ImGui::Checkbox("Use Anisotropy", &data.useAnisotropy);
-	if (data.useAnisotropy)
-	{
-		ImGui::SliderFloat("Anisotropy", &data.anisotropy, .0f, 1.0f);
-		ui::mapInput("Anisotropy Direction", data.anisotropyDirectionMap, finder(data.anisotropyDirectionMap), icons,
-					 Icons::normalMap.uv());
-	}
-
-	ui::separator(1);
+	ui::mapInput("Height Map", data.height, data.heightMap, finder(data.heightMap), icons);
 }
 
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons, const render::ImageTextureFinder& finder)
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
+										 const render::ImageTextureFinder& finder)
 {
 	bool isValid = registry.isValid(entity);
 	if (!isValid)

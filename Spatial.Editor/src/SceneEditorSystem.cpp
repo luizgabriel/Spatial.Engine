@@ -71,7 +71,8 @@ void SceneEditorSystem::onStart()
 		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
 
 	mMaterialController.load("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-	mMaterialController.load("engine://dummy_texture"_hs, render::createDummyTexture(mEngine));
+	mMaterialController.load("engine://dummy_texture_white"_hs, render::createDummyTexture(mEngine));
+	mMaterialController.load("engine://dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
 
 	mMeshController.load("editor://meshes/cube.filamesh"_hs,
 						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
@@ -252,7 +253,7 @@ void SceneEditorSystem::onDrawGui()
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, mIconTexture.ref(), [&](const auto& res) {
-			return mMaterialController(res);
+			return mMaterialController.findResource(res);
 		});
 	});
 

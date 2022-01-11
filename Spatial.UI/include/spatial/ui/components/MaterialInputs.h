@@ -8,6 +8,8 @@
 namespace spatial::ui
 {
 
+void inputHelp(std::string_view title, std::string_view description);
+
 void previewTexture(const filament::Texture* texture, const filament::Texture& icons, const math::float4& uv = {0, 0, 1, 1});
 
 bool cubemapInput(std::string_view label, math::float4& color, Resource<CubeMapTexture>& resource, const filament::Texture& icons, std::string_view dndTargetId = AssetsExplorer::DND_SELECTED_FILE);

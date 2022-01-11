@@ -67,12 +67,6 @@ void serialize(Archive& ar, spatial::editor::StandardOpaqueMaterial& material)
 	ar(make_nvp("roughnessMap", material.roughnessMap));
 	ar(make_nvp("reflectance", material.reflectance));
 	ar(make_nvp("reflectanceMap", material.reflectanceMap));
-	ar(make_nvp("useClearCoat", material.useClearCoat));
-	ar(make_nvp("clearCoat", material.clearCoat));
-	ar(make_nvp("clearCoatRoughness", material.clearCoatRoughness));
-	ar(make_nvp("useAnisotropy", material.useAnisotropy));
-	ar(make_nvp("anisotropy", material.anisotropy));
-	ar(make_nvp("anisotropyDirectionMap", material.anisotropyDirectionMap));
 	ar(make_nvp("ambientOcclusionMap", material.ambientOcclusionMap));
 	ar(make_nvp("normalMap", material.normalMap));
 	ar(make_nvp("bentNormalMap", material.bentNormalMap));

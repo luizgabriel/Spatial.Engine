@@ -93,6 +93,7 @@ add_library(Spatial.Core
         src/ecs/RegistryUtils.cpp
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
+        src/ecs/Mesh.cpp
 
         src/render/Resources.cpp
         src/render/Engine.cpp
@@ -110,13 +111,14 @@ add_library(Spatial.Core
         src/render/SceneController.cpp
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
+        src/render/MaterialController.cpp
 
         #src/script/PlatformContext.cpp
         #src/script/Isolate.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp src/ecs/Mesh.cpp src/render/MaterialController.cpp include/spatial/serialization/Resource.h)
+        src/resources/ResourceLoader.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

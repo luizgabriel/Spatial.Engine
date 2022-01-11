@@ -44,32 +44,6 @@ material {
         },
 
         {
-            type : int,
-            name : useClearCoat
-        },
-        {
-            type : float,
-            name : clearCoat
-        },
-        {
-            type : float,
-            name : clearCoatRoughness
-        },
-
-        {
-            type : int,
-            name : useAnisotropy
-        },
-        {
-            type : float,
-            name : anisotropy
-        },
-        {
-            type : sampler2d,
-            name : anisotropyDirectionMap
-        },
-
-        {
             type : sampler2d,
             name : ambientOcclusionMap
         },
@@ -91,6 +65,15 @@ material {
         {
             type : sampler2d,
             name : emissiveMap
+        },
+
+        {
+            type : float,
+            name : height
+        },
+        {
+            type : sampler2d,
+            name : heightMap
         }
     ]
 }
@@ -104,20 +87,16 @@ fragment {
         material.metallic = texture(materialParams_metallicMap, uv).r * materialParams.metallic;
         material.roughness = texture(materialParams_roughnessMap, uv).r * materialParams.roughness;
         material.reflectance = texture(materialParams_reflectanceMap, uv).r * materialParams.reflectance;
-
-        if (materialParams.useClearCoat > 0) {
-            material.clearCoat = materialParams.clearCoat;
-            material.clearCoatRoughness = materialParams.clearCoatRoughness;
-        }
-
-        if (materialParams.useAnisotropy > 0) {
-            material.anisotropy = materialParams.anisotropy;
-            material.anisotropyDirection = texture(materialParams_anisotropyDirectionMap, uv).rgb;
-        }
-
         material.ambientOcclusion = texture(materialParams_ambientOcclusionMap, uv).r;
         material.normal = texture(materialParams_normalMap, uv).rgb;
         material.bentNormal = texture(materialParams_bentNormalMap, uv).rgb;
         material.emissive = texture(materialParams_emissiveMap, uv) * materialParams.emissive;
+    }
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        vec2 uv = (material.uv0 * materialParams.tilingOffset.xy) + materialParams.tilingOffset.zw;
+        material.worldPosition.xyz += material.worldNormal * materialParams.height * texture(materialParams_heightMap, uv).r;
     }
 }

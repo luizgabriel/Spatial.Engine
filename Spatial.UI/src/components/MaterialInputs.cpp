@@ -178,4 +178,21 @@ void previewTexture(const filament::Texture* texture, const filament::Texture& i
 	}
 }
 
+void inputHelp(std::string_view title, std::string_view description)
+{
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		const auto& colors = ImGui::GetStyle().Colors;
+
+		ImGui::Text("%s", title.data());
+		ImGui::PushStyleColor(ImGuiCol_Text, colors[ImGuiCol_ButtonActive]);
+
+		ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + 300.0f);
+		ImGui::TextWrapped("%s", description.data());
+		ImGui::PopStyleColor();
+		ImGui::EndTooltip();
+	}
+}
+
 } // namespace spatial::ui

@@ -19,8 +19,8 @@
 #include <spatial/render/Entity.h>
 
 #include <memory>
-#include <string_view>
 #include <spatial/resources/FilameshFile.h>
+#include <string_view>
 
 namespace spatial::render
 {
@@ -95,7 +95,24 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 					  filament::Texture::Sampler sampler = filament::Texture::Sampler::SAMPLER_2D);
 
 Texture createDummyCubemap(filament::Engine& engine);
-Texture createDummyTexture(filament::Engine& engine);
+
+template <uint32_t color = 0xFFFFFFFF>
+Texture createDummyTexture(filament::Engine& engine)
+{
+	auto texture = createTexture(engine, {1, 1}, filament::Texture::InternalFormat::RGBA8,
+								 filament::Texture::Usage::DEFAULT, filament::Texture::Sampler::SAMPLER_2D);
+
+	static const uint32_t pixel = color;
+	auto buffer = filament::Texture::PixelBufferDescriptor(&pixel, 4, filament::Texture::Format::RGBA,
+														   filament::Texture::Type::UBYTE);
+
+	auto bufferDescriptor = filament::Texture::PixelBufferDescriptor{&pixel, 4, filament::Texture::Format::RGBA,
+																	 filament::Texture::Type::UBYTE};
+
+	texture->setImage(engine, 0, std::move(bufferDescriptor));
+
+	return texture;
+}
 
 VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
