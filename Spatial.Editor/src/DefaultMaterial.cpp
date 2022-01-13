@@ -50,7 +50,7 @@ void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const r
 						  ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummyWhite, sampler);
 
 	const auto* normalMapTexture = finder(normalMap);
-	instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummyBlack, sampler);
+	instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummyWhite, sampler);
 
 	const auto* bentNormalMapTexture = finder(bentNormalMap);
 	instance.setParameter("bentNormalMap", bentNormalMapTexture != nullptr ? bentNormalMapTexture : dummyBlack, sampler);
