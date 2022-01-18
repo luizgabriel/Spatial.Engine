@@ -204,19 +204,19 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex,
 												  &smallStep, &largeStep, "%lu");
 
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
 																	meshMaterial.materialEntity);
 
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					if (ImGui::Button("Remove"))
 						childToDestroy = child;
 
