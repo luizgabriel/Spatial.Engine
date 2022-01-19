@@ -153,7 +153,7 @@ void EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 	{
 		auto& name = registry.getComponent<ecs::Name>(selectedEntity);
 
-		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 		changed = inputText("##Name", name.name);
 	}
 }

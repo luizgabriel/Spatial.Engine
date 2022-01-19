@@ -22,7 +22,7 @@ bool AssetsExplorer::displayFiles(const std::filesystem::path& rootPath, std::fi
 	ImGui::Columns(6, "AssetsExplorer", false);
 
 	bool selected = false;
-	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvailWidth() * 0.9f, 30.0f, 50.0f)};
+	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
 	for (const auto& entry : directory_iterator{rootPath / selectedPath})
 	{
 		const auto& path = entry.path();

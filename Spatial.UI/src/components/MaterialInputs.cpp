@@ -20,7 +20,7 @@ bool albedoInput(std::string_view label, math::float3& color, Resource<ImageText
 	ui::previewTexture(texture, icons, Icons::picture.uv());
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 	static const char* placeholder = "resource/path.png";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
@@ -84,7 +84,7 @@ bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& reso
 	ui::previewTexture(texture, icons, uv);
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 	static const char* placeholder = "resource/path.png";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
@@ -122,7 +122,7 @@ bool cubemapInput(std::string_view label, math::float4& color, Resource<CubeMapT
 	ui::image(icons, size, Icons::cubemap.uv());
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvailWidth());
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 	static const char* placeholder = "resource/path.ktx";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
