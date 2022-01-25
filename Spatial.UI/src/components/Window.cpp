@@ -6,7 +6,7 @@ namespace spatial::ui
 
 Window::Window(const std::string_view name, WindowFlags flags)
 {
-	const auto imFlags = static_cast<ImGuiWindowFlags>(flags) | ImGuiWindowFlags_AlwaysAutoResize;
+	const auto imFlags = static_cast<ImGuiWindowFlags>(flags);
 	mIsOpen = ImGui::Begin(name.data(), nullptr, imFlags);
 }
 

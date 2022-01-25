@@ -251,7 +251,7 @@ void SceneEditorSystem::onDrawGui()
 	{
 		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView>();
 		auto style = ui::WindowPaddingStyle{};
-		auto window = ui::Window{"Scene View", ui::WindowFlags::NoTitleBar | ui::WindowFlags::NoScrollbar};
+		auto window = ui::Window{"Scene View", ui::WindowFlags::NoScrollbar};
 
 		const auto imageSize = window.getSize() - math::float2{0, 24};
 		ui::SceneView::image(mRegistry, sceneView, imageSize);
