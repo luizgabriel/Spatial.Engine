@@ -258,9 +258,9 @@ void SceneEditorSystem::onDrawGui()
 
 		{
 			auto style2 = ui::WindowPaddingStyle{4};
-			auto popup = ui::Popup{"Scene View Popup"};
-			if (popup.isOpen())
+			ui::Popup::show("Scene View Popup", [&]() {
 				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+			});
 		}
 
 		// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
