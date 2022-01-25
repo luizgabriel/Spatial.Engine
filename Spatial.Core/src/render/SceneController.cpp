@@ -1,6 +1,5 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/Resources.h>
 #include <spatial/render/SceneController.h>

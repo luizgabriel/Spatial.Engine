@@ -3,7 +3,6 @@
 #include <filament/Engine.h>
 #include <spatial/common/EventQueue.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/Resource.h>
 #include <spatial/resources/ResourceLoader.h>

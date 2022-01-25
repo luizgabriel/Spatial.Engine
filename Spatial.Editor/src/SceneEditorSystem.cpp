@@ -7,7 +7,7 @@
 
 #include <assets/generated.h>
 
-#include <spatial/render/Camera.h>
+#include <spatial/render/Resources.h>
 #include <spatial/render/SkyboxResources.h>
 
 #include <spatial/ui/components/AssetsExplorer.h>
@@ -19,9 +19,11 @@
 
 #include <fstream>
 #include <spatial/ecs/SceneView.h>
+#include <spatial/render/EntityBuilder.h>
+#include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
-#include <spatial/ui/components/MenuBar.h>
+#include <spatial/ui/components/DragAndDrop.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;
@@ -66,22 +68,65 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 void SceneEditorSystem::onStart()
 {
+	{
+		auto ib = render::createFullScreenIndexBuffer(mEngine);
+		ecs::build(mRegistry)
+			.asMesh()
+			.withResource("engine://fullscreen")
+			.with<ecs::tags::IsMeshLoaded>()
+			.with(render::createFullScreenVertexBuffer(mEngine))
+			.with(render::MeshGeometries{{0, ib->getIndexCount()}})
+			.with(std::move(ib))
+			.with<tags::IsEditorEntity>();
+	}
+
+	{
+		const auto filamesh = loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE);
+		render::build(mRegistry)
+			.asFilamesh()
+			.withFile(mEngine, filamesh)
+			.asMesh()
+			.withResource("editor://meshes/cube.filamesh")
+			.with<tags::IsEditorEntity>();
+	}
+
+	{
+		const auto filamesh = loadFilameshFromMemory(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE);
+		render::build(mRegistry)
+			.asFilamesh()
+			.withFile(mEngine, filamesh)
+			.asMesh()
+			.withResource("editor://meshes/sphere.filamesh")
+			.with<tags::IsEditorEntity>();
+	}
+
+	{
+		const auto filamesh = loadFilameshFromMemory(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE);
+		render::build(mRegistry)
+			.asFilamesh()
+			.withFile(mEngine, filamesh)
+			.asMesh()
+			.withResource("editor://meshes/plane.filamesh")
+			.with<tags::IsEditorEntity>();
+	}
+
+	{
+		const auto filamesh = loadFilameshFromMemory(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE);
+		render::build(mRegistry)
+			.asFilamesh()
+			.withFile(mEngine, filamesh)
+			.asMesh()
+			.withResource("editor://meshes/cylinder.filamesh")
+			.with<tags::IsEditorEntity>();
+	}
+
 	mMaterialController.load(
 		"editor://textures/default_skybox/texture.ktx"_hs,
 		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
 
 	mMaterialController.load("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-	mMaterialController.load("engine://dummy_texture_white"_hs, render::createDummyTexture(mEngine));
+	mMaterialController.load("engine://dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
 	mMaterialController.load("engine://dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
-
-	mMeshController.load("editor://meshes/cube.filamesh"_hs,
-						 loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/sphere.filamesh"_hs,
-						 loadFilameshFromMemory(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/plane.filamesh"_hs,
-						 loadFilameshFromMemory(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE));
-	mMeshController.load("editor://meshes/cylinder.filamesh"_hs,
-						 loadFilameshFromMemory(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE));
 
 	mIndirectLightController.loadTexture("editor://textures/default_skybox/ibl.ktx"_hs, ASSETS_DEFAULT_SKYBOX_IBL_KTX,
 										 ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE);
@@ -111,16 +156,17 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.asTransform()
 			.withScale({100.0f, 1.0f, 100.0f})
 			.withPosition({.0f, -0.01f, .0f})
-			.asMesh()
-			.withPath("editor://meshes/plane.filamesh")
+			.asMeshInstance()
+			.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/plane.filamesh"))
 			.withMaterialAt(0, registry.getFirstEntity<GridMaterial>());
 
 	if (!registry.isValid(registry.getFirstEntity<tags::IsSkyBoxMesh>()))
 		ecs::build(registry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBoxMesh>()
-			.asMesh()
-			.withPath("engine://fullscreen")
+			.with<tags::IsEditorEntity>()
+			.asMeshInstance()
+			.withMesh(ecs::Mesh::findByResource(registry, "engine://fullscreen"))
 			.withMaterialAt(0, registry.getFirstEntity<SkyBoxMaterial>())
 			.withShadowOptions(false, false)
 			.withCulling(false)
@@ -154,6 +200,8 @@ void SceneEditorSystem::onStartFrame(float)
 	mJobQueue.update();
 	mMaterialController.onStartFrame();
 	createDefaultEditorEntities(mRegistry);
+
+	mMeshController.onStartFrame(mRegistry, mRootPath);
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
@@ -227,7 +275,7 @@ void SceneEditorSystem::onDrawGui()
 		if (ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity))
 			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
 
-		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity, createEntityPosition);
+		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, selectedEntity, createEntityPosition);
 	}
 
 	ui::Window::show("Scene Tree", [&]() {
@@ -242,19 +290,19 @@ void SceneEditorSystem::onDrawGui()
 		});
 	});
 
-	ui::Window::show("Materials Manager", [&]() {
-		ui::MaterialsManager::popup(mRegistry, selectedEntity);
+	ui::Window::show("Assets Manager", [&]() {
+		ui::AssetsManager::popup(mRegistry, selectedEntity);
 
 		static std::string search;
 		ui::Search::searchText(search);
-		ui::MaterialsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+		ui::AssetsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity);
 	});
 
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
-		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, mIconTexture.ref(), [&](const auto& res) {
-			return mMaterialController.findResource(res);
-		});
+		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, mIconTexture.ref(),
+												[&](const auto& res) { return mMaterialController.findResource(res); });
 	});
 
 	ui::Window::show("Assets Explorer",
@@ -311,7 +359,6 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 
 	mRootPath = path;
 	mCurrentPath = path;
-	mMeshController.setRootPath(mRootPath);
 	mIndirectLightController.setRootPath(mRootPath);
 	mMaterialController.setRootPath(mRootPath);
 }

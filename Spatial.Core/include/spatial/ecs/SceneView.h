@@ -6,6 +6,23 @@
 namespace spatial::ecs
 {
 
+namespace tags
+{
+
+struct IsMainView
+{
+};
+
+struct IsRenderable
+{
+};
+
+struct CanDestroy
+{
+};
+
+} // namespace tags
+
 struct SceneView
 {
 	math::int2 size{1280, 720};

@@ -133,6 +133,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity);
 	componentCollapse<ecs::Mesh>(registry, entity);
+	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
 
@@ -153,7 +154,7 @@ void EntityProperties::displayEntityName(ecs::Registry& registry, ecs::Entity se
 	{
 		auto& name = registry.getComponent<ecs::Name>(selectedEntity);
 
-		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		ui::spanToAvailWidth();
 		changed = inputText("##Name", name.name);
 	}
 }
@@ -169,8 +170,8 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::Mesh>(entity) && menu.item("Mesh"))
-		registry.addComponent<ecs::Mesh>(entity);
+	if (!registry.hasAnyComponent<ecs::MeshInstance>(entity) && menu.item("Mesh"))
+		registry.addComponent<ecs::MeshInstance>(entity);
 
 	ImGui::Separator();
 
@@ -378,12 +379,12 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsMaterial, ecs::Child>)
+			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsResource, ecs::Child>)
 				.each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsMaterial, editor::tags::IsEditorEntity, ecs::Child>)
+					ecs::ExcludeComponents<ecs::tags::IsResource, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -428,10 +429,11 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
-							bool showEditorEntities)
+bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+						 bool showEditorEntities)
 {
 	using namespace boost::algorithm;
+	using namespace std::string_view_literals;
 
 	bool changed = false;
 
@@ -439,15 +441,16 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
 										 | ImGuiTableFlags_NoBordersInBody;
 
-	if (ImGui::BeginTable("Scene Graph Entities", 1, flags))
+	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
 	{
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoHide);
 		ImGui::TableHeadersRow();
 
 		auto lowerCaseSearch = std::string{search};
 		to_lower(lowerCaseSearch);
 
-		const auto actionFn = [&](ecs::Entity entity, const auto& name) {
+		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
 			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
@@ -462,15 +465,24 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 				selectedEntity = entity;
 				changed |= true;
 			}
+
+			ImGui::TableNextColumn();
+			std::string_view type;
+			if (registry.hasAllComponents<ecs::Mesh>(entity))
+				type = "Mesh"sv;
+			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
+				type = "Material"sv;
+
+			ImGui::TextDisabled("%s", type.data());
 		};
 
 		if (showEditorEntities)
-			registry.getEntities<const ecs::Name, const ecs::tags::IsMaterial>().each(actionFn);
+			registry.getEntities<const ecs::tags::IsResource, const ecs::Name>().each(eachFn);
 		else
 			registry
-				.getEntities<const ecs::Name, const ecs::tags::IsMaterial>(
+				.getEntities<const ecs::tags::IsResource, const ecs::Name>(
 					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
-				.each(actionFn);
+				.each(eachFn);
 
 		ImGui::EndTable();
 	}
@@ -478,11 +490,11 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
+bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
 	bool changed = false;
 
-	auto popup = ui::Popup{"Materials Window Popup"};
+	auto popup = ui::Popup{"Assets Manager Popup"};
 	ecs::Entity createdEntity = ecs::NullEntity;
 
 	if (popup.isOpen())
@@ -514,10 +526,19 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 			}
 		}
 
-		if (registry.hasAllComponents<ecs::Mesh>(selectedEntity) && changed)
 		{
-			ecs::Mesh::addMaterial(registry, selectedEntity, createdEntity);
+			auto menu = ui::Menu{"Create Mesh"};
+
+			if (menu.item("Filamesh"))
+			{
+				createdEntity = ecs::build(registry).withName("Filamesh").asMesh().withResource("");
+				changed = true;
+			}
 		}
+
+		if (registry.hasAllComponents<ecs::MeshInstance>(selectedEntity)
+			&& registry.hasAnyComponent<ecs::tags::IsMaterial>(createdEntity))
+			ecs::MeshInstance::addMaterial(registry, selectedEntity, createdEntity);
 
 		if (changed)
 			selectedEntity = createdEntity;
@@ -526,34 +547,52 @@ bool MaterialsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntit
 	return changed;
 }
 
+void EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	{
+		auto dnd = ui::DragAndDropTarget{};
+		auto result = dnd.getPayload<std::filesystem::path>();
+		if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
+		{
+			selectedEntity = ecs::build(registry).asMesh().withResource(result.value());
+		}
+	}
+}
+
 bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
 {
 	auto dnd = DragAndDropTarget{};
-	const auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
+	const auto result = dnd.getPayload<std::filesystem::path>();
 	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".spatial.json"))
 	{
 		selectedEntity = ecs::NullEntity;
-		scenePath = result.value();
+		scenePath = std::filesystem::path{result.value()};
 		return true;
 	}
 
 	return false;
 }
 
-bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity,
+bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								 math::float3 createEntityPosition)
 {
 	auto dnd = DragAndDropTarget{};
-	auto result = dnd.getPathPayload(AssetsExplorer::DND_SELECTED_FILE);
+	auto result = dnd.getPayload<std::filesystem::path>();
 
 	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
 	{
+		auto foundMesh = ecs::Mesh::findByResource(registry, result.value());
+		if (!registry.isValid(foundMesh))
+		{
+			foundMesh = ecs::build(registry).asMesh().withResource(result.value());
+		}
+
 		selectedEntity = ecs::build(registry)
 							 .withName(result->stem().string())
 							 .asTransform()
 							 .withPosition(createEntityPosition)
-							 .asMesh()
-							 .withPath(result.value());
+							 .asMeshInstance()
+							 .withMesh(foundMesh);
 
 		return true;
 	}
@@ -585,8 +624,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Cube")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh()
-						.withPath("editor://meshes/cube.filamesh")
+						.asMeshInstance()
+						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/cube.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -598,8 +637,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Plane")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh()
-						.withPath("editor://meshes/plane.filamesh")
+						.asMeshInstance()
+						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/plane.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -611,8 +650,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Sphere")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh()
-						.withPath("editor://meshes/sphere.filamesh")
+						.asMeshInstance()
+						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/sphere.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -624,8 +663,8 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.withName("Cylinder")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
-						.asMesh()
-						.withPath("editor://meshes/cylinder.filamesh")
+						.asMeshInstance()
+						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/cylinder.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;

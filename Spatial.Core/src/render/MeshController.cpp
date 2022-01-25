@@ -1,46 +1,19 @@
-#include <boost/algorithm/string/predicate.hpp>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/resources/FilameshFile.h>
 #include <spatial/resources/ResourceLoader.h>
 
 namespace spatial::render
 {
 
-MeshController::MeshController(filament::Engine& engine)
-	: mEngine{engine}, mRoot{}, mVertexBuffers{}, mIndexBuffers{}, mMeshGeometries{}, mBoundingBoxes{}
+MeshController::MeshController(filament::Engine& engine) : mEngine{engine}
 {
-	mVertexBuffers.emplace("engine://fullscreen"_hs, createFullScreenVertexBuffer(mEngine));
-
-	auto ib = createFullScreenIndexBuffer(mEngine);
-	mMeshGeometries.emplace("engine://fullscreen"_hs, std::vector<MeshGeometry>{MeshGeometry{0, ib->getIndexCount()}});
-	mIndexBuffers.emplace("engine://fullscreen"_hs, std::move(ib));
-}
-
-void MeshController::load(MeshId resourceId, const FilameshFile& filamesh)
-{
-	mVertexBuffers.emplace(resourceId, createVertexBuffer(mEngine, filamesh));
-	mIndexBuffers.emplace(resourceId, createIndexBuffer(mEngine, filamesh));
-	mBoundingBoxes.emplace(resourceId, filamesh.header.aabb);
-
-	auto geometries = std::vector<MeshGeometry>(filamesh.parts.size());
-
-	for (auto i = 0; i < filamesh.parts.size(); i++)
-	{
-		const auto& part = filamesh.parts[i];
-		geometries.at(i) = MeshGeometry{part.offset, part.count};
-	}
-
-	mMeshGeometries.emplace(resourceId, std::move(geometries));
 }
 
 void MeshController::onUpdateFrame(ecs::Registry& registry)
 {
-	populateMeshesDatabase(registry);
 	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
 	clearDirtyRenderables(registry);
@@ -48,46 +21,42 @@ void MeshController::onUpdateFrame(ecs::Registry& registry)
 
 void MeshController::createRenderableMeshes(ecs::Registry& registry)
 {
-	registry.getEntities<const Entity, const ecs::Mesh>(ecs::ExcludeComponents<Renderable>)
-		.each([&](ecs::Entity e, const auto& entity, const auto& mesh) {
-			const auto resourceId = mesh.meshResource.getId();
-
-			if (!hasMeshData(resourceId))
+	registry.getEntities<const Entity, const ecs::MeshInstance>(ecs::ExcludeComponents<Renderable>)
+		.each([&](ecs::Entity e, const auto& entity, const auto& meshInstance) {
+			if (!registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
 				return;
 
-			const auto& parts = mMeshGeometries.at(resourceId);
-			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
+			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
+			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
 			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
 		});
 }
 
 void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
-	registry.getEntities<const Entity, const ecs::Mesh, Renderable>()
-		.each([&](ecs::Entity e, const auto& entity, const auto& mesh, auto& renderable) {
-			const auto resourceId = mesh.meshResource.getId();
-
-			if (!hasMeshData(resourceId))
+	registry.getEntities<const Entity, const ecs::MeshInstance, Renderable>().each(
+		[&](ecs::Entity e, const auto& entity, const auto& meshInstance, auto& renderable) {
+			if (!registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
 				return;
 
-			const auto& parts = mMeshGeometries.at(resourceId);
-			const auto partsCount = mesh.partsCount == 0 ? parts.size() : mesh.partsCount;
+			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
+			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
 
-			auto& vertexBuffer = mVertexBuffers.at(resourceId);
-			auto& indexBuffer = mIndexBuffers.at(resourceId);
+			auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
+			auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
 
-			auto boundingBoxIt = mBoundingBoxes.find(resourceId);
-			if (boundingBoxIt != mBoundingBoxes.end())
-				renderable.setAxisAlignedBoundingBox(boundingBoxIt->second);
+			const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
+			if (boundingBox)
+				renderable.setAxisAlignedBoundingBox(*boundingBox);
 
-			renderable.setCastShadows(mesh.castShadows);
-			renderable.setReceiveShadows(mesh.receiveShadows);
-			renderable.setCulling(mesh.culling);
-			renderable.setPriority(mesh.priority);
+			renderable.setCastShadows(meshInstance.castShadows);
+			renderable.setReceiveShadows(meshInstance.receiveShadows);
+			renderable.setCulling(meshInstance.culling);
+			renderable.setPriority(meshInstance.priority);
 
 			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 			{
-				const auto& geometry = parts[std::min(mesh.partsOffset + i, parts.size() - 1)];
+				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
 				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
 										 geometry.offset, geometry.count);
 			}
@@ -95,23 +64,16 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 
 	registry.getEntities<const ecs::MeshMaterial, const ecs::Child>().each(
 		[&](const auto& meshMaterial, const ecs::Child& child) {
-			if (!registry.hasAllComponents<Renderable, ecs::Mesh>(child.parent))
+			if (!registry.hasAllComponents<Renderable, ecs::MeshInstance>(child.parent))
 				return;
 
 			auto& renderable = registry.getComponent<Renderable>(child.parent);
-			const auto& mesh = registry.getComponent<const ecs::Mesh>(child.parent);
+			const auto& mesh = registry.getComponent<const ecs::MeshInstance>(child.parent);
 
 			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialEntity);
 			if (material != nullptr)
 				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
 		});
-}
-
-bool MeshController::hasMeshData(MeshId resourceId) const
-{
-	return mVertexBuffers.find(resourceId) != mVertexBuffers.end()
-		   && mIndexBuffers.find(resourceId) != mIndexBuffers.end()
-		   && mMeshGeometries.find(resourceId) != mMeshGeometries.end();
 }
 
 void MeshController::clearDirtyRenderables(ecs::Registry& registry)
@@ -123,35 +85,33 @@ void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 	registry.removeComponent<ecs::tags::IsMeshDirty>(d2.begin(), d2.end());
 }
 
-void MeshController::setRootPath(const std::filesystem::path& root)
+void MeshController::onStartFrame(ecs::Registry& registry, const std::filesystem::path& rootPath)
 {
-	mRoot = root;
-}
+	registry.getEntities<const ecs::Mesh>(ecs::ExcludeComponents<ecs::tags::IsMeshLoaded>)
+		.each([&](ecs::Entity entity, const ecs::Mesh& mesh) {
+			if (mesh.resource.isEmpty())
+				return;
 
-void MeshController::populateMeshesDatabase(ecs::Registry& registry)
-{
-	using namespace boost::algorithm;
+			auto result = makeAbsolutePath(rootPath, mesh.resource.relativePath)
+							  .and_then(validateResourcePath)
+							  .and_then([](auto&& path) {
+								  return validateExtensions(std::forward<decltype(path)>(path), {".filamesh"});
+							  })
+							  .and_then(openFileReadStream)
+							  .and_then(toFilamesh)
+							  .map_error(logResourceError);
 
-	registry.getEntities<const ecs::Mesh>().each([this](const auto& mesh) {
-		const auto resourceId = mesh.meshResource.getId();
+			if (!result.has_value())
+				return;
 
-		if (hasMeshData(resourceId))
-			return;
+			const auto& filamesh = result.value();
 
-		if (!ends_with(mesh.meshResource.relativePath.c_str(), ".filamesh"))
-			return;
-
-		auto result = makeAbsolutePath(mRoot, mesh.meshResource.relativePath)
-						  .and_then(validateResourcePath)
-						  .and_then(openFileReadStream)
-						  .and_then(toFilamesh)
-						  .map_error(logResourceError);
-
-		if (!result.has_value())
-			return;
-
-		load(resourceId, result.value());
-	});
+			registry.addOrReplaceComponent(entity, createVertexBuffer(mEngine, filamesh));
+			registry.addOrReplaceComponent(entity, createIndexBuffer(mEngine, filamesh));
+			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
+			registry.addOrReplaceComponent(entity, createMeshGeometries(filamesh));
+			registry.addOrReplaceComponent<ecs::tags::IsMeshLoaded>(entity);
+		});
 }
 
 } // namespace spatial::render

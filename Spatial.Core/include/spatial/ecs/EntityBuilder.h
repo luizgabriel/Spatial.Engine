@@ -9,8 +9,8 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/ecs/Material.h>
 
 namespace spatial::ecs
 {
@@ -32,13 +32,13 @@ class MaterialEntityBuilder;
 
 class MeshEntityBuilder;
 
+class MeshInstanceEntityBuilder;
+
 class SceneViewEntityBuilder;
 
 class EntityBuilder
 {
   public:
-	explicit EntityBuilder(Registry& registry);
-
 	EntityBuilder(Registry& registry, Entity entity);
 
 	EntityBuilder& withName(std::string name);
@@ -78,6 +78,7 @@ class EntityBuilder
 	SceneViewEntityBuilder asSceneView();
 
 	MeshEntityBuilder asMesh();
+	MeshInstanceEntityBuilder asMeshInstance();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
@@ -242,15 +243,17 @@ class MaterialEntityBuilder : public EntityBuilder
 	template <typename... Args>
 	MaterialEntityBuilder(Registry& registry, Entity entity, Args&&... args) : EntityBuilder(registry, entity)
 	{
-		this->with<ecs::tags::IsMaterial>();
-		this->template with<MaterialComponent>(std::forward<Args>(args)...);
+		with<ecs::tags::IsMaterial>();
+		with<ecs::tags::IsResource>();
+		with<MaterialComponent>(std::forward<Args>(args)...);
 	}
 
 	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params)
 		: EntityBuilder(registry, entity)
 	{
-		this->with<ecs::tags::IsMaterial>();
-		this->template with<MaterialComponent>(std::move(params));
+		with<ecs::tags::IsMaterial>();
+		with<ecs::tags::IsResource>();
+		with<MaterialComponent>(std::move(params));
 	}
 };
 
@@ -261,12 +264,22 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
 
 	MeshEntityBuilder(Registry& registry, Entity entity);
 
-	MeshEntityBuilder& withPath(const std::filesystem::path& resourcePath);
-	MeshEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
-	MeshEntityBuilder& withMaterialAt(uint32_t primitiveIndex, Entity materialEntity);
-	MeshEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
-	MeshEntityBuilder& withCulling(bool culling);
-	MeshEntityBuilder& withPriority(uint8_t priority);
+	MeshEntityBuilder& withResource(const std::filesystem::path& filamesh);
+};
+
+class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
+{
+  public:
+	using Base = BasicEntityBuilder<MeshInstance>;
+
+	MeshInstanceEntityBuilder(Registry& registry, Entity entity);
+
+	MeshInstanceEntityBuilder& withMesh(Entity meshSource);
+	MeshInstanceEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
+	MeshInstanceEntityBuilder& withMaterialAt(uint32_t primitiveIndex, Entity materialEntity);
+	MeshInstanceEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
+	MeshInstanceEntityBuilder& withCulling(bool culling);
+	MeshInstanceEntityBuilder& withPriority(uint8_t priority);
 };
 
 class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>

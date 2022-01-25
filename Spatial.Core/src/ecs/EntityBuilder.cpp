@@ -2,15 +2,10 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Tags.h>
 #include <fmt/format.h>
 
 namespace spatial::ecs
 {
-
-EntityBuilder::EntityBuilder(Registry& registry) : EntityBuilder{registry, registry.createEntity()}
-{
-}
 
 EntityBuilder::EntityBuilder(Registry& registry, Entity entity) : mRegistry{registry}, mEntity{entity}
 {
@@ -63,6 +58,11 @@ SunLightEntityBuilder EntityBuilder::asSunLight()
 }
 
 MeshEntityBuilder EntityBuilder::asMesh()
+{
+	return {mRegistry, mEntity};
+}
+
+MeshInstanceEntityBuilder EntityBuilder::asMeshInstance()
 {
 	return {mRegistry, mEntity};
 }
@@ -330,12 +330,18 @@ IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath
 	return *this;
 }
 
-MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+MeshInstanceEntityBuilder::MeshInstanceEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>();
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity meshSource)
+{
+	getComponent().meshSource = meshSource;
+	return *this;
+}
+
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
 {
 	auto& component = getComponent();
 	component.castShadows = castShadows;
@@ -343,40 +349,43 @@ MeshEntityBuilder& MeshEntityBuilder::withShadowOptions(bool castShadows, bool r
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
 {
-	assert(count > 0); // there is no sub-mesh with size zero
 	auto& component = getComponent();
-	component.partsCount = count;
-	component.partsOffset = offset;
+	component.slice.count = count;
+	component.slice.offset = offset;
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withPath(const std::filesystem::path& resourcePath)
-{
-	getComponent().meshResource.relativePath = resourcePath;
-	return *this;
-}
-
-MeshEntityBuilder& MeshEntityBuilder::withCulling(bool culling)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withCulling(bool culling)
 {
 	getComponent().culling = culling;
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withPriority(uint8_t priority)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withPriority(uint8_t priority)
 {
 	getComponent().priority = priority;
 	return *this;
 }
 
-MeshEntityBuilder& MeshEntityBuilder::withMaterialAt(uint32_t primitiveIndex, Entity materialEntity)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMaterialAt(uint32_t primitiveIndex, Entity materialEntity)
 {
-	auto materialInstanceEntity = mRegistry.createEntity();
-	mRegistry.addComponent<ecs::Name>(materialInstanceEntity, fmt::format("Primitive {}", primitiveIndex));
-	mRegistry.addComponent<ecs::MeshMaterial>(materialInstanceEntity, primitiveIndex, materialEntity);
-	ecs::Parent::addChild(mRegistry, mEntity, materialInstanceEntity);
+	ecs::MeshInstance::addMaterial(mRegistry, mEntity, materialEntity, primitiveIndex);
+	return *this;
+}
 
+MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
+{
+	with<ecs::tags::IsResource>();
+}
+
+MeshEntityBuilder& MeshEntityBuilder::withResource(const std::filesystem::path& filamesh)
+{
+	if (!filamesh.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
+		withName(filamesh.filename());
+
+	getComponent().resource.relativePath = filamesh;
 	return *this;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ui/components/Combo.h>
@@ -18,20 +19,22 @@ class Search
 	{
 		bool changed = false;
 
-		const auto* selectedEntityName = registry.template tryGetComponent<const ecs::Name>(selectedEntity);
+		const auto* selectedName = registry.tryGetComponent<const ecs::Name>(selectedEntity);
+		const auto* selectedEntityName = selectedName ? selectedName->c_str() : "UNNAMED";
 
 		{
-			auto combo = Combo{name.data(), selectedEntityName ? selectedEntityName->c_str() : ""};
+			auto combo = Combo{name.data(), selectedEntityName};
 			if (combo.isOpen())
 			{
-				auto view = registry.getEntities<const ecs::Name, const FilterComponents...>();
+				auto view = registry.getEntities<const FilterComponents...>();
 
 				for (auto entity : view)
 				{
-					const auto& entityName = registry.getComponent<const ecs::Name>(entity);
+					const auto* nameComp = registry.tryGetComponent<const ecs::Name>(entity);
+					const auto* entityName = nameComp ? nameComp->c_str() : "UNNAMED";
 
 					auto isSelected = selectedEntity == entity;
-					if (combo.item(entityName.c_str(), isSelected))
+					if (combo.item(entityName, isSelected))
 					{
 						selectedEntity = entity;
 						changed = true;

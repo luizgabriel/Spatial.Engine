@@ -17,10 +17,11 @@
 #include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
+#include <spatial/resources/FilameshFile.h>
 
 #include <memory>
-#include <spatial/resources/FilameshFile.h>
 #include <string_view>
+#include <vector>
 
 namespace spatial::render
 {
@@ -48,6 +49,14 @@ using SharedMaterialInstance = SharedEngineResource<filament::MaterialInstance>;
 using SharedView = SharedEngineResource<filament::View>;
 using SharedTexture = SharedEngineResource<filament::Texture>;
 using SharedCamera = SharedEngineResource<filament::Camera>;
+
+struct MeshGeometry
+{
+	size_t offset;
+	size_t count;
+};
+
+using MeshGeometries = std::vector<MeshGeometry>;
 
 /**
  * \brief Creates a scoped pointer of the filament::SwapChain
@@ -96,7 +105,7 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 
 Texture createDummyCubemap(filament::Engine& engine);
 
-template <uint32_t color = 0xFFFFFFFF>
+template <uint32_t color>
 Texture createDummyTexture(filament::Engine& engine)
 {
 	auto texture = createTexture(engine, {1, 1}, filament::Texture::InternalFormat::RGBA8,
@@ -119,6 +128,9 @@ VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& fi
 IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
 VertexBuffer createFullScreenVertexBuffer(filament::Engine& engine);
+
 IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine);
+
+MeshGeometries createMeshGeometries(const FilameshFile& filamesh);
 
 } // namespace spatial::render

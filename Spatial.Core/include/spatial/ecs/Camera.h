@@ -5,6 +5,15 @@
 namespace spatial::ecs
 {
 
+namespace tags
+{
+
+struct IsCamera
+{
+};
+
+} // namespace tags
+
 struct CustomCamera
 {
 	math::mat4 projectionMatrix{};

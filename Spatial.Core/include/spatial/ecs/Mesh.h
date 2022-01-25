@@ -6,6 +6,19 @@
 namespace spatial::ecs
 {
 
+namespace tags
+{
+
+struct IsMeshDirty
+{
+};
+
+struct IsMeshLoaded
+{
+};
+
+} // namespace tags
+
 struct MeshMaterial
 {
 	size_t primitiveIndex;
@@ -19,17 +32,43 @@ struct MeshMaterial
 
 struct Mesh
 {
-	Resource<ResourceType::FilaMesh> meshResource{};
+	Resource<FilaMesh> resource;
 
-	bool castShadows{false};
-	bool receiveShadows{false};
-	bool culling{false};
+	explicit Mesh() = default;
+	explicit Mesh(const Resource<FilaMesh>& resource) : resource{resource}
+	{
+	}
 
-	size_t partsCount{};
-	size_t partsOffset{};
-	uint8_t priority{};
+	static Entity findByResource(const Registry& registry, const std::filesystem::path& resource);
+};
+
+
+struct MeshInstance
+{
+	struct Slice
+	{
+		size_t offset;
+		size_t count;
+
+		Slice() = default;
+		constexpr Slice(size_t offset, size_t count) : offset(offset), count(count)
+		{
+		}
+	};
+
+	Entity meshSource{ecs::NullEntity};
+
+	bool castShadows;
+	bool receiveShadows;
+	bool culling;
+	uint8_t priority;
+
+	Slice slice;
+
+	MeshInstance() = default;
 
 	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity);
+
 	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity, size_t primitiveIndex);
 };
 

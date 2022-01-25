@@ -7,6 +7,15 @@
 namespace spatial::ecs
 {
 
+namespace tags
+{
+
+struct IsLight
+{
+};
+
+} // namespace tags
+
 struct PointLight
 {
 	float intensity{10000.0f};

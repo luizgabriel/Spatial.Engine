@@ -10,13 +10,13 @@ namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::Mesh& mesh)
+void serialize(Archive& ar, spatial::ecs::MeshInstance& mesh)
 {
-	ar(make_nvp("resourcePath", mesh.meshResource));
+	ar(make_nvp("meshSource", mesh.meshSource));
 	ar(make_nvp("receiveShadows", mesh.receiveShadows));
 	ar(make_nvp("castShadows", mesh.castShadows));
-	ar(make_nvp("partsCount", mesh.partsCount));
-	ar(make_nvp("partsOffset", mesh.partsOffset));
+	ar(make_nvp("partsCount", mesh.slice.count));
+	ar(make_nvp("partsOffset", mesh.slice.offset));
 }
 
 template <typename Archive>

@@ -22,6 +22,8 @@
 namespace spatial::ui
 {
 
+void spanToAvailWidth(float weight = 1.0f);
+
 bool inputText(std::string_view label, std::string& value, std::string_view placeholder = "");
 
 bool inputPath(std::string_view label, std::filesystem::path& path, std::string_view placeholder = "");
@@ -121,8 +123,16 @@ struct ComponentInputImpl<ecs::IndirectLight>
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
+
 template <>
 struct ComponentInputImpl<ecs::Mesh>
+{
+	static constexpr auto sName = "Mesh";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::MeshInstance>
 {
 	static constexpr auto sName = "Mesh";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);

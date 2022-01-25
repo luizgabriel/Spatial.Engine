@@ -26,12 +26,12 @@ add_library(Spatial.Core
         include/spatial/ecs/EntityHandle.h
         include/spatial/ecs/Name.h
         include/spatial/ecs/Mesh.h
-        include/spatial/ecs/Tags.h
         include/spatial/ecs/EntityBuilder.h
         include/spatial/ecs/Relation.h
         include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SceneView.h
         include/spatial/ecs/Script.h
+        include/spatial/ecs/Material.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -51,6 +51,7 @@ add_library(Spatial.Core
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
         include/spatial/render/ResourceFinders.h
+        include/spatial/render/EntityBuilder.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -112,6 +113,7 @@ add_library(Spatial.Core
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
+        src/render/EntityBuilder.cpp
 
         #src/script/PlatformContext.cpp
         #src/script/Isolate.cpp

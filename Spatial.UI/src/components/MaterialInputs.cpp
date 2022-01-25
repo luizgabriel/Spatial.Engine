@@ -8,7 +8,7 @@ namespace spatial::ui
 {
 
 bool albedoInput(std::string_view label, math::float3& color, Resource<ImageTexture>& resource,
-				 const filament::Texture* texture, const filament::Texture& icons, std::string_view dndTargetId)
+				 const filament::Texture* texture, const filament::Texture& icons)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -20,21 +20,10 @@ bool albedoInput(std::string_view label, math::float3& color, Resource<ImageText
 	ui::previewTexture(texture, icons, Icons::picture.uv());
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+	ui::spanToAvailWidth();
 	static const char* placeholder = "resource/path.png";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
-
-	auto dndTarget = ui::DragAndDropTarget{};
-	if (dndTarget.isStarted())
-	{
-		auto result = dndTarget.getPathPayload(dndTargetId);
-		if (result)
-		{
-			resource.relativePath = std::move(result.value());
-			changed = true;
-		}
-	}
 
 	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
@@ -47,7 +36,7 @@ bool albedoInput(std::string_view label, math::float3& color, Resource<ImageText
 }
 
 bool mapInput(std::string_view label, Resource<ImageTexture>& resource, const filament::Texture* texture,
-			  const filament::Texture& icons, const math::float4& uv, std::string_view dndTargetId)
+			  const filament::Texture& icons, const math::float4& uv)
 {
 
 	bool changed = false;
@@ -59,22 +48,11 @@ bool mapInput(std::string_view label, Resource<ImageTexture>& resource, const fi
 
 	changed |= ui::inputPath(label.data(), resource.relativePath, placeholder);
 
-	auto dndTarget = ui::DragAndDropTarget{};
-	if (dndTarget.isStarted())
-	{
-		auto result = dndTarget.getPathPayload(dndTargetId);
-		if (result)
-		{
-			resource.relativePath = std::move(result.value());
-			changed = true;
-		}
-	}
-
 	return changed;
 }
 
 bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& resource, const filament::Texture* texture,
-			  const filament::Texture& icons, const math::float4& uv, std::string_view dndTargetId)
+			  const filament::Texture& icons, const math::float4& uv)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -84,21 +62,10 @@ bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& reso
 	ui::previewTexture(texture, icons, uv);
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+	ui::spanToAvailWidth();
 	static const char* placeholder = "resource/path.png";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
-
-	auto dndTarget = ui::DragAndDropTarget{};
-	if (dndTarget.isStarted())
-	{
-		auto result = dndTarget.getPathPayload(dndTargetId);
-		if (result)
-		{
-			resource.relativePath = std::move(result.value());
-			changed = true;
-		}
-	}
 
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(ImGui::GetColumnWidth() * 0.4f);
@@ -110,7 +77,7 @@ bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& reso
 }
 
 bool cubemapInput(std::string_view label, math::float4& color, Resource<CubeMapTexture>& resource,
-				  const filament::Texture& icons, std::string_view dndTargetId)
+				  const filament::Texture& icons)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -122,26 +89,17 @@ bool cubemapInput(std::string_view label, math::float4& color, Resource<CubeMapT
 	ui::image(icons, size, Icons::cubemap.uv());
 
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+	ui::spanToAvailWidth();
 	static const char* placeholder = "resource/path.ktx";
 
 	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
 
-	auto dndTarget = ui::DragAndDropTarget{};
-	if (dndTarget.isStarted())
-	{
-		auto result = dndTarget.getPathPayload(dndTargetId);
-		if (result)
-		{
-			resource.relativePath = std::move(result.value());
-			changed = true;
-		}
-	}
-
 	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
 	ImGui::SameLine();
-	changed |= ImGui::ColorEdit4(label.data(), &color.r, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+	changed |= ImGui::ColorEdit4(label.data(), &color.r,
+								 ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs
+									 | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 	ImGui::Columns(1);
 	ImGui::PopID();
 

@@ -200,4 +200,17 @@ IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine)
 	return IndexBuffer{engine, ib};
 }
 
+MeshGeometries createMeshGeometries(const FilameshFile& filamesh)
+{
+	auto geometries = MeshGeometries(filamesh.parts.size());
+
+	for (auto i = 0; i < filamesh.parts.size(); i++)
+	{
+		const auto& part = filamesh.parts[i];
+		geometries.at(i) = MeshGeometry{part.offset, part.count};
+	}
+
+	return geometries;
+}
+
 } // namespace spatial::render

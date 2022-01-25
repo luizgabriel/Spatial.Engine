@@ -2,7 +2,6 @@
 #include <imgui.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
@@ -10,6 +9,7 @@
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/VectorInput.h>
+#include "spatial/ui/components/DragAndDrop.h"
 
 namespace spatial::ui
 {
@@ -54,6 +54,14 @@ bool inputPath(const std::string_view label, std::filesystem::path& path, std::s
 		path = std::filesystem::path{value};
 		return true;
 	}
+	{
+		auto dnd = ui::DragAndDropTarget{};
+		auto result = dnd.getPayload<std::filesystem::path>();
+		if (result) {
+			path = std::filesystem::path{result.value()};
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -72,6 +80,11 @@ bool imageButton(const filament::Texture& texture, math::float2 size, math::floa
 #pragma clang diagnostic ignored "-Wold-style-cast"
 	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 #pragma clang diagnostic pop
+}
+
+void spanToAvailWidth(float weight)
+{
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * weight);
 }
 
 void ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ecs::Entity entity)
@@ -128,17 +141,38 @@ void ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::
 	ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
 }
 
+
 void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
 
+	ui::inputPath("Resource", mesh.resource.relativePath, "*.filamesh");
+
+	if (ImGui::Button("Reload Mesh")) {
+		registry.removeComponent<ecs::tags::IsMeshLoaded>(entity);
+	}
+
+	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
+	ImGui::Checkbox("Is Loaded", &loaded);
+}
+
+void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
+
 	bool changed = false;
 
-	changed |= ui::inputPath("Resource", mesh.meshResource.relativePath);
-
-	spacing(3);
-
-	ImGui::Separator();
+	changed |= Search::searchEntity<ecs::Mesh>("Resource", registry, mesh.meshSource);
+	{
+		auto dnd = ui::DragAndDropTarget{};
+		if (dnd.isStarted()) {
+			auto result = dnd.getPayload<std::filesystem::path>();
+			if (result.has_value()) {
+				mesh.meshSource = ecs::Mesh::findByResource(registry, result.value());
+				changed = true;
+			}
+		}
+	}
 
 	spacing(3);
 
@@ -156,9 +190,9 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 		spacing(3);
 
 		changed |=
-			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
+			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.slice.count, &smallStep, &largeStep, "%lu");
 		changed |=
-			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
+			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.slice.offset, &smallStep, &largeStep, "%lu");
 		ImGui::TreePop();
 
 		spacing(3);
@@ -170,7 +204,7 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 
 		if (ImGui::Button("Add Slot"))
 		{
-			ecs::Mesh::addMaterial(registry, entity, ecs::NullEntity);
+			ecs::MeshInstance::addMaterial(registry, entity, ecs::NullEntity);
 			changed = true;
 		}
 
@@ -204,19 +238,19 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+					ui::spanToAvailWidth();
 					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex,
 												  &smallStep, &largeStep, "%lu");
 
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+					ui::spanToAvailWidth();
 					ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
 																	meshMaterial.materialEntity);
 
 					ImGui::TableNextColumn();
 
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+					ui::spanToAvailWidth();
 					if (ImGui::Button("Remove"))
 						childToDestroy = child;
 
@@ -227,7 +261,7 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 				{
 					ecs::Child::remove(registry, childToDestroy);
 					registry.destroy(childToDestroy);
-					mesh.partsCount = std::max(0ul, mesh.partsCount - 1);
+					mesh.slice.count = std::max(0ul, mesh.slice.count - 1);
 					changed = true;
 				}
 			}
