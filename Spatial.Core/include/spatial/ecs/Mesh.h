@@ -40,6 +40,8 @@ struct Mesh
 	}
 
 	static Entity findByResource(const Registry& registry, const std::filesystem::path& resource);
+
+	static Entity findOrCreateResource(Registry& registry, const std::filesystem::path& resource);
 };
 
 

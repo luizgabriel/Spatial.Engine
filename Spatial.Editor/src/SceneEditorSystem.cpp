@@ -23,7 +23,6 @@
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
-#include <spatial/ui/components/DragAndDrop.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;

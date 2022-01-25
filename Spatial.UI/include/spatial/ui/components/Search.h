@@ -20,7 +20,7 @@ class Search
 		bool changed = false;
 
 		const auto* selectedName = registry.tryGetComponent<const ecs::Name>(selectedEntity);
-		const auto* selectedEntityName = selectedName ? selectedName->c_str() : "UNNAMED";
+		const auto* selectedEntityName = selectedName ? selectedName->c_str() : "";
 
 		{
 			auto combo = Combo{name.data(), selectedEntityName};

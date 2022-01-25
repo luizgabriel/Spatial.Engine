@@ -574,25 +574,19 @@ bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity&
 }
 
 bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								 math::float3 createEntityPosition)
+										 math::float3 createEntityPosition)
 {
 	auto dnd = DragAndDropTarget{};
 	auto result = dnd.getPayload<std::filesystem::path>();
 
 	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
 	{
-		auto foundMesh = ecs::Mesh::findByResource(registry, result.value());
-		if (!registry.isValid(foundMesh))
-		{
-			foundMesh = ecs::build(registry).asMesh().withResource(result.value());
-		}
-
 		selectedEntity = ecs::build(registry)
 							 .withName(result->stem().string())
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
-							 .withMesh(foundMesh);
+							 .withMesh(ecs::Mesh::findOrCreateResource(registry, result.value()));
 
 		return true;
 	}

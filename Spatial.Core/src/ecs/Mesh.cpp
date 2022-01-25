@@ -2,6 +2,7 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Material.h>
 
 namespace spatial::ecs
 {
@@ -18,6 +19,20 @@ Entity Mesh::findByResource(const Registry& registry, const std::filesystem::pat
 		return ecs::NullEntity;
 
 	return *it;
+}
+
+Entity Mesh::findOrCreateResource(Registry& registry, const std::filesystem::path& resource)
+{
+	auto foundMesh = Mesh::findByResource(registry, resource);
+	if (!registry.isValid(foundMesh))
+	{
+		foundMesh = registry.createEntity();
+		registry.addComponent<ecs::Name>(foundMesh, resource.filename());
+		registry.addComponent<ecs::Mesh>(foundMesh, resource);
+		registry.addComponent<ecs::tags::IsResource>(foundMesh);
+	}
+
+	return foundMesh;
 }
 
 void MeshInstance::addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity)

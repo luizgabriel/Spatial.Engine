@@ -152,6 +152,8 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 		registry.removeComponent<ecs::tags::IsMeshLoaded>(entity);
 	}
 
+	ImGui::SameLine();
+
 	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
@@ -168,7 +170,7 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		if (dnd.isStarted()) {
 			auto result = dnd.getPayload<std::filesystem::path>();
 			if (result.has_value()) {
-				mesh.meshSource = ecs::Mesh::findByResource(registry, result.value());
+				mesh.meshSource = ecs::Mesh::findOrCreateResource(registry, result.value());
 				changed = true;
 			}
 		}
