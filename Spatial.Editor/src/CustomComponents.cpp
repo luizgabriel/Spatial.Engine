@@ -664,6 +664,17 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 		changed = true;
 	}
 
+	if (menu.item("Mesh Instance"))
+	{
+		newEntity = ecs::build(registry)
+						.withName("Mesh Instance")
+						.asTransform()
+						.withPosition(createEntitiesPosition)
+						.asMeshInstance()
+						.withMesh(ecs::NullEntity);
+		changed = true;
+	}
+
 	ImGui::Separator();
 
 	if (menu.item("Point Light"))
