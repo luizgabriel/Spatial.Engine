@@ -8,7 +8,9 @@
 namespace spatial::render
 {
 
-IndirectLightController::IndirectLightController(filament::Engine& engine) : mEngine{engine}, mTextures{}
+static auto gLogger = createDefaultLogger();
+
+IndirectLightController::IndirectLightController(filament::Engine& engine, FileSystem& fileSystem) : mEngine{engine}, mFileSystem{fileSystem}
 {
 }
 
@@ -22,23 +24,6 @@ void IndirectLightController::loadIrradianceValues(ResourceId resourceId, const 
 	mBands.emplace(resourceId, bands);
 }
 
-tl::expected<bands_t, ResourceError> toBandsData(const std::filesystem::path& path)
-{
-	auto ifs = std::ifstream{path};
-	if (!ifs) return tl::make_unexpected(ResourceError::OpenFailed);
-
-	try
-	{
-		auto bands = bands_t{};
-		ifs >> bands;
-		return bands;
-	}
-	catch (const std::ios::failure& e)
-	{
-		return tl::make_unexpected(ResourceError::ParseError);
-	}
-}
-
 void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 {
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
@@ -46,17 +31,13 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 		if (mTextures.find(reflectionsTextureId) == mTextures.end())
 		{
-			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath.relativePath)
-							  .and_then(validateResourcePath)
-							  .and_then(openFileReadStream)
-							  .transform(toVectorData)
-							  .map_error(logResourceError);
-
-			if (!result.has_value())
+			auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.c_str());
+			if (data.empty()) {
+				gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.c_str());
 				return;
+			}
 
-			const auto& value = result.value();
-			loadTexture(reflectionsTextureId, &value[0], value.size());
+			loadTexture(reflectionsTextureId, &data[0], data.size());
 		}
 	});
 
@@ -65,15 +46,16 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 		if (mBands.find(irradianceValuesId) == mBands.end())
 		{
-			auto result = makeAbsolutePath(mRootPath, component.reflectionsTexturePath.relativePath)
-							  .and_then(validateResourcePath)
-							  .and_then(toBandsData)
-							  .map_error(logResourceError);
-
-			if (!result.has_value())
+			auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.c_str());
+			if (stream->fail()) {
+				gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.c_str());
 				return;
+			}
 
-			loadIrradianceValues(irradianceValuesId, result.value());
+			auto bands = bands_t{};
+			*stream >> bands;
+
+			loadIrradianceValues(irradianceValuesId, std::move(bands));
 		}
 	});
 
@@ -100,11 +82,6 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 	registry.getEntities<ecs::IndirectLight, IndirectLight>().each(
 		[&](ecs::IndirectLight& component, IndirectLight& light) { light->setIntensity(component.intensity); });
-}
-
-void IndirectLightController::setRootPath(const std::filesystem::path& rootPath)
-{
-	mRootPath = rootPath;
 }
 
 } // namespace spatial::render

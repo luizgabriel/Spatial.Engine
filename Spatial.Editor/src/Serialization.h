@@ -6,10 +6,8 @@
 
 #include <cereal/cereal.hpp>
 #include <spatial/ecs/Registry.h>
-#include <spatial/resources/ResourceError.h>
 #include <spatial/serialization/Math.h>
 #include <spatial/serialization/Resource.h>
-#include <tl/expected.hpp>
 
 namespace spatial::editor
 {

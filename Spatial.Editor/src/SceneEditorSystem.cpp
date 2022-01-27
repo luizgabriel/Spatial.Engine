@@ -18,12 +18,12 @@
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <fstream>
+#include <spatial/core/Logger.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/resources/MemoryFileSystem.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
-#include <spatial/core/Logger.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;
@@ -57,7 +57,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mCameraController{mEngine},
 	  mLightController{mEngine},
 	  mMeshController{mEngine, mFileSystem},
-	  mIndirectLightController{mEngine},
+	  mIndirectLightController{mEngine, mFileSystem},
 
 	  mJobQueue{},
 
@@ -155,21 +155,24 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 
 void SceneEditorSystem::onStartFrame(float)
 {
+	mJobQueue.update();
+
 	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsSkyBoxMeshResource>()))
+		ecs::build(mRegistry).with<tags::IsSkyBoxMeshResource>().asMesh().withResource("engine/skybox");
+
+	auto skyboxMesh = mRegistry.getFirstEntity<tags::IsSkyBoxMeshResource>();
+	if (!mRegistry.hasAnyComponent<ecs::tags::IsMeshLoaded>(skyboxMesh))
 	{
-		ecs::build(mRegistry)
-			.withName("skybox")
-			.with<tags::IsSkyBoxMeshResource>()
-			.asDynamicMesh()
-			.withVertexBuffer(toShared(render::createFullScreenVertexBuffer(mEngine)))
-			.withIndexBuffer(toShared(render::createFullScreenIndexBuffer(mEngine)))
-			.withSingleGeometry();
+		auto ib = render::createFullScreenIndexBuffer(mEngine);
+		mRegistry.addComponent<ecs::tags::IsMeshLoaded>(skyboxMesh);
+		mRegistry.addComponent(skyboxMesh, render::createFullScreenVertexBuffer(mEngine));
+		mRegistry.addComponent(skyboxMesh, render::MeshGeometries{{0, ib->getIndexCount()}});
+		mRegistry.addComponent(skyboxMesh, std::move(ib));
 	}
 
-	mJobQueue.update();
-	mMaterialController.onStartFrame();
 	createDefaultEditorEntities(mRegistry);
 
+	mMaterialController.onStartFrame();
 	mMeshController.onStartFrame(mRegistry);
 }
 
@@ -209,7 +212,7 @@ void SceneEditorSystem::onDrawGui()
 			mJobQueue.enqueue<ClearSceneEvent>();
 
 		if (ui::OpenSceneModal::show(mScenePath))
-			mJobQueue.enqueue<LoadSceneEvent>(mScenePath.root_directory() == "project" ? mScenePath : "project" / mScenePath);
+			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
 
 		if (ui::SaveSceneModal::show(mScenePath))
 			mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
@@ -308,17 +311,23 @@ void SceneEditorSystem::loadScene()
 	{
 		auto stream = mFileSystem.openReadStream(mScenePath.c_str());
 		mRegistry = parseRegistry(*stream);
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception& e)
+	{
 		gLogger.warn("Could not load scene: {}", e.what());
 	}
 }
 
 void SceneEditorSystem::saveScene()
 {
-	try {
-		auto stream = mFileSystem.openWriteStream(mScenePath.c_str());
+	try
+	{
+		auto path = (mScenePath.root_directory() == "project" ? mScenePath : "project" / mScenePath);
+		auto stream = mFileSystem.openWriteStream(path.c_str());
 		writeRegistry(mRegistry, *stream);
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception& e)
+	{
 		gLogger.warn("Could not save scene: {}", e.what());
 	}
 }

@@ -2,7 +2,6 @@
 
 #include <spatial/ecs/Registry.h>
 #include <spatial/resources/Resource.h>
-#include <spatial/render/Resources.h>
 
 namespace spatial::ecs
 {
@@ -33,16 +32,6 @@ struct MeshMaterial
 		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
 	{
 	}
-};
-
-struct DynamicMesh
-{
-	render::SharedVertexBuffer vertexBuffer;
-	render::SharedIndexBuffer indexBuffer;
-	render::MeshGeometries geometries;
-	filament::Box boundingBox;
-
-	DynamicMesh() = default;
 };
 
 struct Mesh

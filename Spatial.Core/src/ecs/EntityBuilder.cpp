@@ -62,11 +62,6 @@ MeshEntityBuilder EntityBuilder::asMesh()
 	return {mRegistry, mEntity};
 }
 
-DynamicMeshEntityBuilder EntityBuilder::asDynamicMesh()
-{
-	return {mRegistry, mEntity};
-}
-
 MeshInstanceEntityBuilder EntityBuilder::asMeshInstance()
 {
 	return {mRegistry, mEntity};
@@ -410,40 +405,6 @@ SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity in
 	ecs::Parent::addChild(mRegistry, mEntity, indirectLightEntity);
 	getComponent().indirectLight = indirectLightEntity;
 	return *this;
-}
-
-DynamicMeshEntityBuilder::DynamicMeshEntityBuilder(Registry& registry, Entity entity)
-	: BasicEntityBuilder(registry, entity)
-{
-	with<ecs::tags::IsResource>().with<ecs::tags::IsMesh>();
-}
-
-DynamicMeshEntityBuilder& DynamicMeshEntityBuilder::withVertexBuffer(const render::SharedVertexBuffer& vertexBuffer)
-{
-	getComponent().vertexBuffer = vertexBuffer;
-	return *this;
-}
-
-DynamicMeshEntityBuilder& DynamicMeshEntityBuilder::withIndexBuffer(const render::SharedIndexBuffer& indexBuffer)
-{
-	getComponent().indexBuffer = indexBuffer;
-	return *this;
-}
-DynamicMeshEntityBuilder& DynamicMeshEntityBuilder::withBoundingBox(filament::Box boundingBox)
-{
-	getComponent().boundingBox = boundingBox;
-	return *this;
-}
-
-DynamicMeshEntityBuilder& DynamicMeshEntityBuilder::withGeometries(render::MeshGeometries&& geometries)
-{
-	getComponent().geometries = std::move(geometries);
-	return *this;
-}
-
-DynamicMeshEntityBuilder& DynamicMeshEntityBuilder::withSingleGeometry()
-{
-	return withGeometries(render::MeshGeometries{{0, getComponent().indexBuffer->getIndexCount()}});
 }
 
 } // namespace spatial::ecs

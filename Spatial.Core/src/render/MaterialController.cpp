@@ -1,9 +1,12 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
+#include <spatial/core/Logger.h>
 
 namespace spatial::render
 {
+
+static auto gLogger = createDefaultLogger();
 
 MaterialController::MaterialController(filament::Engine& engine, FileSystem& fileSystem)
 	: mEngine{engine}, mFileSystem{fileSystem}, mJobQueue{}, mTextures{}
@@ -31,8 +34,10 @@ void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
 		return;
 
 	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
-	if (data.empty())
+	if (data.empty()) {
+		gLogger.warn("Image Texture not found: {}", event.texture.relativePath.c_str());
 		return;
+	}
 
 	auto texture = render::createTexture(mEngine, data.data(), data.size());
 	mTextures.emplace(event.texture.getId(), std::move(texture));
@@ -47,7 +52,10 @@ void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 
 	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
 	if (data.empty())
+	{
+		gLogger.warn("CubeMap Texture not found: {}", event.texture.relativePath.c_str());
 		return;
+	}
 
 	auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
 	mTextures.emplace(event.texture.getId(), std::move(texture));

@@ -162,38 +162,6 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
 
-void ComponentInputImpl<ecs::DynamicMesh>::draw(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& mesh = registry.getComponent<ecs::DynamicMesh>(entity);
-
-	if (ImGui::BeginTable("Dynamic Mesh Table", 2, gTableFlags)) {
-
-		ImGui::TableSetupColumn("Info");
-		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableHeadersRow();
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Vertex Buffer");
-		ImGui::TableNextColumn();
-		ImGui::Text("%p", reinterpret_cast<void*>(mesh.vertexBuffer.get()));
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Index Buffer");
-		ImGui::TableNextColumn();
-		ImGui::Text("%p", reinterpret_cast<void*>(mesh.indexBuffer.get()));
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Geometries Count");
-		ImGui::TableNextColumn();
-		ImGui::Text("%lu", mesh.geometries.size());
-
-		ImGui::EndTable();
-	}
-}
-
 void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);

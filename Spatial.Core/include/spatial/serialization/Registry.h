@@ -43,7 +43,6 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::tags::IsLight>(ar);
 	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
-	snapshot.component<ecs::tags::IsMeshLoaded>(ar);
 	snapshot.component<ecs::tags::IsResource>(ar);
 	snapshot.component<ecs::tags::CanDestroy>(ar);
 
@@ -79,7 +78,6 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::tags::IsLight>(ar);
 	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
-	snapshot.component<ecs::tags::IsMeshLoaded>(ar);
 	snapshot.component<ecs::tags::IsResource>(ar);
 	snapshot.component<ecs::tags::CanDestroy>(ar);
 

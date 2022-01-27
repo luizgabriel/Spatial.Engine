@@ -136,7 +136,6 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity);
 	componentCollapse<ecs::Mesh>(registry, entity);
-	componentCollapse<ecs::DynamicMesh>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
@@ -474,8 +473,6 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			std::string_view type;
 			if (registry.hasAllComponents<ecs::Mesh>(entity))
 				type = "Mesh"sv;
-			else if (registry.hasAllComponents<ecs::DynamicMesh>(entity))
-				type = "Dynamic Mesh"sv;
 			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
 				type = "Material"sv;
 

@@ -5,9 +5,12 @@
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
 #include <spatial/resources/ResourceLoaderUtils.h>
+#include <spatial/core/Logger.h>
 
 namespace spatial::render
 {
+
+static auto gLogger = createDefaultLogger();
 
 MeshController::MeshController(filament::Engine& engine, FileSystem& fileSystem)
 	: mEngine{engine}, mFileSystem{fileSystem}
@@ -29,8 +32,6 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 			auto meshPartsCount = 0;
 			if (registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
 				meshPartsCount = registry.getComponent<const MeshGeometries>(meshInstance.meshSource).size();
-			else if (registry.hasAllComponents<ecs::DynamicMesh>(meshInstance.meshSource))
-				meshPartsCount = registry.getComponent<const ecs::DynamicMesh>(meshInstance.meshSource).geometries.size();
 
 			if (meshPartsCount <= 0)
 				return;
@@ -49,22 +50,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			renderable.setCulling(meshInstance.culling);
 			renderable.setPriority(meshInstance.priority);
 
-			if (registry.hasAllComponents<ecs::DynamicMesh>(meshInstance.meshSource))
-			{
-				const auto& customMesh = registry.getComponent<const ecs::DynamicMesh>(meshInstance.meshSource);
-				const auto& parts = customMesh.geometries;
-				const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
-
-				renderable.setAxisAlignedBoundingBox(customMesh.boundingBox);
-
-				for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
-				{
-					const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
-					renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, customMesh.vertexBuffer.get(),
-											 customMesh.indexBuffer.get(), geometry.offset, geometry.count);
-				}
-			}
-			else if (registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
+			if (registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
 			{
 				const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
 				const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
@@ -118,8 +104,10 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 				return;
 
 			auto stream = mFileSystem.openReadStream(mesh.resource.relativePath.c_str());
-			if (stream->bad())
+			if (stream->bad()) {
+				gLogger.warn("Could not load mesh: {}", mesh.resource.relativePath.c_str());
 				return;
+			}
 
 			auto filamesh = FilameshFile{};
 			*stream >> filamesh;
