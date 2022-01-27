@@ -23,6 +23,7 @@
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
+#include <spatial/core/Logger.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;
@@ -31,6 +32,8 @@ using namespace spatial::math;
 
 namespace spatial::editor
 {
+
+static auto gLogger = createDefaultLogger();
 
 SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
 	: mEngine{engine},
@@ -206,7 +209,7 @@ void SceneEditorSystem::onDrawGui()
 			mJobQueue.enqueue<ClearSceneEvent>();
 
 		if (ui::OpenSceneModal::show(mScenePath))
-			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
+			mJobQueue.enqueue<LoadSceneEvent>(mScenePath.root_directory() == "project" ? mScenePath : "project" / mScenePath);
 
 		if (ui::SaveSceneModal::show(mScenePath))
 			mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
@@ -301,17 +304,23 @@ void SceneEditorSystem::clearScene()
 
 void SceneEditorSystem::loadScene()
 {
-	auto stream = mFileSystem.openReadStream(mScenePath.c_str());
-	auto result = parseRegistry(*stream).map_error(logResourceError);
-
-	if (result.has_value())
-		mRegistry = std::move(result.value());
+	try
+	{
+		auto stream = mFileSystem.openReadStream(mScenePath.c_str());
+		mRegistry = parseRegistry(*stream);
+	} catch (const std::exception& e) {
+		gLogger.warn("Could not load scene: {}", e.what());
+	}
 }
 
 void SceneEditorSystem::saveScene()
 {
-	auto stream = mFileSystem.openWriteStream(mScenePath.c_str());
-	writeRegistry(mRegistry, *stream);
+	try {
+		auto stream = mFileSystem.openWriteStream(mScenePath.c_str());
+		writeRegistry(mRegistry, *stream);
+	} catch (const std::exception& e) {
+		gLogger.warn("Could not save scene: {}", e.what());
+	}
 }
 
 void SceneEditorSystem::setRootPath(const std::filesystem::path& path)

@@ -1,6 +1,7 @@
 #include <spatial/resources/MemoryFileSystem.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include <sstream>
+#include <fmt/format.h>
 
 namespace spatial
 {
@@ -12,7 +13,7 @@ std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_v
 
 std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path)
 {
-	return std::make_unique<std::stringstream>(openStream(path));
+	throw std::invalid_argument(fmt::format("Cannot write to memory files: {}", path));
 }
 
 std::set<FileSystem::Entry> MemoryFileSystem::listImpl(std::string_view path) const
