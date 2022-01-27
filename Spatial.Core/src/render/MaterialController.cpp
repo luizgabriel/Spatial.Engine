@@ -1,10 +1,12 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
 
 namespace spatial::render
 {
 
-MaterialController::MaterialController(filament::Engine& engine) : mEngine{engine}, mJobQueue{}, mTextures{}
+MaterialController::MaterialController(filament::Engine& engine, FileSystem& fileSystem)
+	: mEngine{engine}, mFileSystem{fileSystem}, mJobQueue{}, mTextures{}
 {
 	mJobQueue.connect<LoadResourceEvent<ImageTexture>>(*this);
 	mJobQueue.connect<LoadResourceEvent<CubeMapTexture>>(*this);
@@ -22,39 +24,33 @@ void MaterialController::onStartFrame()
 
 void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
 {
-	auto result =
-		makeAbsolutePath(mRootPath, event.texture.relativePath)
-			.and_then(validateResourcePath)
-			.and_then([](auto&& res) { return validateExtensions(std::forward<decltype(res)>(res), {".png", ".jpg"}); })
-			.and_then(openFileReadStream)
-			.transform(toVectorData)
-			.transform([this](auto&& data) { return render::createTexture(mEngine, data.data(), data.size()); })
-			.map_error(logResourceError);
+	using namespace boost::algorithm;
 
-	if (result.has_value()) {
-		mTextures.emplace(event.texture.getId(), std::move(result.value()));
-	}
+	if (!ends_with(event.texture.relativePath.c_str(), ".png")
+		&& !ends_with(event.texture.relativePath.c_str(), ".jpg"))
+		return;
+
+	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
+	if (data.empty())
+		return;
+
+	auto texture = render::createTexture(mEngine, data.data(), data.size());
+	mTextures.emplace(event.texture.getId(), std::move(texture));
 }
 
 void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 {
-	auto result =
-		makeAbsolutePath(mRootPath, event.texture.relativePath)
-			.and_then(validateResourcePath)
-			.and_then([](auto&& res) { return validateExtensions(std::forward<decltype(res)>(res), {".ktx"}); })
-			.and_then(openFileReadStream)
-			.transform(toVectorData)
-			.transform([this](auto&& data) { return render::createKtxTexture(mEngine, data.data(), data.size()); })
-			.map_error(logResourceError);
+	using namespace boost::algorithm;
 
-	if (result.has_value()) {
-		mTextures.emplace(event.texture.getId(), std::move(result.value()));
-	}
+	if (!ends_with(event.texture.relativePath.c_str(), ".ktx"))
+		return;
+
+	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
+	if (data.empty())
+		return;
+
+	auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
+	mTextures.emplace(event.texture.getId(), std::move(texture));
 }
 
-void MaterialController::setRootPath(const std::filesystem::path& rootPath)
-{
-	mRootPath = rootPath;
-}
-
-}
+} // namespace spatial::render

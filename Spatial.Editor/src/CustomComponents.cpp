@@ -51,7 +51,10 @@ void ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(
 
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 
-	ui::cubemapInput("Cubemap", data.color, data.skybox, icons);
+	ui::colorPicker("Background Color", data.color, icons);
+
+	ui::cubemapInput("Cubemap", data.skybox, icons);
+
 	ImGui::Checkbox("Show Sun", &data.showSun);
 }
 
@@ -133,6 +136,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity);
 	componentCollapse<ecs::Mesh>(registry, entity);
+	componentCollapse<ecs::DynamicMesh>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
@@ -470,6 +474,8 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			std::string_view type;
 			if (registry.hasAllComponents<ecs::Mesh>(entity))
 				type = "Mesh"sv;
+			else if (registry.hasAllComponents<ecs::DynamicMesh>(entity))
+				type = "Dynamic Mesh"sv;
 			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
 				type = "Material"sv;
 
@@ -586,7 +592,7 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
-							 .withMesh(ecs::Mesh::findOrCreateResource(registry, result.value()));
+							 .withMesh(ecs::Mesh::findOrCreate(registry, result.value()));
 
 		return true;
 	}
@@ -619,7 +625,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/cube.filamesh"))
+						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/cube.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -632,7 +638,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/plane.filamesh"))
+						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/plane.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -645,7 +651,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/sphere.filamesh"))
+						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/sphere.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -658,7 +664,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/cylinder.filamesh"))
+						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/cylinder.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;

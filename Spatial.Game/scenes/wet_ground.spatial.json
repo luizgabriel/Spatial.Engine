@@ -1,0 +1,584 @@
+{
+    "value0": 22,
+    "value1": 0,
+    "value2": 1,
+    "value3": 2,
+    "value4": 3,
+    "value5": 4,
+    "value6": 5,
+    "value7": 6,
+    "value8": 7,
+    "value9": 8,
+    "value10": 9,
+    "value11": 10,
+    "value12": 11,
+    "value13": 12,
+    "value14": 13,
+    "value15": 14,
+    "value16": 15,
+    "value17": 16,
+    "value18": 17,
+    "value19": 18,
+    "value20": 19,
+    "value21": 20,
+    "value22": 21,
+    "value23": 1048575,
+    "value24": 22,
+    "value25": 0,
+    "value26": {
+        "name": "fullscreen"
+    },
+    "value27": 1,
+    "value28": {
+        "name": "cube.filamesh"
+    },
+    "value29": 2,
+    "value30": {
+        "name": "sphere.filamesh"
+    },
+    "value31": 3,
+    "value32": {
+        "name": "plane.filamesh"
+    },
+    "value33": 4,
+    "value34": {
+        "name": "cylinder.filamesh"
+    },
+    "value35": 5,
+    "value36": {
+        "name": "Default SkyBox Material"
+    },
+    "value37": 6,
+    "value38": {
+        "name": "Grid Material"
+    },
+    "value39": 7,
+    "value40": {
+        "name": "Grid Plane"
+    },
+    "value41": 8,
+    "value42": {
+        "name": "Primitive 0"
+    },
+    "value43": 9,
+    "value44": {
+        "name": "SkyBox"
+    },
+    "value45": 10,
+    "value46": {
+        "name": "Primitive 0"
+    },
+    "value47": 11,
+    "value48": {
+        "name": "Editor View"
+    },
+    "value49": 12,
+    "value50": {
+        "name": "Indirect Light"
+    },
+    "value51": 13,
+    "value52": {
+        "name": "Editor Camera"
+    },
+    "value53": 14,
+    "value54": {
+        "name": "plane_hd"
+    },
+    "value55": 15,
+    "value56": {
+        "name": "Plane Mesh"
+    },
+    "value57": 16,
+    "value58": {
+        "name": "Directional Light"
+    },
+    "value59": 17,
+    "value60": {
+        "name": "Ground Wet Material"
+    },
+    "value61": 18,
+    "value62": {
+        "name": "Primitive 0"
+    },
+    "value63": 19,
+    "value64": {
+        "name": "Sphere"
+    },
+    "value65": 20,
+    "value66": {
+        "name": "Sphere Material"
+    },
+    "value67": 21,
+    "value68": {
+        "name": "Primitive 0"
+    },
+    "value69": 4,
+    "value70": 7,
+    "value71": {
+        "position": {
+            "x": 0.0,
+            "y": -0.009999999776482582,
+            "z": 0.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "scale": {
+            "x": 100.0,
+            "y": 1.0,
+            "z": 100.0
+        }
+    },
+    "value72": 13,
+    "value73": {
+        "position": {
+            "x": 6.713812828063965,
+            "y": 4.4767632484436039,
+            "z": -12.13155746459961
+        },
+        "rotation": {
+            "x": -0.20579975843429566,
+            "y": 2.7581264972686769,
+            "z": 0.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value74": 14,
+    "value75": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "scale": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 10.0
+        }
+    },
+    "value76": 19,
+    "value77": {
+        "position": {
+            "x": 0.0,
+            "y": 3.9000000953674318,
+            "z": 0.0
+        },
+        "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "scale": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 2.0
+        }
+    },
+    "value78": 1,
+    "value79": 13,
+    "value80": {
+        "fieldOfView": 60.0,
+        "aspectRatio": 3.1666666666666667,
+        "near": 0.1,
+        "far": 10000.0
+    },
+    "value81": 0,
+    "value82": 0,
+    "value83": 0,
+    "value84": 1,
+    "value85": 16,
+    "value86": {
+        "intensity": 27380.953125,
+        "direction": {
+            "x": 0.23109407722949983,
+            "y": -0.9597817659378052,
+            "z": 0.15941934287548066
+        },
+        "color": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "castShadows": true
+    },
+    "value87": 0,
+    "value88": 0,
+    "value89": 1,
+    "value90": 12,
+    "value91": {
+        "intensity": 30000.0,
+        "reflectionsTexturePath": {
+            "relativePath": {
+                "value0": "editor://textures/default_skybox/ibl.ktx"
+            }
+        },
+        "irradianceValuesPath": {
+            "relativePath": {
+                "value0": "editor://textures/default_skybox/sh.txt"
+            }
+        }
+    },
+    "value92": 6,
+    "value93": 0,
+    "value94": {
+        "resource": {
+            "relativePath": {
+                "value0": "engine://fullscreen"
+            }
+        }
+    },
+    "value95": 1,
+    "value96": {
+        "resource": {
+            "relativePath": {
+                "value0": "editor://meshes/cube.filamesh"
+            }
+        }
+    },
+    "value97": 2,
+    "value98": {
+        "resource": {
+            "relativePath": {
+                "value0": "editor://meshes/sphere.filamesh"
+            }
+        }
+    },
+    "value99": 3,
+    "value100": {
+        "resource": {
+            "relativePath": {
+                "value0": "editor://meshes/plane.filamesh"
+            }
+        }
+    },
+    "value101": 4,
+    "value102": {
+        "resource": {
+            "relativePath": {
+                "value0": "editor://meshes/cylinder.filamesh"
+            }
+        }
+    },
+    "value103": 15,
+    "value104": {
+        "resource": {
+            "relativePath": {
+                "value0": "meshes/plane_hd.filamesh"
+            }
+        }
+    },
+    "value105": 4,
+    "value106": 7,
+    "value107": {
+        "meshSource": 3,
+        "receiveShadows": false,
+        "castShadows": false,
+        "partsCount": 1,
+        "partsOffset": 0
+    },
+    "value108": 9,
+    "value109": {
+        "meshSource": 0,
+        "receiveShadows": false,
+        "castShadows": false,
+        "partsCount": 1,
+        "partsOffset": 0
+    },
+    "value110": 14,
+    "value111": {
+        "meshSource": 15,
+        "receiveShadows": true,
+        "castShadows": false,
+        "partsCount": 1,
+        "partsOffset": 0
+    },
+    "value112": 19,
+    "value113": {
+        "meshSource": 2,
+        "receiveShadows": true,
+        "castShadows": true,
+        "partsCount": 2,
+        "partsOffset": 0
+    },
+    "value114": 4,
+    "value115": 8,
+    "value116": {
+        "primitiveIndex": 0,
+        "materialEntity": 6
+    },
+    "value117": 10,
+    "value118": {
+        "primitiveIndex": 0,
+        "materialEntity": 5
+    },
+    "value119": 18,
+    "value120": {
+        "primitiveIndex": 0,
+        "materialEntity": 17
+    },
+    "value121": 21,
+    "value122": {
+        "primitiveIndex": 0,
+        "materialEntity": 20
+    },
+    "value123": 0,
+    "value124": 5,
+    "value125": 7,
+    "value126": {
+        "childrenCount": 1,
+        "first": 8,
+        "last": 8
+    },
+    "value127": 9,
+    "value128": {
+        "childrenCount": 1,
+        "first": 10,
+        "last": 10
+    },
+    "value129": 11,
+    "value130": {
+        "childrenCount": 2,
+        "first": 12,
+        "last": 13
+    },
+    "value131": 14,
+    "value132": {
+        "childrenCount": 1,
+        "first": 18,
+        "last": 18
+    },
+    "value133": 19,
+    "value134": {
+        "childrenCount": 1,
+        "first": 21,
+        "last": 21
+    },
+    "value135": 6,
+    "value136": 8,
+    "value137": {
+        "parent": 7,
+        "next": 1048575,
+        "previous": 1048575
+    },
+    "value138": 10,
+    "value139": {
+        "parent": 9,
+        "next": 1048575,
+        "previous": 1048575
+    },
+    "value140": 12,
+    "value141": {
+        "parent": 11,
+        "next": 13,
+        "previous": 1048575
+    },
+    "value142": 13,
+    "value143": {
+        "parent": 11,
+        "next": 1048575,
+        "previous": 12
+    },
+    "value144": 18,
+    "value145": {
+        "parent": 14,
+        "next": 1048575,
+        "previous": 1048575
+    },
+    "value146": 21,
+    "value147": {
+        "parent": 19,
+        "next": 1048575,
+        "previous": 1048575
+    },
+    "value148": 1,
+    "value149": 11,
+    "value150": {
+        "size": {
+            "x": 1280,
+            "y": 720
+        },
+        "camera": 13,
+        "indirectLight": 12
+    },
+    "value151": 4,
+    "value152": 5,
+    "value153": 6,
+    "value154": 17,
+    "value155": 20,
+    "value156": 7,
+    "value157": 7,
+    "value158": 9,
+    "value159": 12,
+    "value160": 13,
+    "value161": 14,
+    "value162": 16,
+    "value163": 19,
+    "value164": 1,
+    "value165": 13,
+    "value166": 2,
+    "value167": 12,
+    "value168": 16,
+    "value169": 0,
+    "value170": 0,
+    "value171": 6,
+    "value172": 0,
+    "value173": 1,
+    "value174": 2,
+    "value175": 3,
+    "value176": 4,
+    "value177": 15,
+    "value178": 10,
+    "value179": 0,
+    "value180": 1,
+    "value181": 2,
+    "value182": 3,
+    "value183": 4,
+    "value184": 5,
+    "value185": 6,
+    "value186": 15,
+    "value187": 17,
+    "value188": 20,
+    "value189": 0,
+    "value190": 1,
+    "value191": 20,
+    "value192": {
+        "baseColor": {
+            "x": 0.5524193644523621,
+            "y": 0.4700019657611847,
+            "z": 0.4700019657611847
+        },
+        "roughness": 0.46000000834465029,
+        "metallic": 1.0,
+        "reflectance": 0.550000011920929
+    },
+    "value193": 1,
+    "value194": 5,
+    "value195": {
+        "skybox": {
+            "relativePath": {
+                "value0": "editor://textures/default_skybox/texture.ktx"
+            }
+        },
+        "showSun": false,
+        "color": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        }
+    },
+    "value196": 1,
+    "value197": 6,
+    "value198": {
+        "color": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "scale": {
+            "x": 10.0,
+            "y": 10.0
+        },
+        "thickness": 0.014999999664723874
+    },
+    "value199": 1,
+    "value200": 17,
+    "value201": {
+        "baseColor": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "albedo": {
+            "relativePath": {
+                "value0": "textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_basecolor.jpg"
+            }
+        },
+        "tiling": {
+            "x": 1.0,
+            "y": 1.0
+        },
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "metallic": 0.0,
+        "metallicMap": {
+            "relativePath": {
+                "value0": ""
+            }
+        },
+        "roughness": 0.5,
+        "roughnessMap": {
+            "relativePath": {
+                "value0": "textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_roughness.jpg"
+            }
+        },
+        "reflectance": 0.0,
+        "reflectanceMap": {
+            "relativePath": {
+                "value0": ""
+            }
+        },
+        "ambientOcclusionMap": {
+            "relativePath": {
+                "value0": "textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_ambientOcclusion.jpg"
+            }
+        },
+        "normalMap": {
+            "relativePath": {
+                "value0": "textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_normal.jpg"
+            }
+        },
+        "bentNormalMap": {
+            "relativePath": {
+                "value0": ""
+            }
+        },
+        "emissive": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.0
+        },
+        "emissiveMap": {
+            "relativePath": {
+                "value0": ""
+            }
+        }
+    },
+    "value202": 1,
+    "value203": 13,
+    "value204": {
+        "velocity": 10.0,
+        "sensitivity": 0.5
+    },
+    "value205": 10,
+    "value206": 0,
+    "value207": 1,
+    "value208": 2,
+    "value209": 3,
+    "value210": 4,
+    "value211": 6,
+    "value212": 7,
+    "value213": 11,
+    "value214": 12,
+    "value215": 13,
+    "value216": 1,
+    "value217": 9,
+    "value218": 1,
+    "value219": 11,
+    "value220": 1,
+    "value221": 7
+}

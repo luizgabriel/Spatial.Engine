@@ -5,8 +5,9 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/Resource.h>
-#include <spatial/resources/ResourceLoader.h>
+#include <spatial/resources/ResourceLoaderUtils.h>
 #include <unordered_map>
+#include <spatial/resources/FilesSystem.h>
 
 namespace spatial::render
 {
@@ -14,7 +15,7 @@ namespace spatial::render
 class MaterialController
 {
   public:
-	explicit MaterialController(filament::Engine& engine);
+	explicit MaterialController(filament::Engine& engine, FileSystem& fileSystem);
 
 	void onEvent(const LoadResourceEvent<ImageTexture>& event);
 
@@ -47,7 +48,7 @@ class MaterialController
 				registry.addComponent<MaterialInstance>(entity, std::move(materialInstance));
 			});
 
-		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
+		registry.getEntities<const MaterialComponent, render::MaterialInstance>().each(
 			[&](const auto& data, auto& materialInstance) {
 				data.apply(materialInstance.ref(), [&](const auto& res) { return findResource(res); });
 			});
@@ -66,10 +67,10 @@ class MaterialController
 			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref()); });
 	}
 
-	void setRootPath(const std::filesystem::path& rootPath);
-
   private:
 	filament::Engine& mEngine;
+	FileSystem& mFileSystem;
+
 	std::filesystem::path mRootPath;
 	mutable EventQueue mJobQueue;
 	std::unordered_map<uint32_t, render::Texture> mTextures;

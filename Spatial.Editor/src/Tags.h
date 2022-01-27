@@ -11,11 +11,15 @@ struct IsEditorView
 {
 };
 
-struct IsSkyBoxMesh
+struct IsSkyBoxMeshInstance
 {
 };
 
 struct IsGridPlane
+{
+};
+
+struct IsSkyBoxMeshResource
 {
 };
 

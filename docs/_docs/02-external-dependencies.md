@@ -17,7 +17,7 @@ We all know that most of C++ projects try to avoid external dependencies due to 
 So, to be able to simplify the process when we're integrating a new external library, I chose to use [Conan](https://conan.io) as our main package management tool. And for simplifying the build and configuration step I chose [CMake](https://cmake.org).
 
 ### Rendering Engine
-Some game engines implement their own rendering library, but as I said, there are very powerful, well-tested and open-source solutions out there. I chose google's [filament](https://github.com/google/filament) rendering engine. You can click and see for yourself all their documentation. They did a pretty good job [documentation](https://google.github.io/filament/Filament.html) and I recommend you to read it all as a homework.
+Some game engines implement their own rendering library, but as I said, there are very powerful, well-tested and open-source solutions out there. I chose google's [filament](https://github.com/google/filament) rendering engine. You can click and see for yourself all their documentation. They did a pretty good job [documentation](https://google.github.io/filament/Filament.html) and I recommend you to readString it all as a homework.
 
 ### Other external libraries
 The other external libraries are described in the [`conanfile.txt`](https://github.com/luizgabriel/Spatial.Engine/blob/master/conanfile.txt).

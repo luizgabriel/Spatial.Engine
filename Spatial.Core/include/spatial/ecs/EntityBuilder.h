@@ -32,6 +32,8 @@ class MaterialEntityBuilder;
 
 class MeshEntityBuilder;
 
+class DynamicMeshEntityBuilder;
+
 class MeshInstanceEntityBuilder;
 
 class SceneViewEntityBuilder;
@@ -78,6 +80,7 @@ class EntityBuilder
 	SceneViewEntityBuilder asSceneView();
 
 	MeshEntityBuilder asMesh();
+	DynamicMeshEntityBuilder asDynamicMesh();
 	MeshInstanceEntityBuilder asMeshInstance();
 
 	template <typename MaterialComponent, typename... Args>
@@ -265,6 +268,20 @@ class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
 	MeshEntityBuilder(Registry& registry, Entity entity);
 
 	MeshEntityBuilder& withResource(const std::filesystem::path& filamesh);
+};
+
+class DynamicMeshEntityBuilder : public BasicEntityBuilder<DynamicMesh>
+{
+  public:
+	using Base = BasicEntityBuilder<Mesh>;
+
+	DynamicMeshEntityBuilder(Registry& registry, Entity entity);
+
+	DynamicMeshEntityBuilder& withVertexBuffer(const render::SharedVertexBuffer& vertexBuffer);
+	DynamicMeshEntityBuilder& withIndexBuffer(const render::SharedIndexBuffer & indexBuffer);
+	DynamicMeshEntityBuilder& withBoundingBox(filament::Box boundingBox);
+	DynamicMeshEntityBuilder& withGeometries(render::MeshGeometries&& geometries);
+	DynamicMeshEntityBuilder& withSingleGeometry();
 };
 
 class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>

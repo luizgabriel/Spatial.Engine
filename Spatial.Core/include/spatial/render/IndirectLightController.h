@@ -3,7 +3,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/resources/ResourceLoader.h>
+#include <spatial/resources/ResourceLoaderUtils.h>
 #include <unordered_map>
 
 namespace spatial::render

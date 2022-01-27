@@ -29,6 +29,7 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::IndirectLight>(ar);
+	snapshot.component<ecs::Mesh>(ar);
 	snapshot.component<ecs::MeshInstance>(ar);
 	snapshot.component<ecs::MeshMaterial>(ar);
 	snapshot.component<ecs::UUID>(ar);
@@ -42,6 +43,8 @@ void serialize(Archive& ar, const Registry& registry)
 	snapshot.component<ecs::tags::IsLight>(ar);
 	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
+	snapshot.component<ecs::tags::IsMeshLoaded>(ar);
+	snapshot.component<ecs::tags::IsResource>(ar);
 	snapshot.component<ecs::tags::CanDestroy>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);
@@ -62,6 +65,7 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::SpotLight>(ar);
 	snapshot.component<ecs::SunLight>(ar);
 	snapshot.component<ecs::IndirectLight>(ar);
+	snapshot.component<ecs::Mesh>(ar);
 	snapshot.component<ecs::MeshInstance>(ar);
 	snapshot.component<ecs::MeshMaterial>(ar);
 	snapshot.component<ecs::UUID>(ar);
@@ -75,6 +79,8 @@ void deserialize(Archive& ar, Registry& registry)
 	snapshot.component<ecs::tags::IsLight>(ar);
 	snapshot.component<ecs::tags::IsMeshDirty>(ar);
 	snapshot.component<ecs::tags::IsMainView>(ar);
+	snapshot.component<ecs::tags::IsMeshLoaded>(ar);
+	snapshot.component<ecs::tags::IsResource>(ar);
 	snapshot.component<ecs::tags::CanDestroy>(ar);
 
 	(snapshot.component<CustomComponent>(ar), ...);

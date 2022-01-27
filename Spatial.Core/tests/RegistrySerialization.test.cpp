@@ -18,8 +18,6 @@ TEST(Registry, EmptySerialization)
 	}
 
 	auto output = ss.str();
-	std::cout << output;
-
 	ASSERT_NE(output.find("<cereal>"), std::string::npos);
 	ASSERT_NE(output.find("</cereal>"), std::string::npos);
 }
@@ -39,8 +37,6 @@ TEST(Registry, SimpleSerialization)
 	}
 
 	auto output = ss.str();
-	std::cout << output;
-
 	ASSERT_NE(output.find("<cereal>"), std::string::npos);
 	ASSERT_NE(output.find("<position>"), std::string::npos);
 	ASSERT_NE(output.find("<scale>"), std::string::npos);
@@ -75,8 +71,6 @@ TEST(Registry, CustomComponentSerialization)
 	}
 
 	auto output = ss.str();
-	std::cout << output;
-
 	ASSERT_NE(output.find("<cereal>"), std::string::npos);
 	ASSERT_NE(output.find("<position>"), std::string::npos);
 	ASSERT_NE(output.find("<scale>"), std::string::npos);

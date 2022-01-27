@@ -56,7 +56,7 @@ Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/
 ## Inspiration
 
 This project was heavly inspired by
-the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and I
+the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?listImpl=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and I
 encourage you to take a look at his amazing YouTube channel.
 
 ## Bibliography

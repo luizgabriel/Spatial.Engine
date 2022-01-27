@@ -104,7 +104,7 @@ auto input = desktop::InputSystem{window};
 ```
 
 This line creates a system responsible for mantanning the `desktop::InputState` of the `desktop::PlatformContext`.
-We need to call `input.getState()` to get the read input or mouse in the game loop. 
+We need to call `input.getState()` to get the readString input or mouse in the game loop. 
 
 > There is no "Input::pressed(...)" facade or singleton here. Just clear dependencies throughout the code. 
 > As a design mindset we tend to avoid the usage of Singletons because of its undesired effects it may cause on the application. 
@@ -130,7 +130,7 @@ Here where the editor logic lives and dies. You can create your own systems too 
 auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
 ```
 
-Can you see that the editor depends on the _engine_, the instantiated _window_ and the _input state_? Clear dependencies make things more readable and I personally like it. It needs the engine to create renderables, light, scenes and etc. It needs the window class for calling `warpMouse` commands (this may change in the future). And also it needs to read the input state for performing some actions based on your input and mouse at runtime.
+Can you see that the editor depends on the _engine_, the instantiated _window_ and the _input state_? Clear dependencies make things more readable and I personally like it. It needs the engine to create renderables, light, scenes and etc. It needs the window class for calling `warpMouse` commands (this may change in the future). And also it needs to readString the input state for performing some actions based on your input and mouse at runtime.
 
 ## Linking all together
 

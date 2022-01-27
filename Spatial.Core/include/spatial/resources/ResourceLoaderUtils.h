@@ -17,7 +17,7 @@ template <ResourceType type>
 struct LoadResourceEvent
 {
 	Resource<type> texture;
-	LoadResourceEvent(Resource<type> resource) : texture{std::move(resource)}
+	explicit LoadResourceEvent(Resource<type> resource) : texture{std::move(resource)}
 	{
 	}
 };
@@ -26,8 +26,6 @@ tl::expected<std::filesystem::path, ResourceError> makeAbsolutePath(const std::f
 																	const std::filesystem::path& resourcePath);
 
 tl::expected<std::filesystem::path, ResourceError> validateResourcePath(std::filesystem::path&& resourceAbsolutePath);
-
-tl::expected<std::filesystem::path, ResourceError> validateExtensions(std::filesystem::path&& resourceAbsolutePath, const std::vector<std::string>& extensions);
 
 tl::expected<std::ifstream, ResourceError> openFileReadStream(const std::filesystem::path& resourceAbsolutePath);
 

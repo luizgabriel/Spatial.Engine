@@ -19,7 +19,7 @@
 
 #include <fstream>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/render/EntityBuilder.h>
+#include <spatial/resources/MemoryFileSystem.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
@@ -43,93 +43,50 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mGridMaterial{render::createMaterial(mEngine, ASSETS_GRID_FILAMAT, ASSETS_GRID_FILAMAT_SIZE)},
 	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
+	  mFileSystem{},
+
 	  mRegistry{},
 
 	  mEditorCameraController{},
 	  mSceneController{mEngine},
-	  mMaterialController{mEngine},
+	  mMaterialController{mEngine, mFileSystem},
 	  mTransformController{mEngine},
 	  mCameraController{mEngine},
 	  mLightController{mEngine},
-	  mMeshController{mEngine},
+	  mMeshController{mEngine, mFileSystem},
 	  mIndirectLightController{mEngine},
 
 	  mJobQueue{},
 
-	  mRootPath{}
+	  mScenePath{},
+	  mCurrentPath{}
 
 {
 	mJobQueue.connect<OpenProjectEvent>(*this);
 	mJobQueue.connect<ClearSceneEvent>(*this);
 	mJobQueue.connect<LoadSceneEvent>(*this);
 	mJobQueue.connect<SaveSceneEvent>(*this);
+
+	auto editorFs = mFileSystem.mount<MemoryFileSystem>("editor");
+	editorFs->define("meshes/cube.filamesh", {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE});
+	editorFs->define("meshes/sphere.filamesh", {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE});
+	editorFs->define("meshes/plane.filamesh", {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE});
+	editorFs->define("meshes/cylinder.filamesh", {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE});
 }
 
 void SceneEditorSystem::onStart()
 {
-	{
-		auto ib = render::createFullScreenIndexBuffer(mEngine);
-		ecs::build(mRegistry)
-			.asMesh()
-			.withResource("engine://fullscreen")
-			.with<ecs::tags::IsMeshLoaded>()
-			.with(render::createFullScreenVertexBuffer(mEngine))
-			.with(render::MeshGeometries{{0, ib->getIndexCount()}})
-			.with(std::move(ib))
-			.with<tags::IsEditorEntity>();
-	}
-
-	{
-		const auto filamesh = loadFilameshFromMemory(ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE);
-		render::build(mRegistry)
-			.asFilamesh()
-			.withFile(mEngine, filamesh)
-			.asMesh()
-			.withResource("editor://meshes/cube.filamesh")
-			.with<tags::IsEditorEntity>();
-	}
-
-	{
-		const auto filamesh = loadFilameshFromMemory(ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE);
-		render::build(mRegistry)
-			.asFilamesh()
-			.withFile(mEngine, filamesh)
-			.asMesh()
-			.withResource("editor://meshes/sphere.filamesh")
-			.with<tags::IsEditorEntity>();
-	}
-
-	{
-		const auto filamesh = loadFilameshFromMemory(ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE);
-		render::build(mRegistry)
-			.asFilamesh()
-			.withFile(mEngine, filamesh)
-			.asMesh()
-			.withResource("editor://meshes/plane.filamesh")
-			.with<tags::IsEditorEntity>();
-	}
-
-	{
-		const auto filamesh = loadFilameshFromMemory(ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE);
-		render::build(mRegistry)
-			.asFilamesh()
-			.withFile(mEngine, filamesh)
-			.asMesh()
-			.withResource("editor://meshes/cylinder.filamesh")
-			.with<tags::IsEditorEntity>();
-	}
-
 	mMaterialController.load(
-		"editor://textures/default_skybox/texture.ktx"_hs,
+		"editor/textures/default_skybox/texture.ktx"_hs,
 		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
 
-	mMaterialController.load("engine://dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-	mMaterialController.load("engine://dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
-	mMaterialController.load("engine://dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
+	mMaterialController.load("engine/dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
+	mMaterialController.load("engine/dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
+	mMaterialController.load("engine/dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
 
-	mIndirectLightController.loadTexture("editor://textures/default_skybox/ibl.ktx"_hs, ASSETS_DEFAULT_SKYBOX_IBL_KTX,
+	mIndirectLightController.loadTexture("editor/textures/default_skybox/ibl.ktx"_hs, ASSETS_DEFAULT_SKYBOX_IBL_KTX,
 										 ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE);
-	mIndirectLightController.loadIrradianceValues("editor://textures/default_skybox/sh.txt"_hs,
+	mIndirectLightController.loadIrradianceValues("editor/textures/default_skybox/sh.txt"_hs,
 												  render::parseShFile(ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE));
 }
 
@@ -141,7 +98,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.asMaterial<SkyBoxMaterial>({
 				false,
 				{math::float3{.0f}, 1.0f},
-				{"editor://textures/default_skybox/texture.ktx"},
+				{"editor/textures/default_skybox/texture.ktx"},
 			});
 
 	if (!registry.isValid(registry.getFirstEntity<GridMaterial>()))
@@ -156,15 +113,15 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withScale({100.0f, 1.0f, 100.0f})
 			.withPosition({.0f, -0.01f, .0f})
 			.asMeshInstance()
-			.withMesh(ecs::Mesh::findByResource(registry, "editor://meshes/plane.filamesh"))
+			.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/plane.filamesh"))
 			.withMaterialAt(0, registry.getFirstEntity<GridMaterial>());
 
-	if (!registry.isValid(registry.getFirstEntity<tags::IsSkyBoxMesh>()))
+	if (!registry.isValid(registry.getFirstEntity<tags::IsSkyBoxMeshInstance>()))
 		ecs::build(registry)
 			.withName("SkyBox")
-			.with<tags::IsSkyBoxMesh>()
+			.with<tags::IsSkyBoxMeshInstance>()
 			.asMeshInstance()
-			.withMesh(ecs::Mesh::findByResource(registry, "engine://fullscreen"))
+			.withMesh(registry.getFirstEntity<tags::IsSkyBoxMeshResource>())
 			.withMaterialAt(0, registry.getFirstEntity<SkyBoxMaterial>())
 			.withShadowOptions(false, false)
 			.withCulling(false)
@@ -180,8 +137,8 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
-								   .withReflectionsTexturePath("editor://textures/default_skybox/ibl.ktx")
-								   .withIrradianceValuesPath("editor://textures/default_skybox/sh.txt"))
+								   .withReflectionsTexturePath("editor/textures/default_skybox/ibl.ktx")
+								   .withIrradianceValuesPath("editor/textures/default_skybox/sh.txt"))
 			.withCamera(ecs::build(registry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
@@ -195,11 +152,22 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 
 void SceneEditorSystem::onStartFrame(float)
 {
+	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsSkyBoxMeshResource>()))
+	{
+		ecs::build(mRegistry)
+			.withName("skybox")
+			.with<tags::IsSkyBoxMeshResource>()
+			.asDynamicMesh()
+			.withVertexBuffer(toShared(render::createFullScreenVertexBuffer(mEngine)))
+			.withIndexBuffer(toShared(render::createFullScreenIndexBuffer(mEngine)))
+			.withSingleGeometry();
+	}
+
 	mJobQueue.update();
 	mMaterialController.onStartFrame();
 	createDefaultEditorEntities(mRegistry);
 
-	mMeshController.onStartFrame(mRegistry, mRootPath);
+	mMeshController.onStartFrame(mRegistry);
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
@@ -225,13 +193,14 @@ void SceneEditorSystem::onDrawGui()
 
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
+	static std::filesystem::path rootPath = std::filesystem::current_path();
 
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(mIconTexture.ref());
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
 
-		if (ui::OpenProjectModal::show(mRootPath))
-			mJobQueue.enqueue<OpenProjectEvent>(mRootPath);
+		if (ui::OpenProjectModal::show(rootPath))
+			mJobQueue.enqueue<OpenProjectEvent>(rootPath);
 
 		if (ui::NewSceneModal::show())
 			mJobQueue.enqueue<ClearSceneEvent>();
@@ -304,7 +273,7 @@ void SceneEditorSystem::onDrawGui()
 	});
 
 	ui::Window::show("Assets Explorer",
-					 [&]() { ui::AssetsExplorer::displayFiles(mRootPath, mCurrentPath, mIconTexture.ref()); });
+					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, mIconTexture.ref()); });
 }
 
 void SceneEditorSystem::onRender(filament::Renderer& renderer) const
@@ -332,11 +301,8 @@ void SceneEditorSystem::clearScene()
 
 void SceneEditorSystem::loadScene()
 {
-	auto result = makeAbsolutePath(mRootPath, mScenePath)
-					  .and_then(validateResourcePath)
-					  .and_then(openFileReadStream)
-					  .and_then(parseRegistry)
-					  .map_error(logResourceError);
+	auto stream = mFileSystem.openReadStream(mScenePath.c_str());
+	auto result = parseRegistry(*stream).map_error(logResourceError);
 
 	if (result.has_value())
 		mRegistry = std::move(result.value());
@@ -344,10 +310,8 @@ void SceneEditorSystem::loadScene()
 
 void SceneEditorSystem::saveScene()
 {
-	auto result = makeAbsolutePath(mRootPath, mScenePath).and_then(openFileWriteStream).map_error(logResourceError);
-
-	if (result.has_value())
-		writeRegistry(mRegistry, std::move(result.value()));
+	auto stream = mFileSystem.openWriteStream(mScenePath.c_str());
+	writeRegistry(mRegistry, *stream);
 }
 
 void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
@@ -355,10 +319,8 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
 
-	mRootPath = path;
-	mCurrentPath = path;
-	mIndirectLightController.setRootPath(mRootPath);
-	mMaterialController.setRootPath(mRootPath);
+	mFileSystem.mount<PhysicalFileSystem>("project", path);
+	mCurrentPath = "project";
 }
 
 void SceneEditorSystem::onEvent(const ClearSceneEvent&)

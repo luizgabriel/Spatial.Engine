@@ -8,6 +8,7 @@
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
 #include <unordered_map>
+#include <spatial/resources/FilesSystem.h>
 
 namespace spatial::render
 {
@@ -15,18 +16,15 @@ namespace spatial::render
 class MeshController
 {
   public:
-
-
-
-
-	explicit MeshController(filament::Engine& engine);
+	explicit MeshController(filament::Engine& engine, FileSystem& fileSystem);
 
 	void onUpdateFrame(ecs::Registry& registry);
 
-	void onStartFrame(ecs::Registry& registry, const std::filesystem::path& rootPath);
+	void onStartFrame(ecs::Registry& registry);
 
   private:
 	filament::Engine& mEngine;
+	FileSystem& mFileSystem;
 
 	void createRenderableMeshes(ecs::Registry& registry);
 	void updateMeshGeometries(ecs::Registry& registry);

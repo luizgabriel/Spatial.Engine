@@ -131,6 +131,15 @@ struct ComponentInputImpl<ecs::Mesh>
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
+
+template <>
+struct ComponentInputImpl<ecs::DynamicMesh>
+{
+	static constexpr auto sName = "Dynamic Mesh";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+
 template <>
 struct ComponentInputImpl<ecs::MeshInstance>
 {

@@ -7,7 +7,7 @@
 namespace spatial::ecs
 {
 
-Entity Mesh::findByResource(const Registry& registry, const std::filesystem::path& resource)
+Entity Mesh::find(const Registry& registry, const std::filesystem::path& resource)
 {
 	auto view = registry.getEntities<const ecs::Mesh>();
 	auto it = std::find_if(view.begin(), view.end(), [&](ecs::Entity entity) {
@@ -21,9 +21,9 @@ Entity Mesh::findByResource(const Registry& registry, const std::filesystem::pat
 	return *it;
 }
 
-Entity Mesh::findOrCreateResource(Registry& registry, const std::filesystem::path& resource)
+Entity Mesh::findOrCreate(Registry& registry, const std::filesystem::path& resource)
 {
-	auto foundMesh = Mesh::findByResource(registry, resource);
+	auto foundMesh = Mesh::find(registry, resource);
 	if (!registry.isValid(foundMesh))
 	{
 		foundMesh = registry.createEntity();

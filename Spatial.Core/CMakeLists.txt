@@ -51,7 +51,6 @@ add_library(Spatial.Core
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
         include/spatial/render/ResourceFinders.h
-        include/spatial/render/EntityBuilder.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -70,7 +69,7 @@ add_library(Spatial.Core
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
         include/spatial/resources/FilameshFile.h
-        include/spatial/resources/ResourceLoader.h
+        include/spatial/resources/ResourceLoaderUtils.h
         include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
         include/spatial/resources/Resource.h
@@ -113,14 +112,13 @@ add_library(Spatial.Core
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
-        src/render/EntityBuilder.cpp
 
         #src/script/PlatformContext.cpp
         #src/script/Isolate.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp)
+        src/resources/ResourceLoader.cpp include/spatial/resources/FilesSystem.h src/resources/FileSystem.cpp include/spatial/resources/PhysicalFileSystem.h src/resources/PhysicalFileSystem.cpp src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

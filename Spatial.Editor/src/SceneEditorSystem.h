@@ -20,6 +20,7 @@
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
+#include <spatial/resources/PhysicalFileSystem.h>
 
 namespace fl = filament;
 
@@ -38,6 +39,8 @@ class SceneEditorSystem
 	render::Material mGridMaterial;
 	render::Texture mIconTexture;
 
+	RootFileSystem mFileSystem;
+
 	ecs::Registry mRegistry;
 
 	EditorCameraController mEditorCameraController;
@@ -52,7 +55,7 @@ class SceneEditorSystem
 
 	EventQueue mJobQueue;
 
-	std::filesystem::path mRootPath;
+
 	std::filesystem::path mScenePath;
 	std::filesystem::path mCurrentPath;
 

@@ -10,6 +10,12 @@ namespace cereal
 {
 
 template <typename Archive>
+void serialize(Archive& ar, spatial::ecs::Mesh& mesh)
+{
+	ar(make_nvp("resource", mesh.resource));
+}
+
+template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MeshInstance& mesh)
 {
 	ar(make_nvp("meshSource", mesh.meshSource));

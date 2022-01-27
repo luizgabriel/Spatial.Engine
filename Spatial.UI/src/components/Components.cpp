@@ -14,6 +14,10 @@
 namespace spatial::ui
 {
 
+static constexpr ImGuiTableFlags gTableFlags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
+									 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
+									 | ImGuiTableFlags_NoBordersInBody;
+
 void spacing(std::uint32_t times)
 {
 	for (std::uint32_t i = 0; i < times; i++)
@@ -158,19 +162,51 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
 
+void ComponentInputImpl<ecs::DynamicMesh>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& mesh = registry.getComponent<ecs::DynamicMesh>(entity);
+
+	if (ImGui::BeginTable("Dynamic Mesh Table", 2, gTableFlags)) {
+
+		ImGui::TableSetupColumn("Info");
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Vertex Buffer");
+		ImGui::TableNextColumn();
+		ImGui::Text("%p", reinterpret_cast<void*>(mesh.vertexBuffer.get()));
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Index Buffer");
+		ImGui::TableNextColumn();
+		ImGui::Text("%p", reinterpret_cast<void*>(mesh.indexBuffer.get()));
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Geometries Count");
+		ImGui::TableNextColumn();
+		ImGui::Text("%lu", mesh.geometries.size());
+
+		ImGui::EndTable();
+	}
+}
+
 void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 
 	bool changed = false;
 
-	changed |= Search::searchEntity<ecs::Mesh>("Resource", registry, mesh.meshSource);
+	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 	{
 		auto dnd = ui::DragAndDropTarget{};
 		if (dnd.isStarted()) {
 			auto result = dnd.getPayload<std::filesystem::path>();
 			if (result.has_value()) {
-				mesh.meshSource = ecs::Mesh::findOrCreateResource(registry, result.value());
+				mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
 				changed = true;
 			}
 		}
@@ -210,11 +246,7 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 			changed = true;
 		}
 
-		static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-											 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-											 | ImGuiTableFlags_NoBordersInBody;
-
-		if (ImGui::BeginTable("MaterialsTable", 3, flags))
+		if (ImGui::BeginTable("MaterialsTable", 3, gTableFlags))
 		{
 
 			ImGui::TableSetupColumn("Primitive Index");

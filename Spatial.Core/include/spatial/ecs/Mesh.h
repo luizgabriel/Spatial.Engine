@@ -2,12 +2,17 @@
 
 #include <spatial/ecs/Registry.h>
 #include <spatial/resources/Resource.h>
+#include <spatial/render/Resources.h>
 
 namespace spatial::ecs
 {
 
 namespace tags
 {
+
+struct IsMesh
+{
+};
 
 struct IsMeshDirty
 {
@@ -30,6 +35,16 @@ struct MeshMaterial
 	}
 };
 
+struct DynamicMesh
+{
+	render::SharedVertexBuffer vertexBuffer;
+	render::SharedIndexBuffer indexBuffer;
+	render::MeshGeometries geometries;
+	filament::Box boundingBox;
+
+	DynamicMesh() = default;
+};
+
 struct Mesh
 {
 	Resource<FilaMesh> resource;
@@ -39,9 +54,9 @@ struct Mesh
 	{
 	}
 
-	static Entity findByResource(const Registry& registry, const std::filesystem::path& resource);
+	static Entity find(const Registry& registry, const std::filesystem::path& resource);
 
-	static Entity findOrCreateResource(Registry& registry, const std::filesystem::path& resource);
+	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
 };
 
 

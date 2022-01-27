@@ -1,14 +1,16 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/resources/ResourceLoader.h>
+#include <spatial/resources/ResourceLoaderUtils.h>
 
 namespace spatial::render
 {
 
-MeshController::MeshController(filament::Engine& engine) : mEngine{engine}
+MeshController::MeshController(filament::Engine& engine, FileSystem& fileSystem)
+	: mEngine{engine}, mFileSystem{fileSystem}
 {
 }
 
@@ -23,11 +25,17 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 {
 	registry.getEntities<const Entity, const ecs::MeshInstance>(ecs::ExcludeComponents<Renderable>)
 		.each([&](ecs::Entity e, const auto& entity, const auto& meshInstance) {
-			if (!registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
+
+			auto meshPartsCount = 0;
+			if (registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
+				meshPartsCount = registry.getComponent<const MeshGeometries>(meshInstance.meshSource).size();
+			else if (registry.hasAllComponents<ecs::DynamicMesh>(meshInstance.meshSource))
+				meshPartsCount = registry.getComponent<const ecs::DynamicMesh>(meshInstance.meshSource).geometries.size();
+
+			if (meshPartsCount <= 0)
 				return;
 
-			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
-			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
+			const auto partsCount = meshInstance.slice.count == 0 ? meshPartsCount : meshInstance.slice.count;
 			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
 		});
 }
@@ -36,29 +44,44 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
 	registry.getEntities<const Entity, const ecs::MeshInstance, Renderable>().each(
 		[&](ecs::Entity e, const auto& entity, const auto& meshInstance, auto& renderable) {
-			if (!registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
-				return;
-
-			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
-			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
-
-			auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
-			auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
-
-			const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
-			if (boundingBox)
-				renderable.setAxisAlignedBoundingBox(*boundingBox);
-
 			renderable.setCastShadows(meshInstance.castShadows);
 			renderable.setReceiveShadows(meshInstance.receiveShadows);
 			renderable.setCulling(meshInstance.culling);
 			renderable.setPriority(meshInstance.priority);
 
-			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
+			if (registry.hasAllComponents<ecs::DynamicMesh>(meshInstance.meshSource))
 			{
-				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
-				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
-										 geometry.offset, geometry.count);
+				const auto& customMesh = registry.getComponent<const ecs::DynamicMesh>(meshInstance.meshSource);
+				const auto& parts = customMesh.geometries;
+				const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
+
+				renderable.setAxisAlignedBoundingBox(customMesh.boundingBox);
+
+				for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
+				{
+					const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
+					renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, customMesh.vertexBuffer.get(),
+											 customMesh.indexBuffer.get(), geometry.offset, geometry.count);
+				}
+			}
+			else if (registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
+			{
+				const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
+				const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
+
+				auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
+				auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
+
+				const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
+				if (boundingBox)
+					renderable.setAxisAlignedBoundingBox(*boundingBox);
+
+				for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
+				{
+					const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
+					renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(),
+											 indexBuffer.get(), geometry.offset, geometry.count);
+				}
 			}
 		});
 
@@ -85,26 +108,21 @@ void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 	registry.removeComponent<ecs::tags::IsMeshDirty>(d2.begin(), d2.end());
 }
 
-void MeshController::onStartFrame(ecs::Registry& registry, const std::filesystem::path& rootPath)
+void MeshController::onStartFrame(ecs::Registry& registry)
 {
+	using namespace boost::algorithm;
+
 	registry.getEntities<const ecs::Mesh>(ecs::ExcludeComponents<ecs::tags::IsMeshLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Mesh& mesh) {
-			if (mesh.resource.isEmpty())
+			if (mesh.resource.isEmpty() || !ends_with(mesh.resource.relativePath.filename().c_str(), ".filamesh"))
 				return;
 
-			auto result = makeAbsolutePath(rootPath, mesh.resource.relativePath)
-							  .and_then(validateResourcePath)
-							  .and_then([](auto&& path) {
-								  return validateExtensions(std::forward<decltype(path)>(path), {".filamesh"});
-							  })
-							  .and_then(openFileReadStream)
-							  .and_then(toFilamesh)
-							  .map_error(logResourceError);
-
-			if (!result.has_value())
+			auto stream = mFileSystem.openReadStream(mesh.resource.relativePath.c_str());
+			if (stream->bad())
 				return;
 
-			const auto& filamesh = result.value();
+			auto filamesh = FilameshFile{};
+			*stream >> filamesh;
 
 			registry.addOrReplaceComponent(entity, createVertexBuffer(mEngine, filamesh));
 			registry.addOrReplaceComponent(entity, createIndexBuffer(mEngine, filamesh));

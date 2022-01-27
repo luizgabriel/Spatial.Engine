@@ -5,7 +5,7 @@
 #include <spatial/core/Logger.h>
 #include <spatial/render/Resources.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/resources/ResourceLoader.h>
+#include <spatial/resources/ResourceLoaderUtils.h>
 #include <sstream>
 
 namespace spatial
@@ -33,16 +33,6 @@ tl::expected<std::filesystem::path, ResourceError> validateResourcePath(std::fil
 		return tl::make_unexpected(ResourceError::NotAFile);
 
 	return resourceAbsolutePath;
-}
-
-tl::expected<std::filesystem::path, ResourceError> validateExtensions(std::filesystem::path&& resourceAbsolutePath, const std::vector<std::string>& extensions)
-{
-	for (auto& extension : extensions) {
-		if (resourceAbsolutePath.extension().compare(extension) == 0)
-			return resourceAbsolutePath;
-	}
-
-	return tl::make_unexpected(ResourceError::InvalidExtension);
 }
 
 tl::expected<std::ifstream, ResourceError> openFileReadStream(const std::filesystem::path& resourceAbsolutePath)
@@ -83,20 +73,6 @@ std::string toErrorMessage(ResourceError code)
 {
 	const auto name = magic_enum::enum_name(code);
 	return fmt::format("Resource Error: {}", name);
-}
-
-tl::expected<FilameshFile, ResourceError> toFilamesh(std::istream&& istream)
-{
-	try
-	{
-		auto filamesh = FilameshFile{};
-		istream >> filamesh;
-		return filamesh;
-	}
-	catch (const std::ios::failure& e)
-	{
-		return tl::make_unexpected(ResourceError::ParseError);
-	}
 }
 
 ResourceError logResourceError(ResourceError code)

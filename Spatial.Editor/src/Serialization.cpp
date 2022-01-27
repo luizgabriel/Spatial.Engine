@@ -1,19 +1,20 @@
 #include "Serialization.h"
-#include <spatial/resources/ResourceLoader.h>
+#include <spatial/resources/ResourceLoaderUtils.h>
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 
 namespace spatial::editor
 {
 
-tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream)
+tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream& istream)
 {
 	auto registry = ecs::Registry{};
 	try
 	{
 		auto archive = JsonInputArchive{istream};
-		ecs::deserialize<ColorMaterial, SkyBoxMaterial, GridMaterial, EditorCamera, tags::IsEditorEntity,
-						 tags::IsSkyBoxMesh, tags::IsEditorView, tags::IsGridPlane>(archive, registry);
+		ecs::deserialize<ColorMaterial, SkyBoxMaterial, GridMaterial, StandardOpaqueMaterial, EditorCamera,
+						 tags::IsEditorEntity, tags::IsSkyBoxMeshInstance, tags::IsEditorView, tags::IsGridPlane, tags::IsSkyBoxMeshResource>(archive,
+																										  registry);
 	}
 	catch (const std::exception& e)
 	{
@@ -23,11 +24,11 @@ tl::expected<ecs::Registry, ResourceError> parseRegistry(std::istream&& istream)
 	return registry;
 }
 
-void writeRegistry(const ecs::Registry& registry, std::ostream&& ostream)
+void writeRegistry(const ecs::Registry& registry, std::ostream& ostream)
 {
 	auto archive = JsonOutputArchive{ostream};
-	ecs::serialize<ColorMaterial, SkyBoxMaterial, GridMaterial, StandardOpaqueMaterial, EditorCamera, tags::IsEditorEntity,
-				   tags::IsSkyBoxMesh, tags::IsEditorView, tags::IsGridPlane>(archive, registry);
+	ecs::serialize<ColorMaterial, SkyBoxMaterial, GridMaterial, StandardOpaqueMaterial, EditorCamera,
+				   tags::IsEditorEntity, tags::IsSkyBoxMeshInstance, tags::IsEditorView, tags::IsGridPlane, tags::IsSkyBoxMeshResource>(archive, registry);
 }
 
 } // namespace spatial::editor

@@ -76,32 +76,48 @@ bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& reso
 	return changed;
 }
 
-bool cubemapInput(std::string_view label, math::float4& color, Resource<CubeMapTexture>& resource,
-				  const filament::Texture& icons)
+bool colorPicker(std::string_view label, math::float4& color, const filament::Texture& icons)
 {
-	ImGui::PushID(label.data());
-	ImGui::Columns(2);
+	static constexpr auto size = math::float2{20.0f};
 
 	bool changed = false;
 
-	constexpr auto size = math::float2{20.0f};
-
-	ui::image(icons, size, Icons::cubemap.uv());
-
-	ImGui::SameLine();
-	ui::spanToAvailWidth();
-	static const char* placeholder = "resource/path.ktx";
-
-	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
-
-	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
 	ImGui::SameLine();
 	changed |= ImGui::ColorEdit4(label.data(), &color.r,
 								 ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs
 									 | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
-	ImGui::Columns(1);
-	ImGui::PopID();
+
+	return changed;
+}
+
+bool colorPicker(std::string_view label, math::float3& color, const filament::Texture& icons)
+{
+	static constexpr auto size = math::float2{20.0f};
+
+	bool changed = false;
+
+	ui::image(icons, size, Icons::picker.uv());
+	ImGui::SameLine();
+	changed |= ImGui::ColorEdit3(label.data(), &color.r,
+								 ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs);
+
+	return changed;
+}
+
+bool cubemapInput(std::string_view label, Resource<CubeMapTexture>& resource,
+				  const filament::Texture& icons)
+{
+	static constexpr auto size = math::float2{20.0f};
+
+	bool changed = false;
+
+	ui::image(icons, size, Icons::cubemap.uv());
+
+	ImGui::SameLine();
+	static const char* placeholder = "resource/path.ktx";
+
+	changed |= ui::inputPath(label.data(), resource.relativePath, placeholder);
 
 	return changed;
 }
