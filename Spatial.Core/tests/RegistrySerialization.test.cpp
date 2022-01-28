@@ -4,6 +4,7 @@
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 #include <sstream>
+#include "spatial/serialization/Snapshot.h"
 
 using namespace spatial;
 
@@ -14,12 +15,10 @@ TEST(Registry, EmptySerialization)
 
 	{
 		auto archive = XMLOutputArchive{ss};
-		ecs::serialize(archive, registry);
+		auto snapshot = ecs::Snapshot{registry};
+		ASSERT_NO_THROW(snapshot.entities(archive));
+		ASSERT_NO_THROW(ecs::serializeCoreComponents(archive, snapshot));
 	}
-
-	auto output = ss.str();
-	ASSERT_NE(output.find("<cereal>"), std::string::npos);
-	ASSERT_NE(output.find("</cereal>"), std::string::npos);
 }
 
 TEST(Registry, SimpleSerialization)
@@ -33,15 +32,10 @@ TEST(Registry, SimpleSerialization)
 
 	{
 		auto archive = XMLOutputArchive{ss};
-		ecs::serialize(archive, registry);
+		auto snapshot = ecs::Snapshot{registry};
+		ASSERT_NO_THROW(snapshot.entities(archive));
+		ASSERT_NO_THROW(ecs::serializeCoreComponents(archive, snapshot));
 	}
-
-	auto output = ss.str();
-	ASSERT_NE(output.find("<cereal>"), std::string::npos);
-	ASSERT_NE(output.find("<position>"), std::string::npos);
-	ASSERT_NE(output.find("<scale>"), std::string::npos);
-	ASSERT_NE(output.find("<rotation>"), std::string::npos);
-	ASSERT_NE(output.find("<intensity>"), std::string::npos);
 }
 
 struct CustomComponent
@@ -67,14 +61,8 @@ TEST(Registry, CustomComponentSerialization)
 
 	{
 		auto archive = XMLOutputArchive{ss};
-		ecs::serialize<CustomComponent>(archive, registry);
+		auto snapshot = ecs::Snapshot{registry};
+		ASSERT_NO_THROW(snapshot.entities(archive));
+		ASSERT_NO_THROW(ecs::serializeCoreComponents(archive, snapshot));
 	}
-
-	auto output = ss.str();
-	ASSERT_NE(output.find("<cereal>"), std::string::npos);
-	ASSERT_NE(output.find("<position>"), std::string::npos);
-	ASSERT_NE(output.find("<scale>"), std::string::npos);
-	ASSERT_NE(output.find("<rotation>"), std::string::npos);
-	ASSERT_NE(output.find("<intensity>"), std::string::npos);
-	ASSERT_NE(output.find("<answer>"), std::string::npos);
 }
