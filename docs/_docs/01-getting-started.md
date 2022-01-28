@@ -157,7 +157,7 @@ Open the Preferences Panel:
 Go to `Build, Execution, Deployment` > `CMake`:
 - On `Build Directory` put `out/build/debug`
 - On `CMake Options` put `-DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=../../install`
-- On `Build Type` put `Debug`
+- On `Build ComponentType` put `Debug`
 - On `Toolchain` put `System`
 
 ![Build, Execution, Deployment, CMake]({{site.baseurl}}/assets/images/clion-config.png)

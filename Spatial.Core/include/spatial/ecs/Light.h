@@ -12,12 +12,15 @@ namespace tags
 
 struct IsLight
 {
+	constexpr static auto typeName = "tag_light";
 };
 
 } // namespace tags
 
 struct PointLight
 {
+	constexpr static auto typeName = "point_light";
+
 	float intensity{10000.0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	float falloff{1.0f};
@@ -25,6 +28,8 @@ struct PointLight
 
 struct SpotLight
 {
+	constexpr static auto typeName = "spot_light";
+
 	float intensity{10000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
@@ -36,6 +41,8 @@ struct SpotLight
 
 struct DirectionalLight
 {
+	constexpr static auto typeName = "directional_light";
+
 	float intensity{10000.0f};
 	math::float3 direction{.0f, -1.0f, .0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
@@ -44,6 +51,8 @@ struct DirectionalLight
 
 struct SunLight
 {
+	constexpr static auto typeName = "sun_light";
+
 	float intensity{10000.0f};
 	math::float3 color{1.0f, 1.0f, 1.0f};
 	float angularRadius{0.545f};
@@ -54,6 +63,8 @@ struct SunLight
 
 struct IndirectLight
 {
+	constexpr static auto typeName = "indirect_light";
+
 	Resource<ResourceType::ImageTexture> reflectionsTexturePath{};
 	Resource<ResourceType::ImageTexture> irradianceValuesPath{};
 	float intensity{30000.0f};

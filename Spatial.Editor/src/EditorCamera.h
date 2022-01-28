@@ -12,6 +12,8 @@ namespace spatial::editor
 
 struct EditorCamera
 {
+	constexpr static auto typeName = "editor_camera";
+
 	float sensitivity{1.0f};
 	float velocity{1.0f};
 };

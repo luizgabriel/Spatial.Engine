@@ -11,20 +11,25 @@ namespace tags
 
 struct IsMainView
 {
+	constexpr static auto typeName = "tag_is_main_view";
 };
 
 struct IsRenderable
 {
+	constexpr static auto typeName = "tag_is_renderable";
 };
 
 struct CanDestroy
 {
+	constexpr static auto typeName = "tag_can_destroy";
 };
 
 } // namespace tags
 
 struct SceneView
 {
+	constexpr static auto typeName = "scene_view";
+
 	math::int2 size{1280, 720};
 	Entity camera{ecs::NullEntity};
 	Entity indirectLight{ecs::NullEntity};

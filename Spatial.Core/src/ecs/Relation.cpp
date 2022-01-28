@@ -32,7 +32,8 @@ void Parent::addChild(Registry& registry, Entity parentEntity, Entity childEntit
 std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
 {
 	const auto& parent = registry.getComponent<const Parent>(parentEntity);
-	auto children = std::vector<Entity>(parent.childrenCount);
+	auto children = std::vector<Entity>{};
+	children.reserve(parent.childrenCount);
 
 	Parent::forEachChild(registry, parentEntity, [&](auto entity) { children.template emplace_back(entity); });
 
@@ -110,7 +111,7 @@ void Parent::destroyChildren(Registry& registry, Entity parentEntity)
 			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
 
 		if (currentEntity != parentEntity)
-			registry.destroy(currentEntity);
+			registry.destroyEntity(currentEntity);
 	}
 
 	registry.removeComponent<Parent>(parentEntity);

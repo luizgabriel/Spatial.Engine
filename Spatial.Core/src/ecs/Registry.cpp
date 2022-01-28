@@ -4,33 +4,48 @@
 namespace spatial::ecs
 {
 
-Registry::Registry() : mRegistry{}
+Registry::Registry() : entt::registry{}
 {
 }
 
 Entity Registry::createEntity()
 {
-	return mRegistry.create();
+	return create();
 }
 
 bool Registry::isValid(Entity entity) const noexcept
 {
-	return mRegistry.valid(entity);
+	return valid(entity);
 }
 
 size_t Registry::getEntitiesCount() const noexcept
 {
-	return mRegistry.size();
+	return size();
 }
 
-void Registry::destroy(Entity entity)
+void Registry::destroyEntity(Entity entity)
 {
-	mRegistry.destroy(entity);
+	destroy(entity);
 }
 
 Registry::VersionType Registry::getVersion(Entity entity) noexcept
 {
 	return entt::registry::version(entity);
+}
+
+const ecs::Entity* Registry::getEntities() const
+{
+	return data();
+}
+
+ecs::Entity Registry::getLastDestroyedEntity() const
+{
+	return destroyed();
+}
+
+void Registry::destroyOrphans()
+{
+	orphans([this](const auto e) { destroyEntity(e); });
 }
 
 } // namespace spatial::ecs

@@ -17,7 +17,9 @@ constexpr auto NullEntity = entt::null;
 
 using Entity = entt::entity;
 
-class Registry
+class SnapshotLoader;
+
+class Registry: private entt::registry
 {
   public:
 	using VersionType = entt::registry::version_type;
@@ -30,10 +32,14 @@ class Registry
 
 	size_t getEntitiesCount() const noexcept;
 
+	const ecs::Entity* getEntities() const;
+
+	ecs::Entity getLastDestroyedEntity() const;
+
 	template <typename Component>
 	size_t getEntitiesCount() const noexcept
 	{
-		return mRegistry.size<Component>();
+		return size<Component>();
 	}
 
 	template <typename... Components>
@@ -45,41 +51,39 @@ class Registry
 	template <typename Component>
 	auto getOnConstructSignal()
 	{
-		return mRegistry.on_construct<Component>();
+		return on_construct<Component>();
 	}
 
 	template <typename Component>
 	auto getOnUpdateSignal()
 	{
-		return mRegistry.on_update<Component>();
+		return on_update<Component>();
 	}
 
 	template <typename Component>
 	auto getOnDestroySignal()
 	{
-		return mRegistry.on_destroy<Component>();
+		return on_destroy<Component>();
 	}
 
 	template <typename... Component, typename... Exclude>
 	auto getEntities(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
-		return mRegistry.view<Component...>(std::move(excludes));
+		return view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
 	auto getEntities(ExcludeComponentsType<Exclude...> excludes = {})
 	{
-		return mRegistry.view<Component...>(std::move(excludes));
+		return view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
 	Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
-		auto view = mRegistry.view<const Component...>(std::move(excludes));
+		auto view = getEntities<std::add_const_t<Component>...>(std::move(excludes));
 		for (auto entity : view)
-		{
 			return entity;
-		}
 
 		return NullEntity;
 	}
@@ -88,124 +92,115 @@ class Registry
 	const Component& getComponent(Entity entity) const
 	{
 		assert(isValid(entity));
-		return mRegistry.get<Component>(entity);
+		return get<Component>(entity);
 	}
 
 	template <typename Component>
 	Component& getComponent(Entity entity)
 	{
 		assert(isValid(entity));
-		return mRegistry.get<Component>(entity);
+		return get<Component>(entity);
 	}
 
 	template <typename Component>
 	void removeComponent(Entity entity)
 	{
 		assert(isValid(entity));
-		mRegistry.remove<Component>(entity);
+		remove<Component>(entity);
 	}
 
 	template <typename Component, typename It>
 	void removeComponent(It begin, It end)
 	{
-		mRegistry.remove<Component>(begin, end);
+		remove<Component>(begin, end);
 	}
 
 	template <typename Component>
 	decltype(auto) addComponent(Entity entity, Component&& component)
 	{
 		assert(isValid(entity));
-		return mRegistry.emplace<Component>(entity, std::forward<Component>(component));
+		return emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) addComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
-		return mRegistry.emplace<Component>(entity, std::forward<Args>(args)...);
+		return emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) addOrReplaceComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
-		return mRegistry.template emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
+		return emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component>
 	decltype(auto) addOrReplaceComponent(Entity entity, Component&& component)
 	{
 		assert(isValid(entity));
-		return mRegistry.template emplace_or_replace<Component>(entity, std::forward<Component>(component));
+		return emplace_or_replace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) getOrAddComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
-		return mRegistry.get_or_emplace<Component>(entity, std::forward<Args>(args)...);
+		return get_or_emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component>
 	decltype(auto) getOrAddComponent(Entity entity, Component&& component)
 	{
 		assert(isValid(entity));
-		return mRegistry.get_or_emplace<Component>(entity, std::forward<Component>(component));
+		return get_or_emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename... Component>
 	bool hasAllComponents(Entity entity) const
 	{
-		return isValid(entity) && mRegistry.all_of<Component...>(entity);
+		return isValid(entity) && all_of<Component...>(entity);
 	}
 
 	template <typename... Component>
 	bool hasAnyComponent(Entity entity) const
 	{
-		return isValid(entity) && mRegistry.any_of<Component...>(entity);
+		return isValid(entity) && any_of<Component...>(entity);
 	}
 
 	static VersionType getVersion(Entity entity) noexcept;
 
-	void destroy(Entity entity);
+	void destroyEntity(Entity entity);
 
 	template <typename It>
-	void destroy(It first, It last)
+	void destroyEntities(It first, It last)
 	{
-		mRegistry.template destroy<It>(first, last);
-	}
-
-	operator const entt::registry&() const
-	{
-		return mRegistry;
-	}
-
-	operator entt::registry&()
-	{
-		return mRegistry;
+		destroy<It>(first, last);
 	}
 
 	template <typename... Component, typename... Exclude>
 	void clone(Registry& destination, ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
 		auto view = getEntities<Component...>(std::move(excludes));
-		destination.mRegistry.insert(view.data(), view.data() + view.size(), view.raw(), view.raw() + view.size());
+		destination.insert(view.data(), view.data() + view.size(), view.raw(), view.raw() + view.size());
 	}
 
 	template <typename Component>
 	const Component* tryGetComponent(Entity entity) const
 	{
-		return isValid(entity) ? mRegistry.template try_get<const Component>(entity) : nullptr;
+		return isValid(entity) ? try_get<const Component>(entity) : nullptr;
 	}
 
 	template <typename Component>
 	Component* tryGetComponent(Entity entity)
 	{
-		return isValid(entity) ? mRegistry.template try_get<Component>(entity) : nullptr;
+		return isValid(entity) ? try_get<Component>(entity) : nullptr;
 	}
 
-  private:
-	entt::registry mRegistry;
+	void destroyOrphans();
+
+	friend class SnapshotLoader;
 };
 
 } // namespace spatial::ecs

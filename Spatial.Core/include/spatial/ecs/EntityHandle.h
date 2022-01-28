@@ -26,7 +26,7 @@ class EntityHandle
 
 	void destroy()
 	{
-		mRegistry.destroy(mEntity);
+		mRegistry.destroyEntity(mEntity);
 	}
 
 	[[nodiscard]] bool isValid() const

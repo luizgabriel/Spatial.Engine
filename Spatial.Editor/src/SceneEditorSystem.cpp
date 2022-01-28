@@ -5,6 +5,8 @@
 #include "Serialization.h"
 #include "Tags.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <assets/generated.h>
 
 #include <spatial/render/Resources.h>
@@ -17,7 +19,6 @@
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
-#include <fstream>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/resources/MemoryFileSystem.h>
@@ -322,7 +323,13 @@ void SceneEditorSystem::saveScene()
 {
 	try
 	{
-		auto path = (mScenePath.root_directory() == "project" ? mScenePath : "project" / mScenePath);
+		auto path = mScenePath;
+		if (mScenePath.root_directory() != "project")
+			path = "project" / path;
+
+		if (!boost::ends_with(mScenePath.filename().c_str(), ".spatial.json"))
+			path = std::filesystem::path{path.string() + ".spatial.json"};
+
 		auto stream = mFileSystem.openWriteStream(path.c_str());
 		writeRegistry(mRegistry, *stream);
 	}

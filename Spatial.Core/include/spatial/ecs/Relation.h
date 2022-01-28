@@ -8,6 +8,8 @@ namespace spatial::ecs
 
 struct Child
 {
+	constexpr static auto typeName = "child";
+
 	Entity parent;
 	Entity previous;
 	Entity next;
@@ -21,6 +23,8 @@ struct Child
 
 struct Parent
 {
+	constexpr static auto typeName = "parent";
+
 	size_t childrenCount;
 	Entity first;
 	Entity last;

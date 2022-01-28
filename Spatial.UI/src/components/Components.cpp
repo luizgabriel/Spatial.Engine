@@ -262,7 +262,7 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 				if (registry.isValid(childToDestroy))
 				{
 					ecs::Child::remove(registry, childToDestroy);
-					registry.destroy(childToDestroy);
+					registry.destroyEntity(childToDestroy);
 					mesh.slice.count = std::max(0ul, mesh.slice.count - 1);
 					changed = true;
 				}

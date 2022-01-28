@@ -7,6 +7,8 @@ namespace spatial::ecs
 
 struct Transform
 {
+	static constexpr auto typeName = "transform";
+
 	math::float3 position;
 	math::float3 scale;
 	math::float3 rotation;

@@ -776,7 +776,7 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 		if (registry.hasAnyComponent<ecs::Parent>(selectedEntity))
 			ecs::Parent::destroyChildren(registry, selectedEntity); // TODO: Should dispatch a job
 
-		registry.destroy(selectedEntity); // TODO: Should dispatch a job
+		registry.destroyEntity(selectedEntity); // TODO: Should dispatch a job
 		selectedEntity = ecs::NullEntity;
 		changed = true;
 	}

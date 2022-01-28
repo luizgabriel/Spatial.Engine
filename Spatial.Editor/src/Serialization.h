@@ -70,6 +70,8 @@ void serialize(Archive& ar, spatial::editor::StandardOpaqueMaterial& material)
 	ar(make_nvp("bentNormalMap", material.bentNormalMap));
 	ar(make_nvp("emissive", material.emissive));
 	ar(make_nvp("emissiveMap", material.emissiveMap));
+	ar(make_nvp("height", material.height));
+	ar(make_nvp("heightMap", material.heightMap));
 }
 
 } // namespace cereal

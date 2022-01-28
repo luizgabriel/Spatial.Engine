@@ -11,10 +11,12 @@ namespace tags
 
 struct IsMesh
 {
+	constexpr static auto typeName = "tag_is_mesh";
 };
 
 struct IsMeshDirty
 {
+	constexpr static auto typeName = "tag_is_mesh_dirty";
 };
 
 struct IsMeshLoaded
@@ -25,6 +27,8 @@ struct IsMeshLoaded
 
 struct MeshMaterial
 {
+	constexpr static auto typeName = "mesh_material";
+
 	size_t primitiveIndex;
 	Entity materialEntity;
 
@@ -36,6 +40,8 @@ struct MeshMaterial
 
 struct Mesh
 {
+	constexpr static auto typeName = "mesh";
+
 	Resource<FilaMesh> resource;
 
 	explicit Mesh() = default;
@@ -48,9 +54,10 @@ struct Mesh
 	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
 };
 
-
 struct MeshInstance
 {
+	constexpr static auto typeName = "mesh_instance";
+
 	struct Slice
 	{
 		size_t offset;

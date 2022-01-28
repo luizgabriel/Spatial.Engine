@@ -118,7 +118,7 @@ add_library(Spatial.Core
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp include/spatial/resources/FilesSystem.h src/resources/FileSystem.cpp include/spatial/resources/PhysicalFileSystem.h src/resources/PhysicalFileSystem.cpp src/resources/MemoryFileSystem.cpp)
+        src/resources/ResourceLoader.cpp include/spatial/resources/FilesSystem.h src/resources/FileSystem.cpp include/spatial/resources/PhysicalFileSystem.h src/resources/PhysicalFileSystem.cpp src/resources/MemoryFileSystem.cpp include/spatial/serialization/Snapshot.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

@@ -10,12 +10,15 @@ namespace tags
 
 struct IsCamera
 {
+	constexpr static auto typeName = "tag_is_camera";
 };
 
 } // namespace tags
 
 struct CustomCamera
 {
+	constexpr static auto typeName = "custom_camera";
+
 	math::mat4 projectionMatrix{};
 	double near{0.1};
 	double far{10000.0};
@@ -29,6 +32,8 @@ struct CustomCamera
 
 struct OrthographicCamera
 {
+	constexpr static auto typeName = "orthographic_camera";
+
 	double left{-1.0};
 	double right{1.0};
 	double bottom{-1.0};
@@ -58,6 +63,8 @@ struct OrthographicCamera
 
 struct PerspectiveCamera
 {
+	constexpr static auto typeName = "perspective_camera";
+
 	double fieldOfView{60.0};
 	double aspectRatio{19.0 / 6.0};
 

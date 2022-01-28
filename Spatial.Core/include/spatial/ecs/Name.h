@@ -11,6 +11,8 @@ namespace spatial::ecs
 
 struct Name
 {
+	constexpr static auto typeName = "name";
+
 	std::string name;
 
 	[[nodiscard]] const char* c_str() const
@@ -21,6 +23,8 @@ struct Name
 
 struct UUID
 {
+	constexpr static auto typeName = "uuid";
+
 	boost::uuids::uuid value;
 
 	UUID() : value{}
