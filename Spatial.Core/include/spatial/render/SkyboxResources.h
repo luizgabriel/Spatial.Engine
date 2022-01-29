@@ -3,7 +3,6 @@
 #include <spatial/render/Resources.h>
 
 #include <math/vec3.h>
-#include <span>
 #include <string_view>
 
 namespace spatial::render

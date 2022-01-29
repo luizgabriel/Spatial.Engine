@@ -1,5 +1,6 @@
 #include <fmt/format.h>
 #include <spatial/resources/FilesSystem.h>
+#include <assert.h>
 
 namespace spatial
 {
