@@ -37,7 +37,7 @@ bands_t parseShFile(const uint8_t* data, uint32_t size)
 {
 	auto bands = bands_t{};
 	auto stream = std::stringstream{};
-	std::copy(data, data + size, std::ostream_iterator<char>(stream));
+	std::copy(data, data + size, std::ostreambuf_iterator<char>(stream));
 	stream >> bands;
 	return bands;
 }

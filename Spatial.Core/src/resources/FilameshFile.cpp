@@ -1,6 +1,7 @@
 #include <spatial/resources/FilameshFile.h>
 #include <spatial/resources/Math.h>
 #include <sstream>
+#include <string.h>
 
 using namespace std;
 
