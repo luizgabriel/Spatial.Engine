@@ -526,21 +526,11 @@
                     "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_normal.jpg"
                 }
             },
-            "bentNormalMap": {
-                "relativePath": {
-                    "value0": ""
-                }
-            },
             "emissive": {
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0,
                 "w": 0.0
-            },
-            "emissiveMap": {
-                "relativePath": {
-                    "value0": ""
-                }
             },
             "height": 1.0,
             "heightMap": {

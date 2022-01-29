@@ -500,21 +500,11 @@
                     "value0": ""
                 }
             },
-            "bentNormalMap": {
-                "relativePath": {
-                    "value0": ""
-                }
-            },
             "emissive": {
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0,
                 "w": 0.0
-            },
-            "emissiveMap": {
-                "relativePath": {
-                    "value0": ""
-                }
             },
             "height": 1.0,
             "heightMap": {
@@ -571,21 +561,11 @@
                     "value0": ""
                 }
             },
-            "bentNormalMap": {
-                "relativePath": {
-                    "value0": ""
-                }
-            },
             "emissive": {
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0,
                 "w": 0.0
-            },
-            "emissiveMap": {
-                "relativePath": {
-                    "value0": ""
-                }
             },
             "height": 1.0,
             "heightMap": {

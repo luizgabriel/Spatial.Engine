@@ -73,7 +73,7 @@ Install all these tools:
 This is the recommend conan profile to compile on Windows (`~/.conan/profiles/default`):
 > If there's no `profiles/default` file, run: `conan profile new default --detect`
 
-```
+```toml
 [settings]
 os=Windows
 os_build=Windows
@@ -92,10 +92,28 @@ After, install [CMake](https://cmake.org/install/).
 
 ```sh
 # Install some build dependencies
-sudo apt-get install ninja-build build-essentials mesa-common-dev libxi-dev libxxf86vm-dev 
+sudo apt-get install ninja-build build-essential mesa-common-dev libxi-dev libxxf86vm-dev 
+
+# Install LLVM Clang (Because it's required to build the filament library)
+sudo apt-get install clang libc++-dev libc++abi-dev
 
 # Install conan
 pip install conan 
+
+# Forces Conan to use the Ninja generator (Because it's required to build the filament library)
+conan config set general.cmake_generator=Ninja
+```
+
+Configure your conan profile:
+```toml
+[settings]
+compiler=clang
+compiler.version=10
+compiler.libcxx=libc++
+
+[env]
+CC=/usr/bin/clang
+CXX=/usr/bin/clang++
 ```
 
 ## Building the Engine
@@ -113,17 +131,25 @@ python setup.py
 
 ### From the Command Line
 
+> Supported Compilers:
+> - LLVM Clang on Linux
+> - Apple Clang on MacOS
+> - Visual Studio 2019 on Windows
+
 If you're wishing to build from the command line, you'll just need to run these commands:
 
 ```sh
-# Creates a build directory
-mkdir -p out/build && cd out/build
+# Create a build directory
+mkdir -p out/build/debug/ && cd out/build/debug
 
-# Runs the Cmake Configure Step
-cmake ../.. -G "CodeBlocks - Unix Makefiles" \
-    -DCMAKE_INSTALL_PREFIX=../install \
+# Run the Cmake Configure Step
+# Linux:    -G "Ninja"
+cmake ../../.. -G "CodeBlocks - Unix Makefiles" \
+    -DCMAKE_INSTALL_PREFIX=../../install \
+    -DSPATIAL_BUILD_TESTS=OFF \
     -DCMAKE_BUILD_TYPE=Debug
 
+# Run the Cmake Build Step
 cmake --build . --target all
 ```
 

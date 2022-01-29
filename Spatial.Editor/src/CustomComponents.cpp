@@ -107,11 +107,11 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 
 	ui::separator(1);
 
-	ui::mapInput("Bent Normals", data.bentNormalMap, finder(data.bentNormalMap), icons, Icons::normalMap.uv());
+	ui::mapInput("Height Map", data.height, data.heightMap, finder(data.heightMap), icons);
 
 	ui::separator(1);
 
-	ui::mapInput("Height Map", data.height, data.heightMap, finder(data.heightMap), icons);
+	ui::colorPicker("Emissive", data.emissive, icons);
 }
 
 bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,

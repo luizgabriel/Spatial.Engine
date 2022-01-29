@@ -52,12 +52,8 @@ void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const r
 	const auto* normalMapTexture = finder(normalMap);
 	instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummyWhite, sampler);
 
-	const auto* bentNormalMapTexture = finder(bentNormalMap);
-	instance.setParameter("bentNormalMap", bentNormalMapTexture != nullptr ? bentNormalMapTexture : dummyBlack, sampler);
-
-	instance.setParameter("emissive", emissive);
-	const auto* emissiveMapTexture = finder(emissiveMap);
-	instance.setParameter("emissiveMap", emissiveMapTexture != nullptr ? emissiveMapTexture : dummyBlack, sampler);
+	auto fixedEmissive = math::float4{emissive.xyz, 1.0f-emissive.w};
+	instance.setParameter("emissive", fixedEmissive);
 
 	instance.setParameter("height", height);
 	const auto* heightMapTexture = finder(heightMap);

@@ -91,7 +91,7 @@ void Renderable::setBones(const math::mat4f* transforms, size_t boneCount, size_
 
 void Renderable::setMorphWeights(const math::float4& weights) noexcept
 {
-	getManager().setMorphWeights(getInstance(), weights);
+	getManager().setMorphWeights(getInstance(), &weights.x, sizeof(math::float4));
 }
 
 const filament::Box& Renderable::getAxisAlignedBoundingBox() const noexcept

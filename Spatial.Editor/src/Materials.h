@@ -81,10 +81,7 @@ struct StandardOpaqueMaterial
 
 	Resource<ImageTexture> normalMap{};
 
-	Resource<ImageTexture> bentNormalMap{};
-
 	math::float4 emissive{.0f};
-	Resource<ImageTexture> emissiveMap;
 
 	float height{1.0f};
 	Resource<ImageTexture> heightMap{};

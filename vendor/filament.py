@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.15.2"
+    version = "1.17.0"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"
@@ -18,6 +18,8 @@ class FilamentConan(ConanFile):
         "skip_samples": [True, False],
         "enable_lto": [True, False],
         "build_filamat": [True, False],
+        "use_swiftshader": [True, False],
+        "supports_opengl": [True, False],
         "supports_metal": [True, False],
         "supports_vulkan": [True, False],
         "generate_js_docs": [True, False],
@@ -27,6 +29,8 @@ class FilamentConan(ConanFile):
         "skip_samples": True,
         "enable_lto": False,
         "build_filamat": True,
+        "use_swiftshader": False,
+        "supports_opengl": True,
         "supports_metal": False,
         "supports_vulkan": False,
         "generate_js_docs": False,
@@ -49,6 +53,8 @@ conan_basic_setup()
         cmake.definitions["FILAMENT_SKIP_SAMPLES"] = self.options.get_safe("skip_samples", False)
         cmake.definitions["FILAMENT_ENABLE_LTO"] = self.options.get_safe("enable_lto", False)
         cmake.definitions["FILAMENT_BUILD_FILAMAT"] = self.options.get_safe("build_filamat", False)
+        cmake.definitions["FILAMENT_USE_SWIFTSHADER"] = self.options.get_safe("use_swiftshader", False)
+        cmake.definitions["FILAMENT_SUPPORTS_OPENGL"] = self.options.get_safe("supports_opengl", False)
         cmake.definitions["FILAMENT_SUPPORTS_METAL"] = self.options.get_safe("supports_metal", False)
         cmake.definitions["FILAMENT_SUPPORTS_VULKAN"] = self.options.get_safe("supports_vulkan", False)
         cmake.definitions["FILAMENT_GENERATE_JS_DOCS"] = self.options.get_safe("generate_js_docs", False)
