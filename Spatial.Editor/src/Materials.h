@@ -71,7 +71,7 @@ struct StandardOpaqueMaterial
 	float metallic{.0f};
 	Resource<ImageTexture> metallicMap{};
 
-	float roughness{0.5f};
+	float roughness{1.0f};
 	Resource<ImageTexture> roughnessMap{};
 
 	float reflectance{.0f};
