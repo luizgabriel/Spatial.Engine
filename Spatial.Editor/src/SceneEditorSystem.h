@@ -40,6 +40,7 @@ class SceneEditorSystem
 	render::Texture mIconTexture;
 
 	RootFileSystem mFileSystem;
+	std::shared_ptr<PhysicalFileSystem> mProjectFileSystem;
 
 	ecs::Registry mRegistry;
 

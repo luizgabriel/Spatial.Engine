@@ -48,6 +48,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
 	  mFileSystem{},
+	  mProjectFileSystem{mFileSystem.mount<PhysicalFileSystem>("project")},
 
 	  mRegistry{},
 
@@ -344,8 +345,9 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
 
-	mFileSystem.mount<PhysicalFileSystem>("project", path);
+
 	mCurrentPath = "project";
+	mProjectFileSystem->setRootPath(path);
 }
 
 void SceneEditorSystem::onEvent(const ClearSceneEvent&)

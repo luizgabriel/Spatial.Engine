@@ -9,7 +9,10 @@ namespace spatial
 class PhysicalFileSystem : public FileSystem
 {
   public:
+	PhysicalFileSystem() = default;
 	explicit PhysicalFileSystem(std::filesystem::path rootPath);
+
+	void setRootPath(const std::filesystem::path& rootPath);
 
   protected:
 	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) override;
