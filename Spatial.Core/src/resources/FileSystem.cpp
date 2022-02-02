@@ -1,6 +1,6 @@
 #include <fmt/format.h>
 #include <spatial/resources/FilesSystem.h>
-#include <assert.h>
+#include <cassert>
 
 namespace spatial
 {
@@ -16,16 +16,15 @@ void FileSystem::mount(std::string_view key, const SharedFileSystem& child)
 FileSystem::ResolveResult FileSystem::resolve(std::string_view path) noexcept
 {
 	auto result = FileSystem::ResolveResult{std::string{path}, *this};
+	if (path.empty())
+		return result;
 
 	auto separatorPos = path.find(SEPARATOR);
 	if (separatorPos == std::string_view::npos)
 	{
-		if (!path.empty())
-		{
-			auto it = mNodes.find(result.path);
-			if (it != mNodes.end())
-				return ResolveResult{"", *it->second};
-		}
+		auto it = mNodes.find(result.path);
+		if (it != mNodes.end())
+			return ResolveResult{"", *it->second};
 
 		return result;
 	}

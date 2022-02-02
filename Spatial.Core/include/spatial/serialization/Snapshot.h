@@ -27,17 +27,16 @@ void save(Archive& ar, const ConstComponentRegistry<Component>& registry)
 {
 	auto view = registry.reg.template getEntities<const Component>();
 
-	if constexpr (std::is_empty_v<Component>) {
+	if constexpr (std::is_empty_v<Component>)
+	{
 		ar(cereal::make_size_tag(static_cast<cereal::size_type>(view.size())));
 		view.each([&](spatial::ecs::Entity entity) { ar(entity); });
 	}
-	else {
+	else
+	{
 		ar(cereal::make_size_tag(static_cast<cereal::size_type>(view.size() * 2)));
-		view.each([&](spatial::ecs::Entity entity, const Component& component) {
-			ar(entity, component);
-		});
+		view.each([&](spatial::ecs::Entity entity, const Component& component) { ar(entity, component); });
 	}
-
 }
 
 template <typename Archive, typename Component>

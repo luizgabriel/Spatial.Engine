@@ -38,4 +38,9 @@ std::set<FileSystem::Entry> PhysicalFileSystem::listImpl(std::string_view path) 
 	return result;
 }
 
+void PhysicalFileSystem::setRootPath(const std::filesystem::path& rootPath)
+{
+	mRootPath = rootPath;
+}
+
 } // namespace spatial
