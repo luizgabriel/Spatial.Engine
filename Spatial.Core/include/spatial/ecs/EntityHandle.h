@@ -35,13 +35,13 @@ class EntityHandle
 	}
 
 	template <typename Component, typename... Args>
-	auto add(Args&&... args)
+	decltype(auto) add(Args&&... args)
 	{
 		return mRegistry.addComponent<Component>(mEntity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component>
-	auto add(Component&& component)
+	decltype(auto) add(Component&& component)
 	{
 		return mRegistry.addComponent<Component>(mEntity, std::forward<Component>(component));
 	}
@@ -194,14 +194,26 @@ class EntityConstHandle
 	Entity mEntity;
 };
 
-constexpr auto handleOf(Registry& stage, Entity instance)
+template <typename... Components>
+constexpr auto handleOf(const Registry& registry)
 {
-	return EntityHandle{stage, instance};
+	return EntityConstHandle{registry, registry.template getFirstEntity<Components...>()};
 }
 
-constexpr auto handleOf(const Registry& stage, Entity instance)
+template <typename... Components>
+constexpr auto handleOf(Registry& registry)
 {
-	return EntityConstHandle{stage, instance};
+	return EntityHandle{registry, registry.template getFirstEntity<Components...>()};
+}
+
+constexpr auto handleOf(Registry& registry, Entity instance)
+{
+	return EntityHandle{registry, instance};
+}
+
+constexpr auto handleOf(const Registry& registry, Entity instance)
+{
+	return EntityConstHandle{registry, instance};
 }
 
 } // namespace spatial::ecs

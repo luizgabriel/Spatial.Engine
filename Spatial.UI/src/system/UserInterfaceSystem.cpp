@@ -3,7 +3,7 @@
 namespace spatial
 {
 
-UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{engine}, mInput{}
+UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine, FileSystem& fileSystem)  : mFileSystem{fileSystem}, mRenderer{engine}, mInput{}
 {
 }
 
@@ -43,6 +43,18 @@ void UserInterfaceSystem::onUpdateFrame(float delta)
 void UserInterfaceSystem::onRender(filament::Renderer& renderer) const
 {
 	renderer.render(&mRenderer.getView());
+}
+
+void UserInterfaceSystem::setMaterial(std::string_view materialResourcePath)
+{
+	auto materialData = mFileSystem.readBinary(materialResourcePath);
+	mRenderer.setMaterial(materialData.data(), materialData.size());
+}
+
+void UserInterfaceSystem::addFont(std::string_view fontPath)
+{
+	auto fontData = mFileSystem.readBinary(fontPath);
+	mRenderer.addFont(fontData.data(), fontData.size());
 }
 
 } // namespace spatial
