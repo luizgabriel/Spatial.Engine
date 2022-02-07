@@ -9,7 +9,7 @@ void FileSystem::mount(std::string_view key, const SharedFileSystem& child)
 {
 	auto result = resolve(key);
 
-	assert(result.path.find(SEPARATOR) == std::string_view::npos);
+	assert(result.path.find(SEPARATOR) == std::string_view::npos && !result.path.empty());
 	result.fileSystem.mNodes.emplace(result.path, child);
 }
 

@@ -39,7 +39,7 @@ class SceneEditorSystem
 	render::Material mGridMaterial;
 	render::Texture mIconTexture;
 
-	RootFileSystem mFileSystem;
+	FileSystem& mFileSystem;
 	std::shared_ptr<PhysicalFileSystem> mProjectFileSystem;
 
 	ecs::Registry mRegistry;
@@ -56,12 +56,11 @@ class SceneEditorSystem
 
 	EventQueue mJobQueue;
 
-
 	std::filesystem::path mScenePath;
 	std::filesystem::path mCurrentPath;
 
   public:
-	SceneEditorSystem(filament::Engine& engine, desktop::Window& window);
+	SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem);
 
 	void onStart();
 

@@ -5,6 +5,7 @@
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/ui/system/ImGuiRenderer.h>
 #include <spatial/ui/system/UserInterfaceInput.h>
+#include <spatial/resources/FilesSystem.h>
 
 #include <string_view>
 
@@ -13,12 +14,13 @@ namespace spatial
 class UserInterfaceSystem
 {
   private:
+	FileSystem& mFileSystem;
 	ImGuiRenderer mRenderer;
 	UserInterfaceInput mInput;
 	Signal<> mRenderGuiSignal;
 
   public:
-	explicit UserInterfaceSystem(filament::Engine& engine);
+	explicit UserInterfaceSystem(filament::Engine& engine, FileSystem& fileSystem);
 
 	void onStart();
 
@@ -45,10 +47,12 @@ class UserInterfaceSystem
 	}
 
 	template <typename WindowImpl>
-	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
+	UserInterfaceSystem(filament::Engine& engine, FileSystem& fileSystem, const WindowImpl& window) : UserInterfaceSystem(engine, fileSystem)
 	{
 		getRenderer().setViewport(window.getSize(), window.getFrameBufferSize());
 	}
+	void setMaterial(std::string_view materialResourcePath);
+	void addFont(std::string_view fontPath);
 };
 
 } // namespace spatial

@@ -36,7 +36,7 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window)
+SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem)
 	: mEngine{engine},
 	  mWindow{window},
 
@@ -47,7 +47,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mGridMaterial{render::createMaterial(mEngine, ASSETS_GRID_FILAMAT, ASSETS_GRID_FILAMAT_SIZE)},
 	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
-	  mFileSystem{},
+	  mFileSystem{fileSystem},
 	  mProjectFileSystem{mFileSystem.mount<PhysicalFileSystem>("project")},
 
 	  mRegistry{},
@@ -71,12 +71,6 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	mJobQueue.connect<ClearSceneEvent>(*this);
 	mJobQueue.connect<LoadSceneEvent>(*this);
 	mJobQueue.connect<SaveSceneEvent>(*this);
-
-	auto editorFs = mFileSystem.mount<MemoryFileSystem>("editor");
-	editorFs->define("meshes/cube.filamesh", {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE});
-	editorFs->define("meshes/sphere.filamesh", {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE});
-	editorFs->define("meshes/plane.filamesh", {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE});
-	editorFs->define("meshes/cylinder.filamesh", {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE});
 }
 
 void SceneEditorSystem::onStart()
@@ -97,7 +91,11 @@ void SceneEditorSystem::onStart()
 
 void createDefaultEditorEntities(ecs::Registry& registry)
 {
-	if (!registry.isValid(registry.getFirstEntity<SkyBoxMaterial>()))
+	if (!ecs::handleOf<tags::IsSkyBoxMeshResource>(registry))
+		ecs::build(registry).with<tags::IsEditorEntity>().with<tags::IsSkyBoxMeshResource>().asMesh().withResource(
+			"engine/skybox");
+
+	if (!ecs::handleOf<SkyBoxMaterial>(registry))
 		ecs::build(registry)
 			.withName("Default SkyBox")
 			.asMaterial<SkyBoxMaterial>({
@@ -106,10 +104,10 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 				{"editor/textures/default_skybox/texture.ktx"},
 			});
 
-	if (!registry.isValid(registry.getFirstEntity<GridMaterial>()))
+	if (!ecs::handleOf<GridMaterial>(registry))
 		ecs::build(registry).withName("Grid Material").with<tags::IsEditorEntity>().asMaterial<GridMaterial>();
 
-	if (!registry.isValid(registry.getFirstEntity<tags::IsGridPlane>()))
+	if (!ecs::handleOf<tags::IsGridPlane>(registry))
 		ecs::build(registry)
 			.withName("Grid Plane")
 			.with<tags::IsEditorEntity>()
@@ -121,7 +119,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/plane.filamesh"))
 			.withMaterialAt(0, registry.getFirstEntity<GridMaterial>());
 
-	if (!registry.isValid(registry.getFirstEntity<tags::IsSkyBoxMeshInstance>()))
+	if (!ecs::handleOf<tags::IsSkyBoxMeshInstance>(registry))
 		ecs::build(registry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBoxMeshInstance>()
@@ -132,7 +130,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withCulling(false)
 			.withPriority(0x7);
 
-	if (!registry.isValid(registry.getFirstEntity<tags::IsEditorView>()))
+	if (!ecs::handleOf<tags::IsEditorView>(registry))
 		ecs::build(registry)
 			.withName("Editor View")
 			.with<tags::IsEditorEntity>()
@@ -159,20 +157,17 @@ void SceneEditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
 
-	if (!mRegistry.isValid(mRegistry.getFirstEntity<tags::IsSkyBoxMeshResource>()))
-		ecs::build(mRegistry).with<tags::IsSkyBoxMeshResource>().asMesh().withResource("engine/skybox");
+	createDefaultEditorEntities(mRegistry);
 
-	auto skyboxMesh = mRegistry.getFirstEntity<tags::IsSkyBoxMeshResource>();
-	if (!mRegistry.hasAnyComponent<ecs::tags::IsMeshLoaded>(skyboxMesh))
+	auto skyboxMeshResource = ecs::handleOf<tags::IsSkyBoxMeshResource>(mRegistry);
+	if (!skyboxMeshResource.has<ecs::tags::IsMeshLoaded>())
 	{
 		auto ib = render::createFullScreenIndexBuffer(mEngine);
-		mRegistry.addComponent<ecs::tags::IsMeshLoaded>(skyboxMesh);
-		mRegistry.addComponent(skyboxMesh, render::createFullScreenVertexBuffer(mEngine));
-		mRegistry.addComponent(skyboxMesh, render::MeshGeometries{{0, ib->getIndexCount()}});
-		mRegistry.addComponent(skyboxMesh, std::move(ib));
+		skyboxMeshResource.add<ecs::tags::IsMeshLoaded>();
+		skyboxMeshResource.add(render::createFullScreenVertexBuffer(mEngine));
+		skyboxMeshResource.add(render::MeshGeometries{{0, ib->getIndexCount()}});
+		skyboxMeshResource.add(std::move(ib));
 	}
-
-	createDefaultEditorEntities(mRegistry);
 
 	mMaterialController.onStartFrame();
 	mMeshController.onStartFrame(mRegistry);
@@ -295,6 +290,9 @@ void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 	mEditorCameraController.onUpdateInput(input);
 	if (input.released(Key::Escape))
 		mEditorCameraController.disable();
+
+	if (input.combined(Key::LControl, Key::S))
+		mJobQueue.enqueue<SaveSceneEvent>();
 }
 
 void SceneEditorSystem::setScenePath(const std::filesystem::path& path)
@@ -344,7 +342,6 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 {
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
-
 
 	mCurrentPath = "project";
 	mProjectFileSystem->setRootPath(path);
