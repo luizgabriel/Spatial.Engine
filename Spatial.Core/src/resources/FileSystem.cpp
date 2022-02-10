@@ -48,17 +48,13 @@ std::unique_ptr<std::istream> FileSystem::openReadStream(std::string_view path)
 std::string FileSystem::readString(std::string_view path)
 {
 	auto stream = openReadStream(path);
-	auto value = std::string{};
-	std::copy(std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>(), std::back_inserter(value));
-	return value;
+	return std::string{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
 }
 
 std::vector<uint8_t> FileSystem::readBinary(std::string_view path)
 {
 	auto stream = openReadStream(path);
-	auto value = std::vector<uint8_t>{};
-	std::copy(std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>(), std::back_inserter(value));
-	return value;
+	return std::vector<uint8_t>{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
 }
 
 std::unique_ptr<std::ostream> FileSystem::openWriteStream(std::string_view path)
