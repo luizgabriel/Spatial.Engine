@@ -13,4 +13,4 @@ enum class ResourceError
 	InvalidExtension
 };
 
-}
+} // namespace spatial

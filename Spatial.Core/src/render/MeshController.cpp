@@ -1,10 +1,10 @@
 #include <boost/algorithm/string/predicate.hpp>
+#include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/core/Logger.h>
 
 namespace spatial::render
 {
@@ -27,7 +27,6 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 {
 	registry.getEntities<const Entity, const ecs::MeshInstance>(ecs::ExcludeComponents<Renderable>)
 		.each([&](ecs::Entity e, const auto& entity, const auto& meshInstance) {
-
 			auto meshPartsCount = 0;
 			if (registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
 				meshPartsCount = registry.getComponent<const MeshGeometries>(meshInstance.meshSource).size();
@@ -65,8 +64,8 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 			{
 				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
-				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(),
-										 indexBuffer.get(), geometry.offset, geometry.count);
+				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
+										 geometry.offset, geometry.count);
 			}
 		});
 
@@ -82,7 +81,8 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			if (material != nullptr)
 				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
 			else
-				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, mEngine.getDefaultMaterial()->getDefaultInstance());
+				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex,
+												 mEngine.getDefaultMaterial()->getDefaultInstance());
 		});
 }
 
@@ -101,11 +101,12 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 
 	registry.getEntities<const ecs::Mesh>(ecs::ExcludeComponents<ecs::tags::IsMeshLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Mesh& mesh) {
-			if (mesh.resource.isEmpty() || !ends_with(mesh.resource.relativePath.filename().c_str(), ".filamesh"))
+			if (mesh.resource.isEmpty() || !ends_with(mesh.resource.filename(), ".filamesh"))
 				return;
 
 			auto stream = mFileSystem.openReadStream(mesh.resource.relativePath.c_str());
-			if (stream->bad()) {
+			if (stream->bad())
+			{
 				gLogger.warn("Could not load mesh: {}", mesh.resource.relativePath.c_str());
 				return;
 			}

@@ -29,6 +29,11 @@ struct Resource
 	{
 	}
 
+	std::string filename() const
+	{
+		return relativePath.filename().string();
+	}
+
 	[[nodiscard]] uint32_t getId() const
 	{
 		return HashedString{relativePath.c_str()}.value();

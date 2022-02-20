@@ -19,7 +19,7 @@ using Entity = entt::entity;
 
 class SnapshotLoader;
 
-class Registry: private entt::registry
+class Registry : private entt::registry
 {
   public:
 	using VersionType = entt::registry::version_type;
