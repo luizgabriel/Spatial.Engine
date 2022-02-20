@@ -12,4 +12,4 @@ void serialize(Archive& ar, spatial::Resource<type>& parent)
 	ar(make_nvp("relativePath", parent.relativePath));
 }
 
-}
+} // namespace cereal

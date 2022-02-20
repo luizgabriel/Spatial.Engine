@@ -20,7 +20,9 @@
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
+#include <spatial/script/ScriptController.h>
 #include <spatial/resources/PhysicalFileSystem.h>
+#include <spatial/script/PlatformContext.h>
 
 namespace fl = filament;
 
@@ -54,13 +56,15 @@ class SceneEditorSystem
 	render::MeshController mMeshController;
 	render::IndirectLightController mIndirectLightController;
 
+	script::ScriptController mScriptController;
+
 	EventQueue mJobQueue;
 
 	std::filesystem::path mScenePath;
 	std::filesystem::path mCurrentPath;
 
   public:
-	SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem);
+	SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem, script::PlatformContext& scriptContext);
 
 	void onStart();
 

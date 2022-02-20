@@ -5,12 +5,12 @@
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
+#include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Transform.h>
-#include <spatial/ecs/Material.h>
 
 namespace spatial::ecs
 {

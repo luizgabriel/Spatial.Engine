@@ -12,7 +12,8 @@ using ::testing::AtLeast;
 std::thread startApplicationRuntime(spatial::Application& app)
 {
 	auto runtime = std::thread([&]() { app.run(); });
-	while (!app.isRunning());
+	while (!app.isRunning())
+		;
 	return runtime;
 }
 

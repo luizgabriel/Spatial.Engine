@@ -1,10 +1,10 @@
+#include "spatial/serialization/Snapshot.h"
 #include <gtest/gtest.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
 #include <sstream>
-#include "spatial/serialization/Snapshot.h"
 
 using namespace spatial;
 

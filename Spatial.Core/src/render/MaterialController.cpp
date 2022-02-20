@@ -1,7 +1,7 @@
 #include <boost/algorithm/string/predicate.hpp>
+#include <spatial/core/Logger.h>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
-#include <spatial/core/Logger.h>
 
 namespace spatial::render
 {
@@ -34,7 +34,8 @@ void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
 		return;
 
 	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
-	if (data.empty()) {
+	if (data.empty())
+	{
 		gLogger.warn("Image Texture not found: {}", event.texture.relativePath.c_str());
 		return;
 	}

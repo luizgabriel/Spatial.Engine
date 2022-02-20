@@ -10,7 +10,8 @@ namespace spatial::render
 
 static auto gLogger = createDefaultLogger();
 
-IndirectLightController::IndirectLightController(filament::Engine& engine, FileSystem& fileSystem) : mEngine{engine}, mFileSystem{fileSystem}
+IndirectLightController::IndirectLightController(filament::Engine& engine, FileSystem& fileSystem)
+	: mEngine{engine}, mFileSystem{fileSystem}
 {
 }
 
@@ -32,8 +33,10 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		if (mTextures.find(reflectionsTextureId) == mTextures.end())
 		{
 			auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.c_str());
-			if (data.empty()) {
-				gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.c_str());
+			if (data.empty())
+			{
+				gLogger.warn("Could not load indirect light: {}",
+							 component.reflectionsTexturePath.relativePath.c_str());
 				return;
 			}
 
@@ -47,8 +50,10 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		if (mBands.find(irradianceValuesId) == mBands.end())
 		{
 			auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.c_str());
-			if (stream->fail()) {
-				gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.c_str());
+			if (stream->fail())
+			{
+				gLogger.warn("Could not load irradiance values: {}",
+							 component.irradianceValuesPath.relativePath.c_str());
 				return;
 			}
 

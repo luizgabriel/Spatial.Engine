@@ -5,6 +5,8 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Material.h>
+#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
@@ -66,9 +68,6 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
 	ui::albedoInput("Albedo", data.baseColor, data.albedo, finder(data.albedo), icons);
-	ui::inputHelp("The Albedo Property", "Defines the perceived color of an object."
-										 "The effect depends on the nature of the surface,"
-										 "controlled by the metallic property.");
 
 	ui::separator(2);
 
@@ -78,20 +77,10 @@ void ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 	ui::separator(1);
 
 	ui::mapInput("Metallic", data.metallic, data.metallicMap, finder(data.metallicMap), icons);
-	ui::inputHelp(
-		"The Metallic Property",
-		"The metallic property defines whether the surface is a metallic (conductor) or a non-metallic (dielectric) "
-		"surface. This property should be used as a binary value, set to either 0 or 1. Intermediate values are only "
-		"truly useful to create transitions between different types of surfaces when using textures.");
 
 	ui::separator(1);
 
 	ui::mapInput("Roughness", data.roughness, data.roughnessMap, finder(data.roughnessMap), icons);
-	ui::inputHelp("The Roughness Property",
-				  "The roughness property controls the perceived smoothness of the surface. When roughness is set to "
-				  "0, the surface is perfectly smooth and highly glossy. The rougher a surface is, the “blurrier” the "
-				  "reflections are. This property is often called glossiness in other engines and tools, and is simply "
-				  "the opposite of the roughness (roughness = 1 - glossiness).");
 
 	ui::separator(1);
 
@@ -173,7 +162,10 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::MeshInstance>(entity) && menu.item("Mesh"))
+	if (!registry.hasAnyComponent<ecs::Mesh>(entity) && menu.item("Mesh"))
+		registry.addComponent<ecs::Mesh>(entity);
+
+	if (!registry.hasAnyComponent<ecs::MeshInstance>(entity) && menu.item("Mesh Instance"))
 		registry.addComponent<ecs::MeshInstance>(entity);
 
 	ImGui::Separator();
@@ -186,6 +178,12 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 
 	if (!registry.hasAnyComponent<ecs::PointLight>(entity) && menu.item("Point Light"))
 		registry.addComponent<ecs::PointLight>(entity);
+
+	if (!registry.hasAnyComponent<ecs::SunLight>(entity) && menu.item("Sun Light"))
+		registry.addComponent<ecs::SunLight>(entity);
+
+	if (!registry.hasAnyComponent<ecs::IndirectLight>(entity) && menu.item("Indirect Light"))
+		registry.addComponent<ecs::IndirectLight>(entity);
 
 	ImGui::Separator();
 
@@ -500,47 +498,61 @@ bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 	auto popup = ui::Popup{"Assets Manager Popup"};
 	ecs::Entity createdEntity = ecs::NullEntity;
 
+	const auto isMeshInstanceSelected = registry.hasAllComponents<ecs::MeshInstance>(selectedEntity);
+	const auto* selectedMeshInstanceName = registry.tryGetComponent<ecs::Name>(selectedEntity);
+
+	const auto mergeMaterialName = [&](const char* materialName) {
+		if (selectedMeshInstanceName)
+			return fmt::format("{} ({})", materialName, selectedMeshInstanceName->c_str());
+		else
+			return std::string{materialName};
+	};
+
 	if (popup.isOpen())
 	{
 		{
-			auto menu = ui::Menu{"Create Material"};
+			auto menu = ui::Menu("New");
+			if (!menu.isOpen())
+				return false;
 
-			if (menu.item("Standard Opaque"))
 			{
-				createdEntity =
-					ecs::build(registry).withName("Standard Opaque").asMaterial<editor::StandardOpaqueMaterial>();
+				auto menu2 = ui::Menu{"Material"};
+
+				if (menu2.item("Standard Opaque"))
+				{
+					createdEntity =
+						ecs::build(registry).withName(mergeMaterialName("Standard Opaque")).asMaterial<editor::StandardOpaqueMaterial>();
+					changed = true;
+				}
+
+				if (menu2.item("Color Material"))
+				{
+					createdEntity = ecs::build(registry).withName(mergeMaterialName("Color Material")).asMaterial<editor::ColorMaterial>();
+					changed = true;
+				}
+			}
+
+			if (menu.item("Script"))
+			{
+				createdEntity = ecs::build(registry).withName("Script").asMesh().withResource("");
 				changed = true;
 			}
 
-			if (menu.item("Color Material"))
+			if (menu.item("Mesh"))
 			{
-				createdEntity = ecs::build(registry).withName("Color Material").asMaterial<editor::ColorMaterial>();
+				createdEntity = ecs::build(registry).withName("Mesh").asMesh().withResource("");
 				changed = true;
 			}
-		}
 
-		{
-			auto menu = ui::Menu{"Create SkyBox"};
-
-			if (menu.item("Default SkyBox"))
+			if (menu.item("SkyBox"))
 			{
 				createdEntity = ecs::build(registry).withName("Default SkyBox").asMaterial<editor::SkyBoxMaterial>();
 				changed = true;
 			}
+
 		}
 
-		{
-			auto menu = ui::Menu{"Create Mesh"};
-
-			if (menu.item("Filamesh"))
-			{
-				createdEntity = ecs::build(registry).withName("Filamesh").asMesh().withResource("");
-				changed = true;
-			}
-		}
-
-		if (registry.hasAllComponents<ecs::MeshInstance>(selectedEntity)
-			&& registry.hasAnyComponent<ecs::tags::IsMaterial>(createdEntity))
+		if (isMeshInstanceSelected && registry.hasAnyComponent<ecs::tags::IsMaterial>(createdEntity))
 			ecs::MeshInstance::addMaterial(registry, selectedEntity, createdEntity);
 
 		if (changed)

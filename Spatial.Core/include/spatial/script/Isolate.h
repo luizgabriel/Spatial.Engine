@@ -11,11 +11,20 @@ class Isolate
 	explicit Isolate(const v8::Isolate::CreateParams& params);
 	explicit Isolate(v8::Isolate* isolate);
 
+	void reset();
+
+	v8::Isolate* release();
+
+	Isolate(Isolate&& isolate) noexcept;
+	Isolate(const Isolate& isolate) noexcept = delete;
+
+	Isolate& operator=(Isolate&& isolate) noexcept;
+	Isolate& operator=(const Isolate& isolate) noexcept = delete;
+
 	~Isolate();
 
   private:
 	v8::Isolate* mIsolate;
 };
 
-
-}
+} // namespace spatial::script

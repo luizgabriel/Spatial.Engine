@@ -7,8 +7,8 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
-#include <unordered_map>
 #include <spatial/resources/FilesSystem.h>
+#include <unordered_map>
 
 namespace spatial::render
 {
@@ -28,7 +28,7 @@ class MeshController
 
 	void createRenderableMeshes(ecs::Registry& registry);
 	void updateMeshGeometries(ecs::Registry& registry);
-	void clearDirtyRenderables(ecs::Registry& registry);
+	static void clearDirtyRenderables(ecs::Registry& registry);
 };
 
 } // namespace spatial::render
