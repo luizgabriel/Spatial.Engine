@@ -1,23 +1,20 @@
 #pragma once
 
-#include "DirectionInput.h"
-#include "SceneView.h"
-#include "Search.h"
-#include "VectorInput.h"
 #include <filament/Texture.h>
-#include <filesystem>
-#include <fmt/format.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
-#include <spatial/ecs/RegistryUtils.h>
-#include <spatial/ecs/Relation.h>
+#include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
-#include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/DirectionInput.h>
+#include <spatial/ui/components/SceneView.h>
+#include <spatial/ui/components/Search.h>
+#include <spatial/ui/components/VectorInput.h>
 
 namespace spatial::ui
 {
@@ -123,7 +120,6 @@ struct ComponentInputImpl<ecs::IndirectLight>
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
-
 template <>
 struct ComponentInputImpl<ecs::Mesh>
 {
@@ -177,6 +173,13 @@ template <>
 struct ComponentInputImpl<ecs::CustomCamera>
 {
 	static constexpr auto sName = "Custom Camera";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::Script>
+{
+	static constexpr auto sName = "Script";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 

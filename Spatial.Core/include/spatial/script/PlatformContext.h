@@ -20,4 +20,4 @@ class PlatformContext
 	std::unique_ptr<v8::ArrayBuffer::Allocator> mAllocator;
 };
 
-} // namespace spatial::v8
+} // namespace spatial::script

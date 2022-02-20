@@ -7,13 +7,35 @@ Isolate::Isolate(v8::Isolate* isolate) : mIsolate{isolate}
 {
 }
 
+Isolate::Isolate(Isolate&& isolate) noexcept : mIsolate{isolate.release()}
+{
+}
+
 Isolate::Isolate(const v8::Isolate::CreateParams& params) : Isolate{v8::Isolate::New(params)}
 {
 }
 
-Isolate::~Isolate()
+void Isolate::reset()
 {
-	mIsolate->Dispose();
+	if (mIsolate)
+		mIsolate->Dispose();
 }
 
+v8::Isolate* Isolate::release()
+{
+	return std::exchange(mIsolate, nullptr);
 }
+
+Isolate& Isolate::operator=(Isolate&& isolate) noexcept
+{
+	reset();
+	mIsolate = isolate.release();
+	return *this;
+}
+
+Isolate::~Isolate()
+{
+	reset();
+}
+
+} // namespace spatial::script

@@ -13,7 +13,6 @@
 #include <spatial/render/SkyboxResources.h>
 
 #include <spatial/ui/components/AssetsExplorer.h>
-#include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DockSpace.h>
 #include <spatial/ui/components/Window.h>
 
@@ -21,6 +20,7 @@
 
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/resources/MemoryFileSystem.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
@@ -36,7 +36,7 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem)
+SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem, script::PlatformContext& scriptContext)
 	: mEngine{engine},
 	  mWindow{window},
 
@@ -61,6 +61,8 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mMeshController{mEngine, mFileSystem},
 	  mIndirectLightController{mEngine, mFileSystem},
 
+	  mScriptController{scriptContext.createIsolate()},
+
 	  mJobQueue{},
 
 	  mScenePath{},
@@ -82,11 +84,6 @@ void SceneEditorSystem::onStart()
 	mMaterialController.load("engine/dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
 	mMaterialController.load("engine/dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
 	mMaterialController.load("engine/dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
-
-	mIndirectLightController.loadTexture("editor/textures/default_skybox/ibl.ktx"_hs, ASSETS_DEFAULT_SKYBOX_IBL_KTX,
-										 ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE);
-	mIndirectLightController.loadIrradianceValues("editor/textures/default_skybox/sh.txt"_hs,
-												  render::parseShFile(ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE));
 }
 
 void createDefaultEditorEntities(ecs::Registry& registry)

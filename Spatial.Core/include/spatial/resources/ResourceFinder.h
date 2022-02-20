@@ -1,10 +1,10 @@
 #pragma once
 
 #include <filesystem>
+#include <functional>
 #include <spatial/resources/Resource.h>
 #include <spatial/resources/ResourceError.h>
 #include <type_traits>
-#include <functional>
 
 namespace spatial
 {

@@ -76,8 +76,9 @@ add_library(Spatial.Core
         include/spatial/resources/FilesSystem.h
         include/spatial/resources/PhysicalFileSystem.h
 
-        #include/spatial/script/Isolate.h
-        #include/spatial/script/PlatformContext.h
+        include/spatial/script/Isolate.h
+        include/spatial/script/PlatformContext.h
+        include/spatial/script/ScriptController.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -115,8 +116,9 @@ add_library(Spatial.Core
         src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
 
-        #src/script/PlatformContext.cpp
-        #src/script/Isolate.cpp
+        src/script/PlatformContext.cpp
+        src/script/Isolate.cpp
+        src/script/ScriptController.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp

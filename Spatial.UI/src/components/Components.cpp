@@ -1,22 +1,22 @@
 #include <array>
 #include <imgui.h>
+#include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/SceneView.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
+#include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/VectorInput.h>
-#include "spatial/ui/components/DragAndDrop.h"
 
 namespace spatial::ui
 {
 
 static constexpr ImGuiTableFlags gTableFlags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-									 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-									 | ImGuiTableFlags_NoBordersInBody;
+											   | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
+											   | ImGuiTableFlags_NoBordersInBody;
 
 void spacing(std::uint32_t times)
 {
@@ -61,7 +61,8 @@ bool inputPath(const std::string_view label, std::filesystem::path& path, std::s
 	{
 		auto dnd = ui::DragAndDropTarget{};
 		auto result = dnd.getPayload<std::filesystem::path>();
-		if (result) {
+		if (result)
+		{
 			path = std::filesystem::path{result.value()};
 			return true;
 		}
@@ -145,6 +146,20 @@ void ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::
 	ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
 }
 
+void ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& script = registry.getComponent<ecs::Script>(entity);
+
+	ui::inputPath("Resource", script.resource.relativePath, "*.filamesh");
+
+	if (ImGui::Button("Reload Mesh"))
+		registry.removeComponent<ecs::tags::IsScriptLoaded>(entity);
+
+	ImGui::SameLine();
+
+	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
+	ImGui::Checkbox("Is Loaded", &loaded);
+}
 
 void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
@@ -152,9 +167,8 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 
 	ui::inputPath("Resource", mesh.resource.relativePath, "*.filamesh");
 
-	if (ImGui::Button("Reload Mesh")) {
+	if (ImGui::Button("Reload Mesh"))
 		registry.removeComponent<ecs::tags::IsMeshLoaded>(entity);
-	}
 
 	ImGui::SameLine();
 
@@ -171,9 +185,11 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 	{
 		auto dnd = ui::DragAndDropTarget{};
-		if (dnd.isStarted()) {
+		if (dnd.isStarted())
+		{
 			auto result = dnd.getPayload<std::filesystem::path>();
-			if (result.has_value()) {
+			if (result.has_value())
+			{
 				mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
 				changed = true;
 			}

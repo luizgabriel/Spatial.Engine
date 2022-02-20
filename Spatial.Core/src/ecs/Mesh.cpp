@@ -1,8 +1,8 @@
 #include <fmt/format.h>
+#include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Material.h>
 
 namespace spatial::ecs
 {

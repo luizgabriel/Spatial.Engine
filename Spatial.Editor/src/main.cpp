@@ -11,6 +11,7 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
+#include <spatial/script/PlatformContext.h>
 #include <spatial/ui/system/UserInterfaceSystem.h>
 #include <spatial/ui/system/UserInterfaceUtils.h>
 #include <spatial/resources/MemoryFileSystem.h>
@@ -27,6 +28,8 @@ RootFileSystem createDefaultFileSystem()
 	editorFs->define("meshes/cylinder.filamesh", {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE});
 	editorFs->define("materials/ui_blit.filamat", {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE});
 	editorFs->define("fonts/roboto_medium.ttf", {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE});
+	editorFs->define("textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE});
+	editorFs->define("textures/default_skybox/sh.txt", {ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE});
 
 	return fileSystem;
 }
@@ -49,7 +52,9 @@ int main(int argc, char* argv[])
 	ui.addFont("editor/fonts/roboto_medium.ttf");
 	ui.getRenderer().createFontTextureAtlas();
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, fileSystem};
+	auto scriptingContext = script::PlatformContext{};
+
+	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, fileSystem, scriptingContext};
 	editor.setRootPath(config.projectFolder);
 
 	// Connect all Systems to the Application Main Loop

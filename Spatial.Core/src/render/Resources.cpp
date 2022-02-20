@@ -157,7 +157,6 @@ IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 	return ib;
 }
 
-
 Texture createDummyCubemap(filament::Engine& engine)
 {
 	auto texture = createTexture(engine, math::int2{1}, fl::Texture::InternalFormat::RGBA8, fl::Texture::Usage::DEFAULT,

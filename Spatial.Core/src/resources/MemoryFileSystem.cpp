@@ -1,7 +1,7 @@
-#include <spatial/resources/MemoryFileSystem.h>
 #include <boost/algorithm/string/predicate.hpp>
-#include <sstream>
 #include <fmt/format.h>
+#include <spatial/resources/MemoryFileSystem.h>
+#include <sstream>
 
 namespace spatial
 {
@@ -22,21 +22,26 @@ std::set<FileSystem::Entry> MemoryFileSystem::listImpl(std::string_view path) co
 
 	auto result = std::set<Entry>();
 
-	for (auto& [k, _] : mMemoryMap) {
-		if (path.empty() || starts_with(k, path)) {
+	for (auto& [k, _] : mMemoryMap)
+	{
+		if (path.empty() || starts_with(k, path))
+		{
 			auto entryPath = k.substr(path.length());
-			if (entryPath[0] == SEPARATOR) entryPath = entryPath.substr(1);
+			if (entryPath[0] == SEPARATOR)
+				entryPath = entryPath.substr(1);
 
 			auto separatorPos = entryPath.find(SEPARATOR);
 
-			if (separatorPos == std::string_view::npos) {
+			if (separatorPos == std::string_view::npos)
+			{
 				result.emplace(entryPath, FileType::File);
-			} else {
+			}
+			else
+			{
 				result.emplace(entryPath.substr(0, separatorPos), FileType::Directory);
 			}
 		}
 	}
-
 
 	return result;
 }
