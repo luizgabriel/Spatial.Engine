@@ -26,11 +26,12 @@ class SpatialEngineConan(ConanFile):
         "cereal/1.3.0",
         "magic_enum/0.7.3",
         "tl-expected/20190710",
+        "assimp/5.1.0",
 
         # Remember to run 'setup.py' to make this dependencies available
-        "imgui/docking@vendor/stable",  # Installed with vendor/imgui.py
-        "filament/1.17.0@vendor/stable",  # Installed with vendor/filament.py
-        # "v8/9.7.37@vendor/stable",  # Installed with vendor/v8.py
+        "imgui/docking@vendor/stable",    # Installed with vendor/imgui.py
+        "filament/1.18.0@vendor/stable",  # Installed with vendor/filament.py
+        "v8/10.1.1@vendor/stable",        # Installed with vendor/v8.py
     ]
 
     def imports(self):

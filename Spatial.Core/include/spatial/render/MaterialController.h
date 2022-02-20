@@ -6,11 +6,19 @@
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilesSystem.h>
 #include <spatial/resources/Resource.h>
-#include <spatial/resources/ResourceLoaderUtils.h>
 #include <unordered_map>
 
 namespace spatial::render
 {
+
+template <ResourceType type>
+struct LoadResourceEvent
+{
+	Resource<type> texture;
+	explicit LoadResourceEvent(Resource<type> resource) : texture{std::move(resource)}
+	{
+	}
+};
 
 class MaterialController
 {

@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.17.0"
+    version = "1.18.0"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"
@@ -12,7 +12,11 @@ class FilamentConan(ConanFile):
     topics = ("graphics", "3d", "filament", "google")
     settings = ("os", "compiler", "build_type", "arch")
     generators = "cmake"
-    build_requires = "cmake/3.19.8"
+    build_requires = [
+        "cmake/3.19.8",
+        "ninja/1.10.0"
+    ]
+
     options = {
         "enable_java": [True, False],
         "skip_samples": [True, False],
@@ -48,7 +52,6 @@ conan_basic_setup()
 
     def _configure_cmake(self):
         cmake = CMake(self)
-
         cmake.definitions["FILAMENT_ENABLE_JAVA"] = self.options.get_safe("enable_java", False)
         cmake.definitions["FILAMENT_SKIP_SAMPLES"] = self.options.get_safe("skip_samples", False)
         cmake.definitions["FILAMENT_ENABLE_LTO"] = self.options.get_safe("enable_lto", False)

@@ -5,7 +5,6 @@ namespace spatial::render
 
 Entity::Entity(filament::Engine& engine) : mEngine{engine}, mEntity{}
 {
-	mEntity.clear();
 }
 
 Entity::~Entity()
@@ -31,10 +30,7 @@ Entity& Entity::operator=(Entity&& other) noexcept
 
 utils::Entity Entity::release() noexcept
 {
-	auto null = utils::Entity{};
-	null.clear();
-
-	return std::exchange(mEntity, null);
+	return std::exchange(mEntity, utils::Entity{});
 }
 
 void Entity::reset()
