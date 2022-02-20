@@ -7,7 +7,6 @@
 #include <set>
 #include <spatial/resources/ResourceError.h>
 #include <string_view>
-#include <tl/expected.hpp>
 
 namespace spatial
 {

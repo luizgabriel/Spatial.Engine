@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <spatial/resources/Resource.h>
 #include <spatial/resources/ResourceError.h>
-#include <tl/expected.hpp>
 #include <type_traits>
 #include <functional>
 
