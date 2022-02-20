@@ -4,7 +4,6 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/resources/ResourceLoaderUtils.h>
 #include <spatial/core/Logger.h>
 
 namespace spatial::render
@@ -50,24 +49,24 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			renderable.setCulling(meshInstance.culling);
 			renderable.setPriority(meshInstance.priority);
 
-			if (registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
+			if (!registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
+				return;
+
+			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
+			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
+
+			auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
+			auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
+
+			const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
+			if (boundingBox)
+				renderable.setAxisAlignedBoundingBox(*boundingBox);
+
+			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 			{
-				const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
-				const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
-
-				auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
-				auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
-
-				const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
-				if (boundingBox)
-					renderable.setAxisAlignedBoundingBox(*boundingBox);
-
-				for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
-				{
-					const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
-					renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(),
-											 indexBuffer.get(), geometry.offset, geometry.count);
-				}
+				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
+				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(),
+										 indexBuffer.get(), geometry.offset, geometry.count);
 			}
 		});
 
@@ -82,6 +81,8 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialEntity);
 			if (material != nullptr)
 				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
+			else
+				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, mEngine.getDefaultMaterial()->getDefaultInstance());
 		});
 }
 

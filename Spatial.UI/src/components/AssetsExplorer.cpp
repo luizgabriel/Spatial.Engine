@@ -16,7 +16,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 
 	displayPathHeader(selectedPath, icon);
 
-	ImGui::Columns(6, "AssetsExplorer", false);
+	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "AssetsExplorer", false);
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};

@@ -1,0 +1,12 @@
+declare_args() {
+  conan_compiler_runtime = "MD"
+}
+
+config("conan_crt") {
+  available_crt = [ "MD", "MT", "MTd", "MDd" ]
+  foreach(crt, available_crt) {
+    if (conan_compiler_runtime == crt) {
+      cflags = [ "/$conan_compiler_runtime" ]
+    }
+  }
+}

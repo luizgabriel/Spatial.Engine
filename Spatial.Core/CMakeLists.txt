@@ -65,14 +65,16 @@ add_library(Spatial.Core
         include/spatial/serialization/Relation.h
         include/spatial/serialization/SkyBox.h
         include/spatial/serialization/Resource.h
+        include/spatial/serialization/Snapshot.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
         include/spatial/resources/FilameshFile.h
-        include/spatial/resources/ResourceLoaderUtils.h
         include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
         include/spatial/resources/Resource.h
+        include/spatial/resources/FilesSystem.h
+        include/spatial/resources/PhysicalFileSystem.h
 
         #include/spatial/script/Isolate.h
         #include/spatial/script/PlatformContext.h
@@ -118,7 +120,9 @@ add_library(Spatial.Core
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
-        src/resources/ResourceLoader.cpp include/spatial/resources/FilesSystem.h src/resources/FileSystem.cpp include/spatial/resources/PhysicalFileSystem.h src/resources/PhysicalFileSystem.cpp src/resources/MemoryFileSystem.cpp include/spatial/serialization/Snapshot.h)
+        src/resources/FileSystem.cpp
+        src/resources/PhysicalFileSystem.cpp
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
@@ -148,8 +152,7 @@ target_link_libraries(Spatial.Core
         CONAN_PKG::glfw
         CONAN_PKG::cereal
         CONAN_PKG::magic_enum
-        #CONAN_PKG::v8
-        CONAN_PKG::tl-expected)
+        CONAN_PKG::v8)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Core PRIVATE OpenGL::GL)

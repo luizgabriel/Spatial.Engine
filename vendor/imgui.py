@@ -3,8 +3,12 @@ import os
 from conans import ConanFile, CMake, tools
 
 CMAKE_FILE_DATA = """
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.19)
 project(imgui CXX)
+
+# Setup C++17 Standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(conanbuildinfo.cmake)
 conan_basic_setup()
@@ -68,8 +72,6 @@ class IMGUIConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
     _source_subfolder = "source_subfolder"
-
-    # build_requires = "cmake_installer/3.15.5@conan/stable"
 
     def config_options(self):
         if self.settings.os == 'Windows':
