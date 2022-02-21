@@ -1,4 +1,4 @@
-#include "SceneEditorSystem.h"
+#include "EditorSystem.h"
 #include "CustomComponents.h"
 #include "EditorCamera.h"
 #include "Materials.h"
@@ -36,7 +36,7 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem, script::PlatformContext& scriptContext)
+EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem, script::PlatformContext& scriptContext)
 	: mEngine{engine},
 	  mWindow{window},
 
@@ -68,7 +68,7 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	mJobQueue.connect<SaveSceneEvent>(*this);
 }
 
-void SceneEditorSystem::onStart()
+void EditorSystem::onStart()
 {
 	mMaterialController.load("engine/dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
 	mMaterialController.load("engine/dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
@@ -139,7 +139,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 							.withAspectRatio(19.0 / 6.0));
 }
 
-void SceneEditorSystem::onStartFrame(float)
+void EditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
 
@@ -158,7 +158,7 @@ void SceneEditorSystem::onStartFrame(float)
 	mMaterialController.onStartFrame();
 }
 
-void SceneEditorSystem::onUpdateFrame(float delta)
+void EditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
@@ -168,7 +168,7 @@ void SceneEditorSystem::onUpdateFrame(float delta)
 	mMaterialController.onUpdateFrameWithFinder<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref());
 }
 
-void SceneEditorSystem::onDrawGui()
+void EditorSystem::onDrawGui()
 {
 	auto dockSpace = ui::DockSpace{"Spatial"};
 
@@ -257,12 +257,12 @@ void SceneEditorSystem::onDrawGui()
 					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, mIconTexture.ref()); });
 }
 
-void SceneEditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
+void EditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
 {
 	publisher.append(mRegistry);
 }
 
-void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
+void EditorSystem::onUpdateInput(const desktop::InputState& input)
 {
 	mEditorCameraController.onUpdateInput(input);
 	if (input.released(Key::Escape))
@@ -272,17 +272,17 @@ void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
 		mJobQueue.enqueue<SaveSceneEvent>();
 }
 
-void SceneEditorSystem::setScenePath(const std::filesystem::path& path)
+void EditorSystem::setScenePath(const std::filesystem::path& path)
 {
 	mScenePath = path;
 }
 
-void SceneEditorSystem::clearScene()
+void EditorSystem::clearScene()
 {
 	mRegistry = ecs::Registry{};
 }
 
-void SceneEditorSystem::loadScene()
+void EditorSystem::loadScene()
 {
 	try
 	{
@@ -295,7 +295,7 @@ void SceneEditorSystem::loadScene()
 	}
 }
 
-void SceneEditorSystem::saveScene()
+void EditorSystem::saveScene()
 {
 	try
 	{
@@ -315,7 +315,7 @@ void SceneEditorSystem::saveScene()
 	}
 }
 
-void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
+void EditorSystem::setRootPath(const std::filesystem::path& path)
 {
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
@@ -324,24 +324,24 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 	mProjectFileSystem->setRootPath(path);
 }
 
-void SceneEditorSystem::onEvent(const ClearSceneEvent&)
+void EditorSystem::onEvent(const ClearSceneEvent&)
 {
 	clearScene();
 }
 
-void SceneEditorSystem::onEvent(const LoadSceneEvent& event)
+void EditorSystem::onEvent(const LoadSceneEvent& event)
 {
 	setScenePath(event.path);
 	loadScene();
 }
 
-void SceneEditorSystem::onEvent(const SaveSceneEvent& event)
+void EditorSystem::onEvent(const SaveSceneEvent& event)
 {
 	setScenePath(event.path);
 	saveScene();
 }
 
-void SceneEditorSystem::onEvent(const OpenProjectEvent& event)
+void EditorSystem::onEvent(const OpenProjectEvent& event)
 {
 	clearScene();
 	setRootPath(event.path);

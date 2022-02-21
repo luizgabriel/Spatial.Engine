@@ -1,4 +1,4 @@
-#include "SceneEditorSystem.h"
+#include "EditorSystem.h"
 #include "Serialization.h"
 #include "Settings.h"
 
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
 	auto scriptingContext = script::PlatformContext{};
 
-	auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, fileSystem, scriptingContext};
+	auto editor = editor::EditorSystem{rendering.getEngine(), window, fileSystem, scriptingContext};
 	editor.setRootPath(config.projectFolder);
 
 	// Connect all Systems to the Application Main Loop
