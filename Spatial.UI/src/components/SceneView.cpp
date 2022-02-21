@@ -11,8 +11,7 @@ namespace spatial::ui
 void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity, math::float2 size)
 {
 	{
-		const auto context = ImGui::GetCurrentContext();
-		const auto currentPosition = context->CurrentWindow->DC.CursorPos;
+		const auto currentPosition = ImGui::GetCursorScreenPos();
 		const auto rectMax = ImVec2(currentPosition.x + size.x, currentPosition.y + size.y);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
@@ -30,9 +29,10 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 		aspectRatio = perspectiveCamera->aspectRatio;
 
 	const auto imageSize = aspectRatio >= 1 ? math::int2{static_cast<double>(size.y) * aspectRatio, size.y}
-										   : math::int2{size.x, static_cast<double>(size.x) / aspectRatio};
+											: math::int2{size.x, static_cast<double>(size.x) / aspectRatio};
 
-	ImGui::SetCursorPosX((size.x - static_cast<float>(imageSize.x)) * 0.5f);
+	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
+									 ImGui::GetCursorScreenPos().y));
 	ui::image(textureView.getColorTexture().ref(), imageSize, math::float4{0, 1, 1, 0});
 }
 

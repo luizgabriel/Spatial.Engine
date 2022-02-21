@@ -51,6 +51,7 @@ add_library(Spatial.Core
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
         include/spatial/render/ResourceFinders.h
+        include/spatial/render/RegistryRenderingSystem.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -115,6 +116,7 @@ add_library(Spatial.Core
         src/render/TextureView.cpp
         src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
+        src/render/SceneRenderingSystem.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
@@ -124,7 +126,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp)
+        src/resources/MemoryFileSystem.cpp include/spatial/ecs/RegistryCollection.h src/ecs/RegistryPublisher.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

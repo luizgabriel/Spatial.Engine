@@ -1,6 +1,5 @@
 #pragma once
 
-#include <argh.h>
 #include <filesystem>
 #include <spatial/ecs/Registry.h>
 
