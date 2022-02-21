@@ -19,12 +19,12 @@ class Signal
 	{
 	}
 
-	void operator()(Args... args)
+	void operator()(Args... args) const
 	{
 		trigger(std::forward<Args>(args)...);
 	}
 
-	void trigger(Args... args)
+	void trigger(Args... args) const
 	{
 		mSigh.publish(std::forward<Args>(args)...);
 	}

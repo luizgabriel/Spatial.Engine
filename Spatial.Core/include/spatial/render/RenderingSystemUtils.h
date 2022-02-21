@@ -2,7 +2,7 @@
 
 #include <spatial/render/RenderingSystem.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 template <typename Listener>

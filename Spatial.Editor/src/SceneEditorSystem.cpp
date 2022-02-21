@@ -48,19 +48,12 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 	  mIconTexture{render::createTexture(mEngine, ASSETS_ICONS_PNG, ASSETS_ICONS_PNG_SIZE)},
 
 	  mFileSystem{fileSystem},
-	  mProjectFileSystem{mFileSystem.mount<PhysicalFileSystem>("project")},
+	  mProjectFileSystem{mFileSystem.mount<PhysicalFileSystem>(PROJECT_DIR)},
 
 	  mRegistry{},
 
 	  mEditorCameraController{},
-	  mSceneController{mEngine},
 	  mMaterialController{mEngine, mFileSystem},
-	  mTransformController{mEngine},
-	  mCameraController{mEngine},
-	  mLightController{mEngine},
-	  mMeshController{mEngine, mFileSystem},
-	  mIndirectLightController{mEngine, mFileSystem},
-
 	  mScriptController{scriptContext.createIsolate()},
 
 	  mJobQueue{},
@@ -77,10 +70,6 @@ SceneEditorSystem::SceneEditorSystem(filament::Engine& engine, desktop::Window& 
 
 void SceneEditorSystem::onStart()
 {
-	mMaterialController.load(
-		"editor/textures/default_skybox/texture.ktx"_hs,
-		render::createKtxTexture(mEngine, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE));
-
 	mMaterialController.load("engine/dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
 	mMaterialController.load("engine/dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
 	mMaterialController.load("engine/dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
@@ -98,7 +87,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.asMaterial<SkyBoxMaterial>({
 				false,
 				{math::float3{.0f}, 1.0f},
-				{"editor/textures/default_skybox/texture.ktx"},
+				{"editor/textures/skybox/texture.ktx"},
 			});
 
 	if (!ecs::handleOf<GridMaterial>(registry))
@@ -137,8 +126,8 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
-								   .withReflectionsTexturePath("editor/textures/default_skybox/ibl.ktx")
-								   .withIrradianceValuesPath("editor/textures/default_skybox/sh.txt"))
+								   .withReflectionsTexturePath("editor/textures/skybox/ibl.ktx")
+								   .withIrradianceValuesPath("editor/textures/skybox/sh.txt"))
 			.withCamera(ecs::build(registry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
@@ -167,24 +156,16 @@ void SceneEditorSystem::onStartFrame(float)
 	}
 
 	mMaterialController.onStartFrame();
-	mMeshController.onStartFrame(mRegistry);
 }
 
 void SceneEditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
-	mSceneController.onUpdateFrame(mRegistry);
-	mTransformController.onUpdateFrame(mRegistry);
-	mCameraController.onUpdateFrame(mRegistry);
-	mLightController.onUpdateFrame(mRegistry);
-	mIndirectLightController.onUpdateFrame(mRegistry);
 
 	mMaterialController.onUpdateFrame<GridMaterial>(mRegistry, mGridMaterial.ref());
 	mMaterialController.onUpdateFrame<ColorMaterial>(mRegistry, mColorMaterial.ref());
 	mMaterialController.onUpdateFrameWithFinder<StandardOpaqueMaterial>(mRegistry, mStandardLitMaterial.ref());
 	mMaterialController.onUpdateFrameWithFinder<SkyBoxMaterial>(mRegistry, mSkyBoxMaterial.ref());
-
-	mMeshController.onUpdateFrame(mRegistry);
 }
 
 void SceneEditorSystem::onDrawGui()
@@ -276,10 +257,9 @@ void SceneEditorSystem::onDrawGui()
 					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, mIconTexture.ref()); });
 }
 
-void SceneEditorSystem::onRender(filament::Renderer& renderer) const
+void SceneEditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
 {
-	mRegistry.getEntities<const render::TextureView, const tags::IsEditorView>().each(
-		[&](const auto& textureView) { renderer.render(textureView.getView().get()); });
+	publisher.append(mRegistry);
 }
 
 void SceneEditorSystem::onUpdateInput(const desktop::InputState& input)
@@ -340,7 +320,7 @@ void SceneEditorSystem::setRootPath(const std::filesystem::path& path)
 	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
 
-	mCurrentPath = "project";
+	mCurrentPath = PROJECT_DIR;
 	mProjectFileSystem->setRootPath(path);
 }
 

@@ -4,7 +4,7 @@
 namespace fl = filament;
 namespace bk = filament::backend;
 
-namespace spatial
+namespace spatial::render
 {
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle)

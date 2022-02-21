@@ -5,7 +5,7 @@
 namespace spatial::script
 {
 
-ScriptController::ScriptController(Isolate&& isolate) : mIsolate{std::move(isolate)}
+ScriptController::ScriptController(Isolate&& isolate) : mIsolate{std::move(isolate)}, mIsolateScope{mIsolate.get()}
 {
 }
 

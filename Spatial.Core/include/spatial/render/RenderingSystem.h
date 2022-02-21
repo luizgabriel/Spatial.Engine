@@ -4,7 +4,7 @@
 #include <spatial/render/Engine.h>
 #include <spatial/render/Resources.h>
 
-namespace spatial
+namespace spatial::render
 {
 
 class RenderingSystem

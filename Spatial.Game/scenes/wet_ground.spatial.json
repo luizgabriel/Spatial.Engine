@@ -215,12 +215,12 @@
             "intensity": 30000.0,
             "reflectionsTexturePath": {
                 "relativePath": {
-                    "value0": "editor/textures/default_skybox/ibl.ktx"
+                    "value0": "editor/textures/skybox/ibl.ktx"
                 }
             },
             "irradianceValuesPath": {
                 "relativePath": {
-                    "value0": "editor/textures/default_skybox/sh.txt"
+                    "value0": "editor/textures/skybox/sh.txt"
                 }
             }
         }
@@ -450,7 +450,7 @@
         {
             "skybox": {
                 "relativePath": {
-                    "value0": "editor/textures/default_skybox/texture.ktx"
+                    "value0": "editor/textures/skybox/texture.ktx"
                 }
             },
             "showSun": false,
