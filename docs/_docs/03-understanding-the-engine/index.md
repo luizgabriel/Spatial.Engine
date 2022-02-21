@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     ui.setMaterial(toShared(createMaterial(rendering.getEngine(), {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE})));
     ui.setFontTexture(toShared(imguiCreateTextureAtlas(rendering.getEngine(), {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE})));
 
-    auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
+    auto editor = editor::EditorSystem{rendering.getEngine(), window, input.getState()};
 
     // Connect all Systems to the Application Main Loop
     app >> desktopContext >> input >> rendering >> ui >> editor;
@@ -127,7 +127,7 @@ There are some resources which it depends one: the [ui_blit.mat](https://github.
 
 Here where the editor logic lives and dies. You can create your own systems too and uses as your `Game` class, it's up to you.
 ```cpp
-auto editor = editor::SceneEditorSystem{rendering.getEngine(), window, input.getState()};
+auto editor = editor::EditorSystem{rendering.getEngine(), window, input.getState()};
 ```
 
 Can you see that the editor depends on the _engine_, the instantiated _window_ and the _input state_? Clear dependencies make things more readable and I personally like it. It needs the engine to create renderables, light, scenes and etc. It needs the window class for calling `warpMouse` commands (this may change in the future). And also it needs to readString the input state for performing some actions based on your input and mouse at runtime.
