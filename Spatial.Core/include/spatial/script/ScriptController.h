@@ -15,6 +15,7 @@ class ScriptController
 
   private:
 	Isolate mIsolate;
+	v8::Isolate::Scope mIsolateScope;
 };
 
 } // namespace spatial::script

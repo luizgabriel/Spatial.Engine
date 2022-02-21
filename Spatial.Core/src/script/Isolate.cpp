@@ -38,4 +38,9 @@ Isolate::~Isolate()
 	reset();
 }
 
+v8::Isolate* Isolate::get()
+{
+	return mIsolate;
+}
+
 } // namespace spatial::script

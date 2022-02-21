@@ -1,7 +1,7 @@
 #include "Settings.h"
 
 #include <fstream>
-#include <magic_enum.hpp>
+#include <argh.h>
 
 namespace fs = std::filesystem;
 

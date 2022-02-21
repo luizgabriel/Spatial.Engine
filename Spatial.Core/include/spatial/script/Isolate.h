@@ -15,6 +15,8 @@ class Isolate
 
 	v8::Isolate* release();
 
+	v8::Isolate* get();
+
 	Isolate(Isolate&& isolate) noexcept;
 	Isolate(const Isolate& isolate) noexcept = delete;
 

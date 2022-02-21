@@ -17,30 +17,30 @@ constexpr bool has_on_event_v = has_member_function_onEvent<T, void, boost::mpl:
 class EventQueue
 {
   private:
-	entt::dispatcher m_dispatcher;
+	entt::dispatcher mDispatcher;
 
   public:
 	template <typename Event>
 	void update()
 	{
-		m_dispatcher.update<Event>();
+		mDispatcher.update<Event>();
 	}
 
 	void update() const
 	{
-		m_dispatcher.update();
+		mDispatcher.update();
 	}
 
 	template <typename Event, auto Function>
 	void connect()
 	{
-		m_dispatcher.template sink<Event>().template connect<Function>();
+		mDispatcher.template sink<Event>().template connect<Function>();
 	}
 
 	template <typename Event, auto Function = nullptr, typename Listener>
 	void connect(Listener& listener)
 	{
-		auto sink = m_dispatcher.template sink<Event>();
+		auto sink = mDispatcher.template sink<Event>();
 		if constexpr (std::is_null_pointer_v<decltype(Function)>)
 		{
 			constexpr auto overloaded = static_cast<void (Listener::*)(const Event&)>(&Listener::onEvent);
@@ -55,13 +55,13 @@ class EventQueue
 	template <typename Event, auto Function>
 	void disconnect()
 	{
-		m_dispatcher.template sink<Event>().template disconnect<Function>();
+		mDispatcher.template sink<Event>().template disconnect<Function>();
 	}
 
 	template <typename Event, auto Function = nullptr, typename Listener>
 	void disconnect(Listener& listener)
 	{
-		auto sink = m_dispatcher.template sink<Event>();
+		auto sink = mDispatcher.template sink<Event>();
 		if constexpr (std::is_null_pointer_v<decltype(Function)>)
 		{
 			constexpr auto overloaded = static_cast<void (Listener::*)(const Event&)>(&Listener::onEvent);
@@ -90,13 +90,13 @@ class EventQueue
 	template <typename Event, typename... Args>
 	void enqueue(Args&&... args)
 	{
-		m_dispatcher.enqueue<Event, Args...>(std::forward<Args>(args)...);
+		mDispatcher.enqueue<Event, Args...>(std::forward<Args>(args)...);
 	}
 
 	template <typename Event>
 	void enqueue(Event&& event)
 	{
-		m_dispatcher.enqueue<Event>(std::forward<Event>(event));
+		mDispatcher.enqueue<Event>(std::forward<Event>(event));
 	}
 };
 

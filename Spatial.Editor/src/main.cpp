@@ -15,6 +15,8 @@
 #include <spatial/ui/system/UserInterfaceSystem.h>
 #include <spatial/ui/system/UserInterfaceUtils.h>
 #include <spatial/resources/MemoryFileSystem.h>
+#include <spatial/render/RegistryRenderingSystem.h>
+#include <spatial/render/RegistryRenderingSystemUtils.h>
 
 using namespace spatial;
 
@@ -28,8 +30,9 @@ RootFileSystem createDefaultFileSystem()
 	editorFs->define("meshes/cylinder.filamesh", {ASSETS_CYLINDER_FILAMESH, ASSETS_CYLINDER_FILAMESH_SIZE});
 	editorFs->define("materials/ui_blit.filamat", {ASSETS_UI_BLIT_FILAMAT, ASSETS_UI_BLIT_FILAMAT_SIZE});
 	editorFs->define("fonts/roboto_medium.ttf", {ASSETS_ROBOTO_MEDIUM_TTF, ASSETS_ROBOTO_MEDIUM_TTF_SIZE});
-	editorFs->define("textures/default_skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE});
-	editorFs->define("textures/default_skybox/sh.txt", {ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE});
+	editorFs->define("textures/skybox/ibl.ktx", {ASSETS_DEFAULT_SKYBOX_IBL_KTX, ASSETS_DEFAULT_SKYBOX_IBL_KTX_SIZE});
+	editorFs->define("textures/skybox/texture.ktx", {ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX, ASSETS_DEFAULT_SKYBOX_SKYBOX_KTX_SIZE});
+	editorFs->define("textures/skybox/sh.txt", {ASSETS_SH_TXT, ASSETS_SH_TXT_SIZE});
 
 	return fileSystem;
 }
@@ -44,8 +47,10 @@ int main(int argc, char* argv[])
 	auto desktopContext = desktop::PlatformContext{};
 
 	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
-	auto rendering = RenderingSystem{window};
+	auto rendering = render::RenderingSystem{window};
 	auto input = desktop::InputSystem{window};
+
+	auto scene = render::RegistryRenderingSystem{rendering.getEngine(), fileSystem};
 
 	auto ui = UserInterfaceSystem{rendering.getEngine(), fileSystem, window};
 	ui.setMaterial("editor/materials/ui_blit.filamat");
@@ -58,7 +63,7 @@ int main(int argc, char* argv[])
 	editor.setRootPath(config.projectFolder);
 
 	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> ui >> editor;
+	app >> desktopContext >> input >> rendering >> ui >> editor >> scene;
 
 	// Connect Desktop Events to All Systems
 	desktopContext >> app >> input >> rendering >> ui >> editor;
@@ -66,8 +71,11 @@ int main(int argc, char* argv[])
 	// Connect Gui Render to Editor
 	ui >> editor;
 
-	// Connect Rendering to Editor and UI
-	rendering >> editor >> ui;
+	// Connect Rendering to Scene Rendering Bridge and UI
+	rendering >> scene >> ui;
+
+	// Connect Scene Rendering Bridge to Editor
+	scene >> editor;
 
 	// Connect Input to Editor
 	input >> editor;

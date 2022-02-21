@@ -383,7 +383,7 @@ void ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Enti
 	if (registry.hasAllComponents<render::TextureView>(entity)
 		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		SceneView::image(registry, entity, {ImGui::GetWindowContentRegionWidth(), 100});
+		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
 		ImGui::TreePop();
 	}
 }
