@@ -150,14 +150,14 @@ void ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity 
 {
 	auto& script = registry.getComponent<ecs::Script>(entity);
 
-	ui::inputPath("Resource", script.resource.relativePath, "*.filamesh");
+	ui::inputPath("Resource", script.resource.relativePath, "*.js");
 
-	if (ImGui::Button("Reload Mesh"))
+	if (ImGui::Button("Reload Script"))
 		registry.removeComponent<ecs::tags::IsScriptLoaded>(entity);
 
 	ImGui::SameLine();
 
-	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
+	auto loaded = registry.hasAllComponents<ecs::tags::IsScriptLoaded>(entity);
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
 
