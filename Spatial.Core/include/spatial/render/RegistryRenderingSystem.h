@@ -35,7 +35,6 @@ class RegistryRenderingSystem
 
   private:
 	filament::Engine& mEngine;
-	FileSystem& mFileSystem;
 
 	Signal<ecs::RegistryCollection&> mOnPublishRegistry;
 
@@ -45,6 +44,7 @@ class RegistryRenderingSystem
 	render::LightController mLightController;
 	render::MeshController mMeshController;
 	render::IndirectLightController mIndirectLightController;
+	render::MaterialController mMaterialController;
 
 	[[nodiscard]] ecs::RegistryCollection getPublishedRegistries() const;
 };

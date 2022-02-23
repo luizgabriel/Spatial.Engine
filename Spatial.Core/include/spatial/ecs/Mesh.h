@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
+#include <spatial/ecs/EntityHandle.h>
 #include <spatial/resources/Resource.h>
 
 namespace spatial::ecs
@@ -30,10 +31,10 @@ struct MeshMaterial
 	constexpr static auto typeName = "mesh_material";
 
 	size_t primitiveIndex;
-	Entity materialEntity;
+	Entity materialInstanceEntity;
 
 	constexpr explicit MeshMaterial(size_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
-		: primitiveIndex(primitiveIndex), materialEntity(materialEntity)
+		: primitiveIndex(primitiveIndex), materialInstanceEntity(materialEntity)
 	{
 	}
 };
@@ -44,14 +45,15 @@ struct Mesh
 
 	Resource<FilaMesh> resource;
 
-	explicit Mesh() = default;
+	Mesh() = default;
+
 	explicit Mesh(const Resource<FilaMesh>& resource) : resource{resource}
 	{
 	}
 
-	static Entity find(const Registry& registry, const std::filesystem::path& resource);
+	static EntityConstHandle find(const Registry& registry, const std::filesystem::path& resource);
 
-	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
+	static EntityHandle findOrCreate(Registry& registry, const std::filesystem::path& resource);
 };
 
 struct MeshInstance
@@ -71,18 +73,18 @@ struct MeshInstance
 
 	Entity meshSource{ecs::NullEntity};
 
-	bool castShadows;
-	bool receiveShadows;
-	bool culling;
-	uint8_t priority;
+	bool castShadows{false};
+	bool receiveShadows{false};
+	bool culling{true};
+	uint8_t priority{0};
 
-	Slice slice;
+	Slice slice{};
 
 	MeshInstance() = default;
 
-	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity);
+	static void addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity);
 
-	static void addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity, size_t primitiveIndex);
+	static void addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex);
 };
 
 } // namespace spatial::ecs

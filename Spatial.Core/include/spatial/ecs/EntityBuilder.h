@@ -28,7 +28,7 @@ class SunLightEntityBuilder;
 class IndirectLightEntityBuilder;
 
 template <typename MaterialComponent>
-class MaterialEntityBuilder;
+class MaterialInstanceEntityBuilder;
 
 class MeshEntityBuilder;
 
@@ -81,15 +81,15 @@ class EntityBuilder
 	MeshInstanceEntityBuilder asMeshInstance();
 
 	template <typename MaterialComponent, typename... Args>
-	MaterialEntityBuilder<MaterialComponent> asMaterial(Args&&... args)
+	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance(Entity material, Args&&... args)
 	{
-		return MaterialEntityBuilder<MaterialComponent>{mRegistry, mEntity, std::forward<Args>(args)...};
+		return asMaterialInstance<MaterialComponent>(material, MaterialComponent{std::forward<Args>(args)...});
 	}
 
 	template <typename MaterialComponent>
-	MaterialEntityBuilder<MaterialComponent> asMaterial(MaterialComponent&& component)
+	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance(Entity material, MaterialComponent&& component)
 	{
-		return MaterialEntityBuilder<MaterialComponent>{mRegistry, mEntity, std::forward<MaterialComponent>(component)};
+		return MaterialInstanceEntityBuilder<MaterialComponent>{mRegistry, mEntity, material, std::forward<MaterialComponent>(component)};
 	}
 
 	[[nodiscard]] EntityHandle get() const
@@ -236,24 +236,16 @@ class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
 	IndirectLightEntityBuilder& withIrradianceValuesPath(const std::filesystem::path& path);
 };
 
-template <typename MaterialComponent>
-class MaterialEntityBuilder : public EntityBuilder
+template <typename MaterialProps>
+class MaterialInstanceEntityBuilder : public EntityBuilder
 {
   public:
-	template <typename... Args>
-	MaterialEntityBuilder(Registry& registry, Entity entity, Args&&... args) : EntityBuilder(registry, entity)
-	{
-		with<ecs::tags::IsMaterial>();
-		with<ecs::tags::IsResource>();
-		with<MaterialComponent>(std::forward<Args>(args)...);
-	}
-
-	MaterialEntityBuilder(Registry& registry, Entity entity, MaterialComponent&& params)
+	MaterialInstanceEntityBuilder(Registry& registry, Entity entity, Entity material, MaterialProps&& params)
 		: EntityBuilder(registry, entity)
 	{
-		with<ecs::tags::IsMaterial>();
-		with<ecs::tags::IsResource>();
-		with<MaterialComponent>(std::move(params));
+		with<tags::IsResource>();
+		with<MaterialInstance>(material);
+		with<MaterialProps>(std::move(params));
 	}
 };
 

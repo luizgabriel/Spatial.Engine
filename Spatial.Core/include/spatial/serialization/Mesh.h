@@ -3,7 +3,6 @@
 #include <cereal/cereal.hpp>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/serialization/BoundingBox.h>
-#include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Resource.h>
 
 namespace cereal
@@ -29,7 +28,7 @@ template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MeshMaterial& meshMaterial)
 {
 	ar(make_nvp("primitiveIndex", meshMaterial.primitiveIndex));
-	ar(make_nvp("materialEntity", meshMaterial.materialEntity));
+	ar(make_nvp("materialEntity", meshMaterial.materialInstanceEntity));
 }
 
 } // namespace cereal

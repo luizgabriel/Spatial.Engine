@@ -5,14 +5,14 @@ namespace spatial::render
 
 RegistryRenderingSystem::RegistryRenderingSystem(filament::Engine& engine, FileSystem& fileSystem)
 	: mEngine{engine},
-	  mFileSystem{fileSystem},
 	  mOnPublishRegistry{},
 	  mSceneController{mEngine},
 	  mTransformController{mEngine},
 	  mCameraController{mEngine},
 	  mLightController{mEngine},
-	  mMeshController{mEngine, mFileSystem},
-	  mIndirectLightController{mEngine, mFileSystem}
+	  mMeshController{mEngine, fileSystem},
+	  mIndirectLightController{mEngine, fileSystem},
+	  mMaterialController{mEngine, fileSystem}
 {
 }
 
@@ -33,6 +33,7 @@ void RegistryRenderingSystem::onUpdateFrame(float)
 		mCameraController.onUpdateFrame(registry);
 		mLightController.onUpdateFrame(registry);
 		mIndirectLightController.onUpdateFrame(registry);
+		mMaterialController.onUpdateFrame(registry);
 		mMeshController.onUpdateFrame(registry);
 	});
 }

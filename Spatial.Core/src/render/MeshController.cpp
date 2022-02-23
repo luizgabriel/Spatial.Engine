@@ -77,7 +77,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			auto& renderable = registry.getComponent<Renderable>(child.parent);
 			const auto& mesh = registry.getComponent<const ecs::MeshInstance>(child.parent);
 
-			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialEntity);
+			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialInstanceEntity);
 			if (material != nullptr)
 				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
 			else

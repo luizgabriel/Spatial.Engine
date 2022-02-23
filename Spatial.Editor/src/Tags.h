@@ -13,7 +13,7 @@ struct IsEditorView
 	constexpr static auto typeName = "tag_is_editor_view";
 };
 
-struct IsSkyBoxMeshInstance
+struct IsSkyBox
 {
 	constexpr static auto typeName = "tag_is_skybox_mesh_instance";
 };

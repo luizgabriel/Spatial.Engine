@@ -21,7 +21,7 @@ struct Script
 {
 	constexpr static auto typeName = "script";
 
-	Resource<ResourceType::Script> resource;
+	Resource<ResourceType::Javascript> resource;
 };
 
 struct ScriptInstance

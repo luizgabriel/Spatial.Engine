@@ -19,7 +19,6 @@
 #include <spatial/render/TextureView.h>
 #include <spatial/render/TransformController.h>
 #include <spatial/script/ScriptController.h>
-#include <spatial/resources/PhysicalFileSystem.h>
 #include <spatial/script/PlatformContext.h>
 #include <spatial/render/RegistryRenderingSystem.h>
 
@@ -65,14 +64,9 @@ class EditorSystem
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
 
-	render::Material mStandardLitMaterial;
-	render::Material mColorMaterial;
-	render::Material mSkyBoxMaterial;
-	render::Material mGridMaterial;
 	render::Texture mIconTexture;
 
 	FileSystem& mFileSystem;
-	std::shared_ptr<PhysicalFileSystem> mProjectFileSystem;
 
 	ecs::Registry mRegistry;
 
