@@ -3,11 +3,12 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/RegistryUtils.h>
 
 namespace spatial::ecs
 {
 
-Entity Mesh::find(const Registry& registry, const std::filesystem::path& resource)
+EntityConstHandle Mesh::find(const Registry& registry, const std::filesystem::path& resource)
 {
 	auto view = registry.getEntities<const ecs::Mesh>();
 	auto it = std::find_if(view.begin(), view.end(), [&](ecs::Entity entity) {
@@ -16,33 +17,33 @@ Entity Mesh::find(const Registry& registry, const std::filesystem::path& resourc
 	});
 
 	if (it == view.end())
-		return ecs::NullEntity;
+		return handleOf(registry, NullEntity);
 
-	return *it;
+	return handleOf(registry, *it);
 }
 
-Entity Mesh::findOrCreate(Registry& registry, const std::filesystem::path& resource)
+EntityHandle Mesh::findOrCreate(Registry& registry, const std::filesystem::path& resource)
 {
-	auto foundMesh = Mesh::find(registry, resource);
-	if (!registry.isValid(foundMesh))
-	{
-		foundMesh = registry.createEntity();
-		registry.addComponent<ecs::Name>(foundMesh, resource.filename());
-		registry.addComponent<ecs::Mesh>(foundMesh, resource);
-		registry.addComponent<ecs::tags::IsResource>(foundMesh);
-	}
+	auto found = Mesh::find(registry, resource);
+	if (found)
+		return handleOf(registry, found);
 
-	return foundMesh;
+	auto mesh = createEntity(registry);
+	mesh.add(ecs::Name{resource.filename()});
+	mesh.add(ecs::Mesh{resource});
+	mesh.add<ecs::tags::IsResource>();
+
+	return mesh;
 }
 
-void MeshInstance::addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity)
+void MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity)
 {
 	const auto& parent = registry.getOrAddComponent<ecs::Parent>(meshEntity);
 	const auto childrenCount = parent.childrenCount;
 	addMaterial(registry, meshEntity, materialEntity, childrenCount);
 }
 
-void MeshInstance::addMaterial(Registry& registry, Entity& meshEntity, Entity materialEntity, size_t primitiveIndex)
+void MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(meshEntity);
 	mesh.slice.count++;

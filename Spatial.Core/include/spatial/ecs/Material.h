@@ -1,16 +1,46 @@
 #pragma once
 
-namespace spatial::ecs::tags
+#include <spatial/resources/Resource.h>
+#include <spatial/ecs/Registry.h>
+#include <spatial/ecs/EntityHandle.h>
+
+namespace spatial::ecs
 {
 
-struct IsMaterial
+namespace tags
 {
-	constexpr static auto typeName = "tag_is_material";
-};
 
 struct IsResource
 {
 	constexpr static auto typeName = "tag_is_resource";
 };
 
-} // namespace spatial::ecs::tags
+struct IsMaterial
+{
+	constexpr static auto typeName = "tag_is_material";
+};
+
+struct IsMaterialLoaded
+{
+};
+
+}
+
+struct PrecompiledMaterial
+{
+	constexpr static auto typeName = "precompiled_material";
+
+	Resource<FilaMat> resource{};
+
+	static EntityConstHandle find(const ecs::Registry& registry, const std::filesystem::path& resourcePath);
+	static EntityHandle findOrCreate(ecs::Registry& registry, const std::filesystem::path& resourcePath);
+};
+
+struct MaterialInstance
+{
+	constexpr static auto typeName = "material_instance";
+
+	Entity materialEntity;
+};
+
+} // namespace spatial::ecs

@@ -15,6 +15,7 @@
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/VectorInput.h>
+#include <spatial/ecs/Material.h>
 
 namespace spatial::ui
 {
@@ -130,7 +131,21 @@ struct ComponentInputImpl<ecs::Mesh>
 template <>
 struct ComponentInputImpl<ecs::MeshInstance>
 {
-	static constexpr auto sName = "Mesh";
+	static constexpr auto sName = "Mesh Instance";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::PrecompiledMaterial>
+{
+	static constexpr auto sName = "Precompiled Material";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::MaterialInstance>
+{
+	static constexpr auto sName = "Material Instance";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 

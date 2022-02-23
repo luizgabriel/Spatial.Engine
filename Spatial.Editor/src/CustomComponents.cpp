@@ -4,9 +4,9 @@
 #include "Tags.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
@@ -50,7 +50,6 @@ void ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(
 																				ecs::Entity entity,
 																				const filament::Texture& icons)
 {
-
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 
 	ui::colorPicker("Background Color", data.color, icons);
@@ -127,6 +126,8 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::Mesh>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
+	componentCollapse<ecs::PrecompiledMaterial>(registry, entity);
+	componentCollapse<ecs::MaterialInstance>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
@@ -207,7 +208,7 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
 	if (!registry.isValid(entity))
 		return;
 
-	if (registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
+	if (registry.hasAnyComponent<ecs::MaterialInstance>(entity))
 		return;
 
 	{
@@ -471,8 +472,10 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			std::string_view type;
 			if (registry.hasAllComponents<ecs::Mesh>(entity))
 				type = "Mesh"sv;
-			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
-				type = "Material"sv;
+			else if (registry.hasAllComponents<ecs::PrecompiledMaterial>(entity))
+				type = "Precompiled Material"sv;
+			else if (registry.hasAllComponents<ecs::MaterialInstance>(entity))
+				type = "Material Instance"sv;
 
 			ImGui::TextDisabled("%s", type.data());
 		};
@@ -520,14 +523,25 @@ bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 
 				if (menu2.item("Standard Opaque"))
 				{
-					createdEntity =
-						ecs::build(registry).withName(mergeMaterialName("Standard Opaque")).asMaterial<editor::StandardOpaqueMaterial>();
+					auto opaqueMaterial =
+						ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/standard_lit.filamat");
+					opaqueMaterial.addOrReplace<editor::tags::IsEditorEntity>();
+
+					createdEntity = ecs::build(registry)
+										.withName(mergeMaterialName("Standard Opaque"))
+										.asMaterialInstance(opaqueMaterial, editor::StandardOpaqueMaterial{});
 					changed = true;
 				}
 
 				if (menu2.item("Color Material"))
 				{
-					createdEntity = ecs::build(registry).withName(mergeMaterialName("Color Material")).asMaterial<editor::ColorMaterial>();
+					auto colorMaterial =
+						ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/color.filamat");
+					colorMaterial.addOrReplace<editor::tags::IsEditorEntity>();
+
+					createdEntity = ecs::build(registry)
+										.withName(mergeMaterialName("Color Material"))
+										.asMaterialInstance(colorMaterial, editor::ColorMaterial{});
 					changed = true;
 				}
 			}
@@ -546,13 +560,18 @@ bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 
 			if (menu.item("SkyBox"))
 			{
-				createdEntity = ecs::build(registry).withName("Default SkyBox").asMaterial<editor::SkyBoxMaterial>();
+				auto skyboxMaterial =
+					ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/skybox.filamat");
+				skyboxMaterial.addOrReplace<editor::tags::IsEditorEntity>();
+
+				createdEntity = ecs::build(registry)
+									.withName("Default SkyBox")
+									.asMaterialInstance(skyboxMaterial, editor::SkyBoxMaterial{});
 				changed = true;
 			}
-
 		}
 
-		if (isMeshInstanceSelected && registry.hasAnyComponent<ecs::tags::IsMaterial>(createdEntity))
+		if (isMeshInstanceSelected && registry.hasAnyComponent<ecs::MaterialInstance>(createdEntity))
 			ecs::MeshInstance::addMaterial(registry, selectedEntity, createdEntity);
 
 		if (changed)

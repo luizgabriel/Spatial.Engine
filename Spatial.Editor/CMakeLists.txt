@@ -5,7 +5,7 @@ add_subdirectory(assets)
 
 add_executable(Spatial.Editor
         src/main.cpp
-        src/SceneEditorSystem.cpp
+        src/EditorSystem.cpp
         src/EditorCameraController.h
         src/EditorCameraController.cpp
         src/EditorCamera.h
@@ -18,7 +18,7 @@ add_executable(Spatial.Editor
         src/CustomComponents.cpp
         src/EditorSettings.cpp
         src/Settings.h
-        ${SPATIAL_EDITOR_MACOS_ICON})
+        ${SPATIAL_EDITOR_MACOS_ICON} src/FileSystem.h src/FileSystem.cpp)
 
 # set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 

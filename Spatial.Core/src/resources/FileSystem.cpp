@@ -83,22 +83,22 @@ std::set<FileSystem::Entry> FileSystem::list(std::string_view path)
 	return pathList;
 }
 
-std::unique_ptr<std::istream> RootFileSystem::openReadStreamImpl(std::string_view path)
+std::unique_ptr<std::istream> AggregateFileSystem::openReadStreamImpl(std::string_view path)
 {
 	throw makeException(path);
 }
 
-std::unique_ptr<std::ostream> RootFileSystem::openWriteStreamImpl(std::string_view path)
+std::unique_ptr<std::ostream> AggregateFileSystem::openWriteStreamImpl(std::string_view path)
 {
 	throw makeException(path);
 }
 
-std::set<FileSystem::Entry> RootFileSystem::listImpl(std::string_view path) const
+std::set<FileSystem::Entry> AggregateFileSystem::listImpl(std::string_view path) const
 {
 	return std::set<Entry>{};
 }
 
-std::invalid_argument RootFileSystem::makeException(const std::string_view& path)
+std::invalid_argument AggregateFileSystem::makeException(const std::string_view& path)
 {
 	return std::invalid_argument{fmt::format("Invalid path: {}", path)};
 }

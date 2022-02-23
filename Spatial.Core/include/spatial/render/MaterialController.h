@@ -2,6 +2,7 @@
 
 #include <filament/Engine.h>
 #include <spatial/common/EventQueue.h>
+#include <spatial/ecs/Material.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilesSystem.h>
@@ -47,14 +48,11 @@ class MaterialController
 		return texture;
 	}
 
-	template <typename MaterialComponent>
-	void onUpdateFrameWithFinder(ecs::Registry& registry, const filament::Material& material)
-	{
-		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
-			.each([&](ecs::Entity entity, const auto&) {
-				registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material));
-			});
+	void onUpdateFrame(ecs::Registry& registry);
 
+	template <typename MaterialComponent>
+	void onUpdateFrameWithFinder(ecs::Registry& registry)
+	{
 		registry.getEntities<const MaterialComponent, render::MaterialInstance>().each(
 			[&](const auto& data, auto& materialInstance) {
 				data.apply(materialInstance.ref(), [&](const auto& res) { return findResource(res); });
@@ -62,13 +60,8 @@ class MaterialController
 	}
 
 	template <typename MaterialComponent>
-	void onUpdateFrame(ecs::Registry& registry, const filament::Material& material)
+	void onUpdateFrame(ecs::Registry& registry)
 	{
-		registry.getEntities<const MaterialComponent>(ecs::ExcludeComponents<render::MaterialInstance>)
-			.each([&](ecs::Entity entity, const auto&) {
-				registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material));
-			});
-
 		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
 			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref()); });
 	}

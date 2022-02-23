@@ -113,10 +113,10 @@ class FileSystem
 	[[nodiscard]] virtual std::set<Entry> listImpl(std::string_view path) const = 0;
 };
 
-class RootFileSystem : public FileSystem
+class AggregateFileSystem : public FileSystem
 {
   public:
-	RootFileSystem() = default;
+	AggregateFileSystem() = default;
 
   protected:
 	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) override;

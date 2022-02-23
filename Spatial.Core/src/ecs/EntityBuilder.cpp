@@ -3,6 +3,7 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
+#include <cassert>
 
 namespace spatial::ecs
 {
