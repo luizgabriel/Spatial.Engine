@@ -1,6 +1,5 @@
 #pragma once
 
-#include <spatial/ecs/Material.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Light.h>
@@ -9,6 +8,7 @@
 #include <spatial/serialization/Relation.h>
 #include <spatial/serialization/SceneView.h>
 #include <spatial/serialization/Transform.h>
+#include <spatial/serialization/Material.h>
 
 namespace spatial::ecs
 {
@@ -29,6 +29,8 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::Mesh>(ar);
 	snapshot.template component<ecs::MeshInstance>(ar);
 	snapshot.template component<ecs::MeshMaterial>(ar);
+	snapshot.template component<ecs::PrecompiledMaterial>(ar);
+	snapshot.template component<ecs::MaterialInstance>(ar);
 	snapshot.template component<ecs::Parent>(ar);
 	snapshot.template component<ecs::Child>(ar);
 	snapshot.template component<ecs::SceneView>(ar);

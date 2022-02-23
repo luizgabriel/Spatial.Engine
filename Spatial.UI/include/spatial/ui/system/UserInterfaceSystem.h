@@ -14,13 +14,12 @@ namespace spatial
 class UserInterfaceSystem
 {
   private:
-	FileSystem& mFileSystem;
 	ImGuiRenderer mRenderer;
 	UserInterfaceInput mInput;
 	Signal<> mRenderGuiSignal;
 
   public:
-	explicit UserInterfaceSystem(filament::Engine& engine, FileSystem& fileSystem);
+	explicit UserInterfaceSystem(filament::Engine& engine);
 
 	void onStart();
 
@@ -47,12 +46,14 @@ class UserInterfaceSystem
 	}
 
 	template <typename WindowImpl>
-	UserInterfaceSystem(filament::Engine& engine, FileSystem& fileSystem, const WindowImpl& window) : UserInterfaceSystem(engine, fileSystem)
+	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
 	{
 		getRenderer().setViewport(window.getSize(), window.getFrameBufferSize());
 	}
-	void setMaterial(std::string_view materialResourcePath);
-	void addFont(std::string_view fontPath);
+
+	void setMaterial(FileSystem& fileSystem, std::string_view materialResourcePath);
+
+	void addFont(FileSystem& fileSystem, std::string_view fontPath);
 };
 
 } // namespace spatial

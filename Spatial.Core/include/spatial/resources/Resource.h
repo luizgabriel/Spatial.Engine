@@ -12,8 +12,9 @@ enum ResourceType
 	ImageTexture,
 	CubeMapTexture,
 	FilaMesh,
-	Script,
-	IrradianceValues,
+	Javascript,
+	FilaMat,
+	Mat,
 };
 
 template <ResourceType t>
@@ -29,7 +30,7 @@ struct Resource
 	{
 	}
 
-	std::string filename() const
+	[[nodiscard]] std::string filename() const
 	{
 		return relativePath.filename().string();
 	}

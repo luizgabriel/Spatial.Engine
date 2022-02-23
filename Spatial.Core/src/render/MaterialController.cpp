@@ -62,4 +62,33 @@ void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 	mTextures.emplace(event.texture.getId(), std::move(texture));
 }
 
+void MaterialController::onUpdateFrame(ecs::Registry& registry)
+{
+	using namespace boost::algorithm;
+
+	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<ecs::tags::IsMaterialLoaded>)
+		.each([&](ecs::Entity entity, const ecs::PrecompiledMaterial& precompiledMaterial) {
+			if (precompiledMaterial.resource.isEmpty()
+				|| !ends_with(precompiledMaterial.resource.relativePath.c_str(), ".filamat"))
+				return;
+
+			auto data = mFileSystem.readBinary(precompiledMaterial.resource.relativePath.c_str());
+			auto material = render::createMaterial(mEngine, data.data(), data.size());
+
+			registry.addComponent(entity, std::move(material));
+			registry.addComponent<ecs::tags::IsMaterialLoaded>(entity);
+		});
+
+	registry.getEntities<const ecs::MaterialInstance>(ecs::ExcludeComponents<render::MaterialInstance>)
+		.each([&](ecs::Entity entity, const ecs::MaterialInstance& materialInstance) {
+			if (!registry.hasAllComponents<Material>(materialInstance.materialEntity))
+				return;
+
+			const auto& material = registry.getComponent<const Material>(materialInstance.materialEntity);
+			registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material.ref()));
+		});
+
+	//TODO: Add logic for compiling .mat files
+}
+
 } // namespace spatial::render

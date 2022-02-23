@@ -176,6 +176,7 @@ void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity en
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
 
+
 void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
@@ -263,8 +264,8 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					ui::Search::searchEntity<ecs::tags::IsMaterial>("##Material", registry,
-																	meshMaterial.materialEntity);
+					ui::Search::searchEntity<ecs::MaterialInstance>("##Material", registry,
+																	meshMaterial.materialInstanceEntity);
 
 					ImGui::TableNextColumn();
 
@@ -303,7 +304,29 @@ void ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::E
 
 	ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep, &largeStep,
 					   "%lu");
-	ui::Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, meshMaterial.materialEntity);
+	ui::Search::searchEntity<ecs::MaterialInstance>("Material", registry, meshMaterial.materialInstanceEntity);
+}
+
+void ComponentInputImpl<ecs::PrecompiledMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& material = registry.getComponent<ecs::PrecompiledMaterial>(entity);
+
+	ui::inputPath("Resource", material.resource.relativePath, "*.filamat");
+
+	if (ImGui::Button("Reload Material"))
+		registry.removeComponent<ecs::tags::IsMaterialLoaded>(entity);
+
+	ImGui::SameLine();
+
+	auto loaded = registry.hasAllComponents<ecs::tags::IsMaterialLoaded>(entity);
+	ImGui::Checkbox("Is Loaded", &loaded);
+}
+
+void ComponentInputImpl<ecs::MaterialInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& materialInstance = registry.getComponent<ecs::MaterialInstance>(entity);
+
+	Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, materialInstance.materialEntity);
 }
 
 void ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Entity entity)

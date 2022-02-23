@@ -63,7 +63,6 @@ class EntityHandle
 	template <typename... Component>
 	[[nodiscard]] bool has() const
 	{
-		assert(isValid());
 		return mRegistry.hasAllComponents<Component...>(mEntity);
 	}
 
@@ -107,6 +106,23 @@ class EntityHandle
 	operator Entity&()
 	{
 		return mEntity;
+	}
+
+	Entity get()
+	{
+		return mEntity;
+	}
+
+	template <typename Component, typename... Args>
+	decltype(auto) addOrReplace(Args&&... args)
+	{
+		return mRegistry.template addOrReplaceComponent<Component>(mEntity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component>
+	decltype(auto) addOrReplace(Component&& component)
+	{
+		return mRegistry.template addOrReplaceComponent<Component>(mEntity, std::forward<Component>(component));
 	}
 
   private:
@@ -160,7 +176,6 @@ class EntityConstHandle
 	template <typename... Component>
 	[[nodiscard]] bool has() const
 	{
-		assert(isValid());
 		return mRegistry.hasAllComponents<Component...>(mEntity);
 	}
 
@@ -187,6 +202,11 @@ class EntityConstHandle
 	[[nodiscard]] const auto& getRegistry() const
 	{
 		return mRegistry;
+	}
+
+	Entity get()
+	{
+		return mEntity;
 	}
 
   private:
