@@ -126,7 +126,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp include/spatial/ecs/RegistryCollection.h src/ecs/RegistryPublisher.cpp src/ecs/Material.cpp include/spatial/serialization/Material.h)
+        src/resources/MemoryFileSystem.cpp include/spatial/ecs/RegistryCollection.h src/ecs/RegistryPublisher.cpp src/ecs/Material.cpp include/spatial/serialization/Material.h include/spatial/render/MaterialInstance.h src/render/MaterialInstance.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

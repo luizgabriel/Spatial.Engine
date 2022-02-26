@@ -17,6 +17,7 @@
 #include <spatial/render/Camera.h>
 #include <spatial/render/EngineResource.h>
 #include <spatial/render/Entity.h>
+#include <spatial/render/MaterialInstance.h>
 #include <spatial/resources/FilameshFile.h>
 
 #include <memory>
@@ -32,7 +33,6 @@ using Renderer = EngineResource<filament::Renderer>;
 using Scene = EngineResource<filament::Scene>;
 using View = EngineResource<filament::View>;
 using Material = EngineResource<filament::Material>;
-using MaterialInstance = EngineResource<filament::MaterialInstance>;
 using Texture = EngineResource<filament::Texture>;
 using VertexBuffer = EngineResource<filament::VertexBuffer>;
 using IndexBuffer = EngineResource<filament::IndexBuffer>;
@@ -45,7 +45,7 @@ using SharedScene = SharedEngineResource<filament::Scene>;
 using SharedVertexBuffer = SharedEngineResource<filament::VertexBuffer>;
 using SharedIndexBuffer = SharedEngineResource<filament::IndexBuffer>;
 using SharedMaterial = SharedEngineResource<filament::Material>;
-using SharedMaterialInstance = SharedEngineResource<filament::MaterialInstance>;
+using SharedMaterialInstance = std::shared_ptr<render::MaterialInstance>;
 using SharedView = SharedEngineResource<filament::View>;
 using SharedTexture = SharedEngineResource<filament::Texture>;
 using SharedCamera = SharedEngineResource<filament::Camera>;
@@ -88,7 +88,7 @@ Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
  */
 Entity createEntity(filament::Engine& engine) noexcept;
 
-MaterialInstance createMaterialInstance(filament::Engine& engine, const filament::Material& material,
+MaterialInstance createMaterialInstance(filament::Engine& engine, const SharedMaterial& material,
 										std::string_view = {}) noexcept;
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);

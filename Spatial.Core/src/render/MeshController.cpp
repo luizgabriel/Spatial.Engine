@@ -41,21 +41,25 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 
 void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
-	registry.getEntities<const Entity, const ecs::MeshInstance, Renderable>().each(
-		[&](ecs::Entity e, const auto& entity, const auto& meshInstance, auto& renderable) {
+	registry.getEntities<const ecs::MeshInstance, Renderable>().each(
+		[&](const auto& meshInstance, auto& renderable) {
 			renderable.setCastShadows(meshInstance.castShadows);
 			renderable.setReceiveShadows(meshInstance.receiveShadows);
 			renderable.setCulling(meshInstance.culling);
 			renderable.setPriority(meshInstance.priority);
+		});
 
-			if (!registry.hasAllComponents<MeshGeometries, VertexBuffer, IndexBuffer>(meshInstance.meshSource))
+	registry.getEntities<const ecs::MeshInstance, Renderable>().each(
+		[&](const auto& meshInstance, auto& renderable) {
+			if (!registry.hasAllComponents<MeshGeometries, SharedVertexBuffer, SharedIndexBuffer>(
+					meshInstance.meshSource))
 				return;
 
 			const auto& parts = registry.getComponent<const MeshGeometries>(meshInstance.meshSource);
 			const auto partsCount = meshInstance.slice.count == 0 ? parts.size() : meshInstance.slice.count;
 
-			auto& vertexBuffer = registry.getComponent<VertexBuffer>(meshInstance.meshSource);
-			auto& indexBuffer = registry.getComponent<IndexBuffer>(meshInstance.meshSource);
+			auto vertexBuffer = registry.getComponent<const SharedVertexBuffer>(meshInstance.meshSource);
+			auto indexBuffer = registry.getComponent<const SharedIndexBuffer>(meshInstance.meshSource);
 
 			const auto* boundingBox = registry.tryGetComponent<filament::Box>(meshInstance.meshSource);
 			if (boundingBox)
@@ -64,35 +68,38 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
 			{
 				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
-				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer.get(), indexBuffer.get(),
+				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer, indexBuffer,
 										 geometry.offset, geometry.count);
 			}
 		});
 
-	registry.getEntities<const ecs::MeshMaterial, const ecs::Child>().each(
-		[&](const auto& meshMaterial, const ecs::Child& child) {
-			if (!registry.hasAllComponents<Renderable, ecs::MeshInstance>(child.parent))
-				return;
+	registry.getEntities<const ecs::MeshMaterial, const ecs::Child>().each([&](ecs::Entity e, const auto& meshMaterial,
+																			   const ecs::Child& child) {
+		if (!registry.hasAllComponents<Renderable, ecs::MeshInstance>(child.parent))
+			return;
 
-			auto& renderable = registry.getComponent<Renderable>(child.parent);
-			const auto& mesh = registry.getComponent<const ecs::MeshInstance>(child.parent);
+		auto& renderable = registry.getComponent<Renderable>(child.parent);
+		const auto& mesh = registry.getComponent<const ecs::MeshInstance>(child.parent);
 
-			const auto* material = registry.tryGetComponent<const MaterialInstance>(meshMaterial.materialInstanceEntity);
-			if (material != nullptr)
-				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, material->get());
-			else
-				renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex,
-												 mEngine.getDefaultMaterial()->getDefaultInstance());
-		});
+
+		if (!registry.hasAllComponents<SharedMaterialInstance>(meshMaterial.materialInstanceEntity))
+		{
+			renderable.resetMaterialInstance(meshMaterial.primitiveIndex);
+			return;
+		}
+
+		const auto& materialInstance = registry.getComponent<const SharedMaterialInstance>(meshMaterial.materialInstanceEntity);
+		renderable.setMaterialInstanceAt(meshMaterial.primitiveIndex, materialInstance);
+	});
 }
 
 void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 {
-	auto d1 = registry.getEntities<ecs::tags::IsMeshDirty, Renderable>();
+	auto d1 = registry.getEntities<ecs::tags::IsMeshInstanceDirty, Renderable>();
 	registry.removeComponent<Renderable>(d1.begin(), d1.end());
 
-	auto d2 = registry.getEntities<ecs::tags::IsMeshDirty>();
-	registry.removeComponent<ecs::tags::IsMeshDirty>(d2.begin(), d2.end());
+	auto d2 = registry.getEntities<ecs::tags::IsMeshInstanceDirty>();
+	registry.removeComponent<ecs::tags::IsMeshInstanceDirty>(d2.begin(), d2.end());
 }
 
 void MeshController::onStartFrame(ecs::Registry& registry)
@@ -114,8 +121,8 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 			auto filamesh = FilameshFile{};
 			*stream >> filamesh;
 
-			registry.addOrReplaceComponent(entity, createVertexBuffer(mEngine, filamesh));
-			registry.addOrReplaceComponent(entity, createIndexBuffer(mEngine, filamesh));
+			registry.addOrReplaceComponent(entity, toShared(createVertexBuffer(mEngine, filamesh)));
+			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(mEngine, filamesh)));
 			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
 			registry.addOrReplaceComponent(entity, createMeshGeometries(filamesh));
 			registry.addOrReplaceComponent<ecs::tags::IsMeshLoaded>(entity);

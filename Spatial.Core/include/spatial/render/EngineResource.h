@@ -58,18 +58,6 @@ class EngineResource
 		return mResource;
 	}
 
-	ResourceType& ref()
-	{
-		assert(isValid());
-		return *mResource;
-	}
-
-	const ResourceType& ref() const
-	{
-		assert(isValid());
-		return *mResource;
-	}
-
 	void reset()
 	{
 		if (isValid())
@@ -98,9 +86,26 @@ class EngineResource
 		return mResource;
 	}
 
+	ResourceType& operator*()
+	{
+		assert(isValid());
+		return *mResource;
+	}
+
+	const ResourceType& operator*() const
+	{
+		assert(isValid());
+		return *mResource;
+	}
+
 	[[nodiscard]] bool isValid() const noexcept
 	{
 		return mResource != nullptr;
+	}
+
+	operator bool() const noexcept
+	{
+		return isValid();
 	}
 };
 

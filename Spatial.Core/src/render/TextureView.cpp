@@ -29,7 +29,7 @@ void TextureView::updateSize(math::int2 size)
 	mRenderDepthTexture = createTexture(*mEngine, size, filament::backend::TextureFormat::DEPTH16,
 										filament::Texture::Usage::DEPTH_ATTACHMENT);
 
-	mRenderTarget = render::createRenderTarget(*mEngine, mRenderColorTexture.ref(), mRenderDepthTexture.ref());
+	mRenderTarget = render::createRenderTarget(*mEngine, *mRenderColorTexture, *mRenderDepthTexture);
 
 	mView->setRenderTarget(mRenderTarget.get());
 }

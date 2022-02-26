@@ -11,7 +11,6 @@
 #include <spatial/desktop/Window.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
-#include <spatial/script/PlatformContext.h>
 #include <spatial/ui/system/UserInterfaceSystem.h>
 #include <spatial/ui/system/UserInterfaceUtils.h>
 #include <spatial/render/RegistryRenderingSystem.h>
@@ -38,9 +37,7 @@ int main(int argc, char* argv[])
 	ui.addFont(*fileSystem, "editor/fonts/roboto_medium.ttf");
 	ui.getRenderer().createFontTextureAtlas();
 
-	auto scriptingContext = script::PlatformContext{};
-
-	auto editor = editor::EditorSystem{rendering.getEngine(), window, *fileSystem, scriptingContext};
+	auto editor = editor::EditorSystem{rendering.getEngine(), window, *fileSystem};
 
 	// Connect all Systems to the Application Main Loop
 	app >> desktopContext >> input >> rendering >> ui >> editor >> scene;

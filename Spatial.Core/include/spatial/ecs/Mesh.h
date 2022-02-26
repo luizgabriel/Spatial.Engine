@@ -15,9 +15,8 @@ struct IsMesh
 	constexpr static auto typeName = "tag_is_mesh";
 };
 
-struct IsMeshDirty
+struct IsMeshInstanceDirty
 {
-	constexpr static auto typeName = "tag_is_mesh_dirty";
 };
 
 struct IsMeshLoaded

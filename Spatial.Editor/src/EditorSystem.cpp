@@ -37,20 +37,20 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem,
-						   script::PlatformContext& scriptContext)
+EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem)
 	: mEngine{engine},
 	  mWindow{window},
 
 	  mIconTexture{mEngine, nullptr},
 
 	  mFileSystem{fileSystem},
+	  mPlatformContext{},
 
 	  mRegistry{},
 
 	  mEditorCameraController{},
 	  mMaterialController{mEngine, mFileSystem},
-	  mScriptController{scriptContext.createIsolate()},
+	  mScriptController{mPlatformContext.createIsolate()},
 
 	  mJobQueue{},
 
@@ -169,11 +169,11 @@ void EditorSystem::onStartFrame(float)
 	auto skyboxMeshResource = ecs::handleOf<tags::IsSkyBoxMeshResource>(mRegistry);
 	if (!skyboxMeshResource.has<ecs::tags::IsMeshLoaded>())
 	{
-		auto ib = render::createFullScreenIndexBuffer(mEngine);
+		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
 		skyboxMeshResource.add<ecs::tags::IsMeshLoaded>();
-		skyboxMeshResource.add(render::createFullScreenVertexBuffer(mEngine));
-		skyboxMeshResource.add(render::MeshGeometries{{0, ib->getIndexCount()}});
-		skyboxMeshResource.add(std::move(ib));
+		skyboxMeshResource.addOrReplace(toShared(render::createFullScreenVertexBuffer(mEngine)));
+		skyboxMeshResource.addOrReplace(render::MeshGeometries{{0, ib->getIndexCount()}});
+		skyboxMeshResource.addOrReplace(std::move(ib));
 	}
 
 	mMaterialController.onStartFrame();
@@ -183,10 +183,10 @@ void EditorSystem::onUpdateFrame(float delta)
 {
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	mMaterialController.onUpdateFrame<GridMaterial>(mRegistry);
-	mMaterialController.onUpdateFrame<ColorMaterial>(mRegistry);
-	mMaterialController.onUpdateFrameWithFinder<StandardOpaqueMaterial>(mRegistry);
-	mMaterialController.onUpdateFrameWithFinder<SkyBoxMaterial>(mRegistry);
+	mMaterialController.applyMaterial<GridMaterial>(mRegistry);
+	mMaterialController.applyMaterial<ColorMaterial>(mRegistry);
+	mMaterialController.applyMaterialWithFinder<StandardOpaqueMaterial>(mRegistry);
+	mMaterialController.applyMaterialWithFinder<SkyBoxMaterial>(mRegistry);
 }
 
 void EditorSystem::onDrawGui()
@@ -198,7 +198,7 @@ void EditorSystem::onDrawGui()
 	static std::filesystem::path rootPath = std::filesystem::current_path();
 
 	ui::MenuBar::show([&]() {
-		ui::EditorMainMenu::fileMenu(mIconTexture.ref());
+		ui::EditorMainMenu::fileMenu(*mIconTexture);
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
 
 		if (ui::OpenProjectModal::show(rootPath))
@@ -270,12 +270,12 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Properties", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
-		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, mIconTexture.ref(),
+		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, *mIconTexture,
 												[&](const auto& res) { return mMaterialController.findResource(res); });
 	});
 
 	ui::Window::show("Assets Explorer",
-					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, mIconTexture.ref()); });
+					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, *mIconTexture); });
 }
 
 void EditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
