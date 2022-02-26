@@ -1,5 +1,6 @@
 #include <filament/Engine.h>
 #include <spatial/render/Renderable.h>
+#include <spatial/render/Resources.h>
 
 namespace fl = filament;
 
@@ -7,7 +8,7 @@ namespace spatial::render
 {
 
 Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
-	: mEngine{engine}, mEntity{entity}
+	: mEngine{engine}, mEntity{entity}, mMaterialInstances{}, mVertexBuffers{}, mIndexBuffers{}
 {
 	if (Builder(primitivesCount).castShadows(true).receiveShadows(true).build(engine, entity)
 		!= Builder::Result::Success)
@@ -99,9 +100,10 @@ const filament::Box& Renderable::getAxisAlignedBoundingBox() const noexcept
 	return getManager().getAxisAlignedBoundingBox(getInstance());
 }
 
-void Renderable::setMaterialInstanceAt(size_t primitiveIndex, const fl::MaterialInstance* materialInstance) noexcept
+void Renderable::setMaterialInstanceAt(size_t primitiveIndex, const SharedMaterialInstance& materialInstance) noexcept
 {
-	return getManager().setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance);
+	mMaterialInstances.emplace(primitiveIndex, materialInstance);
+	return getManager().setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance->get());
 }
 
 fl::MaterialInstance* Renderable::getMaterialInstanceAt(size_t primitiveIndex) const noexcept
@@ -109,10 +111,13 @@ fl::MaterialInstance* Renderable::getMaterialInstanceAt(size_t primitiveIndex) c
 	return getManager().getMaterialInstanceAt(getInstance(), primitiveIndex);
 }
 
-void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type, fl::VertexBuffer* vertices,
-							   fl::IndexBuffer* indices, size_t offset, size_t count) noexcept
+void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type,
+							   const SharedVertexBuffer& vertices, const SharedIndexBuffer& indices, size_t offset,
+							   size_t count) noexcept
 {
-	getManager().setGeometryAt(getInstance(), primitiveIndex, type, vertices, indices, offset, count);
+	mVertexBuffers.emplace(primitiveIndex, vertices);
+	mIndexBuffers.emplace(primitiveIndex, indices);
+	getManager().setGeometryAt(getInstance(), primitiveIndex, type, vertices.get(), indices.get(), offset, count);
 }
 
 void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type, size_t offset,
@@ -172,6 +177,12 @@ Renderable& Renderable::operator=(Renderable&& other) noexcept
 	mEntity = other.release();
 
 	return *this;
+}
+
+void Renderable::resetMaterialInstance(size_t primitiveIndex) noexcept
+{
+	getManager().setMaterialInstanceAt(getInstance(), primitiveIndex,
+									   mEngine.getDefaultMaterial()->getDefaultInstance());
 }
 
 } // namespace spatial::render

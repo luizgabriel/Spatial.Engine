@@ -20,7 +20,7 @@ void RenderingSystem::onEndFrame()
 {
 	if (mRenderer->beginFrame(mSwapChain.get()))
 	{
-		mOnRenderSignal(mRenderer.ref());
+		mOnRenderSignal(*mRenderer);
 		mRenderer->endFrame();
 	}
 }

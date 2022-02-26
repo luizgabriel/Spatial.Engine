@@ -20,7 +20,7 @@ struct IsMaterial
 	constexpr static auto typeName = "tag_is_material";
 };
 
-struct IsMaterialLoaded
+struct IsMaterialDirty
 {
 };
 

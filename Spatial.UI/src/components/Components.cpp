@@ -294,7 +294,7 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	}
 
 	if (changed)
-		registry.addComponent<ecs::tags::IsMeshDirty>(entity);
+		registry.addComponent<ecs::tags::IsMeshInstanceDirty>(entity);
 }
 
 void ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
@@ -314,11 +314,11 @@ void ComponentInputImpl<ecs::PrecompiledMaterial>::draw(ecs::Registry& registry,
 	ui::inputPath("Resource", material.resource.relativePath, "*.filamat");
 
 	if (ImGui::Button("Reload Material"))
-		registry.removeComponent<ecs::tags::IsMaterialLoaded>(entity);
+		registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
 
 	ImGui::SameLine();
 
-	auto loaded = registry.hasAllComponents<ecs::tags::IsMaterialLoaded>(entity);
+	auto loaded = !registry.hasAllComponents<ecs::tags::IsMaterialDirty>(entity);
 	ImGui::Checkbox("Is Loaded", &loaded);
 }
 
@@ -326,7 +326,9 @@ void ComponentInputImpl<ecs::MaterialInstance>::draw(ecs::Registry& registry, ec
 {
 	auto& materialInstance = registry.getComponent<ecs::MaterialInstance>(entity);
 
-	Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, materialInstance.materialEntity);
+	bool changed = Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, materialInstance.materialEntity);
+	if (changed)
+		registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
 }
 
 void ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Entity entity)

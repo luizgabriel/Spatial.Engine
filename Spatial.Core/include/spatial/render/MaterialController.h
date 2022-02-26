@@ -2,6 +2,7 @@
 
 #include <filament/Engine.h>
 #include <spatial/common/EventQueue.h>
+#include <spatial/core/Logger.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
@@ -51,19 +52,19 @@ class MaterialController
 	void onUpdateFrame(ecs::Registry& registry);
 
 	template <typename MaterialComponent>
-	void onUpdateFrameWithFinder(ecs::Registry& registry)
+	void applyMaterialWithFinder(ecs::Registry& registry)
 	{
-		registry.getEntities<const MaterialComponent, render::MaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) {
-				data.apply(materialInstance.ref(), [&](const auto& res) { return findResource(res); });
+		registry.getEntities<const MaterialComponent, SharedMaterialInstance>().each(
+			[this](const auto& data, auto& materialInstance) {
+				data.apply(*materialInstance->get(), [&](const auto& res) { return findResource(res); });
 			});
 	}
 
 	template <typename MaterialComponent>
-	void onUpdateFrame(ecs::Registry& registry)
+	void applyMaterial(ecs::Registry& registry)
 	{
-		registry.getEntities<MaterialComponent, render::MaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) { data.apply(materialInstance.ref()); });
+		registry.getEntities<MaterialComponent, SharedMaterialInstance>().each(
+			[](const auto& data, auto& materialInstance) { data.apply(*materialInstance->get()); });
 	}
 
   private:
