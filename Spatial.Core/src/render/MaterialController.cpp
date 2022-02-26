@@ -3,6 +3,8 @@
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
 
+using namespace boost::algorithm;
+
 namespace spatial::render
 {
 
@@ -27,7 +29,8 @@ void MaterialController::onStartFrame()
 
 void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
 {
-	using namespace boost::algorithm;
+	if (event.texture.isEmpty())
+		return;
 
 	if (!ends_with(event.texture.relativePath.c_str(), ".png")
 		&& !ends_with(event.texture.relativePath.c_str(), ".jpg"))
@@ -46,7 +49,8 @@ void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
 
 void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 {
-	using namespace boost::algorithm;
+	if (event.texture.isEmpty())
+		return;
 
 	if (!ends_with(event.texture.relativePath.c_str(), ".ktx"))
 		return;
@@ -66,29 +70,36 @@ void MaterialController::onUpdateFrame(ecs::Registry& registry)
 {
 	using namespace boost::algorithm;
 
-	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<ecs::tags::IsMaterialLoaded>)
+	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<SharedMaterial>)
 		.each([&](ecs::Entity entity, const ecs::PrecompiledMaterial& precompiledMaterial) {
 			if (precompiledMaterial.resource.isEmpty()
 				|| !ends_with(precompiledMaterial.resource.relativePath.c_str(), ".filamat"))
 				return;
 
 			auto data = mFileSystem.readBinary(precompiledMaterial.resource.relativePath.c_str());
-			auto material = render::createMaterial(mEngine, data.data(), data.size());
+			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
-			registry.addComponent(entity, std::move(material));
-			registry.addComponent<ecs::tags::IsMaterialLoaded>(entity);
+			registry.addComponent<SharedMaterial>(entity, material);
 		});
 
-	registry.getEntities<const ecs::MaterialInstance>(ecs::ExcludeComponents<render::MaterialInstance>)
+	registry.getEntities<const ecs::MaterialInstance>(ecs::ExcludeComponents<SharedMaterialInstance>)
 		.each([&](ecs::Entity entity, const ecs::MaterialInstance& materialInstance) {
-			if (!registry.hasAllComponents<Material>(materialInstance.materialEntity))
+			if (!registry.hasAllComponents<SharedMaterial>(materialInstance.materialEntity))
 				return;
 
-			const auto& material = registry.getComponent<const Material>(materialInstance.materialEntity);
-			registry.addComponent<MaterialInstance>(entity, render::createMaterialInstance(mEngine, material.ref()));
+			auto material = registry.getComponent<const SharedMaterial>(materialInstance.materialEntity);
+			registry.addComponent<SharedMaterialInstance>(entity,
+														  toShared(render::createMaterialInstance(mEngine, material)));
 		});
 
-	//TODO: Add logic for compiling .mat files
+	auto d1 = registry.getEntities<ecs::tags::IsMaterialDirty, SharedMaterialInstance>();
+	registry.removeComponent<SharedMaterialInstance>(d1.begin(), d1.end());
+
+	auto d2 = registry.getEntities<ecs::tags::IsMaterialDirty, SharedMaterial>();
+	registry.removeComponent<SharedMaterial>(d2.begin(), d2.end());
+
+	auto d3 = registry.getEntities<ecs::tags::IsMaterialDirty>();
+	registry.removeComponent<ecs::tags::IsMaterialDirty>(d3.begin(), d3.end());
 }
 
 } // namespace spatial::render

@@ -30,38 +30,36 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
 		auto reflectionsTextureId = component.reflectionsTexturePath.getId();
 
-		if (mTextures.find(reflectionsTextureId) == mTextures.end())
-		{
-			auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.c_str());
-			if (data.empty())
-			{
-				gLogger.warn("Could not load indirect light: {}",
-							 component.reflectionsTexturePath.relativePath.c_str());
-				return;
-			}
+		if (mTextures.find(reflectionsTextureId) != mTextures.end())
+			return;
 
-			loadTexture(reflectionsTextureId, &data[0], data.size());
+		auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.c_str());
+		if (data.empty())
+		{
+			gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.c_str());
+			return;
 		}
+
+		loadTexture(reflectionsTextureId, &data[0], data.size());
 	});
 
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
 		auto irradianceValuesId = component.irradianceValuesPath.getId();
 
-		if (mBands.find(irradianceValuesId) == mBands.end())
+		if (mBands.find(irradianceValuesId) != mBands.end())
+			return;
+
+		auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.c_str());
+		if (stream->fail())
 		{
-			auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.c_str());
-			if (stream->fail())
-			{
-				gLogger.warn("Could not load irradiance values: {}",
-							 component.irradianceValuesPath.relativePath.c_str());
-				return;
-			}
-
-			auto bands = bands_t{};
-			*stream >> bands;
-
-			loadIrradianceValues(irradianceValuesId, std::move(bands));
+			gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.c_str());
+			return;
 		}
+
+		auto bands = bands_t{};
+		*stream >> bands;
+
+		loadIrradianceValues(irradianceValuesId, bands);
 	});
 
 	registry.getEntities<ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)

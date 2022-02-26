@@ -22,7 +22,7 @@ class ImGuiRenderer
 	render::Camera mCamera;
 	render::Entity mEntity;
 	render::Skybox mSkybox;
-	render::Material mMaterial;
+	render::SharedMaterial mMaterial;
 	render::Texture mFontTexture;
 
 	std::vector<render::VertexBuffer> mVertexBuffers;
@@ -67,7 +67,7 @@ class ImGuiRenderer
 	// region Getters
 	[[nodiscard]] const auto& getView() const
 	{
-		return mView.ref();
+		return *mView;
 	}
 	// endregion
 };

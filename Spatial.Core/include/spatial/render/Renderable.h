@@ -5,10 +5,13 @@
 #include <filament/RenderableManager.h>
 #include <filament/VertexBuffer.h>
 #include <spatial/common/Math.h>
+#include <spatial/render/Resources.h>
 #include <utils/Entity.h>
 
 namespace spatial::render
 {
+
+
 
 class Renderable
 {
@@ -53,12 +56,14 @@ class Renderable
 
 	void setMorphWeights(math::float4 const& weights) noexcept;
 
-	void setMaterialInstanceAt(size_t primitiveIndex, filament::MaterialInstance const* materialInstance) noexcept;
+	void setMaterialInstanceAt(size_t primitiveIndex, const SharedMaterialInstance& materialInstance) noexcept;
 
-	filament::MaterialInstance* getMaterialInstanceAt(size_t primitiveIndex) const noexcept;
+	void resetMaterialInstance(size_t primitiveIndex) noexcept;
 
-	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, filament::VertexBuffer* vertices,
-					   filament::IndexBuffer* indices, size_t offset, size_t count) noexcept;
+	[[nodiscard]] filament::MaterialInstance* getMaterialInstanceAt(size_t primitiveIndex) const noexcept;
+
+	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, const SharedVertexBuffer& vertices,
+					   const SharedIndexBuffer& indices, size_t offset, size_t count) noexcept;
 
 	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, size_t offset, size_t count) noexcept;
 
@@ -79,12 +84,36 @@ class Renderable
 	void reset();
 
   private:
+	template <typename T>
+	struct PrimitiveIndex
+	{
+		size_t primitiveIndex;
+		T value;
+
+		PrimitiveIndex(size_t primitiveIndex, T value) : primitiveIndex{primitiveIndex}, value{value}
+		{
+		}
+
+		bool operator<(const PrimitiveIndex& rhs) const
+		{
+			return primitiveIndex < rhs.primitiveIndex;
+		}
+
+		bool operator==(const PrimitiveIndex& rhs) const
+		{
+			return primitiveIndex == rhs.primitiveIndex;
+		}
+	};
+
 	filament::Engine& mEngine;
 	utils::Entity mEntity;
+	std::set<PrimitiveIndex<SharedMaterialInstance>> mMaterialInstances;
+	std::set<PrimitiveIndex<SharedVertexBuffer>> mVertexBuffers;
+	std::set<PrimitiveIndex<SharedIndexBuffer>> mIndexBuffers;
 
-	Instance getInstance() const noexcept;
+    [[nodiscard]] Instance getInstance() const noexcept;
 
-	const Manager& getManager() const noexcept;
+	[[nodiscard]] const Manager& getManager() const noexcept;
 
 	Manager& getManager() noexcept;
 };

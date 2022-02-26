@@ -32,7 +32,7 @@ class EditorSystem
   public:
 	constexpr static auto PROJECT_DIR = "project";
 
-	EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem, script::PlatformContext& scriptContext);
+	EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem);
 
 	void onStart();
 
@@ -67,6 +67,7 @@ class EditorSystem
 	render::Texture mIconTexture;
 
 	FileSystem& mFileSystem;
+	script::PlatformContext mPlatformContext;
 
 	ecs::Registry mRegistry;
 

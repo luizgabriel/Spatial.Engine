@@ -23,7 +23,7 @@ ImGuiRenderer::ImGuiRenderer(fl::Engine& engine)
 	  mCamera{render::createCamera(mEngine, mCameraEntity.get())},
 	  mEntity{render::createEntity(mEngine)},
 	  mSkybox{render::createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
-	  mMaterial{mEngine, nullptr},
+	  mMaterial{},
 	  mFontTexture{mEngine, nullptr}
 {
 	mView->setCamera(mCamera.getInstance());
@@ -40,7 +40,7 @@ ImGuiRenderer::ImGuiRenderer(fl::Engine& engine)
 
 void ImGuiRenderer::setMaterial(const uint8_t* data, size_t size)
 {
-	mMaterial = render::createMaterial(mEngine, data, size);
+	mMaterial = toShared(render::createMaterial(mEngine, data, size));
 }
 
 void ImGuiRenderer::addFont(const uint8_t* data, size_t size)
@@ -289,9 +289,7 @@ void ImGuiRenderer::createMaterialInstances(size_t numRequiredInstances)
 	{
 		mMaterialInstances.reserve(numRequiredInstances);
 		for (size_t i = previousSize; i < numRequiredInstances; i++)
-		{
-			mMaterialInstances.emplace_back(mEngine, mMaterial->createInstance());
-		}
+			mMaterialInstances.emplace_back(render::createMaterialInstance(mEngine, mMaterial));
 	}
 }
 
@@ -323,7 +321,7 @@ void ImGuiRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDraw
 
 void ImGuiRenderer::createFontTextureAtlas()
 {
-	assert(mMaterial.isValid());
+	assert(mMaterial);
 	mFontTexture = ui::imguiCreateTextureAtlas(mEngine);
 	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
