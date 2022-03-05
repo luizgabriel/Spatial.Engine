@@ -16,9 +16,9 @@ class MemoryFileSystem : public FileSystem
 	void define(const std::string& fileName, const std::pair<const uint8_t*, size_t>& blob);
 
   protected:
-	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) override;
+	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) noexcept override;
 
-	[[nodiscard]] std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) override;
+	[[nodiscard]] std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) noexcept override;
 
 	[[nodiscard]] std::set<Entry> listImpl(std::string_view path) const override;
 

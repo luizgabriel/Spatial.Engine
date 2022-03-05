@@ -50,7 +50,7 @@ EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, Fi
 
 	  mEditorCameraController{},
 	  mMaterialController{mEngine, mFileSystem},
-	  mScriptController{mPlatformContext.createIsolate()},
+	  mScriptController{mFileSystem, mPlatformContext.createIsolate()},
 
 	  mJobQueue{},
 
@@ -181,6 +181,7 @@ void EditorSystem::onStartFrame(float)
 
 void EditorSystem::onUpdateFrame(float delta)
 {
+	mScriptController.onUpdateFrame(mRegistry, delta);
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
 	mMaterialController.applyMaterial<GridMaterial>(mRegistry);
@@ -266,6 +267,7 @@ void EditorSystem::onDrawGui()
 		ui::Search::searchText(search);
 		ui::AssetsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity);
+		ui::EditorDragAndDrop::loadScript(mRegistry, selectedEntity);
 	});
 
 	ui::Window::show("Properties", [&]() {

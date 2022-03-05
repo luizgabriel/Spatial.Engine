@@ -32,6 +32,7 @@ add_library(Spatial.Core
         include/spatial/ecs/SceneView.h
         include/spatial/ecs/Script.h
         include/spatial/ecs/Material.h
+        include/spatial/ecs/RegistryCollection.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -52,6 +53,7 @@ add_library(Spatial.Core
         include/spatial/render/IndirectLightController.h
         include/spatial/render/ResourceFinders.h
         include/spatial/render/RegistryRenderingSystem.h
+        include/spatial/render/MaterialInstance.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -67,6 +69,7 @@ add_library(Spatial.Core
         include/spatial/serialization/SkyBox.h
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
+        include/spatial/serialization/Material.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
@@ -80,6 +83,8 @@ add_library(Spatial.Core
         include/spatial/script/Isolate.h
         include/spatial/script/PlatformContext.h
         include/spatial/script/ScriptController.h
+        include/spatial/script/ScriptSourceStream.h
+        include/spatial/script/Utils.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -98,6 +103,8 @@ add_library(Spatial.Core
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
         src/ecs/Mesh.cpp
+        src/ecs/Material.cpp
+        src/ecs/RegistryPublisher.cpp
 
         src/render/Resources.cpp
         src/render/Engine.cpp
@@ -117,16 +124,19 @@ add_library(Spatial.Core
         src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
         src/render/SceneRenderingSystem.cpp
+        src/render/MaterialInstance.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
         src/script/ScriptController.cpp
+        src/script/ScriptSourceStream.cpp
+        src/script/Utils.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp include/spatial/ecs/RegistryCollection.h src/ecs/RegistryPublisher.cpp src/ecs/Material.cpp include/spatial/serialization/Material.h include/spatial/render/MaterialInstance.h src/render/MaterialInstance.cpp)
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

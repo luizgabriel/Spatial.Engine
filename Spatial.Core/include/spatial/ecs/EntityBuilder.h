@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/common/Math.h>
-#include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
@@ -11,6 +10,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/ecs/Script.h>
 
 namespace spatial::ecs
 {
@@ -35,6 +35,8 @@ class MeshEntityBuilder;
 class MeshInstanceEntityBuilder;
 
 class SceneViewEntityBuilder;
+
+class ScriptEntityBuilder;
 
 class EntityBuilder
 {
@@ -79,6 +81,8 @@ class EntityBuilder
 
 	MeshEntityBuilder asMesh();
 	MeshInstanceEntityBuilder asMeshInstance();
+
+	ScriptEntityBuilder asScript();
 
 	template <typename MaterialComponent, typename... Args>
 	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance(Entity material, Args&&... args)
@@ -282,6 +286,15 @@ class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
 	SceneViewEntityBuilder(Registry& registry, Entity entity);
 	SceneViewEntityBuilder& withCamera(ecs::Entity cameraEntity);
 	SceneViewEntityBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
+};
+
+class ScriptEntityBuilder : public BasicEntityBuilder<Script>
+{
+  public:
+	using Base = BasicEntityBuilder<Script>;
+
+	ScriptEntityBuilder(Registry& registry, Entity entity);
+	ScriptEntityBuilder& withResource(const std::filesystem::path& script);
 };
 
 } // namespace spatial::ecs

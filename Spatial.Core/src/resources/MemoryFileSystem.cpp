@@ -6,14 +6,16 @@
 namespace spatial
 {
 
-std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_view path)
+std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_view path) noexcept
 {
 	return std::make_unique<std::stringstream>(openStream(path));
 }
 
-std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path)
+std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path) noexcept
 {
-	throw std::invalid_argument(fmt::format("Cannot write to memory files: {}", path));
+	auto stream = std::make_unique<std::stringstream>();
+	stream->setstate(std::ios::failbit);
+	return stream;
 }
 
 std::set<FileSystem::Entry> MemoryFileSystem::listImpl(std::string_view path) const
@@ -62,8 +64,14 @@ void MemoryFileSystem::define(const std::string& fileName, const std::pair<const
 
 std::stringstream MemoryFileSystem::openStream(std::string_view path) const
 {
-	auto& data = mMemoryMap.at(std::string{path});
-	return std::stringstream{data};
+	try {
+		auto& data = mMemoryMap.at(std::string{path});
+		return std::stringstream{data};
+	} catch (const std::out_of_range& e) {
+		auto value = std::stringstream{};
+		value.setstate(std::ios::badbit);
+		return value;
+	}
 }
 
 } // namespace spatial

@@ -1,9 +1,9 @@
+#include <cassert>
 #include <fmt/format.h>
 #include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <cassert>
 
 namespace spatial::ecs
 {
@@ -74,6 +74,11 @@ IndirectLightEntityBuilder EntityBuilder::asIndirectLight()
 }
 
 SceneViewEntityBuilder EntityBuilder::asSceneView()
+{
+	return {mRegistry, mEntity};
+}
+
+ScriptEntityBuilder EntityBuilder::asScript()
 {
 	return {mRegistry, mEntity};
 }
@@ -405,6 +410,17 @@ SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity in
 {
 	ecs::Parent::addChild(mRegistry, mEntity, indirectLightEntity);
 	getComponent().indirectLight = indirectLightEntity;
+	return *this;
+}
+
+ScriptEntityBuilder::ScriptEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+	with<tags::IsResource>();
+}
+
+ScriptEntityBuilder& ScriptEntityBuilder::withResource(const std::filesystem::path& script)
+{
+	getComponent().resource = script;
 	return *this;
 }
 

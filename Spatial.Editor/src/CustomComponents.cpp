@@ -129,6 +129,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PrecompiledMaterial>(registry, entity);
 	componentCollapse<ecs::MaterialInstance>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
+	componentCollapse<ecs::Script>(registry, entity);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
 	componentCollapse<editor::ColorMaterial>(registry, entity);
@@ -476,6 +477,8 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 				type = "Precompiled Material"sv;
 			else if (registry.hasAllComponents<ecs::MaterialInstance>(entity))
 				type = "Material Instance"sv;
+			else if (registry.hasAllComponents<ecs::Script>(entity))
+				type = "Script"sv;
 
 			ImGui::TextDisabled("%s", type.data());
 		};
@@ -548,7 +551,7 @@ bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 
 			if (menu.item("Script"))
 			{
-				createdEntity = ecs::build(registry).withName("Script").asMesh().withResource("");
+				createdEntity = ecs::build(registry).withName("Script").asScript().withResource("");
 				changed = true;
 			}
 
@@ -581,16 +584,17 @@ bool AssetsManager::popup(ecs::Registry& registry, ecs::Entity& selectedEntity)
 	return changed;
 }
 
-void EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity)
+bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
+	auto dnd = ui::DragAndDropTarget{};
+	auto result = dnd.getPayload<std::filesystem::path>();
+	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
 	{
-		auto dnd = ui::DragAndDropTarget{};
-		auto result = dnd.getPayload<std::filesystem::path>();
-		if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
-		{
-			selectedEntity = ecs::build(registry).asMesh().withResource(result.value());
-		}
+		selectedEntity = ecs::build(registry).asMesh().withResource(result.value());
+		return true;
 	}
+
+	return false;
 }
 
 bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
@@ -621,6 +625,21 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
 							 .withMesh(ecs::Mesh::findOrCreate(registry, result.value()));
+
+		return true;
+	}
+
+	return false;
+}
+
+bool EditorDragAndDrop::loadScript(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	auto dnd = DragAndDropTarget{};
+	auto result = dnd.getPayload<std::filesystem::path>();
+
+	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".js"))
+	{
+		selectedEntity = ecs::build(registry).withName(result->stem().string()).asScript().withResource(*result);
 
 		return true;
 	}
