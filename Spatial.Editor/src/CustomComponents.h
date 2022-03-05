@@ -149,8 +149,9 @@ class EditorDragAndDrop
 {
   public:
 	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
-	static void loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity);
 	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
+	static bool loadScript(ecs::Registry& registry, ecs::Entity& selectedEntity);
 };
 
 template <>

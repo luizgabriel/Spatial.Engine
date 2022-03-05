@@ -1,6 +1,7 @@
 #include <cassert>
 #include <fmt/format.h>
 #include <spatial/resources/FilesSystem.h>
+#include <sstream>
 
 namespace spatial
 {
@@ -39,40 +40,48 @@ FileSystem::ResolveResult FileSystem::resolve(std::string_view path) noexcept
 	return it->second->resolve(restOfPath);
 }
 
-std::unique_ptr<std::istream> FileSystem::openReadStream(std::string_view path)
+std::unique_ptr<std::istream> FileSystem::openReadStream(std::string_view path) noexcept
 {
 	auto result = resolve(path);
 	return result.fileSystem.openReadStreamImpl(result.path);
 }
 
-std::string FileSystem::readString(std::string_view path)
-{
-	auto stream = openReadStream(path);
-	return std::string{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
-}
-
-std::vector<uint8_t> FileSystem::readBinary(std::string_view path)
-{
-	auto stream = openReadStream(path);
-	return std::vector<uint8_t>{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
-}
-
-std::unique_ptr<std::ostream> FileSystem::openWriteStream(std::string_view path)
+std::unique_ptr<std::ostream> FileSystem::openWriteStream(std::string_view path) noexcept
 {
 	auto result = resolve(path);
 	return result.fileSystem.openWriteStreamImpl(result.path);
 }
 
-void FileSystem::write(std::string_view path, std::string&& data)
+std::string FileSystem::readString(std::string_view path) noexcept
+{
+	auto stream = openReadStream(path);
+	if (stream->fail())
+		return "";
+
+	return std::string{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
+}
+
+std::vector<uint8_t> FileSystem::readBinary(std::string_view path) noexcept
+{
+	auto stream = openReadStream(path);
+	if (stream->fail())
+		return std::vector<uint8_t>{};
+
+	return std::vector<uint8_t>{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
+}
+
+
+bool FileSystem::write(std::string_view path, std::string&& data) noexcept
 {
 	auto stream = openWriteStream(path);
 	if (stream->fail())
-		throw std::invalid_argument{fmt::format("Could not open file: {}", path)};
+		return false;
 
 	std::copy(data.begin(), data.end(), std::ostreambuf_iterator<char>(*stream));
+	return true;
 }
 
-std::set<FileSystem::Entry> FileSystem::list(std::string_view path)
+std::set<FileSystem::Entry> FileSystem::list(std::string_view path) noexcept
 {
 	auto result = resolve(path);
 	auto pathList = result.fileSystem.listImpl(result.path);
@@ -83,14 +92,14 @@ std::set<FileSystem::Entry> FileSystem::list(std::string_view path)
 	return pathList;
 }
 
-std::unique_ptr<std::istream> AggregateFileSystem::openReadStreamImpl(std::string_view path)
+std::unique_ptr<std::istream> AggregateFileSystem::openReadStreamImpl(std::string_view path) noexcept
 {
-	throw makeException(path);
+	return makeFailedStream();
 }
 
-std::unique_ptr<std::ostream> AggregateFileSystem::openWriteStreamImpl(std::string_view path)
+std::unique_ptr<std::ostream> AggregateFileSystem::openWriteStreamImpl(std::string_view path) noexcept
 {
-	throw makeException(path);
+	return makeFailedStream();
 }
 
 std::set<FileSystem::Entry> AggregateFileSystem::listImpl(std::string_view path) const
@@ -98,9 +107,11 @@ std::set<FileSystem::Entry> AggregateFileSystem::listImpl(std::string_view path)
 	return std::set<Entry>{};
 }
 
-std::invalid_argument AggregateFileSystem::makeException(const std::string_view& path)
+std::unique_ptr<std::iostream> AggregateFileSystem::makeFailedStream() noexcept
 {
-	return std::invalid_argument{fmt::format("Invalid path: {}", path)};
+	auto stream = std::make_unique<std::stringstream>("");
+	stream->setstate(std::ios::failbit);
+	return stream;
 }
 
 } // namespace spatial

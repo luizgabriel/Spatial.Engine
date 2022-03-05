@@ -92,6 +92,11 @@ void MaterialController::onUpdateFrame(ecs::Registry& registry)
 														  toShared(render::createMaterialInstance(mEngine, material)));
 		});
 
+	registry.getEntities<const ecs::MaterialInstance>().each([&](ecs::Entity entity, const ecs::MaterialInstance& materialInstance) {
+		if (registry.hasAnyComponent<ecs::tags::IsMaterialDirty>(materialInstance.materialEntity))
+			registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
+	});
+
 	auto d1 = registry.getEntities<ecs::tags::IsMaterialDirty, SharedMaterialInstance>();
 	registry.removeComponent<SharedMaterialInstance>(d1.begin(), d1.end());
 

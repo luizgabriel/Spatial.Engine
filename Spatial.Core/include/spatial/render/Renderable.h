@@ -7,11 +7,10 @@
 #include <spatial/common/Math.h>
 #include <spatial/render/Resources.h>
 #include <utils/Entity.h>
+#include <set>
 
 namespace spatial::render
 {
-
-
 
 class Renderable
 {
@@ -90,7 +89,7 @@ class Renderable
 		size_t primitiveIndex;
 		T value;
 
-		PrimitiveIndex(size_t primitiveIndex, T value) : primitiveIndex{primitiveIndex}, value{value}
+		PrimitiveIndex(size_t primitiveIndex, T value) : primitiveIndex{primitiveIndex}, value{std::forward<T>(value)}
 		{
 		}
 

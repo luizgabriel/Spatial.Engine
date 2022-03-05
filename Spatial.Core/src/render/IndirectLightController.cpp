@@ -30,6 +30,9 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
 		auto reflectionsTextureId = component.reflectionsTexturePath.getId();
 
+		if (component.reflectionsTexturePath.isEmpty())
+			return;
+
 		if (mTextures.find(reflectionsTextureId) != mTextures.end())
 			return;
 
@@ -45,6 +48,9 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
 		auto irradianceValuesId = component.irradianceValuesPath.getId();
+
+		if (component.irradianceValuesPath.isEmpty())
+			return;
 
 		if (mBands.find(irradianceValuesId) != mBands.end())
 			return;

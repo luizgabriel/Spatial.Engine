@@ -90,25 +90,25 @@ class FileSystem
 
 	ResolveResult resolve(std::string_view path) noexcept;
 
-	std::unique_ptr<std::istream> openReadStream(std::string_view path);
+	std::unique_ptr<std::istream> openReadStream(std::string_view path) noexcept;
 
-	std::unique_ptr<std::ostream> openWriteStream(std::string_view path);
+	std::unique_ptr<std::ostream> openWriteStream(std::string_view path) noexcept;
 
-	std::set<Entry> list(std::string_view path);
+	std::set<Entry> list(std::string_view path) noexcept;
 
-	std::string readString(std::string_view path);
+	std::string readString(std::string_view path) noexcept;
 
-	std::vector<uint8_t> readBinary(std::string_view path);
+	std::vector<uint8_t> readBinary(std::string_view path) noexcept;
 
-	void write(std::string_view path, std::string&& data);
+	bool write(std::string_view path, std::string&& data) noexcept;
 
   private:
 	std::map<std::string, std::shared_ptr<FileSystem>> mNodes;
 
   protected:
-	[[nodiscard]] virtual std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) = 0;
+	[[nodiscard]] virtual std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) noexcept = 0;
 
-	[[nodiscard]] virtual std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) = 0;
+	[[nodiscard]] virtual std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) noexcept = 0;
 
 	[[nodiscard]] virtual std::set<Entry> listImpl(std::string_view path) const = 0;
 };
@@ -119,14 +119,14 @@ class AggregateFileSystem : public FileSystem
 	AggregateFileSystem() = default;
 
   protected:
-	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) override;
+	[[nodiscard]] std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) noexcept override;
 
-	[[nodiscard]] std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) override;
+	[[nodiscard]] std::unique_ptr<std::ostream> openWriteStreamImpl(std::string_view path) noexcept override;
 
 	[[nodiscard]] std::set<Entry> listImpl(std::string_view path) const override;
 
   private:
-	[[nodiscard]] static std::invalid_argument makeException(const std::string_view& path);
+	[[nodiscard]] static std::unique_ptr<std::iostream> makeFailedStream() noexcept;
 };
 
 } // namespace spatial

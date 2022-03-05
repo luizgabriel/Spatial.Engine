@@ -12,8 +12,8 @@ Transform::Transform(filament::Engine& engine, utils::Entity entity)
 
 Transform::~Transform()
 {
-	if (isValid())
-		mManager.destroy(mEntity);
+	/*if (isValid())
+		mManager.destroy(mEntity);*/
 }
 
 Transform::Transform(Transform&& other) noexcept : mManager{other.mManager}, mEntity{std::exchange(other.mEntity, {})}
