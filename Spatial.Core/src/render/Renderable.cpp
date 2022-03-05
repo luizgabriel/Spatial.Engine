@@ -10,11 +10,8 @@ namespace spatial::render
 Renderable::Renderable(filament::Engine& engine, utils::Entity entity, std::size_t primitivesCount)
 	: mEngine{engine}, mEntity{entity}, mMaterialInstances{}, mVertexBuffers{}, mIndexBuffers{}
 {
-	if (Builder(primitivesCount).castShadows(true).receiveShadows(true).build(engine, entity)
-		!= Builder::Result::Success)
-	{
+	if (Builder(primitivesCount).build(engine, entity) != Builder::Result::Success)
 		throw std::runtime_error("Could not create renderable");
-	}
 }
 
 Renderable::~Renderable()

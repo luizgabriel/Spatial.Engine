@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
+#include <cassert>
 
 namespace spatial::ecs
 {
@@ -20,7 +21,6 @@ class EntityHandle
 	{
 		assert(&mRegistry == &other.mRegistry);
 		mEntity = other.mEntity;
-
 		return *this;
 	}
 

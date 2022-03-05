@@ -23,7 +23,18 @@ class Isolate
 	Isolate& operator=(Isolate&& isolate) noexcept;
 	Isolate& operator=(const Isolate& isolate) noexcept = delete;
 
+	v8::Isolate* operator->() noexcept
+	{
+		return mIsolate;
+	}
+
+	const v8::Isolate* operator->() const noexcept
+	{
+		return mIsolate;
+	}
+
 	~Isolate();
+
 
   private:
 	v8::Isolate* mIsolate;

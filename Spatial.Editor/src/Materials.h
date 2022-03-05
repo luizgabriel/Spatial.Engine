@@ -49,12 +49,15 @@ struct SkyBoxMaterial
 		const auto* texture = finder(skybox);
 		instance.setParameter("constantColor", texture == nullptr);
 
-		const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine/dummy_cubemap"});
-		assert(dummy != nullptr);
-
 		const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
 													  filament::TextureSampler::WrapMode::REPEAT};
-		instance.setParameter("skybox", texture == nullptr ? dummy : texture, sampler);
+		if (texture != nullptr) {
+			instance.setParameter("skybox", texture, sampler);
+		} else {
+			const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine/dummy_cubemap"});
+			assert(dummy != nullptr);
+			instance.setParameter("skybox", dummy, sampler);
+		}
 	}
 };
 
