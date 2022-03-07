@@ -31,7 +31,7 @@ class SpatialEngineConan(ConanFile):
         # Remember to run 'setup.py' to make this dependencies available
         "imgui/docking@vendor/stable",    # Installed with vendor/imgui.py
         "filament/1.18.0@vendor/stable",  # Installed with vendor/filament.py
-        "v8/10.1.1@vendor/stable",        # Installed with vendor/v8.py
+        "v8/10.1.69@vendor/stable",        # Installed with vendor/v8.py
     ]
 
     def imports(self):
