@@ -18,6 +18,14 @@ v8::Local<v8::Value> getAttribute(v8::Local<v8::Object> object, std::string_view
 
 v8::Local<v8::Value> getAttributeOrDefault(v8::Local<v8::Object> object, std::string_view key, v8::Local<v8::Value> defaultValue);
 
+template <typename T, typename E = std::invalid_argument>
+v8::Local<T> unwrap(v8::MaybeLocal<T> value, std::string_view errorMessage)
+{
+	if (value.IsEmpty())
+		throw E{errorMessage.data()};
+	return value.ToLocalChecked();
+}
+
 const char* getTypeName(v8::Local<v8::Value> value);
 
 }
