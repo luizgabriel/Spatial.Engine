@@ -68,8 +68,6 @@ void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 
 void MaterialController::onUpdateFrame(ecs::Registry& registry)
 {
-	using namespace boost::algorithm;
-
 	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<SharedMaterial>)
 		.each([&](ecs::Entity entity, const ecs::PrecompiledMaterial& precompiledMaterial) {
 			if (precompiledMaterial.resource.isEmpty()

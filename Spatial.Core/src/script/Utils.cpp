@@ -25,8 +25,6 @@ std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string)
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
 									std::string_view moduleName)
 {
-	auto moduleScope = v8::Context::Scope{context};
-
 	auto moduleId = static_cast<int>(HashedString{moduleName.data()}.value());
 	auto resourceName = createString(context->GetIsolate(), moduleName);
 	auto fullSource = createString(context->GetIsolate(), "");
@@ -49,7 +47,6 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 	return module;
 }
 
-
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
 {
 	auto moduleScope = v8::Context::Scope{context};
@@ -57,8 +54,9 @@ v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v
 	assert(module->GetStatus() == v8::Module::kInstantiated);
 	auto ns = module->GetModuleNamespace();
 
-	if (module->Evaluate(context).ToLocalChecked().As<v8::Promise>()->State() == v8::Promise::kRejected)
-		throw std::invalid_argument{"Could not evaluate script"};
+	auto result = unwrap(module->Evaluate(context), "Could not evaluate module");
+	if (result->IsUndefined() || result.As<v8::Promise>()->State() == v8::Promise::kRejected)
+		throw std::invalid_argument{"Module evaluation has thrown an exception"};
 
 	assert(module->GetStatus() == v8::Module::kEvaluated);
 

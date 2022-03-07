@@ -1,3 +1,4 @@
+//<editor-fold desc="import {...} from '@spatial/core';">
 const updateComponents = (entity) => (components) => {
     return {
         namespace: "scene",
@@ -18,13 +19,9 @@ const log = (message) => {
         },
     };
 };
+//</editor-fold>
 
-const makeOnUpdate = (eachFn) => ({ delta, entities, components }) => {
-    const fn = eachFn({ delta, components });
-    return entities.reduce((actions, entity) => actions.concat(fn(entity)), []);
-};
-
-const onUpdateEntity = ({ delta, components }) => (entity) => {
+const onUpdateEntity = ({ entity, delta, components }) => {
     const { velocity } = components.test[entity];
     const transform = components.transform[entity];
     transform.position.x += velocity * delta;
@@ -37,7 +34,7 @@ const onUpdateEntity = ({ delta, components }) => (entity) => {
     ];
 };
 
-export default {
+export const props = {
     name: "test",
     props: {
       velocity: {
@@ -48,5 +45,5 @@ export default {
           max: 100.0,
       },
     },
-    onUpdate: makeOnUpdate(onUpdateEntity),
+    onUpdateEntity,
 };

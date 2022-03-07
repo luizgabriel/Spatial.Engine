@@ -7,8 +7,6 @@
 namespace spatial::script
 {
 
-
-
 class ScriptController
 {
   public:
@@ -16,12 +14,12 @@ class ScriptController
 
 	void onUpdateFrame(ecs::Registry& registry, float delta);
 
-	v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::string_view modulePath);
-
   private:
 	FileSystem& mFileSystem;
 	Isolate mIsolate;
 	v8::HandleScope mScope;
+
+	v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::string_view modulePath);
 };
 
 } // namespace spatial::script

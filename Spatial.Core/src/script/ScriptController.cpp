@@ -6,6 +6,8 @@
 #include <spatial/script/ScriptSourceStream.h>
 #include <spatial/script/Utils.h>
 
+using namespace boost::algorithm;
+
 namespace spatial::script
 {
 
@@ -18,8 +20,6 @@ ScriptController::ScriptController(FileSystem& fileSystem, Isolate&& isolate)
 
 void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 {
-	using namespace boost::algorithm;
-
 	registry.getEntities<const ecs::Script>(ecs::ExcludeComponents<ecs::tags::IsScriptLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Script& script) {
 			if (script.resource.isEmpty() || !ends_with(script.resource.filename(), ".js"))
@@ -56,8 +56,6 @@ v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> con
 		throw std::invalid_argument{fmt::format("Script not found: {}", modulePath)};
 
 	auto module = script::compileModule(context, std::move(resourceStream), modulePath);
-
-	assert(module->GetStatus() == v8::Module::kUninstantiated);
 	auto result =
 		module
 			->InstantiateModule(context,
@@ -68,7 +66,6 @@ v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> con
 									return v8::MaybeLocal<v8::Module>();
 								})
 			.ToChecked();
-	assert(module->GetStatus() == v8::Module::kInstantiated);
 
 	if (!result || module.IsEmpty())
 	{
