@@ -25,6 +25,8 @@ std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string)
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
 									std::string_view moduleName)
 {
+	auto handle = v8::EscapableHandleScope{context->GetIsolate()};
+
 	auto moduleId = static_cast<int>(HashedString{moduleName.data()}.value());
 	auto resourceName = createString(context->GetIsolate(), moduleName);
 	auto fullSource = createString(context->GetIsolate(), "");
@@ -44,11 +46,13 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 	if (!v8::ScriptCompiler::CompileModule(context, &streamedSource, fullSource, origin).ToLocal(&module))
 		throw std::invalid_argument{"Could not parse module"};
 
-	return module;
+	return handle.Escape(module);
 }
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
 {
+	auto handle = v8::EscapableHandleScope{context->GetIsolate()};
+
 	auto moduleScope = v8::Context::Scope{context};
 
 	assert(module->GetStatus() == v8::Module::kInstantiated);
@@ -60,7 +64,7 @@ v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v
 
 	assert(module->GetStatus() == v8::Module::kEvaluated);
 
-	return ns->ToObject(context).ToLocalChecked();
+	return handle.Escape(ns->ToObject(context).ToLocalChecked());
 }
 
 const char* getTypeName(v8::Local<v8::Value> value)
@@ -163,8 +167,12 @@ const char* getTypeName(v8::Local<v8::Value> value)
 
 v8::Local<v8::Value> getAttribute(v8::Local<v8::Object> object, std::string_view key)
 {
+	auto handle = v8::EscapableHandleScope{object->GetIsolate()};
 	auto context = object->GetCreationContextChecked();
-	return object->Get(context, createString(object->GetIsolate(), key)).ToLocalChecked();
+	auto attribute = createString(object->GetIsolate(), key);
+	auto value = object->Get(context, attribute).ToLocalChecked();
+
+	return handle.Escape(value);
 }
 
 v8::Local<v8::Value> getAttributeOrDefault(v8::Local<v8::Object> object, std::string_view key,
@@ -176,5 +184,24 @@ v8::Local<v8::Value> getAttributeOrDefault(v8::Local<v8::Object> object, std::st
 
 	return resultValue;
 }
+
+template <>
+bool instanceOf<v8::String>(v8::Local<v8::Value> value)
+{
+	return value->IsString();
+}
+
+template <>
+bool instanceOf<v8::Object>(v8::Local<v8::Value> value)
+{
+	return value->IsObject();
+}
+
+template <>
+bool instanceOf<v8::Function>(v8::Local<v8::Value> value)
+{
+	return value->IsFunction();
+}
+
 
 } // namespace spatial::script

@@ -32,21 +32,33 @@ void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 			registry.addComponent<ecs::tags::IsScriptLoaded>(entity);
 
 			auto context = v8::Context::New(mIsolate.get());
-			auto module = compileModule(context, script.resource.relativePath.c_str());
-			auto moduleNamespace = evaluateModule(context, module);
+			try {
+				auto module = compileModule(context, script.resource.relativePath.c_str());
+				validatorModule(scriptDefaultName, context, module);
 
-			auto defaultExport = getAttribute(moduleNamespace, "default");
-			if (!defaultExport->IsObject()) {
-				gLogger.error("You must export default an object");
+				registry.addComponent<v8::Local<v8::Context>>(entity, context);
+				registry.addComponent<v8::Local<v8::Module>>(entity, module);
+
+			} catch (const std::invalid_argument& e) {
+				gLogger.error(e.what());
+				registry.addComponent<ecs::tags::IsScriptInvalid>(entity);
 				return;
 			}
 
-			auto moduleName = getAttributeOrDefault(defaultExport->ToObject(context).ToLocalChecked(), "name", createString(mIsolate.get(), scriptDefaultName));
-			gLogger.info("Hello, from module: {}", getValue(mIsolate.get(), moduleName->ToString(context).ToLocalChecked()));
-
-			registry.addComponent<v8::Local<v8::Context>>(entity, context);
-			registry.addComponent<v8::Local<v8::Module>>(entity, module);
 		});
+}
+void ScriptController::validatorModule(std::string& scriptDefaultName, v8::Local<v8::Context> context,
+									   v8::Local<v8::Module> module)
+{
+	auto moduleNamespace = evaluateModule(context, module);
+	auto defaultExport = cast<v8::Object>(getAttribute(moduleNamespace, "default"), "You must export default an Object");
+
+	auto defaultName = createString(mIsolate.get(), scriptDefaultName);
+	auto moduleName = cast<v8::String>(getAttributeOrDefault(defaultExport, "name", defaultName), "The module name must be a String");
+
+	gLogger.info("Hello, from module: {}", getValue(mIsolate.get(), moduleName));
+
+	cast<v8::Function>(getAttribute(defaultExport, "onUpdateEntity"), "The module onUpdateEntity must be a Function");
 }
 
 v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> context, std::string_view modulePath)

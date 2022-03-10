@@ -15,6 +15,10 @@ struct IsScriptLoaded
 {
 };
 
+struct IsScriptInvalid
+{
+};
+
 } // namespace tags
 
 struct Script

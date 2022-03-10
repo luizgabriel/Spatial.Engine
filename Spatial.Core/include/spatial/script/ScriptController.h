@@ -20,6 +20,7 @@ class ScriptController
 	v8::HandleScope mScope;
 
 	v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::string_view modulePath);
+	void validatorModule(std::string& scriptDefaultName, v8::Local<Context> context, v8::Local<Module> module);
 };
 
 } // namespace spatial::script
