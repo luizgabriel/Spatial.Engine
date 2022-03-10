@@ -32,33 +32,41 @@ void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 			registry.addComponent<ecs::tags::IsScriptLoaded>(entity);
 
 			auto context = v8::Context::New(mIsolate.get());
-			try {
-				auto module = compileModule(context, script.resource.relativePath.c_str());
-				validatorModule(scriptDefaultName, context, module);
-
+			auto module = compileModule(context, script.resource.relativePath.c_str());
+			if (isModuleValid(context, module, scriptDefaultName)) {
 				registry.addComponent<v8::Local<v8::Context>>(entity, context);
 				registry.addComponent<v8::Local<v8::Module>>(entity, module);
 
-			} catch (const std::invalid_argument& e) {
-				gLogger.error(e.what());
-				registry.addComponent<ecs::tags::IsScriptInvalid>(entity);
-				return;
-			}
+				if (registry.hasAllComponents<ecs::tags::IsScriptInvalid>(entity))
+					registry.removeComponent<ecs::tags::IsScriptInvalid>(entity);
 
+			} else {
+				registry.addComponent<ecs::tags::IsScriptInvalid>(entity);
+			}
 		});
 }
-void ScriptController::validatorModule(std::string& scriptDefaultName, v8::Local<v8::Context> context,
-									   v8::Local<v8::Module> module)
+
+bool ScriptController::isModuleValid(v8::Local<v8::Context> context,
+									   v8::Local<v8::Module> module, const std::string& scriptDefaultName)
 {
-	auto moduleNamespace = evaluateModule(context, module);
-	auto defaultExport = cast<v8::Object>(getAttribute(moduleNamespace, "default"), "You must export default an Object");
+	auto handle = v8::HandleScope{context->GetIsolate()};
 
-	auto defaultName = createString(mIsolate.get(), scriptDefaultName);
-	auto moduleName = cast<v8::String>(getAttributeOrDefault(defaultExport, "name", defaultName), "The module name must be a String");
+	try {
+		auto moduleNamespace = evaluateModule(context, module);
+		auto defaultExport = cast<v8::Object>(getAttribute(moduleNamespace, "default"), "You must export default an Object");
 
-	gLogger.info("Hello, from module: {}", getValue(mIsolate.get(), moduleName));
+		auto defaultName = createString(context->GetIsolate(), scriptDefaultName);
+		auto moduleName = cast<v8::String>(getAttributeOrDefault(defaultExport, "name", defaultName), "The module name must be a String");
 
-	cast<v8::Function>(getAttribute(defaultExport, "onUpdateEntity"), "The module onUpdateEntity must be a Function");
+		gLogger.info("Hello, from module: {}", getValue(context->GetIsolate(), moduleName));
+
+		cast<v8::Function>(getAttribute(defaultExport, "onUpdateEntity"), "The module onUpdateEntity must be a Function");
+
+		return true;
+	} catch (const std::invalid_argument& e) {
+		gLogger.error(e.what());
+		return false;
+	}
 }
 
 v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> context, std::string_view modulePath)
