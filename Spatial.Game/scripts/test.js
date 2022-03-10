@@ -34,7 +34,7 @@ const onUpdateEntity = ({ entity, delta, components }) => {
     ];
 };
 
-export const props = {
+export default {
     name: "test",
     props: {
       velocity: {

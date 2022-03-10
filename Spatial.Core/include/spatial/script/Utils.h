@@ -2,6 +2,8 @@
 
 #include <v8-local-handle.h>
 #include <v8-script.h>
+#include <v8-function.h>
+#include <v8-object.h>
 
 namespace spatial::script
 {
@@ -24,6 +26,17 @@ v8::Local<T> unwrap(v8::MaybeLocal<T> value, std::string_view errorMessage)
 	if (value.IsEmpty())
 		throw E{errorMessage.data()};
 	return value.ToLocalChecked();
+}
+
+template <typename T>
+bool instanceOf(v8::Local<v8::Value> value);
+
+template <typename T, typename E = std::invalid_argument>
+v8::Local<T> cast(v8::Local<v8::Value> value, std::string_view errorMessage)
+{
+	if (!instanceOf<T>(value))
+		throw E{errorMessage.data()};
+	return value.template As<T>();
 }
 
 const char* getTypeName(v8::Local<v8::Value> value);
