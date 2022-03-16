@@ -14,15 +14,7 @@ struct IsMainView
 	constexpr static auto typeName = "tag_is_main_view";
 };
 
-struct IsRenderable
-{
-	constexpr static auto typeName = "tag_is_renderable";
-};
 
-struct CanDestroy
-{
-	constexpr static auto typeName = "tag_can_destroy";
-};
 
 } // namespace tags
 

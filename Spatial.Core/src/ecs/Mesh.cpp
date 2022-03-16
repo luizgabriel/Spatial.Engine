@@ -4,6 +4,7 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/Tags.h>
 
 namespace spatial::ecs
 {

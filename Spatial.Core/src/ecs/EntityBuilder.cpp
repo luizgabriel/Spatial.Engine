@@ -4,6 +4,7 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Tags.h>
 
 namespace spatial::ecs
 {
@@ -81,6 +82,12 @@ SceneViewEntityBuilder EntityBuilder::asSceneView()
 ScriptEntityBuilder EntityBuilder::asScript()
 {
 	return {mRegistry, mEntity};
+}
+
+EntityBuilder& EntityBuilder::withParent(Entity parent)
+{
+	ecs::Parent::addChild(mRegistry, parent, mEntity);
+	return *this;
 }
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)

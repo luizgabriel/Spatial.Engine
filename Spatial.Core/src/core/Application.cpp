@@ -20,9 +20,7 @@ Application::Application()
 {
 }
 
-Application::~Application()
-{
-}
+Application::~Application() = default;
 
 void Application::onEvent(const WindowClosedEvent& event)
 {

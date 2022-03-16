@@ -17,14 +17,14 @@ class EntityProperties
 {
   public:
 	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-								  const render::ImageTextureFinder& finder);
+								  const render::ImageTextureFinder& finder, bool showDebugComponents = false);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
   private:
 	static void addComponentMenu(ecs::Registry& registry, ecs::Entity entity);
 
-	static void displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static bool displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
 };
 
 struct EditorMainMenu
@@ -39,7 +39,7 @@ struct EditorMainMenu
 	};
 
 	static bool fileMenu(const filament::Texture& icons);
-	static bool viewOptionsMenu(bool& mShowEditorEntities);
+	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
 };
 
 class NewSceneModal
@@ -140,7 +140,7 @@ class SceneTree
 class AssetsManager
 {
   public:
-	static bool popup(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
 	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "",
 					 bool showEditorEntities = false);
 };
@@ -158,35 +158,35 @@ template <>
 struct ComponentInputImpl<editor::ColorMaterial>
 {
 	static constexpr auto sName = "Color Material";
-	static void draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::EditorCamera>
 {
 	static constexpr auto sName = "Editor Camera";
-	static void draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::GridMaterial>
 {
 	static constexpr auto sName = "Grid Camera";
-	static void draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>
 {
 	static constexpr auto sName = "SkyBox Material";
-	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons);
 };
 
 template <>
 struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const render::ImageTextureFinder&>
 {
 	static constexpr auto sName = "Standard Opaque Material";
-	static void draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
 					 const render::ImageTextureFinder& finder);
 };
 
