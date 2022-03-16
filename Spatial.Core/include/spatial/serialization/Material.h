@@ -8,12 +8,6 @@ namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::MaterialInstance& materialInstance)
-{
-	ar(make_nvp("materialEntity", materialInstance.materialEntity));
-}
-
-template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::PrecompiledMaterial& material)
 {
 	ar(make_nvp("resource", material.resource));

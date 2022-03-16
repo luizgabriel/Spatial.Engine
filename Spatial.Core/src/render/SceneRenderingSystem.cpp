@@ -20,6 +20,7 @@ void RegistryRenderingSystem::onStartFrame(float)
 {
 	auto registries = getPublishedRegistries();
 	registries.each([this](auto& registry) {
+		mSceneController.onStartFrame(registry);
 		mMeshController.onStartFrame(registry);
 	});
 }

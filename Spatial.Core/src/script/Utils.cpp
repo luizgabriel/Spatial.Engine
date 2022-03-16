@@ -67,10 +67,54 @@ v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v
 	return handle.Escape(ns->ToObject(context).ToLocalChecked());
 }
 
+v8::Local<v8::Value> getAttributeValue(v8::Local<v8::Object> object, size_t key)
+{
+	auto handle = v8::EscapableHandleScope{object->GetIsolate()};
+	auto context = object->GetCreationContextChecked();
+	auto value = object->Get(context, key).ToLocalChecked();
+
+	return handle.Escape(value);
+}
+
+v8::Local<v8::Value> getAttributeValue(v8::Local<v8::Object> object, std::string_view key)
+{
+	auto handle = v8::EscapableHandleScope{object->GetIsolate()};
+	auto context = object->GetCreationContextChecked();
+	auto attribute = createString(object->GetIsolate(), key);
+	auto value = object->Get(context, attribute).ToLocalChecked();
+
+	return handle.Escape(value);
+}
+
+v8::Local<v8::Value> getAttributeValueOrDefault(v8::Local<v8::Object> object, std::string_view key,
+										   v8::Local<v8::Value> defaultValue)
+{
+	auto resultValue = getAttributeValue(object, key);
+	if (resultValue->IsUndefined())
+		return defaultValue;
+
+	return resultValue;
+}
+
+template <>
+bool instanceOf<v8::String>(v8::Local<v8::Value> value)
+{
+	return value->IsString();
+}
+
+std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array)
+{
+	auto values = std::vector<v8::Local<v8::Value>>{};
+	for (auto i = 0; i < array->Length(); i++) {
+		values.emplace_back(getAttributeValue(array, i));
+	}
+
+	return values;
+}
+
 const char* getTypeName(v8::Local<v8::Value> value)
 {
-	if (value.IsEmpty())
-		return "Empty";
+	assert(!value.IsEmpty());
 	if (value->IsArgumentsObject())
 		return "ArgumentsObject";
 	if (value->IsArrayBuffer())
@@ -165,31 +209,6 @@ const char* getTypeName(v8::Local<v8::Value> value)
 	return "Unknown";
 }
 
-v8::Local<v8::Value> getAttribute(v8::Local<v8::Object> object, std::string_view key)
-{
-	auto handle = v8::EscapableHandleScope{object->GetIsolate()};
-	auto context = object->GetCreationContextChecked();
-	auto attribute = createString(object->GetIsolate(), key);
-	auto value = object->Get(context, attribute).ToLocalChecked();
-
-	return handle.Escape(value);
-}
-
-v8::Local<v8::Value> getAttributeOrDefault(v8::Local<v8::Object> object, std::string_view key,
-										   v8::Local<v8::Value> defaultValue)
-{
-	auto resultValue = getAttribute(object, key);
-	if (resultValue->IsUndefined())
-		return defaultValue;
-
-	return resultValue;
-}
-
-template <>
-bool instanceOf<v8::String>(v8::Local<v8::Value> value)
-{
-	return value->IsString();
-}
 
 template <>
 bool instanceOf<v8::Object>(v8::Local<v8::Value> value)
@@ -203,5 +222,34 @@ bool instanceOf<v8::Function>(v8::Local<v8::Value> value)
 	return value->IsFunction();
 }
 
+template <>
+bool instanceOf<v8::Number>(v8::Local<v8::Value> value)
+{
+	return value->IsNumber();
+}
+
+template <>
+const char* getTypeName<v8::Function>()
+{
+	return "Function";
+}
+
+template <>
+const char* getTypeName<v8::String>()
+{
+	return "String";
+}
+
+template <>
+const char* getTypeName<v8::Number>()
+{
+	return "Number";
+}
+
+template <>
+const char* getTypeName<v8::Object>()
+{
+	return "Object";
+}
 
 } // namespace spatial::script

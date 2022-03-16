@@ -1,5 +1,7 @@
+#include "spatial/ecs/Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/core/Logger.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
 
@@ -68,7 +70,7 @@ void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 
 void MaterialController::onUpdateFrame(ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<SharedMaterial>)
+	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<ecs::tags::IsMaterialLoaded>)
 		.each([&](ecs::Entity entity, const ecs::PrecompiledMaterial& precompiledMaterial) {
 			if (precompiledMaterial.resource.isEmpty()
 				|| !ends_with(precompiledMaterial.resource.relativePath.c_str(), ".filamat"))
@@ -77,32 +79,21 @@ void MaterialController::onUpdateFrame(ecs::Registry& registry)
 			auto data = mFileSystem.readBinary(precompiledMaterial.resource.relativePath.c_str());
 			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
-			registry.addComponent<SharedMaterial>(entity, material);
+			registry.addOrReplaceComponent<SharedMaterial>(entity, material);
+			registry.addComponent<ecs::tags::IsMaterialLoaded>(entity);
 		});
 
-	registry.getEntities<const ecs::MaterialInstance>(ecs::ExcludeComponents<SharedMaterialInstance>)
-		.each([&](ecs::Entity entity, const ecs::MaterialInstance& materialInstance) {
-			if (!registry.hasAllComponents<SharedMaterial>(materialInstance.materialEntity))
+	registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Child>(ecs::ExcludeComponents<SharedMaterialInstance>)
+		.each([&](ecs::Entity entity, const ecs::Child& child) {
+			auto materialEntity = child.parent;
+
+			if (!registry.hasAllComponents<SharedMaterial>(materialEntity))
 				return;
 
-			auto material = registry.getComponent<const SharedMaterial>(materialInstance.materialEntity);
+			auto material = registry.getComponent<const SharedMaterial>(materialEntity);
 			registry.addComponent<SharedMaterialInstance>(entity,
 														  toShared(render::createMaterialInstance(mEngine, material)));
 		});
-
-	registry.getEntities<const ecs::MaterialInstance>().each([&](ecs::Entity entity, const ecs::MaterialInstance& materialInstance) {
-		if (registry.hasAnyComponent<ecs::tags::IsMaterialDirty>(materialInstance.materialEntity))
-			registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
-	});
-
-	auto d1 = registry.getEntities<ecs::tags::IsMaterialDirty, SharedMaterialInstance>();
-	registry.removeComponent<SharedMaterialInstance>(d1.begin(), d1.end());
-
-	auto d2 = registry.getEntities<ecs::tags::IsMaterialDirty, SharedMaterial>();
-	registry.removeComponent<SharedMaterial>(d2.begin(), d2.end());
-
-	auto d3 = registry.getEntities<ecs::tags::IsMaterialDirty>();
-	registry.removeComponent<ecs::tags::IsMaterialDirty>(d3.begin(), d3.end());
 }
 
 } // namespace spatial::render

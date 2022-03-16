@@ -5,13 +5,59 @@
 #include <spatial/script/ScriptController.h>
 #include <spatial/script/ScriptSourceStream.h>
 #include <spatial/script/Utils.h>
+#include <variant>
 
 using namespace boost::algorithm;
 
 namespace spatial::script
 {
 
+using ScriptResult = std::variant<ecs::ScriptInfo, ecs::ScriptError>;
+
 static auto gLogger = createDefaultLogger();
+
+ScriptResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module,
+						 const std::string& scriptDefaultName)
+{
+	auto handle = v8::HandleScope{context->GetIsolate()};
+
+	try
+	{
+		auto moduleNamespace = evaluateModule(context, module);
+		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
+
+		auto defaultName = createString(context->GetIsolate(), scriptDefaultName);
+		auto moduleName = getAttributeOrDefault(defaultExport, "name", defaultName);
+
+		getAttribute<v8::Function>(defaultExport, "onUpdateEntity");
+
+		auto properties = std::set<ecs::ScriptInfo::Property>{};
+
+		auto props = getAttribute<v8::Object>(defaultExport, "props");
+		auto keys = toVector(props->GetOwnPropertyNames(context).ToLocalChecked());
+		for (auto key : keys)
+		{
+			auto propertyName = getValue(context->GetIsolate(), key->ToString(context).ToLocalChecked());
+			auto property = getAttribute<v8::Object>(props, propertyName);
+			auto propertyType = getValue(
+				context->GetIsolate(), getAttribute<v8::String>(property, "type"));
+
+			if (propertyType == "FloatRange")
+				properties.emplace(ecs::ScriptInfo::Property{
+					propertyName, ecs::ScriptInfo::Property::FloatRangeType{
+									  static_cast<float>(getAttribute<v8::Number>(property, "default")->Value()),
+									  static_cast<float>(getAttribute<v8::Number>(property, "min")->Value()),
+									  static_cast<float>(getAttribute<v8::Number>(property, "max")->Value()),
+								  }});
+		}
+
+		return ecs::ScriptInfo{getValue(context->GetIsolate(), moduleName), std::move(properties)};
+	}
+	catch (const std::invalid_argument& e)
+	{
+		return ecs::ScriptError{e.what()};
+	}
+}
 
 ScriptController::ScriptController(FileSystem& fileSystem, Isolate&& isolate)
 	: mFileSystem{fileSystem}, mIsolate{std::move(isolate)}, mScope{mIsolate.get()}
@@ -20,7 +66,7 @@ ScriptController::ScriptController(FileSystem& fileSystem, Isolate&& isolate)
 
 void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 {
-	registry.getEntities<const ecs::Script>(ecs::ExcludeComponents<ecs::tags::IsScriptLoaded>)
+	registry.getEntities<const ecs::Script>(ecs::ExcludeComponents<ecs::ScriptInfo, ecs::ScriptError>)
 		.each([&](ecs::Entity entity, const ecs::Script& script) {
 			if (script.resource.isEmpty() || !ends_with(script.resource.filename(), ".js"))
 				return;
@@ -29,44 +75,19 @@ void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 										 ? registry.getComponent<ecs::Name>(entity).name
 										 : script.resource.relativePath.stem().string();
 
-			registry.addComponent<ecs::tags::IsScriptLoaded>(entity);
-
 			auto context = v8::Context::New(mIsolate.get());
 			auto module = compileModule(context, script.resource.relativePath.c_str());
-			if (isModuleValid(context, module, scriptDefaultName)) {
-				registry.addComponent<v8::Local<v8::Context>>(entity, context);
-				registry.addComponent<v8::Local<v8::Module>>(entity, module);
+			auto result = parseModule(context, module, scriptDefaultName);
 
-				if (registry.hasAllComponents<ecs::tags::IsScriptInvalid>(entity))
-					registry.removeComponent<ecs::tags::IsScriptInvalid>(entity);
+			registry.addOrReplaceComponent<v8::Local<v8::Context>>(entity, context);
+			registry.addOrReplaceComponent<v8::Local<v8::Module>>(entity, module);
 
-			} else {
-				registry.addComponent<ecs::tags::IsScriptInvalid>(entity);
-			}
+			std::visit(
+				[&registry, entity](auto&& c) {
+					registry.addComponent<std::decay_t<decltype(c)>>(entity, std::forward<decltype(c)>(c));
+				},
+				std::move(result));
 		});
-}
-
-bool ScriptController::isModuleValid(v8::Local<v8::Context> context,
-									   v8::Local<v8::Module> module, const std::string& scriptDefaultName)
-{
-	auto handle = v8::HandleScope{context->GetIsolate()};
-
-	try {
-		auto moduleNamespace = evaluateModule(context, module);
-		auto defaultExport = cast<v8::Object>(getAttribute(moduleNamespace, "default"), "You must export default an Object");
-
-		auto defaultName = createString(context->GetIsolate(), scriptDefaultName);
-		auto moduleName = cast<v8::String>(getAttributeOrDefault(defaultExport, "name", defaultName), "The module name must be a String");
-
-		gLogger.info("Hello, from module: {}", getValue(context->GetIsolate(), moduleName));
-
-		cast<v8::Function>(getAttribute(defaultExport, "onUpdateEntity"), "The module onUpdateEntity must be a Function");
-
-		return true;
-	} catch (const std::invalid_argument& e) {
-		gLogger.error(e.what());
-		return false;
-	}
 }
 
 v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> context, std::string_view modulePath)
@@ -90,8 +111,8 @@ v8::Local<v8::Module> ScriptController::compileModule(v8::Local<v8::Context> con
 	if (!result || module.IsEmpty())
 	{
 		auto exception = module->GetException().As<v8::String>();
-		throw std::invalid_argument{
-			fmt::format("Could not instantiate module: {}, Exception: {}", modulePath, getValue(mIsolate.get(), exception))};
+		throw std::invalid_argument{fmt::format("Could not instantiate module: {}, Exception: {}", modulePath,
+												getValue(mIsolate.get(), exception))};
 	}
 
 	return module;

@@ -12,42 +12,51 @@ class Clock
 	using delta_t = std::chrono::duration<Precision>;
 
 	Clock()
-		: m_timeStep(std::chrono::steady_clock::duration::zero()), m_lastTime(std::chrono::steady_clock::now()), m_lag()
+		: mTimeStep(std::chrono::steady_clock::duration::zero()), mLastTime(std::chrono::steady_clock::now()), mLag()
 	{
 	}
 
 	void tick()
 	{
-		m_timeStep = std::chrono::steady_clock::now() - m_lastTime;
-		m_lastTime = std::chrono::steady_clock::now();
+		mTimeStep = std::chrono::steady_clock::now() - mLastTime;
+		mLastTime = std::chrono::steady_clock::now();
 
-		m_lag += getDeltaTime().count();
+		mLag += getDeltaTime();
 	}
 
 	bool hasLag(Precision desiredDeltaTime)
 	{
-		return m_lag >= desiredDeltaTime;
+		return mLag >= desiredDeltaTime;
 	}
 
 	void fixLag()
 	{
-		m_lag -= getDeltaTime().count();
+		mLag -= getDeltaTime();
 	}
 
 	auto getLastTime() const
 	{
-		return m_lastTime;
+		return mLastTime;
 	}
 
 	auto getDeltaTime() const
 	{
-		return std::chrono::duration_cast<delta_t>(m_timeStep);
+		return std::chrono::duration_cast<delta_t>(mTimeStep);
+	}
+
+	template <typename Func>
+	static delta_t measure(Func func)
+	{
+		auto clock = Clock{};
+		func();
+		clock.tick();
+		return clock.getDeltaTime();
 	}
 
   private:
-	std::chrono::steady_clock::duration m_timeStep;
-	std::chrono::steady_clock::time_point m_lastTime;
-	Precision m_lag;
+	std::chrono::steady_clock::duration mTimeStep;
+	std::chrono::steady_clock::time_point mLastTime;
+	delta_t mLag;
 };
 
 } // namespace spatial

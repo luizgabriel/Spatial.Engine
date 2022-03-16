@@ -2,7 +2,7 @@
 
 #include <spatial/resources/Resource.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ecs/EntityHandle.h>
+#include <set>
 
 namespace spatial::ecs
 {
@@ -20,8 +20,13 @@ struct IsMaterial
 	constexpr static auto typeName = "tag_is_material";
 };
 
-struct IsMaterialDirty
+struct IsMaterialLoaded
 {
+};
+
+struct IsMaterialInstance
+{
+	constexpr static auto typeName = "tag_is_material_instance";
 };
 
 }
@@ -32,15 +37,8 @@ struct PrecompiledMaterial
 
 	Resource<FilaMat> resource{};
 
-	static EntityConstHandle find(const ecs::Registry& registry, const std::filesystem::path& resourcePath);
-	static EntityHandle findOrCreate(ecs::Registry& registry, const std::filesystem::path& resourcePath);
-};
-
-struct MaterialInstance
-{
-	constexpr static auto typeName = "material_instance";
-
-	Entity materialEntity;
+	static Entity find(const ecs::Registry& registry, const std::filesystem::path& resourcePath);
+	static Entity findOrCreate(ecs::Registry& registry, const std::filesystem::path& resourcePath);
 };
 
 } // namespace spatial::ecs

@@ -9,6 +9,8 @@
 #include <spatial/serialization/SceneView.h>
 #include <spatial/serialization/Transform.h>
 #include <spatial/serialization/Material.h>
+#include <spatial/serialization/Script.h>
+#include <spatial/ecs/Tags.h>
 
 namespace spatial::ecs
 {
@@ -30,11 +32,11 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::MeshInstance>(ar);
 	snapshot.template component<ecs::MeshMaterial>(ar);
 	snapshot.template component<ecs::PrecompiledMaterial>(ar);
-	snapshot.template component<ecs::MaterialInstance>(ar);
 	snapshot.template component<ecs::Parent>(ar);
 	snapshot.template component<ecs::Child>(ar);
 	snapshot.template component<ecs::SceneView>(ar);
 	snapshot.template component<ecs::UUID>(ar);
+	snapshot.template component<ecs::Script>(ar);
 
 	snapshot.template component<ecs::tags::IsMaterial>(ar);
 	snapshot.template component<ecs::tags::IsRenderable>(ar);
@@ -42,7 +44,7 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsLight>(ar);
 	snapshot.template component<ecs::tags::IsMainView>(ar);
 	snapshot.template component<ecs::tags::IsResource>(ar);
-	snapshot.template component<ecs::tags::CanDestroy>(ar);
+	snapshot.template component<ecs::tags::IsMaterialInstance>(ar);
 }
 
 } // namespace spatial::ecs
