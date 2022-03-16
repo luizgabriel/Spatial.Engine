@@ -105,6 +105,8 @@ bool instanceOf<v8::String>(v8::Local<v8::Value> value)
 std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array)
 {
 	auto values = std::vector<v8::Local<v8::Value>>{};
+	values.reserve(array->Length());
+
 	for (auto i = 0; i < array->Length(); i++) {
 		values.emplace_back(getAttributeValue(array, i));
 	}
@@ -232,6 +234,25 @@ template <>
 const char* getTypeName<v8::Function>()
 {
 	return "Function";
+}
+
+std::vector<std::pair<v8::Local<v8::Value>, v8::Local<v8::Value>>> toValueEntries(v8::Local<v8::Object> object)
+{
+	auto context = object->GetCreationContextChecked();
+	auto keys = toVector(object->GetOwnPropertyNames(context).ToLocalChecked());
+	auto entries = std::vector<std::pair<v8::Local<v8::Value>, v8::Local<v8::Value>>>{};
+	entries.reserve(keys.size());
+
+	for (auto key : keys) {
+		entries.emplace_back(key, object->Get(context, key).ToLocalChecked());
+	}
+
+	return entries;
+}
+
+float getValue(v8::Local<v8::Number> number)
+{
+	return static_cast<float>(number->Value());
 }
 
 template <>

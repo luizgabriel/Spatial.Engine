@@ -31,6 +31,8 @@ const char* getTypeName(v8::Local<v8::Value> value);
 
 std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string);
 
+float getValue(v8::Local<v8::Number> number);
+
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream, std::string_view moduleName);
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
@@ -58,6 +60,28 @@ v8::Local<T> getAttributeOrDefault(v8::Local<v8::Object> object, const K& key, v
 }
 
 std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array);
+
+std::vector<std::pair<v8::Local<v8::Value>, v8::Local<v8::Value>>> toValueEntries(v8::Local<v8::Object> object);
+
+template <typename K, typename V>
+std::vector<std::pair<v8::Local<K>, v8::Local<V>>> toEntries(v8::Local<v8::Object> object)
+{
+	static auto keyType = getTypeName<K>();
+	static auto valueType = getTypeName<V>();
+
+	auto valueEntries = toValueEntries(object);
+	auto newEntries = std::vector<std::pair<v8::Local<K>, v8::Local<V>>>{};
+	newEntries.reserve(valueEntries.size());
+
+	for (auto [key, value] : valueEntries) {
+		newEntries.emplace_back(
+			cast<K>(key, fmt::format("Could not cast Object key to '{}'", keyType)),
+			cast<V>(value, fmt::format("Could not cast Object value to '{}'", valueType))
+		);
+	}
+
+	return newEntries;
+}
 
 template <typename T, typename E = std::invalid_argument>
 v8::Local<T> unwrap(v8::MaybeLocal<T> value, std::string_view errorMessage)

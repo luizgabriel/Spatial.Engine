@@ -46,6 +46,7 @@ struct ScriptInfo
 			float max{std::numeric_limits<float>::max()};
 		};
 
+		std::string key;
 		std::string name;
 		std::variant<StringType, FloatRangeType> type;
 

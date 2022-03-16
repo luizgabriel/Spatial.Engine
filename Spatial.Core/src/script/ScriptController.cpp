@@ -34,21 +34,23 @@ ScriptResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> m
 		auto properties = std::set<ecs::ScriptInfo::Property>{};
 
 		auto props = getAttribute<v8::Object>(defaultExport, "props");
-		auto keys = toVector(props->GetOwnPropertyNames(context).ToLocalChecked());
-		for (auto key : keys)
-		{
-			auto propertyName = getValue(context->GetIsolate(), key->ToString(context).ToLocalChecked());
-			auto property = getAttribute<v8::Object>(props, propertyName);
-			auto propertyType = getValue(
-				context->GetIsolate(), getAttribute<v8::String>(property, "type"));
 
-			if (propertyType == "FloatRange")
+		for (auto [key, property] : toEntries<v8::String, v8::Object>(props))
+		{
+			auto propertyKey = getValue(context->GetIsolate(), key);
+			auto propertyName = getValue(context->GetIsolate(), getAttributeOrDefault(property, "name", key));
+
+			auto propertyType = getValue(context->GetIsolate(), getAttribute<v8::String>(property, "type"));
+			if (propertyType == ecs::ScriptInfo::Property::FloatRangeType::typeName)
+			{
 				properties.emplace(ecs::ScriptInfo::Property{
-					propertyName, ecs::ScriptInfo::Property::FloatRangeType{
-									  static_cast<float>(getAttribute<v8::Number>(property, "default")->Value()),
-									  static_cast<float>(getAttribute<v8::Number>(property, "min")->Value()),
-									  static_cast<float>(getAttribute<v8::Number>(property, "max")->Value()),
-								  }});
+					propertyKey, propertyName,
+					ecs::ScriptInfo::Property::FloatRangeType{
+						getValue(getAttribute<v8::Number>(property, "default")),
+						getValue(getAttribute<v8::Number>(property, "min")),
+						getValue(getAttribute<v8::Number>(property, "max")),
+					}});
+			}
 		}
 
 		return ecs::ScriptInfo{getValue(context->GetIsolate(), moduleName), std::move(properties)};
