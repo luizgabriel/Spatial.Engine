@@ -23,53 +23,58 @@
         20,
         21,
         22,
-        23
+        23,
+        24
     ],
     "last_destroyed": 1048575,
     "name": [
-        23,
-        {
-            "name": "Directional Light"
-        },
-        22,
+        24,
         {
             "name": "Primitive 0"
         },
-        21,
+        23,
         {
             "name": "Color Material (Sphere)"
         },
-        20,
+        22,
         {
             "name": "color.filamat"
         },
-        19,
+        21,
         {
             "name": "sphere.filamesh"
         },
-        18,
+        20,
         {
             "name": "Sphere"
         },
-        17,
+        19,
+        {
+            "name": "Directional Light"
+        },
+        18,
         {
             "name": "Primitive 0"
         },
-        16,
+        17,
         {
-            "name": "Standard Opaque (plane_hd)"
+            "name": "Standard Opaque (plane)"
         },
-        15,
+        16,
         {
             "name": "standard_lit.filamat"
         },
-        14,
+        15,
         {
             "name": "plane_hd.filamesh"
         },
+        14,
+        {
+            "name": "plane_hd"
+        },
         13,
         {
-            "name": "Ground"
+            "name": "test.js"
         },
         12,
         {
@@ -125,11 +130,11 @@
         }
     ],
     "transform": [
-        18,
+        20,
         {
             "position": {
                 "x": 0.0,
-                "y": 3.5999999046325685,
+                "y": 3.700000047683716,
                 "z": 0.0
             },
             "rotation": {
@@ -143,7 +148,7 @@
                 "z": 3.0
             }
         },
-        13,
+        14,
         {
             "position": {
                 "x": 0.0,
@@ -164,13 +169,13 @@
         12,
         {
             "position": {
-                "x": 4.68704891204834,
-                "y": 4.1169891357421879,
-                "z": -11.435155868530274
+                "x": -5.005289554595947,
+                "y": 4.0446858406066898,
+                "z": -11.955321311950684
             },
             "rotation": {
-                "x": -0.2150254100561142,
-                "y": 2.753142833709717,
+                "x": -0.06455208361148834,
+                "y": 3.497828722000122,
                 "z": 0.0
             },
             "scale": {
@@ -211,13 +216,13 @@
     "custom_camera": [],
     "point_light": [],
     "directional_light": [
-        23,
+        19,
         {
             "intensity": 10000.0,
             "direction": {
-                "x": 0.07857928425073624,
-                "y": -0.7658270597457886,
-                "z": 0.6382274627685547
+                "x": 0.31439486145973208,
+                "y": -0.7038561105728149,
+                "z": -0.6369792222976685
             },
             "color": {
                 "x": 1.0,
@@ -246,7 +251,7 @@
         }
     ],
     "mesh": [
-        19,
+        21,
         {
             "resource": {
                 "relativePath": {
@@ -254,7 +259,7 @@
                 }
             }
         },
-        14,
+        15,
         {
             "resource": {
                 "relativePath": {
@@ -280,18 +285,18 @@
         }
     ],
     "mesh_instance": [
-        18,
+        20,
         {
-            "meshSource": 19,
+            "meshSource": 21,
             "receiveShadows": true,
             "castShadows": true,
             "partsCount": 2,
             "partsOffset": 0
         },
-        13,
+        14,
         {
-            "meshSource": 14,
-            "receiveShadows": false,
+            "meshSource": 15,
+            "receiveShadows": true,
             "castShadows": false,
             "partsCount": 1,
             "partsOffset": 0
@@ -314,15 +319,15 @@
         }
     ],
     "mesh_material": [
-        22,
+        24,
         {
             "primitiveIndex": 0,
-            "materialEntity": 21
+            "materialEntity": 23
         },
-        17,
+        18,
         {
             "primitiveIndex": 0,
-            "materialEntity": 16
+            "materialEntity": 17
         },
         9,
         {
@@ -336,7 +341,7 @@
         }
     ],
     "precompiled_material": [
-        20,
+        22,
         {
             "resource": {
                 "relativePath": {
@@ -344,7 +349,7 @@
                 }
             }
         },
-        15,
+        16,
         {
             "resource": {
                 "relativePath": {
@@ -369,32 +374,26 @@
             }
         }
     ],
-    "material_instance": [
-        21,
-        {
-            "materialEntity": 20
-        },
-        16,
-        {
-            "materialEntity": 15
-        },
-        3,
-        {
-            "materialEntity": 2
-        },
-        1,
-        {
-            "materialEntity": 0
-        }
-    ],
     "parent": [
-        18,
+        20,
         {
             "childrenCount": 1,
-            "first": 22,
-            "last": 22
+            "first": 24,
+            "last": 24
         },
-        13,
+        22,
+        {
+            "childrenCount": 1,
+            "first": 23,
+            "last": 23
+        },
+        14,
+        {
+            "childrenCount": 1,
+            "first": 18,
+            "last": 18
+        },
+        16,
         {
             "childrenCount": 1,
             "first": 17,
@@ -417,18 +416,42 @@
             "childrenCount": 1,
             "first": 6,
             "last": 6
+        },
+        2,
+        {
+            "childrenCount": 1,
+            "first": 3,
+            "last": 3
+        },
+        0,
+        {
+            "childrenCount": 1,
+            "first": 1,
+            "last": 1
         }
     ],
     "child": [
-        22,
+        24,
         {
-            "parent": 18,
+            "parent": 20,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        23,
+        {
+            "parent": 22,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        18,
+        {
+            "parent": 14,
             "next": 1048575,
             "previous": 1048575
         },
         17,
         {
-            "parent": 13,
+            "parent": 16,
             "next": 1048575,
             "previous": 1048575
         },
@@ -455,6 +478,18 @@
             "parent": 5,
             "next": 1048575,
             "previous": 1048575
+        },
+        3,
+        {
+            "parent": 2,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        1,
+        {
+            "parent": 0,
+            "next": 1048575,
+            "previous": 1048575
         }
     ],
     "scene_view": [
@@ -470,15 +505,15 @@
     ],
     "uuid": [],
     "tag_is_material": [
-        20,
-        15,
+        22,
+        16,
         2,
         0
     ],
-    "tag_is_renderable": [
-        23,
-        18,
-        13,
+    "is_renderable": [
+        20,
+        19,
+        14,
         12,
         11,
         8,
@@ -488,18 +523,18 @@
         12
     ],
     "tag_light": [
-        23,
+        19,
         11
     ],
-    "tag_is_mesh_dirty": [],
     "tag_is_main_view": [],
     "tag_is_resource": [
+        23,
+        22,
         21,
-        20,
-        19,
+        17,
         16,
         15,
-        14,
+        13,
         7,
         4,
         3,
@@ -507,18 +542,23 @@
         1,
         0
     ],
-    "tag_can_destroy": [],
+    "tag_is_material_instance": [
+        23,
+        17,
+        3,
+        1
+    ],
     "color_material": [
-        21,
+        23,
         {
             "baseColor": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.8911290168762207,
+                "y": 0.8911290168762207,
+                "z": 0.8911290168762207
             },
-            "roughness": 0.4000000059604645,
-            "metallic": 0.800000011920929,
-            "reflectance": 0.10000000149011612
+            "roughness": 0.3199999928474426,
+            "metallic": 0.4399999976158142,
+            "reflectance": 0.6000000238418579
         }
     ],
     "skybox_material": [
@@ -554,7 +594,7 @@
         }
     ],
     "standard_opaque_material": [
-        16,
+        17,
         {
             "baseColor": {
                 "x": 1.0,
@@ -624,8 +664,8 @@
         }
     ],
     "tag_is_editor_entity": [
-        20,
-        15,
+        22,
+        16,
         12,
         11,
         10,

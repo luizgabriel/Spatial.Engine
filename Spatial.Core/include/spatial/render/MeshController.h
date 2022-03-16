@@ -27,7 +27,7 @@ class MeshController
 	FileSystem& mFileSystem;
 
 	void createRenderableMeshes(ecs::Registry& registry);
-	void updateMeshGeometries(ecs::Registry& registry);
+	static void updateMeshGeometries(ecs::Registry& registry);
 	static void clearDirtyRenderables(ecs::Registry& registry);
 };
 

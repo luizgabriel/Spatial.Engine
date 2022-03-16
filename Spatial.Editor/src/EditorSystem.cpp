@@ -20,6 +20,7 @@
 
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/resources/MemoryFileSystem.h>
 #include <spatial/resources/PhysicalFileSystem.h>
@@ -80,27 +81,31 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 {
 	if (!ecs::handleOf<SkyBoxMaterial>(registry))
 	{
-		auto skyboxMaterial = ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/skybox.filamat");
+		auto skyboxMaterial = ecs::handleOf(
+			registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/skybox.filamat"));
 		skyboxMaterial.addOrReplace<tags::IsEditorEntity>();
 
 		ecs::build(registry)
 			.withName("SkyBox Material")
-			.asMaterialInstance(skyboxMaterial, SkyBoxMaterial{
-													false,
-													{math::float3{.0f}, 1.0f},
-													{"editor/textures/skybox/texture.ktx"},
-												});
+			.asMaterialInstance<SkyBoxMaterial>(skyboxMaterial)
+			.withProps({
+				false,
+				{math::float3{.0f}, 1.0f},
+				{"editor/textures/skybox/texture.ktx"},
+			});
 	}
 
 	if (!ecs::handleOf<GridMaterial>(registry))
 	{
-		auto gridMaterial = ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/grid.filamat");
+		auto gridMaterial =
+			ecs::handleOf(registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/grid.filamat"));
 		gridMaterial.addOrReplace<tags::IsEditorEntity>();
 
 		ecs::build(registry)
 			.withName("Grid Material")
 			.with<tags::IsEditorEntity>()
-			.asMaterialInstance(gridMaterial, GridMaterial{});
+			.asMaterialInstance<GridMaterial>(gridMaterial)
+			.withProps({});
 	}
 
 	if (!ecs::handleOf<tags::IsGridPlane>(registry))
@@ -196,11 +201,12 @@ void EditorSystem::onDrawGui()
 
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
+	static bool showDebugComponents{false};
 	static std::filesystem::path rootPath = std::filesystem::current_path();
 
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(*mIconTexture);
-		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities);
+		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 
 		if (ui::OpenProjectModal::show(rootPath))
 			mJobQueue.enqueue<OpenProjectEvent>(rootPath);
@@ -218,10 +224,11 @@ void EditorSystem::onDrawGui()
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
 	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =
-		cameraTransform ? (cameraTransform->position + cameraTransform->getForwardVector() * 10.0f) : math::float3{};
+		cameraTransform ? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0f) - (math::axisY * 0.1f))
+						: math::float3{};
 
 	{
-		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView>();
+		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView, tags::IsEditorView>();
 		auto style = ui::WindowPaddingStyle{};
 		auto window = ui::Window{"Scene View", ui::WindowFlags::NoScrollbar};
 
@@ -236,10 +243,10 @@ void EditorSystem::onDrawGui()
 		}
 
 		// TODO: Move cursor exactly to the center of the scene window (Not the center of the screen)
-		if (ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
+		if (ImGui::IsWindowFocused() && ImGui::IsItemClicked() && mEditorCameraController.toggleControl())
 			mWindow.warpMouse(mWindow.getSize() * .5f);
 
-		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		if (!ImGui::IsWindowFocused() || (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)))
 			mEditorCameraController.disable();
 
 		if (ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity))
@@ -261,19 +268,23 @@ void EditorSystem::onDrawGui()
 	});
 
 	ui::Window::show("Assets Manager", [&]() {
-		ui::AssetsManager::popup(mRegistry, selectedEntity);
-
 		static std::string search;
 		ui::Search::searchText(search);
 		ui::AssetsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity);
 		ui::EditorDragAndDrop::loadScript(mRegistry, selectedEntity);
+
+		ui::Popup::show("Asset Manager Popup", [&]() {
+			ui::AssetsManager::createMenu(mRegistry, selectedEntity);
+			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+		});
 	});
 
-	ui::Window::show("Properties", [&]() {
+	ui::Window::show("Components", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, *mIconTexture,
-												[&](const auto& res) { return mMaterialController.findResource(res); });
+												[&](const auto& res) { return mMaterialController.findResource(res); }, showDebugComponents);
 	});
 
 	ui::Window::show("Assets Explorer",

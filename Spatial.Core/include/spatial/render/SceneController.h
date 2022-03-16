@@ -10,12 +10,20 @@ namespace spatial::render
 class SceneController
 {
   public:
-	SceneController(filament::Engine& engine);
+	explicit SceneController(filament::Engine& engine);
+
+	void onStartFrame(ecs::Registry& registry);
 
 	void onUpdateFrame(ecs::Registry& registry);
 
   private:
 	filament::Engine& mEngine;
+
+	void createScenes(ecs::Registry& registry) const;
+	void createRenderable(ecs::Registry& registry) const;
+
+	static void cleanUpDestroyableEntities(ecs::Registry& registry);
+	static void addToScene(ecs::Registry& registry);
 };
 
 } // namespace spatial::render

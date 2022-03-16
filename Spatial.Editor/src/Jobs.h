@@ -24,5 +24,4 @@ struct OpenProjectEvent
 	std::filesystem::path path;
 };
 
-
 } // namespace spatial::editor

@@ -2,6 +2,7 @@
 
 #include <spatial/ecs/Registry.h>
 #include <type_traits>
+#include <set>
 
 namespace spatial::ecs
 {
@@ -64,7 +65,12 @@ struct Parent
 	/**
 	 * @descriptions Collects a vector of child entities
 	 */
-	static std::vector<Entity> getChildren(const Registry& registry, Entity parentEntity);
+	static std::set<Entity> getChildren(const Registry& registry, Entity parentEntity);
+	
+	/**
+	 * @descriptions Collects a vector of child entities recursively
+	 */
+	static std::set<Entity> getChildrenDepth(const Registry& registry, Entity parentEntity);
 
 	/**
 	 * @description Visits every direct child of the parentEntity

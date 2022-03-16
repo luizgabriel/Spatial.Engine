@@ -1,4 +1,3 @@
-#include <array>
 #include <imgui.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
@@ -92,96 +91,152 @@ void spanToAvailWidth(float weight)
 	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * weight);
 }
 
-void ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::DirectionalLight>(entity);
+	bool changed = false;
 
-	ImGui::Checkbox("Cast Shadows", &light.castShadows);
-	ImGui::ColorEdit3("Color", &light.color.r);
-	ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
+	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	changed |= ImGui::ColorEdit3("Color", &light.color.r);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
+	changed |= directionInput("Direction", light.direction);
 
-	directionInput("Direction", light.direction);
+	return changed;
 }
 
-void ComponentInputImpl<ecs::PointLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::PointLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::PointLight>(entity);
+	bool changed = false;
 
-	ImGui::ColorEdit3("Color", &light.color.r);
-	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	ImGui::InputFloat("Falloff", &light.falloff);
+	changed |= ImGui::ColorEdit3("Color", &light.color.r);
+	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::InputFloat("Falloff", &light.falloff);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::SpotLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::SpotLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::SpotLight>(entity);
+	bool changed = false;
 
-	ImGui::Checkbox("Cast Shadows", &light.castShadows);
-	ImGui::ColorEdit3("Color", &light.color.r);
-	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	ImGui::InputFloat("Falloff", &light.falloff);
-	ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
-	ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
+	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	changed |= ImGui::ColorEdit3("Color", &light.color.r);
+	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::InputFloat("Falloff", &light.falloff);
+	changed |= ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
+	changed |= ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
+	changed |= directionInput("Direction", light.direction);
 
-	directionInput("Direction", light.direction);
+	return changed;
 }
 
-void ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::SunLight>(entity);
+	bool changed = false;
 
-	ImGui::Checkbox("Cast Shadows", &light.castShadows);
-	ImGui::ColorEdit3("Color", &light.color.r);
-	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
-	ImGui::InputFloat("Halo size", &light.haloSize);
+	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
+	changed |= ImGui::ColorEdit3("Color", &light.color.r);
+	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
+	changed |= ImGui::InputFloat("Halo size", &light.haloSize);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
+	bool changed = false;
 
-	ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	ui::inputPath("Reflections Texture", light.reflectionsTexturePath.relativePath);
-	ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
+	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ui::inputPath("Reflections Texture", light.reflectionsTexturePath.relativePath);
+	changed |= ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& script = registry.getComponent<ecs::Script>(entity);
+	bool changed = false;
 
-	ui::inputPath("Resource", script.resource.relativePath, "*.js");
-
+	changed |= ui::inputPath("Resource", script.resource.relativePath, "*.js");
 	if (ImGui::Button("Reload Script"))
-		registry.removeComponent<ecs::tags::IsScriptLoaded>(entity);
+	{
+		registry.removeComponentIfExists<ecs::ScriptInfo>(entity);
+		registry.removeComponentIfExists<ecs::ScriptError>(entity);
+		changed = true;
+	}
 
 	ImGui::SameLine();
 
-	auto loaded = registry.hasAllComponents<ecs::tags::IsScriptLoaded>(entity);
+	const auto* info = registry.tryGetComponent<const ecs::ScriptInfo>(entity);
+	const auto* error = registry.tryGetComponent<const ecs::ScriptError>(entity);
+
+	auto loaded = info != nullptr;
 	ImGui::Checkbox("Is Loaded", &loaded);
+
+	if (error)
+	{
+		ImGui::Separator();
+		ImGui::TextColored(ImVec4(0.81f, 0.27f, 0.33f, 1.0), "Error: %s", error->message.c_str());
+	}
+
+	if (info)
+	{
+		ui::spacing(3);
+		if (ImGui::BeginTable("ScriptPropertiesTable", 2, gTableFlags))
+		{
+
+			ImGui::TableSetupColumn("Property", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Type");
+			ImGui::TableHeadersRow();
+
+			for (const auto& prop : info->properties)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("%s", prop.name.c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::Text("%s", prop.getTypeName());
+			}
+
+			ImGui::EndTable();
+		}
+		ui::spacing(3);
+	}
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
+	bool changed = false;
 
-	ui::inputPath("Resource", mesh.resource.relativePath, "*.filamesh");
+	changed |= ui::inputPath("Resource", mesh.resource.relativePath, "*.filamesh");
 
-	if (ImGui::Button("Reload Mesh"))
+	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
+
+	if (loaded && ImGui::Button("Reload Mesh"))
 		registry.removeComponent<ecs::tags::IsMeshLoaded>(entity);
 
 	ImGui::SameLine();
 
-	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
 	ImGui::Checkbox("Is Loaded", &loaded);
+
+	return changed;
 }
 
-
-void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
-
 	bool changed = false;
+	bool shouldRecreateMesh = false;
 
 	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 	{
@@ -192,6 +247,7 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 			if (result.has_value())
 			{
 				mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
+				shouldRecreateMesh = true;
 				changed = true;
 			}
 		}
@@ -199,8 +255,8 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 
 	spacing(3);
 
-	ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
-	ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	changed |= ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
+	changed |= ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
 
 	spacing(3);
 
@@ -212,8 +268,9 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	{
 		spacing(3);
 
-		changed |=
+		shouldRecreateMesh =
 			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.slice.count, &smallStep, &largeStep, "%lu");
+		changed |= shouldRecreateMesh;
 		changed |=
 			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.slice.offset, &smallStep, &largeStep, "%lu");
 		ImGui::TreePop();
@@ -258,14 +315,14 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					changed |= ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex,
-												  &smallStep, &largeStep, "%lu");
+					ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep,
+									   &largeStep, "%lu");
 
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					ui::Search::searchEntity<ecs::MaterialInstance>("##Material", registry,
-																	meshMaterial.materialInstanceEntity);
+					ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("##Material", registry,
+																			meshMaterial.materialInstanceEntity);
 
 					ImGui::TableNextColumn();
 
@@ -278,9 +335,9 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 
 				if (registry.isValid(childToDestroy))
 				{
-					ecs::Child::remove(registry, childToDestroy);
-					registry.destroyEntity(childToDestroy);
+					registry.addComponent<ecs::tags::CanDestroy>(childToDestroy);
 					mesh.slice.count = std::max(0ul, mesh.slice.count - 1);
+					shouldRecreateMesh = true;
 					changed = true;
 				}
 			}
@@ -293,113 +350,126 @@ void ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		ImGui::TreePop();
 	}
 
-	if (changed)
-		registry.addComponent<ecs::tags::IsMeshInstanceDirty>(entity);
+	if (shouldRecreateMesh)
+	{
+		registry.addComponent<ecs::tags::ShouldRecreateRenderable>(entity);
+		changed = true;
+	}
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
 	const size_t smallStep = 1, largeStep = 1;
+	bool changed = false;
 
-	ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep, &largeStep,
-					   "%lu");
-	ui::Search::searchEntity<ecs::MaterialInstance>("Material", registry, meshMaterial.materialInstanceEntity);
+	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep,
+								  &largeStep, "%lu");
+	changed |= ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("Material", registry,
+																	   meshMaterial.materialInstanceEntity);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::PrecompiledMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::PrecompiledMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& material = registry.getComponent<ecs::PrecompiledMaterial>(entity);
+	bool changed = false;
 
-	ui::inputPath("Resource", material.resource.relativePath, "*.filamat");
+	changed |= ui::inputPath("Resource", material.resource.relativePath, "*.filamat");
+	auto loaded = registry.hasAllComponents<ecs::tags::IsMaterialLoaded>(entity);
 
-	if (ImGui::Button("Reload Material"))
-		registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
+	if (loaded && ImGui::Button("Reload Material"))
+		registry.removeComponent<ecs::tags::IsMaterialLoaded>(entity);
 
-	ImGui::SameLine();
+	changed |= ImGui::Checkbox("Is Loaded", &loaded);
 
-	auto loaded = !registry.hasAllComponents<ecs::tags::IsMaterialDirty>(entity);
-	ImGui::Checkbox("Is Loaded", &loaded);
+	return changed;
 }
 
-void ComponentInputImpl<ecs::MaterialInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& materialInstance = registry.getComponent<ecs::MaterialInstance>(entity);
-
-	bool changed = Search::searchEntity<ecs::tags::IsMaterial>("Material", registry, materialInstance.materialEntity);
-	if (changed)
-		registry.addComponent<ecs::tags::IsMaterialDirty>(entity);
-}
-
-void ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& transform = registry.getComponent<ecs::Transform>(entity);
+	bool changed = false;
 
-	vec3Input("Position", transform.position);
+	changed |= vec3Input("Position", transform.position);
 
 	auto eulerAnglesRotation = transform.getEulerAnglesRotation();
-	vec3Input("Rotation", eulerAnglesRotation);
+	changed |= vec3Input("Rotation", eulerAnglesRotation);
 	transform.rotation = math::deg2rad * eulerAnglesRotation;
 
-	vec3Input("Scale", transform.scale);
+	changed |= vec3Input("Scale", transform.scale);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::PerspectiveCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::PerspectiveCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::PerspectiveCamera>(entity);
+	bool changed = false;
 
-	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
 
 	double min = 15.0, max = 120.0;
-	ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
-	ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
+	changed |= ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
+	changed |= ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::OrthographicCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::OrthographicCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::OrthographicCamera>(entity);
+	bool changed = false;
 
-	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
 
-	ImGui::InputDouble("Left", &camera.left);
-	ImGui::InputDouble("Right", &camera.right);
-	ImGui::InputDouble("Bottom", &camera.bottom);
-	ImGui::InputDouble("Top", &camera.top);
+	changed |= ImGui::InputDouble("Left", &camera.left);
+	changed |= ImGui::InputDouble("Right", &camera.right);
+	changed |= ImGui::InputDouble("Bottom", &camera.bottom);
+	changed |= ImGui::InputDouble("Top", &camera.top);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& camera = registry.getComponent<ecs::CustomCamera>(entity);
+	auto changed = false;
 
-	ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
-	ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
+	changed |= ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
 
-	ImGui::InputScalarN("m0", ImGuiDataType_Double, &camera.projectionMatrix[0], 4);
-	ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
-	ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
-	ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+	changed |= ImGui::InputScalarN("m0", ImGuiDataType_Double, &camera.projectionMatrix[0], 4);
+	changed |= ImGui::InputScalarN("m1", ImGuiDataType_Double, &camera.projectionMatrix[1], 4);
+	changed |= ImGui::InputScalarN("m2", ImGuiDataType_Double, &camera.projectionMatrix[2], 4);
+	changed |= ImGui::InputScalarN("m3", ImGuiDataType_Double, &camera.projectionMatrix[3], 4);
+
+	return changed;
 }
 
-void ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
+	auto changed = false;
 
-	ImGui::DragInt2("Size", &sceneView.size.x);
+	changed |= ImGui::DragInt2("Size", &sceneView.size.x);
+	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
+	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
 
-	Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
-
-	Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
 	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
 		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		spacing(3);
 		if (registry.hasAllComponents<ecs::PerspectiveCamera>(sceneView.camera))
 			ui::componentInput<ecs::PerspectiveCamera>(registry, sceneView.camera);
-		if (registry.hasAllComponents<ecs::OrthographicCamera>(sceneView.camera))
+		else if (registry.hasAllComponents<ecs::OrthographicCamera>(sceneView.camera))
 			ui::componentInput<ecs::OrthographicCamera>(registry, sceneView.camera);
-		if (registry.hasAllComponents<ecs::CustomCamera>(sceneView.camera))
+		else if (registry.hasAllComponents<ecs::CustomCamera>(sceneView.camera))
 			ui::componentInput<ecs::CustomCamera>(registry, sceneView.camera);
 		spacing(3);
 		ImGui::TreePop();
@@ -411,6 +481,35 @@ void ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Enti
 		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
 		ImGui::TreePop();
 	}
+
+	return changed;
+}
+
+bool ComponentInputImpl<ecs::Parent>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& parent = registry.getComponent<ecs::Parent>(entity);
+	bool changed = false;
+
+	changed |= ui::Search::searchEntity<ecs::Name>("First Child", registry, parent.first);
+	changed |= ui::Search::searchEntity<ecs::Name>("Last Child", registry, parent.last);
+
+	size_t stepSlow = 1, stepFast = 5;
+	changed |=
+		ImGui::InputScalar("Children Count", ImGuiDataType_U64, &parent.childrenCount, &stepSlow, &stepFast, "%d");
+
+	return changed;
+}
+
+bool ComponentInputImpl<ecs::Child>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& child = registry.getComponent<ecs::Child>(entity);
+	bool changed = false;
+
+	changed |= ui::Search::searchEntity<ecs::Name>("Parent", registry, child.parent);
+	changed |= ui::Search::searchEntity<ecs::Name>("Previous Sibling", registry, child.previous);
+	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", registry, child.next);
+
+	return changed;
 }
 
 } // namespace spatial::ui

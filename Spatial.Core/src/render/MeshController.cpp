@@ -5,6 +5,7 @@
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
+#include <spatial/ecs/Tags.h>
 
 namespace spatial::render
 {
@@ -42,7 +43,7 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 void MeshController::updateMeshGeometries(ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::MeshInstance, Renderable>().each(
-		[&](const auto& meshInstance, auto& renderable) {
+		[&](const ecs::MeshInstance& meshInstance, Renderable& renderable) {
 			renderable.setCastShadows(meshInstance.castShadows);
 			renderable.setReceiveShadows(meshInstance.receiveShadows);
 			renderable.setCulling(meshInstance.culling);
@@ -95,11 +96,8 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 
 void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 {
-	auto d1 = registry.getEntities<ecs::tags::IsMeshInstanceDirty, Renderable>();
+	auto d1 = registry.getEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
 	registry.removeComponent<Renderable>(d1.begin(), d1.end());
-
-	auto d2 = registry.getEntities<ecs::tags::IsMeshInstanceDirty>();
-	registry.removeComponent<ecs::tags::IsMeshInstanceDirty>(d2.begin(), d2.end());
 }
 
 void MeshController::onStartFrame(ecs::Registry& registry)

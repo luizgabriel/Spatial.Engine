@@ -103,16 +103,36 @@ class Registry : private entt::registry
 	}
 
 	template <typename Component>
+	void removeComponentFromEntities()
+	{
+		auto view = getEntities<Component>();
+		remove<Component>(view.begin(), view.end());
+	}
+
+	template <typename Component>
 	void removeComponent(Entity entity)
 	{
 		assert(isValid(entity));
 		remove<Component>(entity);
 	}
 
+	template <typename Component>
+	void removeComponentIfExists(Entity entity)
+	{
+		assert(isValid(entity));
+		remove_if_exists<Component>(entity);
+	}
+
 	template <typename Component, typename It>
 	void removeComponent(It begin, It end)
 	{
 		remove<Component>(begin, end);
+	}
+
+	template <typename Component, typename It>
+	void insertComponent(It begin, It end, const Component& component = {})
+	{
+		return insert<Component>(begin, end, component);
 	}
 
 	template <typename Component>
