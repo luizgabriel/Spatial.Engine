@@ -22,6 +22,7 @@ const log = (message) => {
 
 const InputType = Object.freeze({
     FloatRange: 'FloatRange',
+    String: 'String',
 });
 //</editor-fold>
 
@@ -41,13 +42,16 @@ const onUpdateEntity = ({ entity, delta, components }) => {
 export default {
     name: "test",
     props: {
-      velocity: {
-          type: InputType.FloatRange,
-          name: "Velocity",
-          default: 5.0,
-          min: .0,
-          max: 100.0,
-      },
+        velocity: {
+            type: InputType.FloatRange,
+            default: 5.0,
+            min: .0,
+            max: 100.0,
+        },
+        name: {
+            type: InputType.String,
+            default: "Luiz Gabriel",
+        },
     },
     onUpdateEntity,
 };

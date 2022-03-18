@@ -1,11 +1,7 @@
 #pragma once
 
 #include <v8-local-handle.h>
-#include <v8-script.h>
-#include <v8-function.h>
-#include <v8-object.h>
-#include <v8-container.h>
-#include <v8-primitive.h>
+#include <v8-isolate.h>
 #include <fmt/format.h>
 
 namespace spatial::script
@@ -30,8 +26,6 @@ const char* getTypeName();
 const char* getTypeName(v8::Local<v8::Value> value);
 
 std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string);
-
-float getValue(v8::Local<v8::Number> number);
 
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream, std::string_view moduleName);
 

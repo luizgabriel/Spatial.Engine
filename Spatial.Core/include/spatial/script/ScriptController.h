@@ -1,7 +1,7 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <spatial/script/Isolate.h>
 
 namespace spatial::script
@@ -19,8 +19,6 @@ class ScriptController
 	FileSystem& mFileSystem;
 	Isolate mIsolate;
 	v8::HandleScope mScope;
-
-	v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::string_view modulePath);
 };
 
 } // namespace spatial::script
