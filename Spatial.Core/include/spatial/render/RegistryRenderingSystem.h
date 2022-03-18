@@ -11,7 +11,7 @@
 #include <spatial/render/MeshController.h>
 #include <spatial/render/SceneController.h>
 #include <spatial/render/TransformController.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <spatial/script/PlatformContext.h>
 
 namespace spatial::render

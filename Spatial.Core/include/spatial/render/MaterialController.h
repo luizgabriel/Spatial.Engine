@@ -6,7 +6,7 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <spatial/resources/Resource.h>
 #include <unordered_map>
 

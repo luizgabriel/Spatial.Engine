@@ -1,9 +1,10 @@
 #include <spatial/common/StringHelpers.h>
 #include <spatial/script/ScriptSourceStream.h>
 #include <spatial/script/Utils.h>
+#include <v8-container.h>
 #include <v8-context.h>
 #include <v8-promise.h>
-#include <fmt/format.h>
+#include <chrono>
 
 namespace spatial::script
 {
@@ -28,7 +29,12 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 	auto handle = v8::EscapableHandleScope{context->GetIsolate()};
 
 	auto moduleId = static_cast<int>(HashedString{moduleName.data()}.value());
-	auto resourceName = createString(context->GetIsolate(), moduleName);
+
+	// For some reason, V8 Caches the script source by the module name. By generating a custom module name, we avoid it.
+	// TODO: How to enable/disable this module caching when appropriate?
+	auto uniqueModuleName = fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
+
+	auto resourceName = createString(context->GetIsolate(), uniqueModuleName);
 	auto fullSource = createString(context->GetIsolate(), "");
 
 	auto origin = v8::ScriptOrigin{
@@ -87,7 +93,7 @@ v8::Local<v8::Value> getAttributeValue(v8::Local<v8::Object> object, std::string
 }
 
 v8::Local<v8::Value> getAttributeValueOrDefault(v8::Local<v8::Object> object, std::string_view key,
-										   v8::Local<v8::Value> defaultValue)
+												v8::Local<v8::Value> defaultValue)
 {
 	auto resultValue = getAttributeValue(object, key);
 	if (resultValue->IsUndefined())
@@ -107,7 +113,8 @@ std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array)
 	auto values = std::vector<v8::Local<v8::Value>>{};
 	values.reserve(array->Length());
 
-	for (auto i = 0; i < array->Length(); i++) {
+	for (auto i = 0; i < array->Length(); i++)
+	{
 		values.emplace_back(getAttributeValue(array, i));
 	}
 
@@ -211,7 +218,6 @@ const char* getTypeName(v8::Local<v8::Value> value)
 	return "Unknown";
 }
 
-
 template <>
 bool instanceOf<v8::Object>(v8::Local<v8::Value> value)
 {
@@ -243,16 +249,12 @@ std::vector<std::pair<v8::Local<v8::Value>, v8::Local<v8::Value>>> toValueEntrie
 	auto entries = std::vector<std::pair<v8::Local<v8::Value>, v8::Local<v8::Value>>>{};
 	entries.reserve(keys.size());
 
-	for (auto key : keys) {
+	for (auto key : keys)
+	{
 		entries.emplace_back(key, object->Get(context, key).ToLocalChecked());
 	}
 
 	return entries;
-}
-
-float getValue(v8::Local<v8::Number> number)
-{
-	return static_cast<float>(number->Value());
 }
 
 template <>

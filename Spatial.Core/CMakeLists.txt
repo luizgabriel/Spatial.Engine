@@ -33,6 +33,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Script.h
         include/spatial/ecs/Material.h
         include/spatial/ecs/RegistryCollection.h
+        include/spatial/ecs/Tags.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -70,6 +71,7 @@ add_library(Spatial.Core
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
         include/spatial/serialization/Material.h
+        include/spatial/serialization/Script.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
@@ -77,7 +79,7 @@ add_library(Spatial.Core
         include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
         include/spatial/resources/Resource.h
-        include/spatial/resources/FilesSystem.h
+        include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
 
         include/spatial/script/Isolate.h
@@ -85,6 +87,7 @@ add_library(Spatial.Core
         include/spatial/script/ScriptController.h
         include/spatial/script/ScriptSourceStream.h
         include/spatial/script/Utils.h
+        include/spatial/script/Parsing.h
 
         ## SOURCES
         src/common/StringHelpers.cpp
@@ -105,6 +108,7 @@ add_library(Spatial.Core
         src/ecs/Mesh.cpp
         src/ecs/Material.cpp
         src/ecs/RegistryPublisher.cpp
+        src/ecs/Script.cpp
 
         src/render/Resources.cpp
         src/render/Engine.cpp
@@ -131,12 +135,13 @@ add_library(Spatial.Core
         src/script/ScriptController.cpp
         src/script/ScriptSourceStream.cpp
         src/script/Utils.cpp
+        src/script/Parsing.cpp
 
         src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp src/ecs/Script.cpp include/spatial/ecs/Tags.h)
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
