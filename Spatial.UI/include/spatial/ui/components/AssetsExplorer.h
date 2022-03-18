@@ -3,10 +3,9 @@
 #include "Window.h"
 #include <filament/Texture.h>
 #include <filesystem>
-#include <opencl-c-base.h>
 #include <spatial/common/Math.h>
 #include <spatial/common/StringHelpers.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <unordered_map>
 
 namespace spatial::ui

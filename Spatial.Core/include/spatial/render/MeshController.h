@@ -7,7 +7,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <unordered_map>
 
 namespace spatial::render

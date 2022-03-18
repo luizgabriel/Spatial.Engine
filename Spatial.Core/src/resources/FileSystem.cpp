@@ -1,6 +1,6 @@
 #include <cassert>
 #include <fmt/format.h>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <sstream>
 
 namespace spatial

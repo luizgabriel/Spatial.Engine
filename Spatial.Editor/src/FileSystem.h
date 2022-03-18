@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Settings.h"
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 
 namespace spatial::editor
 {

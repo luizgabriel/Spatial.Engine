@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 
 namespace spatial
 {

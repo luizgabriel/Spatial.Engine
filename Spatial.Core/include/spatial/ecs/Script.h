@@ -25,13 +25,11 @@ struct Script
 
 struct ScriptInfo
 {
-
-
 	struct Property {
 
 		struct StringType
 		{
-			static constexpr const char* typeName = "StringType";
+			static constexpr const char* typeName = "String";
 
 			// std::string regexValidation;
 			std::string defaultValue{};
@@ -46,9 +44,11 @@ struct ScriptInfo
 			float max{std::numeric_limits<float>::max()};
 		};
 
+		using Type = std::variant<StringType, FloatRangeType>;
+
 		std::string key;
 		std::string name;
-		std::variant<StringType, FloatRangeType> type;
+		Type type;
 
 		bool operator<(const Property& rhs) const;
 

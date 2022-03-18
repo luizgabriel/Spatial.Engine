@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spatial/resources/FilesSystem.h>
+#include <spatial/resources/FileSystem.h>
 #include <unordered_map>
 
 namespace spatial
