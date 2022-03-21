@@ -27,12 +27,16 @@ class DirectionalLightEntityBuilder;
 class SunLightEntityBuilder;
 class IndirectLightEntityBuilder;
 
+class PrecompiledMaterialEntityBuilder;
+
 template <typename MaterialComponent>
 class MaterialInstanceEntityBuilder;
 
 class MeshEntityBuilder;
 
 class MeshInstanceEntityBuilder;
+
+class MeshMaterialEntityBuilder;
 
 class SceneViewEntityBuilder;
 
@@ -48,7 +52,7 @@ class EntityBuilder
 	template <typename Component>
 	EntityBuilder& with(Component&& component)
 	{
-		mRegistry.template addOrReplaceComponent<Component>(mEntity, std::forward<Component>(component));
+		mRegistry.template addComponent<Component>(mEntity, std::forward<Component>(component));
 		return *this;
 	}
 
@@ -57,14 +61,14 @@ class EntityBuilder
 	template <typename Component, typename... Args>
 	EntityBuilder& with(Args&&... args)
 	{
-		mRegistry.addOrReplaceComponent<Component>(mEntity, std::forward<Args>(args)...);
+		mRegistry.template addComponent<Component>(mEntity, std::forward<Args>(args)...);
 		return *this;
 	}
 
 	template <typename Component>
 	EntityBuilder& with()
 	{
-		mRegistry.addOrReplaceComponent<Component>(mEntity);
+		mRegistry.template addComponent<Component>(mEntity);
 		return *this;
 	}
 
@@ -83,13 +87,16 @@ class EntityBuilder
 
 	MeshEntityBuilder asMesh();
 	MeshInstanceEntityBuilder asMeshInstance();
+	MeshMaterialEntityBuilder asMeshMaterial();
 
 	ScriptEntityBuilder asScript();
 
+	PrecompiledMaterialEntityBuilder asPrecompiledMaterial();
+
 	template <typename MaterialComponent>
-	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance(Entity material)
+	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance()
 	{
-		return MaterialInstanceEntityBuilder<MaterialComponent>{ mRegistry, mEntity, material};
+		return MaterialInstanceEntityBuilder<MaterialComponent>{ mRegistry, mEntity };
 	}
 
 	[[nodiscard]] EntityHandle get() const
@@ -236,21 +243,40 @@ class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
 	IndirectLightEntityBuilder& withIrradianceValuesPath(const std::filesystem::path& path);
 };
 
+class PrecompiledMaterialEntityBuilder : public BasicEntityBuilder<PrecompiledMaterial>
+{
+  public:
+	using Base = BasicEntityBuilder<PrecompiledMaterial>;
+
+	PrecompiledMaterialEntityBuilder(Registry& registry, Entity entity);
+
+	PrecompiledMaterialEntityBuilder& withResource(const std::filesystem::path& filamat);
+};
+
 template <typename MaterialProps>
 class MaterialInstanceEntityBuilder : public EntityBuilder
 {
   public:
-	MaterialInstanceEntityBuilder(Registry& registry, Entity entity, Entity material)
+	MaterialInstanceEntityBuilder(Registry& registry, Entity entity)
 		: EntityBuilder(registry, entity)
 	{
 		with<tags::IsResource>();
 		with<tags::IsMaterialInstance>();
+		with<MaterialProps>({});
+	}
+
+	MaterialInstanceEntityBuilder& withMaterial(Entity material)
+	{
+		if (mRegistry.hasAllComponents<Name>(material) && !mRegistry.hasAnyComponent<Name>(mEntity))
+			withName(mRegistry.getComponent<Name>(material).name);
+
 		withParent(material);
+		return *this;
 	}
 
 	MaterialInstanceEntityBuilder& withProps(MaterialProps&& params)
 	{
-		with<MaterialProps>(std::move(params));
+		mRegistry.template addOrReplaceComponent(mEntity, std::move(params));
 		return *this;
 	}
 };
@@ -278,6 +304,17 @@ class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
 	MeshInstanceEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
 	MeshInstanceEntityBuilder& withCulling(bool culling);
 	MeshInstanceEntityBuilder& withPriority(uint8_t priority);
+};
+
+class MeshMaterialEntityBuilder : public BasicEntityBuilder<MeshMaterial>
+{
+  public:
+	using Base = BasicEntityBuilder<MeshMaterial>;
+
+	MeshMaterialEntityBuilder(Registry& registry, Entity entity);
+
+	MeshMaterialEntityBuilder& withPrimitiveIndex(uint32_t primitiveIndex);
+	MeshMaterialEntityBuilder& withMaterial(Entity materialInstance);
 };
 
 class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>

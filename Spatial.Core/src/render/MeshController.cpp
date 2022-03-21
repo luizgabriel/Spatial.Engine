@@ -51,7 +51,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 		});
 
 	registry.getEntities<const ecs::MeshInstance, Renderable>().each(
-		[&](const auto& meshInstance, auto& renderable) {
+		[&](const ecs::MeshInstance& meshInstance, Renderable& renderable) {
 			if (!registry.hasAllComponents<MeshGeometries, SharedVertexBuffer, SharedIndexBuffer>(
 					meshInstance.meshSource))
 				return;

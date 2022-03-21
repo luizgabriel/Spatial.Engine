@@ -13,7 +13,7 @@ namespace spatial::ecs
 
 struct Script
 {
-	constexpr static auto typeName = "script";
+	static constexpr auto typeName = "script";
 
 	Resource<ResourceType::Javascript> resource;
 
@@ -29,7 +29,7 @@ struct ScriptInfo
 
 		struct StringType
 		{
-			static constexpr const char* typeName = "String";
+			static constexpr auto typeName = "String";
 
 			// std::string regexValidation;
 			std::string defaultValue{};
@@ -37,7 +37,7 @@ struct ScriptInfo
 
 		struct FloatRangeType
 		{
-			static constexpr const char* typeName = "FloatRange";
+			static constexpr auto typeName = "FloatRange";
 
 			float defaultValue{.0f};
 			float min{std::numeric_limits<float>::min()};
@@ -66,10 +66,13 @@ struct ScriptError
 
 struct ScriptInstance
 {
-	constexpr static auto typeName = "script_instance";
+	static constexpr auto typeName = "script_instance";
 
-	Entity script;
-	std::unordered_map<std::string, std::any> customData;
+	using DataValueType = std::variant<float, std::string>;
+	using DataContainer = std::unordered_map<std::string, DataValueType>;
+
+	Entity source;
+	DataContainer customData;
 };
 
 } // namespace spatial::ecs

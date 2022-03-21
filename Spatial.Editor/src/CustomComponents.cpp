@@ -8,7 +8,6 @@
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/render/TextureView.h>
-#include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
@@ -150,7 +149,8 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<editor::GridMaterial>(registry, entity);
 	componentCollapse<editor::StandardOpaqueMaterial>(registry, entity, icons, finder);
 
-	if (showDebugComponents) {
+	if (showDebugComponents)
+	{
 		componentCollapse<ecs::Parent>(registry, entity);
 		componentCollapse<ecs::Child>(registry, entity);
 	}
@@ -539,7 +539,7 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 	const auto* selectedMeshInstanceName = registry.tryGetComponent<ecs::Name>(selectedEntity);
 
 	const auto mergeMaterialName = [&](const char* materialName) {
-		if (selectedMeshInstanceName)
+		if (selectedMeshInstanceName && isMeshInstanceSelected)
 			return fmt::format("{} ({})", materialName, selectedMeshInstanceName->c_str());
 		else
 			return std::string{materialName};
@@ -560,8 +560,8 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 
 			createdEntity = ecs::build(registry)
 								.withName(mergeMaterialName("Standard Opaque"))
-								.asMaterialInstance<editor::StandardOpaqueMaterial>(opaqueMaterial)
-								.withProps({});
+								.asMaterialInstance<editor::StandardOpaqueMaterial>()
+								.withMaterial(opaqueMaterial);
 			changed = true;
 		}
 
@@ -573,8 +573,8 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 
 			createdEntity = ecs::build(registry)
 								.withName(mergeMaterialName("Color Material"))
-								.asMaterialInstance<editor::ColorMaterial>(colorMaterial)
-								.withProps({});
+								.asMaterialInstance<editor::ColorMaterial>()
+								.withMaterial(colorMaterial);
 			changed = true;
 		}
 	}
@@ -599,8 +599,8 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 
 		createdEntity = ecs::build(registry)
 							.withName("Default SkyBox")
-							.asMaterialInstance<editor::SkyBoxMaterial>(skyboxMaterial)
-							.withProps({});
+							.asMaterialInstance<editor::SkyBoxMaterial>()
+							.withMaterial(skyboxMaterial);
 		changed = true;
 	}
 
@@ -678,20 +678,45 @@ bool EditorDragAndDrop::loadScript(ecs::Registry& registry, ecs::Entity& selecte
 bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 										  math::float3 createEntitiesPosition, bool addAsChild)
 {
-	auto menu = Menu{"Create Entity"};
-	if (!menu.isOpen())
-		return false;
-
 	bool changed = false;
 	ecs::Entity newEntity = ecs::NullEntity;
 
-	if (menu.item("Empty"))
+	if (Menu::itemButton("Empty"))
 	{
 		newEntity = ecs::build(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
-	ImGui::Separator();
+	if (Menu::itemButton("Scene View"))
+	{
+		newEntity = ecs::build(registry).withName("Scene View").asSceneView();
+		changed = true;
+	}
+
+	changed |= SceneOptionsMenu::createMeshMenu(registry, selectedEntity, createEntitiesPosition, addAsChild);
+	changed |= SceneOptionsMenu::createLightMenu(registry, selectedEntity, createEntitiesPosition, addAsChild);
+	changed |= SceneOptionsMenu::createCameraMenu(registry, selectedEntity, createEntitiesPosition, addAsChild);
+
+	if (registry.isValid(newEntity))
+	{
+		if (registry.isValid(selectedEntity) && addAsChild)
+			ecs::Parent::addChild(registry, selectedEntity, newEntity);
+
+		selectedEntity = newEntity;
+	}
+
+	return changed;
+}
+
+bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+									  math::float3 createEntitiesPosition, bool addAsChild)
+{
+	auto menu = Menu{"Mesh"};
+	if (!menu.isOpen())
+		return false;
+
+	bool changed = false;
+	ecs::Entity newEntity = ecs::NullEntity;
 
 	if (menu.item("Cube"))
 	{
@@ -745,18 +770,46 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 		changed = true;
 	}
 
-	if (menu.item("Mesh Instance"))
+	if (menu.item("Skybox"))
 	{
+		auto skyboxMaterial = ecs::PrecompiledMaterial::find(registry, "editor/materials/skybox.filamat");
+		auto materialInstance = ecs::build(registry)
+									.asMaterialInstance<editor::SkyBoxMaterial>()
+									.withMaterial(skyboxMaterial)
+									.withProps({
+										false,
+										{math::float3{.0f}, 1.0f},
+										{"editor/textures/skybox/texture.ktx"},
+									});
+
 		newEntity = ecs::build(registry)
-						.withName("Mesh Instance")
-						.asTransform()
-						.withPosition(createEntitiesPosition)
+						.withName("Skybox")
 						.asMeshInstance()
-						.withMesh(ecs::NullEntity);
+						.withMesh(ecs::Mesh::findOrCreate(registry, "engine/skybox"))
+						.withMaterialAt(0, materialInstance);
 		changed = true;
 	}
 
-	ImGui::Separator();
+	if (registry.isValid(newEntity))
+	{
+		if (registry.isValid(selectedEntity) && addAsChild)
+			ecs::Parent::addChild(registry, selectedEntity, newEntity);
+
+		selectedEntity = newEntity;
+	}
+
+	return changed;
+}
+
+bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+									   math::float3 createEntitiesPosition, bool addAsChild)
+{
+	auto menu = Menu{"Light"};
+	if (!menu.isOpen())
+		return false;
+
+	bool changed = false;
+	ecs::Entity newEntity = ecs::NullEntity;
 
 	if (menu.item("Point Light"))
 	{
@@ -784,7 +837,32 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 		changed = true;
 	}
 
-	ImGui::Separator();
+	if (menu.item("Sun Light"))
+	{
+		newEntity = ecs::build(registry).withName("Sun Light").asSunLight();
+		changed = true;
+	}
+
+	if (registry.isValid(newEntity))
+	{
+		if (registry.isValid(selectedEntity) && addAsChild)
+			ecs::Parent::addChild(registry, selectedEntity, newEntity);
+
+		selectedEntity = newEntity;
+	}
+
+	return changed;
+}
+
+bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+										math::float3 createEntitiesPosition, bool addAsChild)
+{
+	auto menu = Menu{"Camera"};
+	if (!menu.isOpen())
+		return false;
+
+	bool changed = false;
+	ecs::Entity newEntity = ecs::NullEntity;
 
 	if (menu.item("Perspective Camera"))
 	{
@@ -806,11 +884,12 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 		changed = true;
 	}
 
-	ImGui::Separator();
-
-	if (menu.item("Scene View"))
+	if (menu.item("Custom Camera"))
 	{
-		newEntity = ecs::build(registry).withName("Scene View").asSceneView();
+		newEntity = ecs::build(registry)
+						.withName("Custom Camera")
+						.asCustomCamera()
+						.withProjection(math::mat4::perspective(45.0, 1280.0 / 720.0, .1, 1000.0));
 		changed = true;
 	}
 
@@ -836,6 +915,7 @@ bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& select
 
 	if (!menu.isOpen())
 		return false;
+
 	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition, true);
 }
 
@@ -934,6 +1014,16 @@ bool EditorMainMenu::viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEdit
 	}
 
 	return changed;
+}
+
+bool EditorMainMenu::createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								const math::float3& createEntitiesPosition)
+{
+	auto menu = Menu{"Create"};
+	if (!menu.isOpen())
+		return false;
+
+	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition);
 }
 
 } // namespace spatial::ui
