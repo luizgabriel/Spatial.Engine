@@ -78,6 +78,7 @@ void SceneController::cleanUpDestroyableEntities(ecs::Registry& registry)
 		if (registry.hasAnyComponent<ecs::Parent>(entity))
 		{
 			auto children = ecs::Parent::getChildren(registry, entity);
+			registry.removeComponent<ecs::Child>(children.begin(), children.end());
 			registry.insertComponent<ecs::tags::CanDestroy>(children.begin(), children.end());
 		}
 

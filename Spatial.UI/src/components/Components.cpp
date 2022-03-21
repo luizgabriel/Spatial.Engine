@@ -241,15 +241,12 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 	{
 		auto dnd = ui::DragAndDropTarget{};
-		if (dnd.isStarted())
+		auto result = dnd.getPayload<std::filesystem::path>();
+		if (result.has_value())
 		{
-			auto result = dnd.getPayload<std::filesystem::path>();
-			if (result.has_value())
-			{
-				mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
-				shouldRecreateMesh = true;
-				changed = true;
-			}
+			mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
+			shouldRecreateMesh = true;
+			changed = true;
 		}
 	}
 
@@ -327,8 +324,17 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					if (ImGui::Button("Remove"))
+
+					if (mesh.slice.count == 1) {
+						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
+					}
+
+					if (ImGui::Button("Remove") && mesh.slice.count > 1)
 						childToDestroy = child;
+
+					if (mesh.slice.count == 1) {
+						ImGui::PopStyleVar();
+					}
 
 					ImGui::PopID();
 				});

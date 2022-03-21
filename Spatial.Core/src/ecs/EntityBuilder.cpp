@@ -84,6 +84,16 @@ ScriptEntityBuilder EntityBuilder::asScript()
 	return {mRegistry, mEntity};
 }
 
+MeshMaterialEntityBuilder EntityBuilder::asMeshMaterial()
+{
+	return { mRegistry, mEntity };
+}
+
+PrecompiledMaterialEntityBuilder EntityBuilder::asPrecompiledMaterial()
+{
+	return { mRegistry, mEntity };
+}
+
 EntityBuilder& EntityBuilder::withParent(Entity parent)
 {
 	ecs::Parent::addChild(mRegistry, parent, mEntity);
@@ -396,7 +406,7 @@ MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity) : BasicE
 MeshEntityBuilder& MeshEntityBuilder::withResource(const std::filesystem::path& filamesh)
 {
 	if (!filamesh.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
-		withName(filamesh.filename());
+		withName(filamesh.filename().string());
 
 	getComponent().resource.relativePath = filamesh;
 	return *this;
@@ -408,14 +418,12 @@ SceneViewEntityBuilder::SceneViewEntityBuilder(Registry& registry, Entity entity
 
 SceneViewEntityBuilder& SceneViewEntityBuilder::withCamera(ecs::Entity cameraEntity)
 {
-	ecs::Parent::addChild(mRegistry, mEntity, cameraEntity);
 	getComponent().camera = cameraEntity;
 	return *this;
 }
 
 SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
-	ecs::Parent::addChild(mRegistry, mEntity, indirectLightEntity);
 	getComponent().indirectLight = indirectLightEntity;
 	return *this;
 }
@@ -428,6 +436,42 @@ ScriptEntityBuilder::ScriptEntityBuilder(Registry& registry, Entity entity) : Ba
 ScriptEntityBuilder& ScriptEntityBuilder::withResource(const std::filesystem::path& script)
 {
 	getComponent().resource = script;
+	return *this;
+}
+
+MeshMaterialEntityBuilder::MeshMaterialEntityBuilder(Registry& registry, Entity entity)
+	: BasicEntityBuilder(registry, entity)
+{
+}
+
+MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withPrimitiveIndex(uint32_t primitiveIndex)
+{
+	if (!mRegistry.hasAllComponents<Name>(mEntity))
+		withName(fmt::format("Primitive {}", primitiveIndex));
+
+	getComponent().primitiveIndex = primitiveIndex;
+	return *this;
+}
+
+MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withMaterial(Entity materialInstance)
+{
+	getComponent().materialInstanceEntity = materialInstance;
+	return *this;
+}
+
+PrecompiledMaterialEntityBuilder::PrecompiledMaterialEntityBuilder(Registry& registry, Entity entity)
+	: BasicEntityBuilder(registry, entity)
+{
+	with<tags::IsMaterial>();
+	with<tags::IsResource>();
+}
+
+PrecompiledMaterialEntityBuilder& PrecompiledMaterialEntityBuilder::withResource(const std::filesystem::path& filamat)
+{
+	if (!filamat.empty() && !mRegistry.hasAllComponents<Name>(mEntity))
+		withName(filamat.filename().string());
+
+	getComponent().resource.relativePath = filamat;
 	return *this;
 }
 
