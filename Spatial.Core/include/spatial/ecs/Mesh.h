@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
-#include <spatial/ecs/EntityHandle.h>
 #include <spatial/resources/Resource.h>
 
 namespace spatial::ecs
@@ -46,9 +45,9 @@ struct Mesh
 	{
 	}
 
-	static EntityConstHandle find(const Registry& registry, const std::filesystem::path& resource);
+	static Entity find(const Registry& registry, const std::filesystem::path& resource);
 
-	static EntityHandle findOrCreate(Registry& registry, const std::filesystem::path& resource);
+	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
 };
 
 struct MeshInstance
@@ -77,9 +76,9 @@ struct MeshInstance
 
 	MeshInstance() = default;
 
-	static void addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity);
+	static Entity addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity);
 
-	static void addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex);
+	static Entity addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex);
 };
 
 } // namespace spatial::ecs

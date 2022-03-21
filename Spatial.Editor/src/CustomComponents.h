@@ -40,6 +40,7 @@ struct EditorMainMenu
 
 	static bool fileMenu(const filament::Texture& icons);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
+	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, const math::float3& createEntitiesPosition);
 };
 
 class NewSceneModal
@@ -123,8 +124,17 @@ class SceneOptionsMenu
   public:
 	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								   math::float3 createEntitiesPosition, bool addAsChild = false);
+
 	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
 	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
+
+  private:
+	static bool createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+							   math::float3 createEntitiesPosition, bool addAsChild = false);
+	static bool createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								math::float3 createEntitiesPosition, bool addAsChild = false);
+	static bool createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								 math::float3 createEntitiesPosition, bool addAsChild = false);
 };
 
 class SceneTree
