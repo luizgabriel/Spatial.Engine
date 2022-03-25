@@ -4,6 +4,7 @@
 #include "Tags.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <magic_enum.hpp>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Relation.h>
@@ -136,6 +137,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::SpotLight>(registry, entity);
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity);
+	componentCollapse<ecs::SunLight>(registry, entity);
 	componentCollapse<ecs::Mesh>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
@@ -428,7 +430,7 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 
 	const auto selectedFlags = selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
 	const auto childrenFlags = hasChildren
-								   ? ImGuiTreeNodeFlags_SpanFullWidth
+								   ? ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick
 								   : ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet
 										 | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth;
 
@@ -465,7 +467,37 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter)
+{
+	static const auto filterToName = std::unordered_map<AssetType, const char*>{
+		{AssetType::Material, "Materials"},
+		{AssetType::Script, "Scripts"},
+		{AssetType::Mesh, "Meshes"},
+	};
+
+	bool changed = false;
+
+	ImGui::Columns(2);
+	ui::spanToAvailWidth();
+	if (ImGui::BeginCombo("##ResourceTypeFilter", filterToName.at(filter)))
+	{
+		for (auto value : magic_enum::enum_values<AssetType>()) {
+			if (ImGui::Selectable(filterToName.at(value), filter == value)) {
+				filter = value;
+				changed = true;
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::NextColumn();
+	changed |= ui::Search::searchText(search);
+
+	ImGui::Columns(1);
+
+	return changed;
+}
+
+bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search, AssetsManager::AssetType type,
 						 bool showEditorEntities)
 {
 	using namespace boost::algorithm;
@@ -490,6 +522,15 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
+			if (type == AssetType::Material && !registry.hasAnyComponent<ecs::PrecompiledMaterial, ecs::tags::IsMaterialInstance>(entity))
+				return;
+
+			if (type == AssetType::Mesh && !registry.hasAnyComponent<ecs::Mesh>(entity))
+				return;
+
+			if (type == AssetType::Script && !registry.hasAllComponents<ecs::Script>(entity))
+				return;
+
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 
@@ -503,17 +544,17 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			}
 
 			ImGui::TableNextColumn();
-			std::string_view type;
+			std::string_view typeText;
 			if (registry.hasAllComponents<ecs::Mesh>(entity))
-				type = "Mesh"sv;
+				typeText = "Mesh"sv;
 			else if (registry.hasAllComponents<ecs::PrecompiledMaterial>(entity))
-				type = "Precompiled Material"sv;
+				typeText = "Precompiled Material"sv;
 			else if (registry.hasAllComponents<ecs::tags::IsMaterialInstance>(entity))
-				type = "Material Instance"sv;
+				typeText = "Material Instance"sv;
 			else if (registry.hasAllComponents<ecs::Script>(entity))
-				type = "Script"sv;
+				typeText = "Script"sv;
 
-			ImGui::TextDisabled("%s", type.data());
+			ImGui::TextDisabled("%s", typeText.data());
 		};
 
 		if (showEditorEntities)
@@ -786,7 +827,9 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withName("Skybox")
 						.asMeshInstance()
 						.withMesh(ecs::Mesh::findOrCreate(registry, "engine/skybox"))
-						.withMaterialAt(0, materialInstance);
+						.withMaterialAt(0, materialInstance)
+						.withCulling(false)
+						.withPriority(0x7);
 		changed = true;
 	}
 
