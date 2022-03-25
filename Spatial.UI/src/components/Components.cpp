@@ -190,7 +190,6 @@ bool ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity 
 		ui::spacing(3);
 		if (ImGui::BeginTable("ScriptPropertiesTable", 2, gTableFlags))
 		{
-
 			ImGui::TableSetupColumn("Property", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableSetupColumn("Type");
 			ImGui::TableHeadersRow();
@@ -237,6 +236,7 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 	bool changed = false;
 	bool shouldRecreateMesh = false;
+	const size_t smallStep = 1, largeStep = 5;
 
 	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 	{
@@ -254,26 +254,16 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 
 	changed |= ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
 	changed |= ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
+	changed |= ImGui::Checkbox("Culling", &mesh.culling);
+
+	ImGui::SetNextItemWidth(100.0f);
+	changed |= ImGui::InputScalar("Priority", ImGuiDataType_U8, &mesh.priority, &smallStep, &largeStep);
 
 	spacing(3);
 
-	const size_t smallStep = 1, largeStep = 5;
+	changed |= Search::searchEntity<ecs::tags::IsMaterialInstance>("Default Material", registry, mesh.defaultMaterial);
 
 	spacing(3);
-
-	if (ImGui::TreeNodeEx("Geometry Configuration", ImGuiTreeNodeFlags_SpanFullWidth))
-	{
-		spacing(3);
-
-		shouldRecreateMesh =
-			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.slice.count, &smallStep, &largeStep, "%lu");
-		changed |= shouldRecreateMesh;
-		changed |=
-			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.slice.offset, &smallStep, &largeStep, "%lu");
-		ImGui::TreePop();
-
-		spacing(3);
-	}
 
 	if (ImGui::TreeNodeEx("Materials", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -282,12 +272,12 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		if (ImGui::Button("Add Slot"))
 		{
 			ecs::MeshInstance::addMaterial(registry, entity, ecs::NullEntity);
+			shouldRecreateMesh = true;
 			changed = true;
 		}
 
 		if (ImGui::BeginTable("MaterialsTable", 3, gTableFlags))
 		{
-
 			ImGui::TableSetupColumn("Primitive Index");
 			ImGui::TableSetupColumn("Material", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableSetupColumn("Actions");
@@ -325,16 +315,8 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 
 					ui::spanToAvailWidth();
 
-					if (mesh.slice.count == 1) {
-						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
-					}
-
-					if (ImGui::Button("Remove") && mesh.slice.count > 1)
+					if (ImGui::Button("Remove"))
 						childToDestroy = child;
-
-					if (mesh.slice.count == 1) {
-						ImGui::PopStyleVar();
-					}
 
 					ImGui::PopID();
 				});
@@ -342,7 +324,6 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 				if (registry.isValid(childToDestroy))
 				{
 					registry.addComponent<ecs::tags::CanDestroy>(childToDestroy);
-					mesh.slice.count = std::max(0ul, mesh.slice.count - 1);
 					shouldRecreateMesh = true;
 					changed = true;
 				}
@@ -356,9 +337,25 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		ImGui::TreePop();
 	}
 
+	spacing(3);
+
+	if (ImGui::TreeNodeEx("Geometry Slice", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		spacing(3);
+
+		shouldRecreateMesh =
+			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.slice.count, &smallStep, &largeStep, "%lu");
+		changed |= shouldRecreateMesh;
+		changed |=
+			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.slice.offset, &smallStep, &largeStep, "%lu");
+		ImGui::TreePop();
+
+		spacing(3);
+	}
+
 	if (shouldRecreateMesh)
 	{
-		registry.addComponent<ecs::tags::ShouldRecreateRenderable>(entity);
+		registry.addOrReplaceComponent<ecs::tags::ShouldRecreateRenderable>(entity);
 		changed = true;
 	}
 

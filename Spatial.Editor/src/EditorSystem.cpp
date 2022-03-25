@@ -22,12 +22,11 @@
 #include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/resources/MemoryFileSystem.h>
 #include <spatial/resources/PhysicalFileSystem.h>
+#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
-#include <spatial/ui/components/Menu.h>
 
 namespace fl = filament;
 namespace fs = std::filesystem;
@@ -214,11 +213,10 @@ void EditorSystem::onDrawGui()
 			? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0f) - (math::axisY * 0.1f))
 			: math::float3{};
 
-
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(*mIconTexture);
-		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 		ui::EditorMainMenu::createMenu(mRegistry, selectedEntity, createEntityPosition);
+		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 
 		if (ui::OpenProjectModal::show(rootPath))
 			mJobQueue.enqueue<OpenProjectEvent>(rootPath);
@@ -233,7 +231,6 @@ void EditorSystem::onDrawGui()
 			mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
 	});
 
-
 	{
 		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView, tags::IsEditorView>();
 		auto style = ui::WindowPaddingStyle{};
@@ -246,7 +243,8 @@ void EditorSystem::onDrawGui()
 			auto style2 = ui::WindowPaddingStyle{4};
 			ui::Popup::show("Scene View Popup", [&]() {
 				auto menu = ui::Menu{"Create"};
-				if (!menu.isOpen()) return;
+				if (!menu.isOpen())
+					return;
 				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
 			});
 		}
@@ -278,8 +276,10 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Assets Manager", [&]() {
 		static std::string search;
-		ui::Search::searchText(search);
-		ui::AssetsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+		static ui::AssetsManager::AssetType type = ui::AssetsManager::AssetType::Material;
+
+		ui::AssetsManager::header(search, type);
+		ui::AssetsManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
 
 		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity);
 		ui::EditorDragAndDrop::loadScript(mRegistry, selectedEntity);
@@ -329,36 +329,57 @@ void EditorSystem::clearScene()
 
 void EditorSystem::loadScene()
 {
+	const auto path = getScenePath();
+
+	auto stream = mFileSystem.openReadStream(path.c_str());
+	if (stream->fail())
+	{
+		gLogger.error("Could not open scene file: {}", path.c_str());
+		return;
+	}
+
 	try
 	{
-		auto stream = mFileSystem.openReadStream(mScenePath.c_str());
 		mRegistry = parseRegistry(*stream);
-		createDefaultEditorEntities(mRegistry);
 	}
 	catch (const std::exception& e)
 	{
 		gLogger.warn("Could not load scene: {}", e.what());
 	}
+
+	createDefaultEditorEntities(mRegistry);
 }
 
 void EditorSystem::saveScene()
 {
+	const auto path = getScenePath();
+
+	auto stream = mFileSystem.openWriteStream(path.c_str());
+	if (stream->fail())
+	{
+		gLogger.error("Could not open scene file: {}", path.c_str());
+		return;
+	}
+
 	try
 	{
-		auto path = mScenePath;
-		if (mScenePath.root_directory() != "project")
-			path = "project" / path;
-
-		if (!boost::ends_with(mScenePath.filename().c_str(), ".spatial.json"))
-			path = std::filesystem::path{path.string() + ".spatial.json"};
-
-		auto stream = mFileSystem.openWriteStream(path.c_str());
 		writeRegistry(mRegistry, *stream);
 	}
 	catch (const std::exception& e)
 	{
 		gLogger.warn("Could not save scene: {}", e.what());
 	}
+}
+std::filesystem::path EditorSystem::getScenePath() const
+{
+	auto path = mScenePath;
+	if (!boost::starts_with(path.parent_path().c_str(), "project/"))
+		path = "project" / path;
+
+	if (!boost::ends_with(mScenePath.filename().c_str(), ".spatial.json"))
+		path = std::filesystem::path{path.string() + ".spatial.json"};
+
+	return path;
 }
 
 void EditorSystem::setRootPath(const std::filesystem::path& path)

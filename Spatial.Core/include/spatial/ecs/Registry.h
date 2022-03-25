@@ -102,11 +102,11 @@ class Registry : private entt::registry
 		return get<Component>(entity);
 	}
 
-	template <typename Component>
+	template <typename... Component>
 	void removeComponentFromEntities()
 	{
-		auto view = getEntities<Component>();
-		remove<Component>(view.begin(), view.end());
+		auto view = getEntities<Component...>();
+		remove<Component...>(view.begin(), view.end());
 	}
 
 	template <typename Component>

@@ -9,7 +9,7 @@
         6,
         7,
         8,
-        9,
+        1048593,
         10,
         11,
         12,
@@ -17,109 +17,134 @@
         14,
         15,
         16,
-        17,
+        1048597,
         18,
         19,
         20,
-        21
+        1048602,
+        22,
+        23,
+        24,
+        25,
+        1048606,
+        27,
+        28,
+        29,
+        2097151
     ],
-    "last_destroyed": 1048575,
+    "last_destroyed": 9,
     "name": [
-        21,
+        25,
         {
-            "name": "Color Material (Sphere)"
+            "name": "Color Material (Cylinder)"
         },
-        20,
+        24,
         {
-            "name": "color.filamat"
+            "name": "cylinder.filamesh"
         },
-        19,
+        23,
         {
-            "name": "sphere.filamesh"
+            "name": "Cylinder"
         },
-        18,
-        {
-            "name": "Sphere"
-        },
-        17,
-        {
-            "name": "Standard Opaque (plane_hd)"
-        },
-        16,
-        {
-            "name": "standard_lit.filamat"
-        },
-        15,
+        22,
         {
             "name": "Directional Light"
         },
-        14,
+        28,
         {
-            "name": "plane_hd.filamesh"
+            "name": "cube.filamesh"
         },
-        13,
+        20,
         {
-            "name": "plane_hd"
+            "name": "Standard Opaque (Plane)"
         },
-        12,
+        19,
         {
-            "name": "Editor Camera"
+            "name": "standard_lit.filamat"
         },
-        11,
+        18,
         {
-            "name": "Indirect Light"
+            "name": "Plane"
         },
-        10,
+        0,
         {
-            "name": "Editor View"
-        },
-        9,
-        {
-            "name": "Primitive 0"
-        },
-        8,
-        {
-            "name": "SkyBox"
-        },
-        7,
-        {
-            "name": "skybox"
-        },
-        6,
-        {
-            "name": "Primitive 0"
-        },
-        5,
-        {
-            "name": "Grid Plane"
-        },
-        4,
-        {
-            "name": "plane.filamesh"
-        },
-        3,
-        {
-            "name": "Grid Material"
-        },
-        2,
-        {
-            "name": "grid.filamat"
+            "name": "skybox.filamat"
         },
         1,
         {
             "name": "SkyBox Material"
         },
-        0,
+        2,
         {
-            "name": "skybox.filamat"
+            "name": "grid.filamat"
+        },
+        3,
+        {
+            "name": "Grid Material"
+        },
+        4,
+        {
+            "name": "plane.filamesh"
+        },
+        5,
+        {
+            "name": "Grid Plane"
+        },
+        6,
+        {
+            "name": "Primitive 0"
+        },
+        7,
+        {
+            "name": "skybox"
+        },
+        8,
+        {
+            "name": "SkyBox"
+        },
+        29,
+        {
+            "name": "Color Material (Cube)"
+        },
+        10,
+        {
+            "name": "Editor View"
+        },
+        11,
+        {
+            "name": "Indirect Light"
+        },
+        12,
+        {
+            "name": "Editor Camera"
+        },
+        13,
+        {
+            "name": "Sphere"
+        },
+        14,
+        {
+            "name": "sphere.filamesh"
+        },
+        15,
+        {
+            "name": "color.filamat"
+        },
+        16,
+        {
+            "name": "Color Material (Sphere)"
+        },
+        27,
+        {
+            "name": "Cube"
         }
     ],
     "transform": [
-        18,
+        27,
         {
             "position": {
-                "x": 0.0,
-                "y": 3.299999952316284,
+                "x": -2.5,
+                "y": 1.0,
                 "z": 0.0
             },
             "rotation": {
@@ -128,12 +153,30 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 3.0,
-                "y": 3.0,
-                "z": 3.0
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             }
         },
-        13,
+        23,
+        {
+            "position": {
+                "x": 2.5,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        18,
         {
             "position": {
                 "x": 0.0,
@@ -149,24 +192,6 @@
                 "x": 10.0,
                 "y": 10.0,
                 "z": 10.0
-            }
-        },
-        12,
-        {
-            "position": {
-                "x": 5.882683277130127,
-                "y": 4.503762722015381,
-                "z": -10.476144790649414
-            },
-            "rotation": {
-                "x": -0.18130265176296235,
-                "y": 2.660207748413086,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
             }
         },
         5,
@@ -186,6 +211,42 @@
                 "y": 1.0,
                 "z": 100.0
             }
+        },
+        12,
+        {
+            "position": {
+                "x": -3.8963000774383547,
+                "y": 3.225896120071411,
+                "z": 5.525558948516846
+            },
+            "rotation": {
+                "x": -0.3133399486541748,
+                "y": -0.5525804758071899,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        13,
+        {
+            "position": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
         }
     ],
     "perspective_camera": [
@@ -201,13 +262,13 @@
     "custom_camera": [],
     "point_light": [],
     "directional_light": [
-        15,
+        22,
         {
-            "intensity": 10000.0,
+            "intensity": 61538.46484375,
             "direction": {
-                "x": 0.5183799862861633,
-                "y": -0.8473153114318848,
-                "z": 0.11549479514360428
+                "x": 0.42720532417297366,
+                "y": -0.8759844303131104,
+                "z": 0.22393473982810975
             },
             "color": {
                 "x": 1.0,
@@ -236,19 +297,27 @@
         }
     ],
     "mesh": [
-        19,
+        28,
         {
             "resource": {
                 "relativePath": {
-                    "value0": "editor/meshes/sphere.filamesh"
+                    "value0": "editor/meshes/cube.filamesh"
                 }
             }
         },
-        14,
+        24,
         {
             "resource": {
                 "relativePath": {
-                    "value0": "project/meshes/plane_hd.filamesh"
+                    "value0": "editor/meshes/cylinder.filamesh"
+                }
+            }
+        },
+        4,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/meshes/plane.filamesh"
                 }
             }
         },
@@ -260,46 +329,46 @@
                 }
             }
         },
-        4,
+        14,
         {
             "resource": {
                 "relativePath": {
-                    "value0": "editor/meshes/plane.filamesh"
+                    "value0": "editor/meshes/sphere.filamesh"
                 }
             }
         }
     ],
     "mesh_instance": [
-        18,
+        27,
         {
-            "meshSource": 19,
-            "defaultMaterial": 21,
+            "meshSource": 28,
+            "defaultMaterial": 29,
             "receiveShadows": true,
             "castShadows": true,
-            "culling": true,
-            "priority": 0,
-            "partsCount": 1,
-            "partsOffset": 0
-        },
-        13,
-        {
-            "meshSource": 14,
-            "defaultMaterial": 17,
-            "receiveShadows": false,
-            "castShadows": false,
             "culling": true,
             "priority": 0,
             "partsCount": 0,
             "partsOffset": 0
         },
-        8,
+        23,
         {
-            "meshSource": 7,
-            "defaultMaterial": 1048575,
-            "receiveShadows": false,
+            "meshSource": 24,
+            "defaultMaterial": 25,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        18,
+        {
+            "meshSource": 4,
+            "defaultMaterial": 20,
+            "receiveShadows": true,
             "castShadows": false,
-            "culling": false,
-            "priority": 7,
+            "culling": true,
+            "priority": 0,
             "partsCount": 0,
             "partsOffset": 0
         },
@@ -311,16 +380,33 @@
             "castShadows": false,
             "culling": true,
             "priority": 0,
+            "partsCount": 1,
+            "partsOffset": 0
+        },
+        8,
+        {
+            "meshSource": 7,
+            "defaultMaterial": 1,
+            "receiveShadows": false,
+            "castShadows": false,
+            "culling": false,
+            "priority": 7,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        13,
+        {
+            "meshSource": 14,
+            "defaultMaterial": 16,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
             "partsCount": 0,
             "partsOffset": 0
         }
     ],
     "mesh_material": [
-        9,
-        {
-            "primitiveIndex": 0,
-            "materialEntity": 1
-        },
         6,
         {
             "primitiveIndex": 0,
@@ -328,19 +414,19 @@
         }
     ],
     "precompiled_material": [
-        20,
-        {
-            "resource": {
-                "relativePath": {
-                    "value0": "editor/materials/color.filamat"
-                }
-            }
-        },
-        16,
+        19,
         {
             "resource": {
                 "relativePath": {
                     "value0": "editor/materials/standard_lit.filamat"
+                }
+            }
+        },
+        0,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/materials/skybox.filamat"
                 }
             }
         },
@@ -352,39 +438,45 @@
                 }
             }
         },
-        0,
+        15,
         {
             "resource": {
                 "relativePath": {
-                    "value0": "editor/materials/skybox.filamat"
+                    "value0": "editor/materials/color.filamat"
                 }
             }
         }
     ],
     "parent": [
-        20,
+        27,
         {
-            "childrenCount": 1,
-            "first": 21,
-            "last": 21
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
         },
-        16,
+        23,
         {
-            "childrenCount": 1,
-            "first": 17,
-            "last": 17
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
         },
-        8,
+        18,
         {
-            "childrenCount": 1,
-            "first": 9,
-            "last": 9
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
         },
-        5,
+        19,
         {
             "childrenCount": 1,
-            "first": 6,
-            "last": 6
+            "first": 20,
+            "last": 20
+        },
+        0,
+        {
+            "childrenCount": 1,
+            "first": 1,
+            "last": 1
         },
         2,
         {
@@ -392,35 +484,41 @@
             "first": 3,
             "last": 3
         },
-        0,
+        5,
         {
             "childrenCount": 1,
-            "first": 1,
-            "last": 1
+            "first": 6,
+            "last": 6
+        },
+        8,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        },
+        15,
+        {
+            "childrenCount": 3,
+            "first": 16,
+            "last": 29
+        },
+        13,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
         }
     ],
     "child": [
-        21,
+        20,
         {
-            "parent": 20,
+            "parent": 19,
             "next": 1048575,
             "previous": 1048575
         },
-        17,
+        1,
         {
-            "parent": 16,
-            "next": 1048575,
-            "previous": 1048575
-        },
-        9,
-        {
-            "parent": 8,
-            "next": 1048575,
-            "previous": 1048575
-        },
-        6,
-        {
-            "parent": 5,
+            "parent": 0,
             "next": 1048575,
             "previous": 1048575
         },
@@ -430,11 +528,29 @@
             "next": 1048575,
             "previous": 1048575
         },
-        1,
+        6,
         {
-            "parent": 0,
+            "parent": 5,
             "next": 1048575,
             "previous": 1048575
+        },
+        29,
+        {
+            "parent": 15,
+            "next": 1048575,
+            "previous": 25
+        },
+        16,
+        {
+            "parent": 15,
+            "next": 25,
+            "previous": 1048575
+        },
+        25,
+        {
+            "parent": 15,
+            "next": 29,
+            "previous": 16
         }
     ],
     "scene_view": [
@@ -452,57 +568,86 @@
     "script": [],
     "script_instance": [],
     "tag_is_material": [
-        20,
-        16,
+        19,
+        0,
         2,
-        0
+        15
     ],
     "is_renderable": [
+        27,
+        23,
+        22,
         18,
-        15,
-        13,
-        12,
-        11,
+        5,
         8,
-        5
+        11,
+        12,
+        13
     ],
     "tag_is_camera": [
         12
     ],
     "tag_light": [
-        15,
+        22,
         11
     ],
     "tag_is_main_view": [],
     "tag_is_resource": [
-        21,
+        29,
+        28,
+        25,
+        24,
         20,
         19,
-        17,
-        16,
-        14,
-        7,
-        4,
-        3,
-        2,
+        0,
         1,
-        0
+        2,
+        3,
+        4,
+        7,
+        14,
+        15,
+        16
     ],
     "tag_is_material_instance": [
-        21,
-        17,
+        29,
+        25,
+        20,
+        1,
         3,
-        1
+        16
     ],
     "color_material": [
-        21,
+        29,
         {
             "baseColor": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.42315417528152468,
+                "y": 0.8024193644523621,
+                "z": 0.3073783814907074
             },
-            "roughness": 0.4300000071525574,
+            "roughness": 0.14000000059604646,
+            "metallic": 0.800000011920929,
+            "reflectance": 0.10000000149011612
+        },
+        25,
+        {
+            "baseColor": {
+                "x": 0.9395161271095276,
+                "y": 0.14395809173583985,
+                "z": 0.14395809173583985
+            },
+            "roughness": 0.2199999988079071,
+            "metallic": 0.6399999856948853,
+            "reflectance": 0.0
+        },
+        16,
+        {
+            "baseColor": {
+                "x": 0.28920069336891177,
+                "y": 0.4342251420021057,
+                "z": 0.9314516186714172
+            },
+            "roughness": 0.47999998927116396,
             "metallic": 0.800000011920929,
             "reflectance": 0.10000000149011612
         }
@@ -540,7 +685,7 @@
         }
     ],
     "standard_opaque_material": [
-        17,
+        20,
         {
             "baseColor": {
                 "x": 1.0,
@@ -549,7 +694,7 @@
             },
             "albedo": {
                 "relativePath": {
-                    "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_basecolor.jpg"
+                    "value0": "project/textures/uv.png"
                 }
             },
             "tiling": {
@@ -569,7 +714,7 @@
             "roughness": 1.0,
             "roughnessMap": {
                 "relativePath": {
-                    "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_roughness.jpg"
+                    "value0": ""
                 }
             },
             "reflectance": 0.0,
@@ -580,12 +725,12 @@
             },
             "ambientOcclusionMap": {
                 "relativePath": {
-                    "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_ambientOcclusion.jpg"
+                    "value0": ""
                 }
             },
             "normalMap": {
                 "relativePath": {
-                    "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_normal.jpg"
+                    "value0": ""
                 }
             },
             "emissive": {
@@ -597,7 +742,7 @@
             "height": 1.0,
             "heightMap": {
                 "relativePath": {
-                    "value0": "project/textures/Ground_Wet_Rocks_001_SD/Ground_Wet_Rocks_001_height.png"
+                    "value0": ""
                 }
             }
         }
@@ -610,17 +755,17 @@
         }
     ],
     "tag_is_editor_entity": [
-        20,
-        16,
-        12,
-        11,
-        10,
-        7,
-        5,
-        4,
-        3,
+        19,
+        0,
         2,
-        0
+        3,
+        4,
+        5,
+        7,
+        10,
+        11,
+        12,
+        15
     ],
     "tag_is_skybox_mesh_instance": [
         8

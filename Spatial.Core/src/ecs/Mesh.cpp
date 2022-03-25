@@ -33,16 +33,17 @@ Entity Mesh::findOrCreate(Registry& registry, const std::filesystem::path& resou
 
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity)
 {
-	const auto& parent = registry.getOrAddComponent<ecs::Parent>(meshEntity);
-	const auto childrenCount = parent.childrenCount;
-	return addMaterial(registry, meshEntity, materialEntity, childrenCount);
+	auto& mesh = registry.getOrAddComponent<ecs::MeshInstance>(meshEntity);
+	if (!registry.isValid(mesh.defaultMaterial)) {
+		mesh.defaultMaterial = materialEntity;
+		return ecs::NullEntity;
+	}
+
+	return addMaterial(registry, meshEntity, materialEntity, mesh.slice.count++);
 }
 
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex)
 {
-	auto& mesh = registry.getComponent<ecs::MeshInstance>(meshEntity);
-	mesh.slice.count++;
-
 	auto child = build(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
 	ecs::Parent::addChild(registry, meshEntity, child);
 
