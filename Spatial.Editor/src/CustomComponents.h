@@ -150,9 +150,17 @@ class SceneTree
 class AssetsManager
 {
   public:
+	enum class AssetType
+	{
+		Material,
+		Mesh,
+		Script,
+	};
+
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search = "",
-					 bool showEditorEntities = false);
+	static bool header(std::string& search, AssetType& filter);
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search, AssetsManager::AssetType type,
+					 bool showEditorEntities);
 };
 
 class EditorDragAndDrop

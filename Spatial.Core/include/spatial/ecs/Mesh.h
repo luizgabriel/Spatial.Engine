@@ -67,6 +67,8 @@ struct MeshInstance
 
 	Entity meshSource{ecs::NullEntity};
 
+	Entity defaultMaterial{ecs::NullEntity};
+
 	bool castShadows{false};
 	bool receiveShadows{false};
 	bool culling{true};

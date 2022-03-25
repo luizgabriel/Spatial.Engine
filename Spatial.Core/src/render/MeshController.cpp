@@ -66,11 +66,20 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 			if (boundingBox)
 				renderable.setAxisAlignedBoundingBox(*boundingBox);
 
-			for (auto i = 0; i < std::min(partsCount, parts.size()); i++)
+			const auto numParts = std::min(partsCount, parts.size());
+
+			for (auto i = 0; i < numParts; i++)
 			{
 				const auto& geometry = parts[std::min(meshInstance.slice.offset + i, parts.size() - 1)];
 				renderable.setGeometryAt(i, Renderable::PrimitiveType::TRIANGLES, vertexBuffer, indexBuffer,
 										 geometry.offset, geometry.count);
+			}
+
+			if (registry.hasAllComponents<SharedMaterialInstance>(meshInstance.defaultMaterial)) {
+				const auto& materialInstance = registry.getComponent<const SharedMaterialInstance>(meshInstance.defaultMaterial);
+
+				for (auto i = 0; i < numParts; i++)
+					renderable.setMaterialInstanceAt(i, materialInstance);
 			}
 		});
 
@@ -81,7 +90,6 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 
 		auto& renderable = registry.getComponent<Renderable>(child.parent);
 		const auto& mesh = registry.getComponent<const ecs::MeshInstance>(child.parent);
-
 
 		if (!registry.hasAllComponents<SharedMaterialInstance>(meshMaterial.materialInstanceEntity))
 		{
@@ -96,8 +104,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 
 void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 {
-	auto d1 = registry.getEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
-	registry.removeComponent<Renderable>(d1.begin(), d1.end());
+	registry.removeComponentFromEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
 }
 
 void MeshController::onStartFrame(ecs::Registry& registry)

@@ -79,6 +79,7 @@ class EditorSystem
 
 	std::filesystem::path mScenePath;
 	std::filesystem::path mCurrentPath;
+	std::filesystem::path getScenePath() const;
 };
 
 } // namespace spatial::editor

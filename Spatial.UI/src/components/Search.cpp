@@ -7,7 +7,7 @@ namespace spatial::ui
 
 bool Search::searchText(std::string& search)
 {
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.80f);
+	ui::spanToAvailWidth(.8f);
 	return ui::inputText("Search", search);
 }
 
