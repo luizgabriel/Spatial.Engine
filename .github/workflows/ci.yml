@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         config:
-          - { name: "Ubuntu-Clang", os: ubuntu-latest, gen: "Ninja", cc: "clang", cxx: "clang++" }
-          - { name: "MacOS-Clang", os: macos-latest, gen: "CodeBlocks - Unix Makefiles", cc: "clang", cxx: "clang++" }
-          - { name: "Windows-MSVC", os: windows-latest, gen: "Visual Studio 16 2019", cc: "cl", cxx: "cl" }
+          - { name: "Ubuntu-Clang", os: ubuntu-20.04, gen: "Ninja", cc: "clang", cxx: "clang++" }
+          - { name: "MacOS-Clang", os: macos-11, gen: "CodeBlocks - Unix Makefiles", cc: "clang", cxx: "clang++" }
+          - { name: "Windows-MSVC", os: windows-2019, gen: "Visual Studio 16 2019", cc: "cl", cxx: "cl" }
 
     steps:
       - uses: actions/checkout@v2
@@ -35,6 +35,7 @@ jobs:
         if: matrix.config.gen == 'Visual Studio 16 2019'
         uses: microsoft/setup-msbuild@v1.1
         with:
+          vs-version: '[16.4,16.5)'
           msbuild-architecture: x64
 
       - name: Install Ninja
