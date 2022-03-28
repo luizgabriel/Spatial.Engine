@@ -39,7 +39,9 @@ jobs:
 
       - name: Install Ninja
         if: matrix.config.gen == 'Ninja'
-        uses: turtlesec-no/get-ninja@main
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.2
 
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
