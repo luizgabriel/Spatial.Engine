@@ -35,9 +35,10 @@ class CmakeBuildOptions:
 
 def run(command):
     print("\n > %s\n" % command)
-    return os.system(command)
-    return 0
-
+    result = os.system(command)
+    if result != 0:
+        print("The command returned a non-zero response: \n\t > {}".format(command), file=sys.stderr)
+        sys.exit(result)
 
 def conan_export(export: PackageExport):
     return "conan export %s %s" % (export.dir, export.name)
