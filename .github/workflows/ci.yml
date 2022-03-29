@@ -47,6 +47,7 @@ jobs:
         uses: turtlebrowser/get-conan@main
 
       - name: Setup Vendor Packages
+        shell: bash
         run: python3 $GITHUB_WORKSPACE/setup.py
 
       - name: Cache Conan Data
@@ -84,6 +85,7 @@ jobs:
       - name: Get the version
         if: contains(github.ref, 'tags/v')
         id: get_version
+        shell: bash
         run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
 
       - name: Upload artifacts
