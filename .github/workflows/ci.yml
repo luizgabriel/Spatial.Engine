@@ -59,13 +59,13 @@ jobs:
       - name: Cmake Configure
         shell: bash
         run: >-
-          cmake 
-          -B ${{ runner.workspace }}/out/build
-          -S ${{ runner.workspace }}
+          cmake
+          -B out/build
+          -S $GITHUB_WORKSPACE
           -G "${{ matrix.config.gen }}"
           -DCMAKE_BUILD_TYPE=Release
           -DSPATIAL_BUILD_TESTS=ON
-          -DCMAKE_INSTALL_PREFIX=${{ runner.workspace }}/out/install
+          -DCMAKE_INSTALL_PREFIX=out/install
 
       - name: Cmake Build
         working-directory: out/build
