@@ -63,7 +63,7 @@ jobs:
           cc: ${{ matrix.config.cc }}
           cxx: ${{ matrix.config.cxx }}
           build-type: Release
-          configure-options: "-G ${{ matrix.config.gen }} -DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=${{ runner.workspace }}/install"
+          configure-options: -G '${{ matrix.config.gen }}' -DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=${{ runner.workspace }}/install
           run-test: true
           install-build: true
           parallel: 14
