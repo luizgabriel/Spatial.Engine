@@ -24,7 +24,7 @@ jobs:
           - { name: "Windows-MSVC", os: windows-2019, gen: "Visual Studio 16 2019", cc: "cl", cxx: "cl" }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Python
         uses: actions/setup-python@v1
@@ -47,8 +47,7 @@ jobs:
         uses: turtlebrowser/get-conan@main
 
       - name: Setup Vendor Packages
-        run: |
-          python3 $GITHUB_WORKSPACE/setup.py
+        run: python3 $GITHUB_WORKSPACE/setup.py
 
       - name: Cache Conan Data
         uses: actions/cache@v2
