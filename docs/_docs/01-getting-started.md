@@ -139,18 +139,16 @@ python setup.py
 If you're wishing to build from the command line, you'll just need to run these commands:
 
 ```sh
-# Create a build directory
-mkdir -p out/build/debug/ && cd out/build/debug
-
 # Run the Cmake Configure Step
-# Linux:    -G "Ninja"
-cmake ../../.. -G "CodeBlocks - Unix Makefiles" \
-    -DCMAKE_INSTALL_PREFIX=../../install \
+# On Linux use: -G "Ninja"
+cmake -G "CodeBlocks - Unix Makefiles" \
+    -B out/build/debug \
+    -DCMAKE_INSTALL_PREFIX=out/install \
     -DSPATIAL_BUILD_TESTS=OFF \
     -DCMAKE_BUILD_TYPE=Debug
 
 # Run the Cmake Build Step
-cmake --build . --target all
+cmake --build out/build/debug --target all
 ```
 
 ### With VSCode

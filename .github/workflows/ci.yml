@@ -31,19 +31,19 @@ jobs:
         with:
           python-version: ">= 3.5"
 
-      - name: Setup MSBuild
+      - name: (Windows) Setup MSBuild
         if: matrix.config.os == 'windows-2019'
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
 
-      - name: Install Ninja
+      - name: (Ubuntu) Install Ninja
         if: matrix.config.os == 'ubuntu-20.04'
         uses: ashutoshvarma/setup-ninja@master
         with:
           version: 1.10.2
 
-      - name: Set up Clang
+      - name: (Ubuntu) Set up Clang
         if: matrix.config.os == 'ubuntu-20.04'
         uses: egor-tensin/setup-clang@v1
         with:
@@ -53,41 +53,33 @@ jobs:
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
 
-      - name: Setup Vendor Packages
+      - name: (Ubuntu) Conan - Configure Ninja
+        if: matrix.config.os == 'ubuntu-20.04'
         shell: bash
-        run: python3 $GITHUB_WORKSPACE/setup.py
+        run: conan config set general.cmake_generator=Ninja
 
       - name: Cache Conan Data
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.conan/
           key: ${{ runner.os }}-${{ hashFiles('conanfile.py') }}
 
-      - name: Cmake Configure
+      - name: Configure
         shell: bash
-        run: >-
-          cmake
-          -B out/build
-          -S $GITHUB_WORKSPACE
-          -G "${{ matrix.config.gen }}"
-          -DCMAKE_BUILD_TYPE=Release
-          -DSPATIAL_BUILD_TESTS=ON
-          -DCMAKE_INSTALL_PREFIX=out/install
+        run: python $GITHUB_WORKSPACE/cli.py configure --build-type=Release --build-tests
 
-      - name: Cmake Build
-        working-directory: out/build
+      - name: Build
         shell: bash
-        run: cmake --build . --config Release --target all
+        run: python $GITHUB_WORKSPACE/cli.py build --build-type=Release
 
       - name: Run Tests
         working-directory: out/build/Spatial.Core/tests
         shell: bash
         run: ./Spatial.Core.Tests
 
-      - name: Cmake Install
-        working-directory: out/build
+      - name: Install
         shell: bash
-        run: cmake --build . --config Release --target install
+        run: python $GITHUB_WORKSPACE/cli.py install --build-type=Release
 
       - name: Get the version
         if: contains(github.ref, 'tags/v')
@@ -100,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
-          path: ${{ runner.workspace }}/out/install/*
+          path: out/install/*
 
   release:
     if: contains(github.ref, 'tags/v')
@@ -110,10 +102,6 @@ jobs:
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
-
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
 
       - name: Upload to Release
         uses: meeDamian/github-release@2.0
