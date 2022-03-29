@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         config:
-          - { name: "Ubuntu-Clang", os: ubuntu-20.04, gen: "Ninja", cc: "clang", cxx: "clang++" }
-          - { name: "MacOS-Clang", os: macos-11, gen: "'CodeBlocks - Unix Makefiles'", cc: "clang", cxx: "clang++" }
-          # - { name: "Windows-MSVC", os: windows-2019, gen: "'Visual Studio 16 2019'", cc: "cl", cxx: "cl" }
+          - { name: "Ubuntu-Clang", os: ubuntu-20.04, gen: "Ninja" }
+          - { name: "MacOS-Clang", os: macos-11, gen: "CodeBlocks - Unix Makefiles" }
+          - { name: "Windows-MSVC", os: windows-2019, gen: "Visual Studio 16 2019", cc: "cl", cxx: "cl" }
 
     steps:
       - uses: actions/checkout@v2
@@ -56,19 +56,33 @@ jobs:
           path: ~/.conan/
           key: ${{ runner.os }}-${{ hashFiles('conanfile.py') }}
 
-      - name: Build & Test
-        uses: ashutoshvarma/action-cmake-build@master
-        with:
-          build-dir: ${{ runner.workspace }}/build/
-          cc: ${{ matrix.config.cc }}
-          cxx: ${{ matrix.config.cxx }}
-          build-type: Release
-          configure-options: -G ${{ matrix.config.gen }} -DSPATIAL_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=${{ runner.workspace }}/install
-          run-test: true
-          install-build: true
-          parallel: 14
+      - name: Cmake Configure
+        working-directory: out/build
+        shell: bash
+        run: >-
+          cmake ../../
+          -G "${{ matrix.config.gen }}"
+          -DCMAKE_BUILD_TYPE=Release
+          -DSPATIAL_BUILD_TESTS=ON
+          -DCMAKE_INSTALL_PREFIX=../../install
+
+      - name: Cmake Build
+        working-directory: out/build
+        shell: bash
+        run: cmake --build . --config Release --target all
+
+      - name: Run Tests
+        working-directory: out/build/Spatial.Core/tests
+        shell: bash
+        run: ./Spatial.Core.Tests
+
+      - name: Cmake Build
+        working-directory: out/build
+        shell: bash
+        run: cmake --build . --config Release --target install
 
       - name: Get the version
+        if: contains(github.ref, 'tags/v')
         id: get_version
         run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
 
@@ -76,8 +90,8 @@ jobs:
         if: contains(github.ref, 'tags/v')
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.zip
-          path: ${{runner.workspace}}/install/*
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
+          path: ${{runner.workspace}}/out/install/*
 
   release:
     if: contains(github.ref, 'tags/v')
@@ -95,6 +109,6 @@ jobs:
       - name: Upload to Release
         uses: meeDamian/github-release@2.0
         with:
-          files: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.zip
+          files: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
           gzip: folders
           token: ${{ secrets.GITHUB_TOKEN }}
