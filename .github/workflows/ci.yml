@@ -53,11 +53,6 @@ jobs:
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
 
-      - name: (Ubuntu) Conan - Configure Ninja
-        if: matrix.config.os == 'ubuntu-20.04'
-        shell: bash
-        run: conan config set general.cmake_generator=Ninja
-
       - name: Cache Conan Data
         uses: actions/cache@v3
         with:
@@ -66,7 +61,7 @@ jobs:
 
       - name: Configure
         shell: bash
-        run: python $GITHUB_WORKSPACE/cli.py configure --build-type=Release --build-tests
+        run: python $GITHUB_WORKSPACE/cli.py configure --build-type=Release --enable-tests
 
       - name: Build
         shell: bash
