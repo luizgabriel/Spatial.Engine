@@ -100,26 +100,10 @@ def cmake_install(options: CmakeBuildOptions):
     )
 
 
-def setup(args):
-    parsed_args = parse_args(args)
-    source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
-
-    packages = [
-        Package("filament", "1.18.0"),
-        Package("imgui", "docking"),
-        Package("v8", "10.1.69"),
-    ]
-
-    to_export = to_package_export(source_path)
-
-    for package in packages:
-        run(conan_export(to_export(package)))
-
-
 def parse_option_value(name: str):
     prop = "--{}".format(name)
 
-    def h(args):
+    def h(args) -> Optional[str]:
         found = next((arg for arg in args if arg.find(prop) == 0), None)
         if not found:
             return None
@@ -140,7 +124,7 @@ def parse_option_bool(name: str):
 
 
 def parse_args(args):
-    result = {"enable-tests": parse_option_value("enable-tests")(args)}
+    result = {"enable-tests": parse_option_bool("enable-tests")(args)}
 
     options = ["conan-profile", "build-type", "cmake-generator", "build-path", "install-path", "source-path"]
     for option in options:
@@ -149,6 +133,22 @@ def parse_args(args):
             result[option] = value
 
     return result
+
+
+def setup(args):
+    parsed_args = parse_args(args)
+    source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
+
+    packages = [
+        Package("filament", "1.18.0"),
+        Package("imgui", "docking"),
+        Package("v8", "10.1.69"),
+    ]
+
+    to_export = to_package_export(source_path)
+
+    for package in packages:
+        run(conan_export(to_export(package)))
 
 
 def configure(args):
@@ -165,7 +165,7 @@ def configure(args):
 
     generator = parsed_args.get("cmake-generator", recommended_sys_generator)
     build_tests = parsed_args.get("enable-tests", False)
-    build_type = parsed_args.get("build-type", "debug")
+    build_type = parsed_args.get("build-type", "Debug")
     conan_profile = parsed_args.get("conan-profile")
 
     setup(args)
@@ -203,17 +203,16 @@ def install(args):
     run(cmake_install(build_options))
 
 
-USAGE = "Usage:"
-"\n\t python cli.py setup"
-"\n\t python cli.py configure [--enable-tests] [--build-type=] [--cmake-generator=] [--conan-profile=]"
-"\n\t python cli.py build [--build-type=]"
-"\n\t python cli.py install [--build-type=]"
-"\nExample:"
-"\n\t python cli.py configure --build-type=Debug --conan-profile=default"
-"\n\t python cli.py configure --build-type=Release --build-tests"
-"\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\""
-"\n\t python cli.py build --build-type=Release"
-"\n\t python cli.py install --build-type=Release"
+USAGE = "Usage:" \
+        "\n\t python cli.py configure [--enable-tests] [--build-type=] [--conan-profile=] [--cmake-generator=]" \
+        "\n\t python cli.py build [--build-type=]" \
+        "\n\t python cli.py install [--build-type=]" \
+        "\nExample:" \
+        "\n\t python cli.py configure --conan-profile=default" \
+        "\n\t python cli.py configure --build-type=Release --enable-tests" \
+        "\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\"" \
+        "\n\t python cli.py build --build-type=Release" \
+        "\n\t python cli.py install --build-type=Release"
 
 
 def main():
