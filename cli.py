@@ -2,6 +2,7 @@ import os
 import os.path
 import sys
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass(init=True)
@@ -33,12 +34,13 @@ class CmakeBuildOptions:
     build_type: str
 
 
-def run(command):
+def run(command: str):
     print("\n > %s\n" % command)
     result = os.system(command)
     if result != 0:
-        print("The command returned a non-zero response: \n\t > {}".format(command), file=sys.stderr)
+        print("The command returned a non-zero response: \n > {}".format(command), file=sys.stderr)
         sys.exit(result)
+
 
 def conan_export(export: PackageExport):
     return "conan export %s %s" % (export.dir, export.name)
@@ -48,12 +50,20 @@ def vendor_package(package: Package):
     return "%s/%s@vendor/stable" % (package.name, package.version)
 
 
-def package_path(package: Package):
-    return os.path.join("vendor", "%s.py" % package.name)
+def package_path(source_path: str):
+    def h(package: Package):
+        return os.path.join(source_path, "vendor", "%s.py" % package.name)
+
+    return h
 
 
-def to_package_export(package: Package) -> PackageExport:
-    return PackageExport(package_path(package), vendor_package(package))
+def to_package_export(source_path):
+    to_package_path = package_path(source_path)
+
+    def h(package: Package) -> PackageExport:
+        return PackageExport(dir=to_package_path(package), name=vendor_package(package))
+
+    return h
 
 
 def cmake_configure(options: CmakeConfigureOptions):
@@ -91,16 +101,22 @@ def cmake_install(options: CmakeBuildOptions):
 
 
 def setup(args):
+    parsed_args = parse_args(args)
+    source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
+
     packages = [
         Package("filament", "1.18.0"),
         Package("imgui", "docking"),
         Package("v8", "10.1.69"),
     ]
 
-    map(lambda p: run(conan_export(to_package_export(p))), packages)
+    to_export = to_package_export(source_path)
+
+    for package in packages:
+        run(conan_export(to_export(package)))
 
 
-def parse_option_value(name):
+def parse_option_value(name: str):
     prop = "--{}".format(name)
 
     def h(args):
@@ -113,10 +129,10 @@ def parse_option_value(name):
     return h
 
 
-def parse_option_bool(name):
+def parse_option_bool(name: str):
     prop = "--{}".format(name)
 
-    def h(args):
+    def h(args) -> bool:
         found = next((arg for arg in args if arg.find(prop) == 0), None)
         return not not found
 
@@ -124,29 +140,16 @@ def parse_option_bool(name):
 
 
 def parse_args(args):
-    result = {}
+    result = {"enable-tests": parse_option_value("enable-tests")(args)}
 
-    conan_profile = parse_option_value("conan-profile")(args)
-    if conan_profile: result["conan-profile"] = conan_profile
-
-    build_type = parse_option_value("build-type")(args)
-    if build_type: result["build-type"] = build_type
-
-    generator = parse_option_value("cmake-generator")(args)
-    if generator: result["cmake-generator"] = generator
-
-    result["enable-tests"] = parse_option_value("enable-tests")(args)
-
-    build_path = parse_option_value("build-path")(args)
-    if build_path: result["build-path"] = build_path
-
-    install_path = parse_option_value("install-path")(args)
-    if install_path: result["install-path"] = install_path
-
-    source_path = parse_option_value("source-path")(args)
-    if source_path: result["source-path"] = source_path
+    options = ["conan-profile", "build-type", "cmake-generator", "build-path", "install-path", "source-path"]
+    for option in options:
+        value = parse_option_value(option)(args)
+        if value:
+            result[option] = value
 
     return result
+
 
 def configure(args):
     parsed_args = parse_args(args)
@@ -161,7 +164,7 @@ def configure(args):
     }.get(sys.platform, None)
 
     generator = parsed_args.get("cmake-generator", recommended_sys_generator)
-    build_tests = parsed_args.get("enable-tests")
+    build_tests = parsed_args.get("enable-tests", False)
     build_type = parsed_args.get("build-type", "debug")
     conan_profile = parsed_args.get("conan-profile")
 
@@ -181,7 +184,7 @@ def configure(args):
 def build(args):
     parsed_args = parse_args(args)
     build_path = parsed_args.get("build-path", os.path.join("out", "build"))
-    build_type = parsed_args.get("build-type", "debug")
+    build_type = parsed_args.get("build-type", "Debug")
     run(cmake_build(CmakeBuildOptions(
         build_dir=build_path,
         build_type=build_type
@@ -191,13 +194,14 @@ def build(args):
 def install(args):
     parsed_args = parse_args(args)
     build_path = parsed_args.get("build-path", os.path.join("out", "build"))
-    build_type = parsed_args.get("build-type", "debug")
+    build_type = parsed_args.get("build-type", "Debug")
     build_options = CmakeBuildOptions(
         build_dir=build_path,
         build_type=build_type
     )
 
     run(cmake_install(build_options))
+
 
 USAGE = "Usage:"
 "\n\t python cli.py setup"
@@ -210,6 +214,7 @@ USAGE = "Usage:"
 "\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\""
 "\n\t python cli.py build --build-type=Release"
 "\n\t python cli.py install --build-type=Release"
+
 
 def main():
     args = sys.argv[1:]
