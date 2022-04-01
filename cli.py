@@ -18,6 +18,12 @@ class PackageExport:
 
 
 @dataclass(init=True)
+class Remote:
+    name: str
+    url: str
+
+
+@dataclass(init=True)
 class CmakeConfigureOptions:
     generator: str
     source_dir: str
@@ -42,12 +48,16 @@ def run(command: str):
         sys.exit(result)
 
 
+def conan_add_remote(remote: Remote):
+    return "conan remote add %s %s" % (remote.name, remote.url)
+
+
 def conan_export(export: PackageExport):
     return "conan export %s %s" % (export.dir, export.name)
 
 
 def vendor_package(package: Package):
-    return "%s/%s@vendor/stable" % (package.name, package.version)
+    return "%s/%s@spatial/stable" % (package.name, package.version)
 
 
 def package_path(source_path: str):
@@ -139,10 +149,12 @@ def setup(args):
     parsed_args = parse_args(args)
     source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
 
+    run(conan_add_remote(Remote("luizgabriel", "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
+
     packages = [
-        Package("filament", "1.18.0"),
-        Package("imgui", "docking"),
-        Package("v8", "10.1.69"),
+        # Package("filament", "1.18.0"),
+        # Package("imgui", "docking"),
+        # Package("v8", "10.1.69"),
     ]
 
     to_export = to_package_export(source_path)
