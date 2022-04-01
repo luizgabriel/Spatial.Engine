@@ -27,10 +27,14 @@ std::filesystem::path PhysicalFileSystem::makeFullPath(std::string_view path) co
 
 std::set<FileSystem::Entry> PhysicalFileSystem::listImpl(std::string_view path) const
 {
+	auto result = std::set<Entry>{};
+
 	auto absolutePath = makeFullPath(path);
+	if (!std::filesystem::exists(absolutePath))
+		return result;
+
 	auto directoryView = std::filesystem::directory_iterator{absolutePath};
 
-	auto result = std::set<Entry>{};
 	for (auto& entry : directoryView)
 		result.emplace(std::filesystem::relative(entry.path(), absolutePath).string(),
 					   entry.is_directory() ? FileSystem::FileType::Directory : FileSystem::FileType::File);
