@@ -149,7 +149,7 @@ def setup(args):
     parsed_args = parse_args(args)
     source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
 
-    run(conan_add_remote(Remote("luizgabriel", "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
+    run(conan_add_remote(Remote("luizgabriel", "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan-remote")))
 
     packages = [
         # Package("filament", "1.18.0"),
