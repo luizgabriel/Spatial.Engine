@@ -21,6 +21,7 @@ class V8Conan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
     generators = "cmake"
+    revision_mode = "hash"
     short_paths = True
 
     exports_sources = [
