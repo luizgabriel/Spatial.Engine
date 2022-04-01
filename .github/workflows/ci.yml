@@ -11,6 +11,7 @@ on:
 
 env:
   CONAN_SYSREQUIRES_MODE: enabled
+  CONAN_REVISIONS_ENABLED: 1
 
 jobs:
   build:
