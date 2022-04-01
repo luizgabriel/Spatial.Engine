@@ -53,12 +53,6 @@ jobs:
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
 
-      - name: Cache Conan Data
-        uses: actions/cache@v3
-        with:
-          path: ~/.conan/
-          key: ${{ runner.os }}-${{ hashFiles('conanfile.py') }}
-
       - name: Configure
         shell: bash
         run: python $GITHUB_WORKSPACE/cli.py configure --build-type=Release --enable-tests
