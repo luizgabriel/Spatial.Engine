@@ -11,6 +11,7 @@ class FilamentConan(ConanFile):
                   "macOS and WASM/WebGL "
     topics = ("graphics", "3d", "filament", "google")
     settings = ("os", "compiler", "build_type", "arch")
+    revision_mode = "hash"
     generators = "cmake"
     build_requires = [
         "cmake/3.19.8",

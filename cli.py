@@ -40,20 +40,37 @@ class CmakeBuildOptions:
     build_type: str
 
 
-def run(command: str):
-    print("\n > %s\n" % command)
-    result = os.system(command)
-    if result != 0:
-        print("The command returned a non-zero response: \n > {}".format(command), file=sys.stderr)
-        sys.exit(result)
+@dataclass(init=True)
+class CommandResult:
+    code: int
 
 
-def conan_add_remote(remote: Remote):
-    return "conan remote add %s %s" % (remote.name, remote.url)
+@dataclass(init=True)
+class Command:
+    expression: str
 
 
-def conan_export(export: PackageExport):
-    return "conan export %s %s" % (export.dir, export.name)
+def run(command: Command) -> CommandResult:
+    print("\n > %s\n" % command.expression)
+    return CommandResult(os.system(command.expression))
+
+
+def exit_on_error(result: CommandResult):
+    if result.code != 0:
+        print("The command returned a non-zero response", file=sys.stderr)
+        sys.exit(result.code)
+
+
+def run_or_exit(command: Command):
+    exit_on_error(run(command))
+
+
+def conan_add_remote(remote: Remote) -> Command:
+    return Command("conan remote add %s %s" % (remote.name, remote.url))
+
+
+def conan_export(export: PackageExport) -> Command:
+    return Command("conan export %s %s" % (export.dir, export.name))
 
 
 def vendor_package(package: Package):
@@ -76,7 +93,7 @@ def to_package_export(source_path):
     return h
 
 
-def cmake_configure(options: CmakeConfigureOptions):
+def cmake_configure(options: CmakeConfigureOptions) -> Command:
     commands = ["cmake -S {} -B {}".format(options.source_dir, options.build_dir)]
 
     if options.generator:
@@ -93,21 +110,21 @@ def cmake_configure(options: CmakeConfigureOptions):
 
     commands += ["-DSPATIAL_BUILD_TESTS={}".format("ON" if options.build_tests else "OFF")]
 
-    return " ".join(commands)
+    return Command(" ".join(commands))
 
 
-def cmake_build(options: CmakeBuildOptions):
-    return "cmake --build {build_dir} --config {build_type} --target all".format(
+def cmake_build(options: CmakeBuildOptions) -> Command:
+    return Command("cmake --build {build_dir} --config {build_type} --target all".format(
         build_dir=options.build_dir,
         build_type=options.build_type
-    )
+    ))
 
 
-def cmake_install(options: CmakeBuildOptions):
-    return "cmake --build {build_dir} --target install".format(
+def cmake_install(options: CmakeBuildOptions) -> Command:
+    return Command("cmake --build {build_dir} --target install".format(
         build_dir=options.build_dir,
         build_type=options.build_type
-    )
+    ))
 
 
 def parse_option_value(name: str):
@@ -152,15 +169,15 @@ def setup(args):
     run(conan_add_remote(Remote("luizgabriel", "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
 
     packages = [
-        # Package("filament", "1.18.0"),
-        # Package("imgui", "docking"),
-        # Package("v8", "10.1.69"),
+        Package("filament", "1.18.0"),
+        Package("imgui", "docking"),
+        Package("v8", "10.1.69"),
     ]
 
     to_export = to_package_export(source_path)
 
     for package in packages:
-        run(conan_export(to_export(package)))
+        run_or_exit(conan_export(to_export(package)))
 
 
 def configure(args):
@@ -182,7 +199,7 @@ def configure(args):
 
     setup(args)
 
-    run(cmake_configure(CmakeConfigureOptions(
+    run_or_exit(cmake_configure(CmakeConfigureOptions(
         source_dir=source_path,
         build_dir=build_path,
         install_dir=install_path,
@@ -197,7 +214,8 @@ def build(args):
     parsed_args = parse_args(args)
     build_path = parsed_args.get("build-path", os.path.join("out", "build"))
     build_type = parsed_args.get("build-type", "Debug")
-    run(cmake_build(CmakeBuildOptions(
+
+    run_or_exit(cmake_build(CmakeBuildOptions(
         build_dir=build_path,
         build_type=build_type
     )))
@@ -212,7 +230,7 @@ def install(args):
         build_type=build_type
     )
 
-    run(cmake_install(build_options))
+    run_or_exit(cmake_install(build_options))
 
 
 USAGE = "Usage:" \
