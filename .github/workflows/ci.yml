@@ -70,7 +70,7 @@ jobs:
       - name: Run Tests
         working-directory: out/build/Spatial.Core/tests
         shell: bash
-        run: ./Spatial.Core.Tests
+        run: ./Spatial.Core.Tests --gtest_filter='-Application.*:DesktopWindow.*'
 
       - name: Install
         shell: bash
