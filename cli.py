@@ -144,7 +144,7 @@ def cmake_configure(options: CmakeConfigureOptions) -> Command:
 
     # Force the use of MT / MTd compiler runtime on Visual Studio (Filament Library Requirement)
     if not options.conan_profile and options.is_msvc:
-        commands += ["-DCMAKE_CXX_FLAGS=\\MT{}".format("d" if options.is_debug else "")]
+        commands += ["-DCMAKE_CXX_FLAGS=/MT{}".format("d" if options.is_debug else "")]
 
     if options.build_type:
         commands += ["-DCMAKE_BUILD_TYPE={}".format(str(options.build_type).capitalize())]
