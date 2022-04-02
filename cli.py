@@ -57,6 +57,14 @@ class CmakeConfigureOptions:
     build_tests: bool
     conan_profile: str
 
+    @property
+    def is_debug(self) -> bool:
+        return "debug" in self.build_type.lower()
+
+    @property
+    def is_msvc(self) -> bool:
+        return "Visual Studio" in self.generator
+
 
 @dataclass(init=True)
 class CmakeBuildOptions:
@@ -120,16 +128,23 @@ def to_package_export(source_path):
 
 
 def cmake_configure(options: CmakeConfigureOptions) -> Command:
-    commands = ["cmake -S {} -B {}".format(options.source_dir, options.build_dir)]
+    commands = ["cmake"]
 
-    if options.generator:
-        commands += ["-G \"{}\"".format(options.generator)]
+    commands += ["-S {}".format(options.source_dir)]
+
+    commands += ["-B {}".format(options.build_dir)]
+
+    commands += ["-G \"{}\"".format(options.generator)]
 
     if options.install_dir:
         commands += ["-DCMAKE_INSTALL_PREFIX={}".format(options.install_dir)]
 
     if options.conan_profile:
         commands += ["-DCONAN_PROFILE={}".format(options.conan_profile)]
+
+    # Force the use of MT / MTd compiler runtime on Visual Studio (Filament Library Requirement)
+    if not options.conan_profile and options.is_msvc:
+        commands += ["-DCMAKE_CXX_FLAGS=\\MT{}".format("d" if options.is_debug else "")]
 
     if options.build_type:
         commands += ["-DCMAKE_BUILD_TYPE={}".format(str(options.build_type).capitalize())]
