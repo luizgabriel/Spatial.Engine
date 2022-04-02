@@ -20,9 +20,9 @@ jobs:
     strategy:
       matrix:
         config:
-          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, gen: "Ninja" }
-          - { name: "MacOS-Clang", os: macos-11, gen: "CodeBlocks - Unix Makefiles" }
-          # - { name: "Windows-MSVC", os: windows-2019, gen: "Visual Studio 16 2019", cc: "cl", cxx: "cl" }
+          # - { name: "Ubuntu-Clang", os: ubuntu-20.04 }
+          # - { name: "MacOS-Clang", os: macos-11 }
+          - { name: "Windows-MSVC", os: windows-2019 }
 
     steps:
       - uses: actions/checkout@v3
