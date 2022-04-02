@@ -4,6 +4,30 @@ import sys
 from dataclasses import dataclass
 from typing import Optional
 
+USAGE = "Usage:" \
+        "\n\t python cli.py configure [--enable-tests] [--build-type=] [--conan-profile=] [--cmake-generator=]" \
+        "\n\t python cli.py build [--build-type=]" \
+        "\n\t python cli.py install [--build-type=]" \
+        "\nExample:" \
+        "\n\t python cli.py configure --conan-profile=default" \
+        "\n\t python cli.py configure --build-type=Release --enable-tests" \
+        "\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\"" \
+        "\n\t python cli.py build --build-type=Release" \
+        "\n\t python cli.py install --build-type=Release"
+
+DEFAULT_SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
+DEFAULT_BUILD_DIR = os.path.join("out", "build")
+DEFAULT_INSTALL_DIR = os.path.join("out", "install")
+DEFAULT_BUILD_TYPE = "Debug"
+DEFAULT_CMAKE_GENERATOR = {
+    "win32": "Visual Studio 16 2019",
+    "cygwin": "Visual Studio 16 2019",
+    "darwin": "CodeBlocks - Unix Makefiles",
+    "linux": "Ninja"
+}.get(sys.platform, None)
+
+
+# <editor-fold desc="Data Objects">
 
 @dataclass(init=True)
 class Package:
@@ -48,6 +72,8 @@ class CommandResult:
 @dataclass(init=True)
 class Command:
     expression: str
+
+# </editor-fold>
 
 
 def run(command: Command) -> CommandResult:
@@ -164,7 +190,7 @@ def parse_args(args):
 
 def setup(args):
     parsed_args = parse_args(args)
-    source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
+    source_path = parsed_args.get("source-path", DEFAULT_SOURCE_DIR)
 
     run(conan_add_remote(Remote("luizgabriel", "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
 
@@ -182,19 +208,12 @@ def setup(args):
 
 def configure(args):
     parsed_args = parse_args(args)
-    source_path = parsed_args.get("source-path", os.path.abspath(os.path.dirname(__file__)))
-    build_path = parsed_args.get("build-path", os.path.join("out", "build"))
-    install_path = parsed_args.get("install-path", os.path.join("out", "install"))
-    recommended_sys_generator = {
-        "win32": "Visual Studio 16 2019",
-        "cygwin": "Visual Studio 16 2019",
-        "darwin": "CodeBlocks - Unix Makefiles",
-        "linux": "Ninja"
-    }.get(sys.platform, None)
-
-    generator = parsed_args.get("cmake-generator", recommended_sys_generator)
+    source_path = parsed_args.get("source-path", DEFAULT_SOURCE_DIR)
+    build_path = parsed_args.get("build-path", DEFAULT_BUILD_DIR)
+    install_path = parsed_args.get("install-path", DEFAULT_INSTALL_DIR)
+    generator = parsed_args.get("cmake-generator", DEFAULT_CMAKE_GENERATOR)
     build_tests = parsed_args.get("enable-tests", False)
-    build_type = parsed_args.get("build-type", "Debug")
+    build_type = parsed_args.get("build-type", DEFAULT_BUILD_TYPE)
     conan_profile = parsed_args.get("conan-profile")
 
     setup(args)
@@ -212,8 +231,8 @@ def configure(args):
 
 def build(args):
     parsed_args = parse_args(args)
-    build_path = parsed_args.get("build-path", os.path.join("out", "build"))
-    build_type = parsed_args.get("build-type", "Debug")
+    build_path = parsed_args.get("build-path", DEFAULT_BUILD_DIR)
+    build_type = parsed_args.get("build-type", DEFAULT_BUILD_TYPE)
 
     run_or_exit(cmake_build(CmakeBuildOptions(
         build_dir=build_path,
@@ -223,26 +242,14 @@ def build(args):
 
 def install(args):
     parsed_args = parse_args(args)
-    build_path = parsed_args.get("build-path", os.path.join("out", "build"))
-    build_type = parsed_args.get("build-type", "Debug")
+    build_path = parsed_args.get("build-path", DEFAULT_BUILD_DIR)
+    build_type = parsed_args.get("build-type", DEFAULT_BUILD_TYPE)
     build_options = CmakeBuildOptions(
         build_dir=build_path,
         build_type=build_type
     )
 
     run_or_exit(cmake_install(build_options))
-
-
-USAGE = "Usage:" \
-        "\n\t python cli.py configure [--enable-tests] [--build-type=] [--conan-profile=] [--cmake-generator=]" \
-        "\n\t python cli.py build [--build-type=]" \
-        "\n\t python cli.py install [--build-type=]" \
-        "\nExample:" \
-        "\n\t python cli.py configure --conan-profile=default" \
-        "\n\t python cli.py configure --build-type=Release --enable-tests" \
-        "\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\"" \
-        "\n\t python cli.py build --build-type=Release" \
-        "\n\t python cli.py install --build-type=Release"
 
 
 def main():
