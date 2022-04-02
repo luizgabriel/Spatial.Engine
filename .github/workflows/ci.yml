@@ -12,6 +12,7 @@ on:
 env:
   CONAN_SYSREQUIRES_MODE: enabled
   CONAN_REVISIONS_ENABLED: 1
+  CONAN_USE_ALWAYS_SHORT_PATHS: 1
 
 jobs:
   build:
