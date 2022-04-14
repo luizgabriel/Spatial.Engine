@@ -1,0 +1,782 @@
+{
+    "entities": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1048593,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        1048597,
+        18,
+        19,
+        20,
+        1048602,
+        22,
+        23,
+        24,
+        25,
+        1048606,
+        27,
+        28,
+        29,
+        2097151
+    ],
+    "last_destroyed": 9,
+    "name": [
+        25,
+        {
+            "name": "Color Material (Cylinder)"
+        },
+        24,
+        {
+            "name": "cylinder.filamesh"
+        },
+        23,
+        {
+            "name": "Cylinder"
+        },
+        22,
+        {
+            "name": "Directional Light"
+        },
+        28,
+        {
+            "name": "cube.filamesh"
+        },
+        20,
+        {
+            "name": "Standard Opaque (Plane)"
+        },
+        19,
+        {
+            "name": "standard_lit.filamat"
+        },
+        18,
+        {
+            "name": "Plane"
+        },
+        0,
+        {
+            "name": "skybox.filamat"
+        },
+        1,
+        {
+            "name": "SkyBox Material"
+        },
+        2,
+        {
+            "name": "grid.filamat"
+        },
+        3,
+        {
+            "name": "Grid Material"
+        },
+        4,
+        {
+            "name": "plane.filamesh"
+        },
+        5,
+        {
+            "name": "Grid Plane"
+        },
+        6,
+        {
+            "name": "Primitive 0"
+        },
+        7,
+        {
+            "name": "skybox"
+        },
+        8,
+        {
+            "name": "SkyBox"
+        },
+        29,
+        {
+            "name": "Color Material (Cube)"
+        },
+        10,
+        {
+            "name": "Editor View"
+        },
+        11,
+        {
+            "name": "Indirect Light"
+        },
+        12,
+        {
+            "name": "Editor Camera"
+        },
+        13,
+        {
+            "name": "Sphere"
+        },
+        14,
+        {
+            "name": "sphere.filamesh"
+        },
+        15,
+        {
+            "name": "color.filamat"
+        },
+        16,
+        {
+            "name": "Color Material (Sphere)"
+        },
+        27,
+        {
+            "name": "Cube"
+        }
+    ],
+    "transform": [
+        27,
+        {
+            "position": {
+                "x": -2.5,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        23,
+        {
+            "position": {
+                "x": 2.5,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        18,
+        {
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 10.0,
+                "y": 10.0,
+                "z": 10.0
+            }
+        },
+        5,
+        {
+            "position": {
+                "x": 0.0,
+                "y": -0.009999999776482582,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 100.0,
+                "y": 1.0,
+                "z": 100.0
+            }
+        },
+        12,
+        {
+            "position": {
+                "x": -3.8963000774383547,
+                "y": 3.225896120071411,
+                "z": 5.525558948516846
+            },
+            "rotation": {
+                "x": -0.3133399486541748,
+                "y": -0.5525804758071899,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        13,
+        {
+            "position": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    ],
+    "perspective_camera": [
+        12,
+        {
+            "fieldOfView": 60.0,
+            "aspectRatio": 3.1666666666666667,
+            "near": 0.1,
+            "far": 10000.0
+        }
+    ],
+    "orthographic_camera": [],
+    "custom_camera": [],
+    "point_light": [],
+    "directional_light": [
+        22,
+        {
+            "intensity": 61538.46484375,
+            "direction": {
+                "x": 0.42720532417297366,
+                "y": -0.8759844303131104,
+                "z": 0.22393473982810975
+            },
+            "color": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "castShadows": true
+        }
+    ],
+    "spot_light": [],
+    "sun_light": [],
+    "indirect_light": [
+        11,
+        {
+            "intensity": 30000.0,
+            "reflectionsTexturePath": {
+                "relativePath": {
+                    "value0": "editor/textures/skybox/ibl.ktx"
+                }
+            },
+            "irradianceValuesPath": {
+                "relativePath": {
+                    "value0": "editor/textures/skybox/sh.txt"
+                }
+            }
+        }
+    ],
+    "mesh": [
+        28,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/meshes/cube.filamesh"
+                }
+            }
+        },
+        24,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/meshes/cylinder.filamesh"
+                }
+            }
+        },
+        4,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/meshes/plane.filamesh"
+                }
+            }
+        },
+        7,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "engine/skybox"
+                }
+            }
+        },
+        14,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/meshes/sphere.filamesh"
+                }
+            }
+        }
+    ],
+    "mesh_instance": [
+        27,
+        {
+            "meshSource": 28,
+            "defaultMaterial": 29,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        23,
+        {
+            "meshSource": 24,
+            "defaultMaterial": 25,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        18,
+        {
+            "meshSource": 4,
+            "defaultMaterial": 20,
+            "receiveShadows": true,
+            "castShadows": false,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        5,
+        {
+            "meshSource": 4,
+            "defaultMaterial": 1048575,
+            "receiveShadows": false,
+            "castShadows": false,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 1,
+            "partsOffset": 0
+        },
+        8,
+        {
+            "meshSource": 7,
+            "defaultMaterial": 1,
+            "receiveShadows": false,
+            "castShadows": false,
+            "culling": false,
+            "priority": 7,
+            "partsCount": 0,
+            "partsOffset": 0
+        },
+        13,
+        {
+            "meshSource": 14,
+            "defaultMaterial": 16,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 0,
+            "partsOffset": 0
+        }
+    ],
+    "mesh_material": [
+        6,
+        {
+            "primitiveIndex": 0,
+            "materialEntity": 3
+        }
+    ],
+    "precompiled_material": [
+        19,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/materials/standard_lit.filamat"
+                }
+            }
+        },
+        0,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/materials/skybox.filamat"
+                }
+            }
+        },
+        2,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/materials/grid.filamat"
+                }
+            }
+        },
+        15,
+        {
+            "resource": {
+                "relativePath": {
+                    "value0": "editor/materials/color.filamat"
+                }
+            }
+        }
+    ],
+    "parent": [
+        27,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        },
+        23,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        },
+        18,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        },
+        19,
+        {
+            "childrenCount": 1,
+            "first": 20,
+            "last": 20
+        },
+        0,
+        {
+            "childrenCount": 1,
+            "first": 1,
+            "last": 1
+        },
+        2,
+        {
+            "childrenCount": 1,
+            "first": 3,
+            "last": 3
+        },
+        5,
+        {
+            "childrenCount": 1,
+            "first": 6,
+            "last": 6
+        },
+        8,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        },
+        15,
+        {
+            "childrenCount": 3,
+            "first": 16,
+            "last": 29
+        },
+        13,
+        {
+            "childrenCount": 0,
+            "first": 1048575,
+            "last": 1048575
+        }
+    ],
+    "child": [
+        20,
+        {
+            "parent": 19,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        1,
+        {
+            "parent": 0,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        3,
+        {
+            "parent": 2,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        6,
+        {
+            "parent": 5,
+            "next": 1048575,
+            "previous": 1048575
+        },
+        29,
+        {
+            "parent": 15,
+            "next": 1048575,
+            "previous": 25
+        },
+        16,
+        {
+            "parent": 15,
+            "next": 25,
+            "previous": 1048575
+        },
+        25,
+        {
+            "parent": 15,
+            "next": 29,
+            "previous": 16
+        }
+    ],
+    "scene_view": [
+        10,
+        {
+            "size": {
+                "x": 1280,
+                "y": 720
+            },
+            "camera": 12,
+            "indirectLight": 11
+        }
+    ],
+    "uuid": [],
+    "script": [],
+    "script_instance": [],
+    "tag_is_material": [
+        19,
+        0,
+        2,
+        15
+    ],
+    "is_renderable": [
+        27,
+        23,
+        22,
+        18,
+        5,
+        8,
+        11,
+        12,
+        13
+    ],
+    "tag_is_camera": [
+        12
+    ],
+    "tag_light": [
+        22,
+        11
+    ],
+    "tag_is_main_view": [],
+    "tag_is_resource": [
+        29,
+        28,
+        25,
+        24,
+        20,
+        19,
+        0,
+        1,
+        2,
+        3,
+        4,
+        7,
+        14,
+        15,
+        16
+    ],
+    "tag_is_material_instance": [
+        29,
+        25,
+        20,
+        1,
+        3,
+        16
+    ],
+    "color_material": [
+        29,
+        {
+            "baseColor": {
+                "x": 0.42315417528152468,
+                "y": 0.8024193644523621,
+                "z": 0.3073783814907074
+            },
+            "roughness": 0.14000000059604646,
+            "metallic": 0.800000011920929,
+            "reflectance": 0.10000000149011612
+        },
+        25,
+        {
+            "baseColor": {
+                "x": 0.9395161271095276,
+                "y": 0.14395809173583985,
+                "z": 0.14395809173583985
+            },
+            "roughness": 0.2199999988079071,
+            "metallic": 0.6399999856948853,
+            "reflectance": 0.0
+        },
+        16,
+        {
+            "baseColor": {
+                "x": 0.28920069336891177,
+                "y": 0.4342251420021057,
+                "z": 0.9314516186714172
+            },
+            "roughness": 0.47999998927116396,
+            "metallic": 0.800000011920929,
+            "reflectance": 0.10000000149011612
+        }
+    ],
+    "skybox_material": [
+        1,
+        {
+            "skybox": {
+                "relativePath": {
+                    "value0": "editor/textures/skybox/texture.ktx"
+                }
+            },
+            "showSun": false,
+            "color": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        }
+    ],
+    "grid_material": [
+        3,
+        {
+            "color": {
+                "x": 0.5,
+                "y": 0.5,
+                "z": 0.5
+            },
+            "scale": {
+                "x": 10.0,
+                "y": 10.0
+            },
+            "thickness": 0.014999999664723874
+        }
+    ],
+    "standard_opaque_material": [
+        20,
+        {
+            "baseColor": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "albedo": {
+                "relativePath": {
+                    "value0": "project/textures/uv.png"
+                }
+            },
+            "tiling": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "offset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "metallic": 0.0,
+            "metallicMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            },
+            "roughness": 1.0,
+            "roughnessMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            },
+            "reflectance": 0.0,
+            "reflectanceMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            },
+            "ambientOcclusionMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            },
+            "normalMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            },
+            "emissive": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "height": 1.0,
+            "heightMap": {
+                "relativePath": {
+                    "value0": ""
+                }
+            }
+        }
+    ],
+    "editor_camera": [
+        12,
+        {
+            "velocity": 10.0,
+            "sensitivity": 0.5
+        }
+    ],
+    "tag_is_editor_entity": [
+        19,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        10,
+        11,
+        12,
+        15
+    ],
+    "tag_is_skybox_mesh_instance": [
+        8
+    ],
+    "tag_is_editor_view": [
+        10
+    ],
+    "tag_is_grid_plane": [
+        5
+    ],
+    "tag_is_skybox_mesh_resource": [
+        7
+    ]
+}
