@@ -1,3 +1,4 @@
+#include <boost/algorithm/string/join.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
@@ -158,75 +159,90 @@ bool ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Script>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::ScriptInfo>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
-	auto& script = registry.getComponent<ecs::Script>(entity);
+	auto& script = registry.getComponent<ecs::ScriptInfo>(entity);
 	bool changed = false;
 
-	changed |= ui::inputPath("Resource", script.resource.relativePath, "*.js");
-	if (ImGui::Button("Reload Script"))
+	ui::spacing(3);
+
+	if (!script.systems.empty() && ImGui::BeginTable("ScriptSystemsTable", 3, gTableFlags))
 	{
-		registry.removeComponentIfExists<ecs::ScriptInfo>(entity);
-		registry.removeComponentIfExists<ecs::ScriptError>(entity);
-		changed = true;
-	}
+		ImGui::TableSetupColumn("Name");
+		ImGui::TableSetupColumn("Required Components", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Excluded Components", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
 
-	ImGui::SameLine();
-
-	const auto* info = registry.tryGetComponent<const ecs::ScriptInfo>(entity);
-	const auto* error = registry.tryGetComponent<const ecs::ScriptError>(entity);
-
-	auto loaded = info != nullptr;
-	ImGui::Checkbox("Is Loaded", &loaded);
-
-	if (error)
-	{
-		ImGui::Separator();
-		ImGui::TextColored(ImVec4(0.81f, 0.27f, 0.33f, 1.0), "Error: %s", error->message.c_str());
-	}
-
-	if (info)
-	{
-		ui::spacing(3);
-		if (ImGui::BeginTable("ScriptPropertiesTable", 2, gTableFlags))
+		for (const auto& system : script.systems)
 		{
-			ImGui::TableSetupColumn("Property", ImGuiTableColumnFlags_WidthStretch);
-			ImGui::TableSetupColumn("Type");
-			ImGui::TableHeadersRow();
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("%s", system.name.c_str());
 
-			for (const auto& prop : info->properties)
-			{
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("%s", prop.name.c_str());
+			ImGui::TableNextColumn();
+			ImGui::Text("%s", boost::algorithm::join(system.requiredComponents, ", ").c_str());
 
-				ImGui::TableNextColumn();
-				ImGui::Text("%s", prop.getTypeName());
-			}
-
-			ImGui::EndTable();
+			ImGui::TableNextColumn();
+			ImGui::Text("%s", boost::algorithm::join(system.excludedComponents, ", ").c_str());
 		}
-		ui::spacing(3);
+
+		ImGui::EndTable();
+	}
+
+	ui::spacing(3);
+
+	if (!script.components.empty() && ImGui::BeginTable("ScriptComponentsTable", 2, gTableFlags))
+	{
+		ImGui::TableSetupColumn("Name");
+		ImGui::TableSetupColumn("Properties", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
+
+		for (const auto& component : script.components)
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("%s", component.name.c_str());
+
+			ImGui::TableNextColumn();
+			auto props = std::vector<std::string>{};
+			props.reserve(component.properties.size());
+			std::transform(component.properties.begin(), component.properties.end(), std::back_inserter(props),
+						   [](const auto& prop) { return prop.first; });
+
+			ImGui::Text("%s", boost::algorithm::join(props, ", ").c_str());
+		}
+
+		ImGui::EndTable();
 	}
 
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Mesh>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
-	auto& mesh = registry.getComponent<ecs::Mesh>(entity);
+	auto& resource = registry.getComponent<ecs::Resource>(entity);
 	bool changed = false;
 
-	changed |= ui::inputPath("Resource", mesh.resource.relativePath, "*.filamesh");
+	changed |= ui::inputPath("Resource", resource.relativePath, "project/assets/*");
 
-	auto loaded = registry.hasAllComponents<ecs::tags::IsMeshLoaded>(entity);
+	auto loaded = registry.hasAllComponents<ecs::tags::IsResourceLoaded>(entity);
 
-	if (loaded && ImGui::Button("Reload Mesh"))
-		registry.removeComponent<ecs::tags::IsMeshLoaded>(entity);
+	if (loaded && ImGui::Button("Reload"))
+		registry.removeComponent<ecs::tags::IsResourceLoaded>(entity);
 
 	ImGui::SameLine();
 
 	ImGui::Checkbox("Is Loaded", &loaded);
+
+	ui::spacing(2);
+
+	const auto* error = registry.tryGetComponent<const ecs::ResourceError>(entity);
+
+	if (error)
+	{
+		ImGui::Separator();
+		ImGui::TextColored(ImVec4(0.81f, 0.27f, 0.33f, 1.0), "Error: %s", error->errorMessage.c_str());
+	}
 
 	return changed;
 }
@@ -244,7 +260,7 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		auto result = dnd.getPayload<std::filesystem::path>();
 		if (result.has_value())
 		{
-			mesh.meshSource = ecs::Mesh::findOrCreate(registry, result.value());
+			mesh.meshSource = ecs::Resource::findOrCreate(registry, result.value());
 			shouldRecreateMesh = true;
 			changed = true;
 		}
@@ -253,9 +269,11 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	spacing(3);
 
 	changed |= ImGui::Checkbox("Cast Shadows", &mesh.castShadows);
+	ImGui::SameLine();
 	changed |= ImGui::Checkbox("Receive Shadows", &mesh.receiveShadows);
-	changed |= ImGui::Checkbox("Culling", &mesh.culling);
 
+	changed |= ImGui::Checkbox("Culling", &mesh.culling);
+	ImGui::SameLine();
 	ImGui::SetNextItemWidth(100.0f);
 	changed |= ImGui::InputScalar("Priority", ImGuiDataType_U8, &mesh.priority, &smallStep, &largeStep);
 
@@ -372,22 +390,6 @@ bool ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::E
 								  &largeStep, "%lu");
 	changed |= ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("Material", registry,
 																	   meshMaterial.materialInstanceEntity);
-
-	return changed;
-}
-
-bool ComponentInputImpl<ecs::PrecompiledMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
-{
-	auto& material = registry.getComponent<ecs::PrecompiledMaterial>(entity);
-	bool changed = false;
-
-	changed |= ui::inputPath("Resource", material.resource.relativePath, "*.filamat");
-	auto loaded = registry.hasAllComponents<ecs::tags::IsMaterialLoaded>(entity);
-
-	if (loaded && ImGui::Button("Reload Material"))
-		registry.removeComponent<ecs::tags::IsMaterialLoaded>(entity);
-
-	changed |= ImGui::Checkbox("Is Loaded", &loaded);
 
 	return changed;
 }

@@ -19,9 +19,7 @@ class Popup
 	{
 		auto popup = ui::Popup(name);
 		if (popup.isOpen())
-		{
 			std::invoke(std::forward<Function>(func));
-		}
 	}
 
   private:

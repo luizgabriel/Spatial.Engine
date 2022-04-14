@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Resource.h"
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/EntityHandle.h>
@@ -9,8 +10,8 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/ecs/Transform.h>
 #include <spatial/ecs/Script.h>
+#include <spatial/ecs/Transform.h>
 
 namespace spatial::ecs
 {
@@ -29,10 +30,10 @@ class IndirectLightEntityBuilder;
 
 class PrecompiledMaterialEntityBuilder;
 
+class ResourceEntityBuilder;
+
 template <typename MaterialComponent>
 class MaterialInstanceEntityBuilder;
-
-class MeshEntityBuilder;
 
 class MeshInstanceEntityBuilder;
 
@@ -85,13 +86,10 @@ class EntityBuilder
 	IndirectLightEntityBuilder asIndirectLight();
 	SceneViewEntityBuilder asSceneView();
 
-	MeshEntityBuilder asMesh();
+	ResourceEntityBuilder asResource();
+
 	MeshInstanceEntityBuilder asMeshInstance();
 	MeshMaterialEntityBuilder asMeshMaterial();
-
-	ScriptEntityBuilder asScript();
-
-	PrecompiledMaterialEntityBuilder asPrecompiledMaterial();
 
 	template <typename MaterialComponent>
 	MaterialInstanceEntityBuilder<MaterialComponent> asMaterialInstance()
@@ -243,16 +241,6 @@ class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
 	IndirectLightEntityBuilder& withIrradianceValuesPath(const std::filesystem::path& path);
 };
 
-class PrecompiledMaterialEntityBuilder : public BasicEntityBuilder<PrecompiledMaterial>
-{
-  public:
-	using Base = BasicEntityBuilder<PrecompiledMaterial>;
-
-	PrecompiledMaterialEntityBuilder(Registry& registry, Entity entity);
-
-	PrecompiledMaterialEntityBuilder& withResource(const std::filesystem::path& filamat);
-};
-
 template <typename MaterialProps>
 class MaterialInstanceEntityBuilder : public EntityBuilder
 {
@@ -260,7 +248,6 @@ class MaterialInstanceEntityBuilder : public EntityBuilder
 	MaterialInstanceEntityBuilder(Registry& registry, Entity entity)
 		: EntityBuilder(registry, entity)
 	{
-		with<tags::IsResource>();
 		with<tags::IsMaterialInstance>();
 		with<MaterialProps>({});
 	}
@@ -281,14 +268,14 @@ class MaterialInstanceEntityBuilder : public EntityBuilder
 	}
 };
 
-class MeshEntityBuilder : public BasicEntityBuilder<Mesh>
+class ResourceEntityBuilder : public BasicEntityBuilder<Resource>
 {
   public:
-	using Base = BasicEntityBuilder<Mesh>;
+	using Base = BasicEntityBuilder<Resource>;
 
-	MeshEntityBuilder(Registry& registry, Entity entity);
+	ResourceEntityBuilder(Registry& registry, Entity entity);
 
-	MeshEntityBuilder& withResource(const std::filesystem::path& filamesh);
+	ResourceEntityBuilder& withPath(const std::filesystem::path& relativePath);
 };
 
 class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
@@ -325,15 +312,6 @@ class SceneViewEntityBuilder : public BasicEntityBuilder<SceneView>
 	SceneViewEntityBuilder(Registry& registry, Entity entity);
 	SceneViewEntityBuilder& withCamera(ecs::Entity cameraEntity);
 	SceneViewEntityBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
-};
-
-class ScriptEntityBuilder : public BasicEntityBuilder<Script>
-{
-  public:
-	using Base = BasicEntityBuilder<Script>;
-
-	ScriptEntityBuilder(Registry& registry, Entity entity);
-	ScriptEntityBuilder& withResource(const std::filesystem::path& script);
 };
 
 } // namespace spatial::ecs

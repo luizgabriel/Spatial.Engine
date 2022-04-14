@@ -43,7 +43,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 	if (!ecs::handleOf<SkyBoxMaterial>(registry))
 	{
 		auto skyboxMaterial = ecs::handleOf(
-			registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/skybox.filamat"));
+			registry, ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
 		skyboxMaterial.addOrReplace<tags::IsEditorEntity>();
 
 		ecs::build(registry)
@@ -60,7 +60,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 	if (!ecs::handleOf<GridMaterial>(registry))
 	{
 		auto gridMaterial =
-			ecs::handleOf(registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/grid.filamat"));
+			ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "editor/materials/grid.filamat"));
 		gridMaterial.addOrReplace<tags::IsEditorEntity>();
 
 		ecs::build(registry)
@@ -73,7 +73,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 
 	if (!ecs::handleOf<tags::IsGridPlane>(registry))
 	{
-		auto planeMesh = ecs::handleOf(registry, ecs::Mesh::findOrCreate(registry, "editor/meshes/plane.filamesh"));
+		auto planeMesh = ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"));
 		planeMesh.addOrReplace<tags::IsEditorEntity>();
 
 		ecs::build(registry)
@@ -90,7 +90,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 
 	if (!ecs::handleOf<tags::IsSkyBox>(registry))
 	{
-		auto skyboxMesh = ecs::handleOf(registry, ecs::Mesh::findOrCreate(registry, "engine/skybox"));
+		auto skyboxMesh = ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "engine/skybox"));
 		skyboxMesh.addOrReplace<tags::IsSkyBoxMeshResource>();
 		skyboxMesh.addOrReplace<tags::IsEditorEntity>();
 
@@ -174,10 +174,10 @@ void EditorSystem::onStartFrame(float)
 	mJobQueue.update();
 
 	auto skyboxMeshResource = ecs::handleOf<tags::IsSkyBoxMeshResource>(mRegistry);
-	if (skyboxMeshResource && !skyboxMeshResource.has<ecs::tags::IsMeshLoaded>())
+	if (skyboxMeshResource && !skyboxMeshResource.has<ecs::tags::IsResourceLoaded>())
 	{
 		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
-		skyboxMeshResource.add<ecs::tags::IsMeshLoaded>();
+		skyboxMeshResource.add<ecs::tags::IsResourceLoaded>();
 		skyboxMeshResource.addOrReplace(toShared(render::createFullScreenVertexBuffer(mEngine)));
 		skyboxMeshResource.addOrReplace(render::MeshGeometries{{0, ib->getIndexCount()}});
 		skyboxMeshResource.addOrReplace(std::move(ib));
@@ -281,11 +281,21 @@ void EditorSystem::onDrawGui()
 		ui::AssetsManager::header(search, type);
 		ui::AssetsManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
 
-		ui::EditorDragAndDrop::loadMesh(mRegistry, selectedEntity);
-		ui::EditorDragAndDrop::loadScript(mRegistry, selectedEntity);
+		ui::EditorDragAndDrop::loadResource(mRegistry, selectedEntity);
 
 		ui::Popup::show("Asset Manager Popup", [&]() {
-			ui::AssetsManager::createMenu(mRegistry, selectedEntity);
+			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+		});
+	});
+
+	ui::Window::show("Materials Manager", [&]() {
+		static std::string search;
+
+		ui::MaterialsManager::header(search);
+		ui::MaterialsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+
+		ui::Popup::show("Asset Manager Popup", [&]() {
+			ui::MaterialsManager::createMenu(mRegistry, selectedEntity);
 			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
 		});
 	});

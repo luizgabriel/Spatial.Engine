@@ -138,12 +138,10 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity);
 	componentCollapse<ecs::SunLight>(registry, entity);
-	componentCollapse<ecs::Mesh>(registry, entity);
+	componentCollapse<ecs::Resource>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity);
 	componentCollapse<ecs::MeshMaterial>(registry, entity);
-	componentCollapse<ecs::PrecompiledMaterial>(registry, entity);
 	componentCollapse<ecs::SceneView>(registry, entity);
-	componentCollapse<ecs::Script>(registry, entity);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
 	componentCollapse<editor::ColorMaterial>(registry, entity);
@@ -185,9 +183,6 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 		registry.addComponent<ecs::Transform>(entity);
 
 	ImGui::Separator();
-
-	if (!registry.hasAnyComponent<ecs::Mesh>(entity) && menu.item("Mesh"))
-		registry.addComponent<ecs::Mesh>(entity);
 
 	if (!registry.hasAnyComponent<ecs::MeshInstance>(entity) && menu.item("Mesh Instance"))
 		registry.addComponent<ecs::MeshInstance>(entity);
@@ -404,12 +399,11 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::tags::IsResource, ecs::Child>)
-				.each(onEachNodeFn);
+			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::Resource, ecs::Child>).each(onEachNodeFn);
 		else
 			registry
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::tags::IsResource, editor::tags::IsEditorEntity, ecs::Child>)
+					ecs::ExcludeComponents<ecs::Resource, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -429,10 +423,11 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	const auto hasChildren = relation && relation->childrenCount > 0;
 
 	const auto selectedFlags = selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
-	const auto childrenFlags = hasChildren
-								   ? ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick
-								   : ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet
-										 | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth;
+	const auto childrenFlags =
+		hasChildren
+			? ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick
+			: ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
+				  | ImGuiTreeNodeFlags_SpanFullWidth;
 
 	bool open = ImGui::TreeNodeEx(name.c_str(), childrenFlags | selectedFlags);
 	if (ImGui::IsItemClicked())
@@ -481,8 +476,10 @@ bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter
 	ui::spanToAvailWidth();
 	if (ImGui::BeginCombo("##ResourceTypeFilter", filterToName.at(filter)))
 	{
-		for (auto value : magic_enum::enum_values<AssetType>()) {
-			if (ImGui::Selectable(filterToName.at(value), filter == value)) {
+		for (auto value : magic_enum::enum_values<AssetType>())
+		{
+			if (ImGui::Selectable(filterToName.at(value), filter == value))
+			{
 				filter = value;
 				changed = true;
 			}
@@ -497,8 +494,8 @@ bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter
 	return changed;
 }
 
-bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search, AssetsManager::AssetType type,
-						 bool showEditorEntities)
+bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+						 AssetsManager::AssetType type, bool showEditorEntities)
 {
 	using namespace boost::algorithm;
 	using namespace std::string_view_literals;
@@ -509,7 +506,7 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
 										 | ImGuiTableFlags_NoBordersInBody;
 
-	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
+	if (ImGui::BeginTable("AssetsManagerTable", 2, flags))
 	{
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
 		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoHide);
@@ -518,17 +515,17 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 		auto lowerCaseSearch = std::string{search};
 		to_lower(lowerCaseSearch);
 
-		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
+		const auto eachFn = [&](ecs::Entity entity, const auto& resource, const auto& name) {
 			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
-			if (type == AssetType::Material && !registry.hasAnyComponent<ecs::PrecompiledMaterial, ecs::tags::IsMaterialInstance>(entity))
+			if (type == AssetType::Material && !registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
 				return;
 
-			if (type == AssetType::Mesh && !registry.hasAnyComponent<ecs::Mesh>(entity))
+			if (type == AssetType::Mesh && !registry.hasAnyComponent<ecs::tags::IsMesh>(entity))
 				return;
 
-			if (type == AssetType::Script && !registry.hasAllComponents<ecs::Script>(entity))
+			if (type == AssetType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
 				return;
 
 			ImGui::TableNextRow();
@@ -543,26 +540,25 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 				changed |= true;
 			}
 
+			ui::Popup::show("ResourcePopup", [&]() { ImGui::Text("%s", resource.relativePath.c_str()); });
+
 			ImGui::TableNextColumn();
 			std::string_view typeText;
-			if (registry.hasAllComponents<ecs::Mesh>(entity))
+			if (registry.hasAllComponents<ecs::tags::IsMesh>(entity))
 				typeText = "Mesh"sv;
-			else if (registry.hasAllComponents<ecs::PrecompiledMaterial>(entity))
-				typeText = "Precompiled Material"sv;
-			else if (registry.hasAllComponents<ecs::tags::IsMaterialInstance>(entity))
-				typeText = "Material Instance"sv;
-			else if (registry.hasAllComponents<ecs::Script>(entity))
+			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
+				typeText = "Material"sv;
+			else if (registry.hasAllComponents<ecs::tags::IsScript>(entity))
 				typeText = "Script"sv;
 
 			ImGui::TextDisabled("%s", typeText.data());
 		};
 
 		if (showEditorEntities)
-			registry.getEntities<const ecs::tags::IsResource, const ecs::Name>().each(eachFn);
+			registry.getEntities<const ecs::Resource, const ecs::Name>().each(eachFn);
 		else
 			registry
-				.getEntities<const ecs::tags::IsResource, const ecs::Name>(
-					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
+				.getEntities<const ecs::Resource, const ecs::Name>(ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
 				.each(eachFn);
 
 		ImGui::EndTable();
@@ -571,7 +567,7 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 	return changed;
 }
 
-bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
+bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
 	bool changed = false;
 	ecs::Entity createdEntity = ecs::NullEntity;
@@ -596,7 +592,7 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 		if (menu2.item("Standard Opaque"))
 		{
 			auto opaqueMaterial = ecs::handleOf(
-				registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
+				registry, ecs::Resource::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
 			opaqueMaterial.addOrReplace<editor::tags::IsEditorEntity>();
 
 			createdEntity = ecs::build(registry)
@@ -609,7 +605,7 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 		if (menu2.item("Color Material"))
 		{
 			auto colorMaterial = ecs::handleOf(
-				registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/color.filamat"));
+				registry, ecs::Resource::findOrCreate(registry, "editor/materials/color.filamat"));
 			colorMaterial.addOrReplace<editor::tags::IsEditorEntity>();
 
 			createdEntity = ecs::build(registry)
@@ -620,22 +616,10 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 		}
 	}
 
-	if (menu.item("Script"))
-	{
-		createdEntity = ecs::build(registry).withName("Script").asScript().withResource("");
-		changed = true;
-	}
-
-	if (menu.item("Mesh"))
-	{
-		createdEntity = ecs::build(registry).withName("Mesh").asMesh().withResource("");
-		changed = true;
-	}
-
 	if (menu.item("SkyBox"))
 	{
 		auto skyboxMaterial = ecs::handleOf(
-			registry, ecs::PrecompiledMaterial::findOrCreate(registry, "editor/materials/skybox.filamat"));
+			registry, ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
 		skyboxMaterial.addOrReplace<editor::tags::IsEditorEntity>();
 
 		createdEntity = ecs::build(registry)
@@ -651,16 +635,72 @@ bool AssetsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEnt
 	if (changed)
 		selectedEntity = createdEntity;
 
+
 	return changed;
 }
 
-bool EditorDragAndDrop::loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity)
+bool MaterialsManager::header(std::string& search)
+{
+	return ui::Search::searchText(search);
+}
+
+bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+							bool showEditorEntities)
+{
+	using namespace boost::algorithm;
+	using namespace std::string_view_literals;
+
+	bool changed = false;
+
+	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
+										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
+										 | ImGuiTableFlags_NoBordersInBody;
+
+	if (ImGui::BeginTable("MaterialInstancesTable", 1, flags))
+	{
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
+
+		auto lowerCaseSearch = std::string{search};
+		to_lower(lowerCaseSearch);
+
+		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
+			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
+				return;
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+
+			const auto selectedFlags = selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+			ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
+												| ImGuiTreeNodeFlags_SpanFullWidth | selectedFlags);
+			if (ImGui::IsItemClicked())
+			{
+				selectedEntity = entity;
+				changed |= true;
+			}
+		};
+
+		if (showEditorEntities)
+			registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>().each(eachFn);
+		else
+			registry
+				.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>(ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
+				.each(eachFn);
+
+		ImGui::EndTable();
+	}
+
+	return changed;
+}
+
+bool EditorDragAndDrop::loadResource(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
 	auto dnd = ui::DragAndDropTarget{};
 	auto result = dnd.getPayload<std::filesystem::path>();
-	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
+	if (result && !result->empty())
 	{
-		selectedEntity = ecs::Mesh::findOrCreate(registry, *result);
+		selectedEntity = ecs::Resource::findOrCreate(registry, *result);
 		return true;
 	}
 
@@ -694,22 +734,8 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
-							 .withMesh(ecs::Mesh::findOrCreate(registry, result.value()));
+							 .withMesh(ecs::Resource::findOrCreate(registry, result.value()));
 
-		return true;
-	}
-
-	return false;
-}
-
-bool EditorDragAndDrop::loadScript(ecs::Registry& registry, ecs::Entity& selectedEntity)
-{
-	auto dnd = DragAndDropTarget{};
-	auto result = dnd.getPayload<std::filesystem::path>();
-
-	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".js"))
-	{
-		selectedEntity = ecs::Script::findOrCreate(registry, *result);
 		return true;
 	}
 
@@ -766,7 +792,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/cube.filamesh"))
+						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/cube.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -779,7 +805,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/plane.filamesh"))
+						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -792,7 +818,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/sphere.filamesh"))
+						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/sphere.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -805,7 +831,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findOrCreate(registry, "editor/meshes/cylinder.filamesh"))
+						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/cylinder.filamesh"))
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -813,7 +839,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Skybox"))
 	{
-		auto skyboxMaterial = ecs::PrecompiledMaterial::find(registry, "editor/materials/skybox.filamat");
+		auto skyboxMaterial = ecs::Resource::find(registry, "editor/materials/skybox.filamat");
 		auto materialInstance = ecs::build(registry)
 									.asMaterialInstance<editor::SkyBoxMaterial>()
 									.withMaterial(skyboxMaterial)
@@ -826,7 +852,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 		newEntity = ecs::build(registry)
 						.withName("Skybox")
 						.asMeshInstance()
-						.withMesh(ecs::Mesh::findOrCreate(registry, "engine/skybox"))
+						.withMesh(ecs::Resource::findOrCreate(registry, "engine/skybox"))
 						.withMaterialAt(0, materialInstance)
 						.withCulling(false)
 						.withPriority(0x7);

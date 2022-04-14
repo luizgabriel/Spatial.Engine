@@ -8,6 +8,8 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
+#include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Resource.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Tags.h>
@@ -17,7 +19,6 @@
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 #include <spatial/ui/components/VectorInput.h>
-#include <spatial/ecs/Relation.h>
 
 namespace spatial::ui
 {
@@ -111,9 +112,9 @@ struct ComponentInputImpl<ecs::IndirectLight>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Mesh>
+struct ComponentInputImpl<ecs::Resource>
 {
-	static constexpr auto sName = "Mesh";
+	static constexpr auto sName = "Resource";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
@@ -121,13 +122,6 @@ template <>
 struct ComponentInputImpl<ecs::MeshInstance>
 {
 	static constexpr auto sName = "Mesh Instance";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
-};
-
-template <>
-struct ComponentInputImpl<ecs::PrecompiledMaterial>
-{
-	static constexpr auto sName = "Precompiled Material";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
@@ -174,9 +168,9 @@ struct ComponentInputImpl<ecs::CustomCamera>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Script>
+struct ComponentInputImpl<ecs::ScriptInfo>
 {
-	static constexpr auto sName = "Script";
+	static constexpr auto sName = "Script Information";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 

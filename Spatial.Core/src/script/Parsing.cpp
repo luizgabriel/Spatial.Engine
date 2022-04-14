@@ -39,27 +39,33 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, FileSystem& 
 	return module;
 }
 
-template <>
-ecs::ScriptInfo::Property::FloatRangeType parsePropertyType(v8::Local<v8::Object> object)
+ecs::ScriptComponent::Property::NumberRangeType parseNumberRangeProperty(v8::Local<v8::Object> object)
 {
-	return
-	{
-		static_cast<float>(getAttribute<v8::Number>(object, "default")->Value()),
-			static_cast<float>(getAttribute<v8::Number>(object, "min")->Value()),
-			static_cast<float>(getAttribute<v8::Number>(object, "max")->Value()),
+	return {
+		getAttribute<v8::Number>(object, "default")->Value(),
+		getAttribute<v8::Number>(object, "min")->Value(),
+		getAttribute<v8::Number>(object, "max")->Value(),
 	};
 }
 
-template <>
-ecs::ScriptInfo::Property::StringType parsePropertyType(v8::Local<v8::Object> object)
+ecs::ScriptComponent::Property::StringType parseStringProperty(v8::Local<v8::Object> object)
 {
-	return
-	{
+	return {
 		getValue(object->GetIsolate(), getAttribute<v8::String>(object, "default")),
 	};
 }
 
-ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module, std::string_view moduleName)
+ecs::ScriptComponent::Property parseProperty(v8::Local<v8::Object> object, const ParserMap& parserMap)
+{
+	auto isolate = object->GetIsolate();
+	auto emptyName = createString(isolate, "");
+	auto propertyName = getValue(isolate, getAttributeOrDefault(object, "name", emptyName));
+	auto propertyType = getValue(isolate, getAttribute<v8::String>(object, "type"));
+
+	return ecs::ScriptComponent::Property{propertyName, std::apply(parserMap.at(propertyType), std::make_tuple(object))};
+}
+
+ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module, std::string_view moduleName, const ParserMap& parserMap)
 {
 	auto handle = v8::HandleScope{context->GetIsolate()};
 
@@ -73,31 +79,20 @@ ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Modu
 
 		getAttribute<v8::Function>(defaultExport, "onUpdateEntity");
 
-		auto properties = std::set<ecs::ScriptInfo::Property>{};
-
+		auto properties = std::unordered_map<std::string, ecs::ScriptComponent::Property>{};
 		auto props = getAttribute<v8::Object>(defaultExport, "props");
 
 		for (auto [key, property] : toEntries<v8::String, v8::Object>(props))
 		{
 			auto propertyKey = getValue(context->GetIsolate(), key);
-			auto propertyName = getValue(context->GetIsolate(), getAttributeOrDefault(property, "name", key));
-			auto propertyType = getValue(context->GetIsolate(), getAttribute<v8::String>(property, "type"));
-			ecs::ScriptInfo::Property::Type type;
-
-			if (propertyType == ecs::ScriptInfo::Property::FloatRangeType::typeName)
-				type = parsePropertyType<ecs::ScriptInfo::Property::FloatRangeType>(property);
-			else if (propertyType == ecs::ScriptInfo::Property::StringType::typeName)
-				type = parsePropertyType<ecs::ScriptInfo::Property::StringType>(property);
-
-			properties.emplace(
-				ecs::ScriptInfo::Property{std::move(propertyKey), std::move(propertyName), std::move(type)});
+			properties.emplace(std::move(propertyKey), parseProperty(property, parserMap));
 		}
 
-		return ecs::ScriptInfo{getValue(context->GetIsolate(), scriptName), std::move(properties)};
+		return ecs::ScriptComponent{getValue(context->GetIsolate(), scriptName), std::move(properties)};
 	}
 	catch (const std::invalid_argument& e)
 	{
-		return ecs::ScriptError{e.what()};
+		return ecs::ResourceError{e.what()};
 	}
 }
 

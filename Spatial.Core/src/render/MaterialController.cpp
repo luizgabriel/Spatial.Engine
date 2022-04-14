@@ -1,3 +1,4 @@
+#include "spatial/ecs/Resource.h"
 #include "spatial/ecs/Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/core/Logger.h>
@@ -70,17 +71,17 @@ void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
 
 void MaterialController::onUpdateFrame(ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::PrecompiledMaterial>(ecs::ExcludeComponents<ecs::tags::IsMaterialLoaded>)
-		.each([&](ecs::Entity entity, const ecs::PrecompiledMaterial& precompiledMaterial) {
-			if (precompiledMaterial.resource.isEmpty()
-				|| !ends_with(precompiledMaterial.resource.relativePath.c_str(), ".filamat"))
+	registry.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
+			if (resource.relativePath.empty()
+				|| !ends_with(resource.relativePath.c_str(), ".filamat"))
 				return;
 
-			auto data = mFileSystem.readBinary(precompiledMaterial.resource.relativePath.c_str());
+			auto data = mFileSystem.readBinary(resource.relativePath.c_str());
 			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, material);
-			registry.addComponent<ecs::tags::IsMaterialLoaded>(entity);
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
 	registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Child>(ecs::ExcludeComponents<SharedMaterialInstance>)

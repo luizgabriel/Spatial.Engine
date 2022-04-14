@@ -1,11 +1,12 @@
+#include "spatial/ecs/Resource.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/Entity.h>
 #include <spatial/render/MeshController.h>
 #include <spatial/render/Renderable.h>
-#include <spatial/ecs/Tags.h>
 
 namespace spatial::render
 {
@@ -111,15 +112,15 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 {
 	using namespace boost::algorithm;
 
-	registry.getEntities<const ecs::Mesh>(ecs::ExcludeComponents<ecs::tags::IsMeshLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Mesh& mesh) {
-			if (mesh.resource.isEmpty() || !ends_with(mesh.resource.filename(), ".filamesh"))
+	registry.getEntities<const ecs::Resource, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
+			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".filamesh"))
 				return;
 
-			auto stream = mFileSystem.openReadStream(mesh.resource.relativePath.c_str());
+			auto stream = mFileSystem.openReadStream(resource.relativePath.c_str());
 			if (stream->bad())
 			{
-				gLogger.warn("Could not load mesh: {}", mesh.resource.relativePath.c_str());
+				gLogger.warn("Could not load mesh: {}", resource.relativePath.c_str());
 				return;
 			}
 
@@ -130,7 +131,7 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(mEngine, filamesh)));
 			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
 			registry.addOrReplaceComponent(entity, createMeshGeometries(filamesh));
-			registry.addOrReplaceComponent<ecs::tags::IsMeshLoaded>(entity);
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
 

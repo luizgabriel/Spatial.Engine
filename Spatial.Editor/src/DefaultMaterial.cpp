@@ -20,8 +20,8 @@ void GridMaterial::apply(filament::MaterialInstance& instance) const
 
 void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const render::ImageTextureFinder& finder) const
 {
-	const auto* dummyWhite = finder(Resource<ResourceType::ImageTexture>{"engine/dummy_texture_white"});
-	const auto* dummyBlack = finder(Resource<ResourceType::ImageTexture>{"engine/dummy_texture_black"});
+	const auto* dummyWhite = finder(ResourcePath<ResourceType::ImageTexture>{"engine/dummy_texture_white"});
+	const auto* dummyBlack = finder(ResourcePath<ResourceType::ImageTexture>{"engine/dummy_texture_black"});
 	assert(dummyWhite != nullptr);
 	assert(dummyBlack != nullptr);
 

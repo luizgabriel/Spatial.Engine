@@ -3,30 +3,27 @@
 #include <any>
 #include <set>
 #include <spatial/ecs/Registry.h>
-#include <spatial/ecs/EntityHandle.h>
-#include <spatial/resources/Resource.h>
+#include <spatial/resources/ResourcePath.h>
 #include <unordered_map>
 #include <variant>
 
 namespace spatial::ecs
 {
 
-struct Script
+namespace tags
 {
-	static constexpr auto typeName = "script";
 
-	Resource<ResourceType::Javascript> resource;
-
-	Script() = default;
-
-	static EntityConstHandle find(const ecs::Registry& registry, const std::filesystem::path& resourcePath);
-	static EntityHandle findOrCreate(ecs::Registry& registry, const std::filesystem::path& resourcePath);
+struct IsScript
+{
+	static constexpr auto typeName = "is_script_tag";
 };
 
-struct ScriptInfo
-{
-	struct Property {
+} // namespace tags
 
+struct ScriptComponent
+{
+	struct Property
+	{
 		struct StringType
 		{
 			static constexpr auto typeName = "String";
@@ -35,18 +32,17 @@ struct ScriptInfo
 			std::string defaultValue{};
 		};
 
-		struct FloatRangeType
+		struct NumberRangeType
 		{
-			static constexpr auto typeName = "FloatRange";
+			static constexpr auto typeName = "NumberRange";
 
-			float defaultValue{.0f};
-			float min{std::numeric_limits<float>::min()};
-			float max{std::numeric_limits<float>::max()};
+			double defaultValue{.0};
+			double min{std::numeric_limits<double>::min()};
+			double max{std::numeric_limits<double>::max()};
 		};
 
-		using Type = std::variant<StringType, FloatRangeType>;
+		using Type = std::variant<StringType, NumberRangeType>;
 
-		std::string key;
 		std::string name;
 		Type type;
 
@@ -56,23 +52,20 @@ struct ScriptInfo
 	};
 
 	std::string name;
-	std::set<Property> properties;
+	std::unordered_map<std::string, Property> properties;
 };
 
-struct ScriptError
+struct ScriptSystem
 {
-	std::string message;
+	std::string name;
+	std::set<std::string> requiredComponents;
+	std::set<std::string> excludedComponents;
 };
 
-struct ScriptInstance
+struct ScriptInfo
 {
-	static constexpr auto typeName = "script_instance";
-
-	using DataValueType = std::variant<float, std::string>;
-	using DataContainer = std::unordered_map<std::string, DataValueType>;
-
-	Entity source;
-	DataContainer customData;
+	std::set<ScriptComponent> components;
+	std::set<ScriptSystem> systems;
 };
 
 } // namespace spatial::ecs
