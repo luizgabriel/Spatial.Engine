@@ -1,3 +1,4 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <cassert>
 #include <fmt/format.h>
 #include <spatial/ecs/EntityBuilder.h>
@@ -59,11 +60,6 @@ SunLightEntityBuilder EntityBuilder::asSunLight()
 	return {mRegistry, mEntity};
 }
 
-MeshEntityBuilder EntityBuilder::asMesh()
-{
-	return {mRegistry, mEntity};
-}
-
 MeshInstanceEntityBuilder EntityBuilder::asMeshInstance()
 {
 	return {mRegistry, mEntity};
@@ -79,17 +75,12 @@ SceneViewEntityBuilder EntityBuilder::asSceneView()
 	return {mRegistry, mEntity};
 }
 
-ScriptEntityBuilder EntityBuilder::asScript()
-{
-	return {mRegistry, mEntity};
-}
-
 MeshMaterialEntityBuilder EntityBuilder::asMeshMaterial()
 {
 	return { mRegistry, mEntity };
 }
 
-PrecompiledMaterialEntityBuilder EntityBuilder::asPrecompiledMaterial()
+ResourceEntityBuilder EntityBuilder::asResource()
 {
 	return { mRegistry, mEntity };
 }
@@ -398,19 +389,6 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMaterialAt(uint32_t pr
 	return *this;
 }
 
-MeshEntityBuilder::MeshEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
-{
-	with<ecs::tags::IsResource>().with<ecs::tags::IsMesh>();
-}
-
-MeshEntityBuilder& MeshEntityBuilder::withResource(const std::filesystem::path& filamesh)
-{
-	if (!filamesh.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
-		withName(filamesh.filename().string());
-
-	getComponent().resource.relativePath = filamesh;
-	return *this;
-}
 
 SceneViewEntityBuilder::SceneViewEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
@@ -425,17 +403,6 @@ SceneViewEntityBuilder& SceneViewEntityBuilder::withCamera(ecs::Entity cameraEnt
 SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
 	getComponent().indirectLight = indirectLightEntity;
-	return *this;
-}
-
-ScriptEntityBuilder::ScriptEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
-{
-	with<tags::IsResource>();
-}
-
-ScriptEntityBuilder& ScriptEntityBuilder::withResource(const std::filesystem::path& script)
-{
-	getComponent().resource = script;
 	return *this;
 }
 
@@ -459,19 +426,25 @@ MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withMaterial(Entity materi
 	return *this;
 }
 
-PrecompiledMaterialEntityBuilder::PrecompiledMaterialEntityBuilder(Registry& registry, Entity entity)
-	: BasicEntityBuilder(registry, entity)
+ResourceEntityBuilder::ResourceEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
 {
-	with<tags::IsMaterial>();
-	with<tags::IsResource>();
 }
 
-PrecompiledMaterialEntityBuilder& PrecompiledMaterialEntityBuilder::withResource(const std::filesystem::path& filamat)
+ResourceEntityBuilder& ResourceEntityBuilder::withPath(const std::filesystem::path& relativePath)
 {
-	if (!filamat.empty() && !mRegistry.hasAllComponents<Name>(mEntity))
-		withName(filamat.filename().string());
+	if (!relativePath.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
+		withName(relativePath.filename().string());
 
-	getComponent().resource.relativePath = filamat;
+	getComponent().relativePath = relativePath;
+
+	if (boost::ends_with(relativePath.c_str(), ".filamesh")) {
+		with<ecs::tags::IsMesh>();
+	} else if (boost::ends_with(relativePath.c_str(), ".filamat")) {
+		with<ecs::tags::IsMaterial>();
+	} else if (boost::ends_with(relativePath.c_str(), ".js")) {
+		with<ecs::tags::IsScript>();
+	}
+
 	return *this;
 }
 

@@ -15,12 +15,12 @@ bool colorPicker(std::string_view label, math::float4& color, const filament::Te
 
 bool colorPicker(std::string_view label, math::float3& color, const filament::Texture& icons);
 
-bool cubemapInput(std::string_view label, Resource<CubeMapTexture>& resource, const filament::Texture& icons);
+bool cubemapInput(std::string_view label, ResourcePath<CubeMapTexture>& resource, const filament::Texture& icons);
 
-bool albedoInput(std::string_view label, math::float3& color, Resource<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons);
+bool albedoInput(std::string_view label, math::float3& color, ResourcePath<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons);
 
-bool mapInput(std::string_view label, Resource<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons, const math::float4& uv = Icons::bwPicture.uv());
+bool mapInput(std::string_view label, ResourcePath<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons, const math::float4& uv = Icons::bwPicture.uv());
 
-bool mapInput(std::string_view label, float& value, Resource<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons, const math::float4& uv = Icons::bwPicture.uv());
+bool mapInput(std::string_view label, float& value, ResourcePath<ImageTexture>& resource, const filament::Texture* texture, const filament::Texture& icons, const math::float4& uv = Icons::bwPicture.uv());
 
 }

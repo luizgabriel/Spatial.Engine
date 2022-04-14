@@ -10,7 +10,6 @@ namespace spatial::script
 class ScriptController
 {
   public:
-
 	explicit ScriptController(FileSystem& mFileSystem, Isolate&& isolate);
 
 	void onUpdateFrame(ecs::Registry& registry, float delta);

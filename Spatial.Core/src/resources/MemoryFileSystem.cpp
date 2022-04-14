@@ -13,6 +13,7 @@ std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_v
 
 std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path) noexcept
 {
+	//TODO: Use span-stream on C++23
 	auto stream = std::make_unique<std::stringstream>();
 	stream->setstate(std::ios::failbit);
 	return stream;
