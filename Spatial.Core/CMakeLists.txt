@@ -78,7 +78,7 @@ add_library(Spatial.Core
         include/spatial/resources/FilameshFile.h
         include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
-        include/spatial/resources/Resource.h
+        include/spatial/resources/ResourcePath.h
         include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
 
@@ -106,7 +106,6 @@ add_library(Spatial.Core
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
         src/ecs/Mesh.cpp
-        src/ecs/Material.cpp
         src/ecs/RegistryPublisher.cpp
         src/ecs/Script.cpp
 
@@ -141,7 +140,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp)
+        src/resources/MemoryFileSystem.cpp include/spatial/ecs/Resource.h src/ecs/Resource.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

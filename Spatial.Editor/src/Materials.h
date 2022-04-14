@@ -3,8 +3,8 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/resources/Resource.h>
 #include <spatial/render/ResourceFinders.h>
+#include <spatial/resources/ResourcePath.h>
 
 namespace spatial::editor
 {
@@ -38,7 +38,7 @@ struct SkyBoxMaterial
 
 	bool showSun{false};
 	math::float4 color{.0f, .0f, .0f, 1.0f};
-	Resource<ResourceType::CubeMapTexture> skybox{};
+	ResourcePath<ResourceType::CubeMapTexture> skybox{};
 
 	template <typename Finder, typename = std::enable_if_t<render::is_cubemap_texture_finder_v<Finder>>>
 	void apply(filament::MaterialInstance& instance, const Finder& finder) const
@@ -54,7 +54,7 @@ struct SkyBoxMaterial
 		if (texture != nullptr) {
 			instance.setParameter("skybox", texture, sampler);
 		} else {
-			const auto* dummy = finder(Resource<ResourceType::CubeMapTexture>{"engine/dummy_cubemap"});
+			const auto* dummy = finder(ResourcePath<ResourceType::CubeMapTexture>{"engine/dummy_cubemap"});
 			assert(dummy != nullptr);
 			instance.setParameter("skybox", dummy, sampler);
 		}
@@ -66,28 +66,28 @@ struct StandardOpaqueMaterial
 	constexpr static auto typeName = "standard_opaque_material";
 
 	math::float3 baseColor{1.0f};
-	Resource<ImageTexture> albedo{};
+	ResourcePath<ImageTexture> albedo{};
 
 	math::float2 tiling{1.0f};
 	math::float2 offset{.0f};
 
 	float metallic{.0f};
-	Resource<ImageTexture> metallicMap{};
+	ResourcePath<ImageTexture> metallicMap{};
 
 	float roughness{1.0f};
-	Resource<ImageTexture> roughnessMap{};
+	ResourcePath<ImageTexture> roughnessMap{};
 
 	float reflectance{.0f};
-	Resource<ImageTexture> reflectanceMap{};
+	ResourcePath<ImageTexture> reflectanceMap{};
 
-	Resource<ImageTexture> ambientOcclusionMap{};
+	ResourcePath<ImageTexture> ambientOcclusionMap{};
 
-	Resource<ImageTexture> normalMap{};
+	ResourcePath<ImageTexture> normalMap{};
 
 	math::float4 emissive{.0f};
 
 	float height{1.0f};
-	Resource<ImageTexture> heightMap{};
+	ResourcePath<ImageTexture> heightMap{};
 
 	void apply(filament::MaterialInstance& instance, const render::ImageTextureFinder& finder) const;
 };

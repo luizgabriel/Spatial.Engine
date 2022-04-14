@@ -7,7 +7,7 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FileSystem.h>
-#include <spatial/resources/Resource.h>
+#include <spatial/resources/ResourcePath.h>
 #include <unordered_map>
 
 namespace spatial::render
@@ -16,8 +16,8 @@ namespace spatial::render
 template <ResourceType type>
 struct LoadResourceEvent
 {
-	Resource<type> texture;
-	explicit LoadResourceEvent(Resource<type> resource) : texture{std::move(resource)}
+	ResourcePath<type> texture;
+	explicit LoadResourceEvent(ResourcePath<type> resource) : texture{std::move(resource)}
 	{
 	}
 };
@@ -36,7 +36,7 @@ class MaterialController
 	void onStartFrame();
 
 	template <ResourceType type, typename = std::enable_if_t<type == CubeMapTexture || type == ImageTexture>>
-	constexpr const filament::Texture* findResource(const Resource<type>& resource)
+	constexpr const filament::Texture* findResource(const ResourcePath<type>& resource)
 	{
 		if (resource.isEmpty())
 			return nullptr;

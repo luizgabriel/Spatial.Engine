@@ -40,7 +40,8 @@ struct EditorMainMenu
 
 	static bool fileMenu(const filament::Texture& icons);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
-	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, const math::float3& createEntitiesPosition);
+	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
+						   const math::float3& createEntitiesPosition);
 };
 
 class NewSceneModal
@@ -157,9 +158,17 @@ class AssetsManager
 		Script,
 	};
 
-	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
 	static bool header(std::string& search, AssetType& filter);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search, AssetsManager::AssetType type,
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+					 AssetsManager::AssetType type, bool showEditorEntities);
+};
+
+class MaterialsManager
+{
+  public:
+	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool header(std::string& search);
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
 					 bool showEditorEntities);
 };
 
@@ -167,9 +176,9 @@ class EditorDragAndDrop
 {
   public:
 	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
-	static bool loadMesh(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntityPosition = {});
-	static bool loadScript(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool loadResource(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								 math::float3 createEntityPosition = {});
 };
 
 template <>

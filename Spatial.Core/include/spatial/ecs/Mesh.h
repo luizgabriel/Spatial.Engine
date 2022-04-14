@@ -1,7 +1,7 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
-#include <spatial/resources/Resource.h>
+#include <spatial/resources/ResourcePath.h>
 
 namespace spatial::ecs
 {
@@ -12,10 +12,6 @@ namespace tags
 struct IsMesh
 {
 	constexpr static auto typeName = "tag_is_mesh";
-};
-
-struct IsMeshLoaded
-{
 };
 
 } // namespace tags
@@ -31,23 +27,6 @@ struct MeshMaterial
 		: primitiveIndex(primitiveIndex), materialInstanceEntity(materialEntity)
 	{
 	}
-};
-
-struct Mesh
-{
-	constexpr static auto typeName = "mesh";
-
-	Resource<FilaMesh> resource;
-
-	Mesh() = default;
-
-	explicit Mesh(const Resource<FilaMesh>& resource) : resource{resource}
-	{
-	}
-
-	static Entity find(const Registry& registry, const std::filesystem::path& resource);
-
-	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
 };
 
 struct MeshInstance

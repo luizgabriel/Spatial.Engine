@@ -18,15 +18,15 @@ enum ResourceType
 };
 
 template <ResourceType t>
-struct Resource
+struct ResourcePath
 {
 	static constexpr ResourceType type{t};
 
 	std::filesystem::path relativePath;
 
-	constexpr Resource() = default;
+	constexpr ResourcePath() = default;
 
-	Resource(std::filesystem::path path) : relativePath{std::move(path)} // NOLINT(google-explicit-constructor)
+	ResourcePath(std::filesystem::path path) : relativePath{std::move(path)} // NOLINT(google-explicit-constructor)
 	{
 	}
 
