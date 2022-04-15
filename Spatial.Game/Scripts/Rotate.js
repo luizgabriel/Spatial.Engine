@@ -20,56 +20,52 @@ const log = (message) => {
     };
 };
 
-const InputType = Object.freeze({
+const PropertyType = Object.freeze({
     NumberRange: 'NumberRange',
     String: 'String',
 });
+
+const ExportType = Object.freeze({
+    Component: 'Component',
+    ComponentFlag: 'ComponentFlag',
+    System: 'System',
+});
 //</editor-fold>
 
-const onUpdateEntity = ({entity, delta, components}) => {
-    const {velocity} = components["RotateVelocity"][entity];
-    const transform = components["Transform"][entity];
-    transform.position.x += velocity * delta;
+const RotateSystem = {
+    Type: ExportType.System,
+    Query: {
+        Required: ["Transform", "RotateVelocity"],
+        Excluded: ["StopRotatingFlag"]
+    },
+    onUpdateEntity: ({entity, delta, components}) => {
+        const {velocity} = components["RotateVelocity"][entity];
+        const transform = components["Transform"][entity];
+        transform.position.x += velocity * delta;
 
-    return [
-        log(`A log message from entity ${entity}`),
-        updateComponents(entity)({
-            transform
-        }),
-    ];
+        return [
+            log(`A log message from entity ${entity}`),
+            updateComponents(entity)({
+                transform
+            }),
+        ];
+    },
 };
 
-export default {
-
-    components: {
-
-        RotateVelocity: {
-            properties: {
-                velocity: {
-                    type: InputType.NumberRange,
-                    default: 5.0,
-                    min: .0,
-                    max: 100.0,
-                },
-            }
+const RotateVelocity = {
+    Type: ExportType.Component,
+    Properties: {
+        Velocity: {
+            Type: PropertyType.NumberRange,
+            Default: 5.0,
+            Min: .0,
+            Max: 100.0,
         },
-
-        StopRotatingFlag: {
-            isFlag: true,
-        }
-
     },
+};
 
-    systems: {
+const StopRotatingFlag = {
+    Type: ExportType.ComponentFlag,
+};
 
-        RotateSystem: {
-            query: {
-                required: ["Transform", "RotateVelocity"],
-                excluded: ["StopRotatingFlag"]
-            },
-            onUpdateEntity,
-        },
-
-    },
-
-}
+export default {RotateVelocity, StopRotatingFlag, RotateSystem};
