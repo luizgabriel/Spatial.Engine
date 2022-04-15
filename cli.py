@@ -16,8 +16,8 @@ USAGE = "Usage:" \
         "\n\t python cli.py install --build-type=Release"
 
 DEFAULT_SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
-DEFAULT_BUILD_DIR = os.path.join("out", "build")
-DEFAULT_INSTALL_DIR = os.path.join("out", "install")
+DEFAULT_BUILD_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "build")
+DEFAULT_INSTALL_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "install")
 DEFAULT_BUILD_TYPE = "Debug"
 DEFAULT_CMAKE_GENERATOR = {
     "win32": "Visual Studio 16 2019",

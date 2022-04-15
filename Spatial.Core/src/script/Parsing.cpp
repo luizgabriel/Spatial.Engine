@@ -67,28 +67,27 @@ ecs::ScriptComponent::Property parseProperty(v8::Local<v8::Object> object, const
 
 ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module, std::string_view moduleName, const ParserMap& parserMap)
 {
-	auto handle = v8::HandleScope{context->GetIsolate()};
+	auto isolate = context->GetIsolate();
+	auto handle = v8::HandleScope{isolate};
 
 	try
 	{
 		auto moduleNamespace = evaluateModule(context, module);
 		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
 
-		auto defaultName = createString(context->GetIsolate(), moduleName);
-		auto scriptName = getAttributeOrDefault(defaultExport, "name", defaultName);
+		auto components = getAttributeOrDefault(defaultExport, "components", v8::Object::New(isolate));
+		auto parsedComponents = std::unordered_map<std::string, ecs::ScriptComponent>{};
 
-		getAttribute<v8::Function>(defaultExport, "onUpdateEntity");
-
-		auto properties = std::unordered_map<std::string, ecs::ScriptComponent::Property>{};
-		auto props = getAttribute<v8::Object>(defaultExport, "props");
-
-		for (auto [key, property] : toEntries<v8::String, v8::Object>(props))
+		for (auto [key, property] : toEntries<v8::String, v8::Object>(components))
 		{
-			auto propertyKey = getValue(context->GetIsolate(), key);
-			properties.emplace(std::move(propertyKey), parseProperty(property, parserMap));
+			auto propertyKey = getValue(isolate, key);
+			parsedComponents.emplace(std::move(propertyKey), parseProperty(property, parserMap));
 		}
 
-		return ecs::ScriptComponent{getValue(context->GetIsolate(), scriptName), std::move(properties)};
+		auto systems = getAttributeOrDefault(defaultExport, "systems", v8::Object::New(isolate));
+
+
+		return ecs::ScriptComponent{};
 	}
 	catch (const std::invalid_argument& e)
 	{
