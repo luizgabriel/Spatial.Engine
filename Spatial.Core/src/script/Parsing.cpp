@@ -75,18 +75,6 @@ ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Modu
 		auto moduleNamespace = evaluateModule(context, module);
 		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
 
-		auto components = getAttributeOrDefault(defaultExport, "components", v8::Object::New(isolate));
-		auto parsedComponents = std::unordered_map<std::string, ecs::ScriptComponent>{};
-
-		for (auto [key, property] : toEntries<v8::String, v8::Object>(components))
-		{
-			auto propertyKey = getValue(isolate, key);
-			parsedComponents.emplace(std::move(propertyKey), parseProperty(property, parserMap));
-		}
-
-		auto systems = getAttributeOrDefault(defaultExport, "systems", v8::Object::New(isolate));
-
-
 		return ecs::ScriptComponent{};
 	}
 	catch (const std::invalid_argument& e)

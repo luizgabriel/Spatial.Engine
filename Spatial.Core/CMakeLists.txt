@@ -70,7 +70,6 @@ add_library(Spatial.Core
         include/spatial/serialization/SkyBox.h
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
-        include/spatial/serialization/Material.h
         include/spatial/serialization/Script.h
 
         include/spatial/resources/Math.h
