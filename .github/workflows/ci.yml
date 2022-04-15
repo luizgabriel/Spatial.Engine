@@ -66,7 +66,7 @@ jobs:
       - name: Run Tests
         working-directory: ${{runner.workspace}}/out/build/Spatial.Core/tests
         shell: bash
-        run: ./Spatial.Core.Tests --gtest_filter='-Application.*:DesktopWindow.*'
+        run: python $GITHUB_WORKSPACE/cli.py test
 
       - name: Install
         shell: bash

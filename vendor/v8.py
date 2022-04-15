@@ -43,7 +43,7 @@ class V8Conan(ConanFile):
         # In any case, check its actual version for compatibility
         from six import StringIO  # Python 2 and 3 compatible
         version_buf = StringIO()
-        cmd_v = "{} --version".format(python_exe)
+        cmd_v = "\"{}\" --version".format(python_exe)
         self.run(cmd_v, output=version_buf)
         p = re.compile(r'Python (\d+\.\d+\.\d+)')
         verstr = p.match(version_buf.getvalue().strip()).group(1)
