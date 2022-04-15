@@ -32,6 +32,10 @@ Install all these tools:
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
 - [Visual Studio 2019 Community](https://my.visualstudio.com/Downloads?q=visual%20studio%20community%202019&wt.mc_id=o~msft~vscom~older-downloads)
+> *V8 Library Requirement:*
+> You must install "Windows 10 SDK version 10.0.19041.0" including the ["Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.) feature.
+
+> You might also have problems with your antivirus when building Boost and its dependencies. Make sure to disable it if you have problems.
 
 This is the recommend conan profile to compile on Windows (`~/.conan/profiles/default`):
 > If there's no `profiles/default` file, run: `conan profile new default --detect`

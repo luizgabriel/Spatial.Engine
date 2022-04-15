@@ -212,7 +212,7 @@ def cmake_build(options: CmakeBuildOptions) -> Command:
 
 
 def cmake_install(options: CmakeBuildOptions) -> Command:
-    return Command("cmake --build {build_dir} --target install".format(
+    return Command("cmake --install {build_dir}".format(
         build_dir=options.build_dir,
         build_type=options.build_type
     ))
