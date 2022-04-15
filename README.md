@@ -48,7 +48,7 @@ Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/
     - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
 * Serialization System
     - Open and Save XML/JSON/binary scene files built in the editor.
-* Javascript/WASM Scripting (With the [V8 Engine](https://github.com/v8/v8))
+* [WIP] Javascript/WASM Scripting (With the [V8 Engine](https://github.com/v8/v8))
     - Write logic scripts with Javascript or Web Assembly. V8 implements ECMAScript as specified in ECMA-262.
 * Docking UI
     - Integrated [ImGui](https://github.com/ocornut/imgui) interface
