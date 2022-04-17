@@ -6,6 +6,7 @@
 #include "Tags.h"
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <entt/core/hashed_string.hpp>
 
 #include <assets/generated.h>
 
@@ -32,6 +33,7 @@ namespace fl = filament;
 namespace fs = std::filesystem;
 
 using namespace spatial::math;
+using namespace entt::literals;
 
 namespace spatial::editor
 {
