@@ -188,7 +188,7 @@ def parse_args(args) -> Arguments:
     )
 
 
-def make_preset(system: str = DETECTED_OS, build_type: str = DEFAULT_BUILD_TYPE) -> str:
+def make_preset(system: str, build_type: str) -> str:
     return "%s-%s" % (system, build_type)
 
 
@@ -253,7 +253,7 @@ def main():
     args = parse_args(sys_args[1:])
     args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
     args.project_path = args.project_path if args.project_path else DEFAULT_PROJECT_PATH
-    args.preset = args.preset if args.preset else make_preset()
+    args.preset = args.preset if args.preset else make_preset(DETECTED_OS, DEFAULT_BUILD_TYPE)
 
     action(args).catch(exit_on_error)
 
