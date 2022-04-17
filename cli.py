@@ -26,6 +26,7 @@ DEFAULT_PROJECT_PATH = os.path.join(DEFAULT_SOURCE_DIR, "Spatial.Game")
 
 # <editor-fold desc="Data Objects">
 
+
 @dataclass(init=True)
 class Package:
     name: str
@@ -43,15 +44,13 @@ class Remote:
     name: str
     url: str
 
+
 @dataclass(init=True)
 class Arguments:
     preset: str
     source_path: str
     project_path: str
 
-    @property
-    def is_windows(self) -> bool:
-        return "win" in self.preset.lowercase()
 
 @dataclass(init=True)
 class CommandResult:
@@ -182,9 +181,9 @@ def parse_option_bool(name: str):
 
 def parse_args(args) -> Arguments:
     return Arguments(
-        project_path= parse_option_value("project-path")(args),
-        source_path= parse_option_value("source-path")(args),
-        preset= parse_option_value("preset")(args)
+        project_path=parse_option_value("project-path")(args),
+        source_path=parse_option_value("source-path")(args),
+        preset=parse_option_value("preset")(args)
     )
 
 
@@ -244,6 +243,7 @@ CLI_COMMANDS = {
     "install": install_cli
 }
 
+
 def main():
     sys_args = sys.argv[1:]
     if len(sys_args) == 0:
@@ -255,7 +255,8 @@ def main():
     args = parse_args(sys_args[1:])
     args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
     args.project_path = args.project_path if args.project_path else DEFAULT_PROJECT_PATH
-    args.preset = args.preset if args.preset else make_preset(DETECTED_OS, DEFAULT_BUILD_TYPE)
+    args.preset = args.preset if args.preset else make_preset(
+        DETECTED_OS, DEFAULT_BUILD_TYPE)
 
     action(args).catch(exit_on_error)
 
