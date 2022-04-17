@@ -53,6 +53,4 @@ class SpatialEngineConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.builddirs = ["lib/cmake"]
-        self.cpp_info.resdirs = ["assets"]
         self.cpp_info.libs = tools.collect_libs(self)

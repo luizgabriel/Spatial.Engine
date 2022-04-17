@@ -20,6 +20,8 @@ add_executable(Spatial.Editor
         src/Settings.h
         ${SPATIAL_EDITOR_MACOS_ICON} src/FileSystem.h src/FileSystem.cpp)
 
+set_property(TARGET Spatial.Editor PROPERTY CXX_STANDARD 20)
+
 # set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 
 set_project_warnings(Spatial.Editor)
