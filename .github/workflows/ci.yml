@@ -34,11 +34,11 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: (Ubuntu) Install Ninja
+      - name: (Linux) Setup Linux Dependencies
         if: matrix.config.os == 'ubuntu-20.04'
-        uses: ashutoshvarma/setup-ninja@master
-        with:
-          version: 1.10.2
+        shell: bash
+        run: |
+          sudo apt-get install ninja-build mesa-common-dev libxi-dev libxxf86vm-dev
 
       - name: (Ubuntu) Set up Clang
         if: matrix.config.os == 'ubuntu-20.04'
