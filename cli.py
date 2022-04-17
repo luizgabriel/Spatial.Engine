@@ -19,8 +19,14 @@ USAGE = "Usage:" \
         "\n\t python cli.py install --preset=Windows-Debug"
 
 DEFAULT_SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
-DETECTED_OS = platform.system()
+OS_PRESET_MAP = {
+    "Linux": "Linux",
+    "Darwin": "MacOS",
+    "Java": "Windows",
+    "Windows": "Windows"}
+DETECTED_OS = OS_PRESET_MAP[platform.system()]
 DEFAULT_BUILD_TYPE = "Release"
+
 
 # <editor-fold desc="Data Objects">
 
@@ -73,6 +79,7 @@ class CommandResult:
 @dataclass(init=True)
 class Command:
     expression: str
+
 
 # </editor-fold>
 
@@ -185,9 +192,8 @@ def make_preset(system: str, build_type: str) -> str:
 
 
 def setup_cli(args: Arguments) -> CommandResult:
-
     run(conan_add_remote(Remote("luizgabriel",
-        "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
+                                "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
 
     packages = [
         Package("filament", "1.18.0"),
