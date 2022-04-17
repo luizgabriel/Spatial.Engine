@@ -37,24 +37,6 @@ Install all these tools:
 
 > You might also have problems with your antivirus when building Boost and its dependencies. Make sure to disable it if you have problems.
 
-This is the recommend conan profile to compile on Windows (`~/.conan/profiles/default`):
-> If there's no `profiles/default` file, run: `conan profile new default --detect`
-
-```toml
-[settings]
-os=Windows
-os_build=Windows
-arch=x86_64
-arch_build=x86_64
-build_type=Release
-
-compiler=Visual Studio
-compiler.version=16
-compiler.runtime=MT
-```
-
-The most important setting is this `compiler.runtime=MT` (This is required for the `filament` library to build properly).
-
 Now, go to [Building the Engine](#building-the-engine) topic.
 
 ### Linux
@@ -74,19 +56,6 @@ pip install conan
 conan config set general.cmake_generator=Ninja
 ```
 
-Configure your conan profile:
-```toml
-[settings]
-compiler=clang
-compiler.version=10
-compiler.libcxx=libc++
-build_type=Release
-
-[env]
-CC=/usr/bin/clang
-CXX=/usr/bin/clang++
-```
-
 Now, go to [Building the Engine](#building-the-engine) topic.
 
 ## Building the Engine
@@ -99,7 +68,7 @@ cd Spatial.Engine
 
 Now, inside the project's folder. Run this script install all required conan dependencies which are not found by conan by default.
 ```
-python ./cli.py run-editor --build-type=Release --conan-profile=default
+python ./cli.py run-editor
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.

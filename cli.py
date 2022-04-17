@@ -1,35 +1,28 @@
 import os
 import os.path
-import sys
+import platform
 from dataclasses import dataclass
+import sys
 from typing import Optional
 
 USAGE = "Usage:" \
-        "\n\t python cli.py configure [--with-tests] [--build-type=] [--conan-profile=] [--cmake-generator=]" \
-        "\n\t python cli.py build [--build-type=]" \
-        "\n\t python cli.py install [--build-type=]" \
-        "\n\t python cli.py test [--desktop-tests]" \
-        "\n\t python cli.py run-editor [--build-type=] [--conan-profile=] [--cmake-generator=]" \
+        "\n\t python cli.py configure [--preset=]" \
+        "\n\t python cli.py build [--preset=]" \
+        "\n\t python cli.py install [--preset=]" \
+        "\n\t python cli.py test [--preset=]" \
+        "\n\t python cli.py run-editor [--preset=]" \
         "\nExample:" \
-        "\n\t python cli.py run-editor --build-type=Release --conan-profile=default" \
-        "\n\t python cli.py configure --conan-profile=default" \
-        "\n\t python cli.py configure --build-type=Release --with-tests" \
-        "\n\t python cli.py configure --cmake-generator=\"Unix Makefiles\"" \
-        "\n\t python cli.py build --build-type=Release" \
-        "\n\t python cli.py install --build-type=Release"
+        "\n\t python cli.py run-editor" \
+        "\n\t python cli.py run-editor --preset=MacOS-Debug" \
+        "\n\t python cli.py configure --preset=Linux-Release" \
+        "\n\t python cli.py build --preset=Windows-Release" \
+        "\n\t python cli.py install --preset=Windows-Debug"
 
 DEFAULT_SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
-DEFAULT_BUILD_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "build")
-DEFAULT_INSTALL_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "install")
-DEFAULT_BUILD_TYPE = "Debug"
-DEFAULT_CMAKE_GENERATOR = {
-    "win32": "Visual Studio 16 2019",
-    "cygwin": "Visual Studio 16 2019",
-    "darwin": "CodeBlocks - Unix Makefiles",
-    "linux": "Ninja"
-}.get(sys.platform, None)
-IS_WINDOWS = (sys.platform in {"win32", "cygwin"})
-
+DETECTED_OS = platform.system()
+DEFAULT_BUILD_TYPE = "Release"
+DEFAULT_BASE_BUILD_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "build")
+DEFAULT_PROJECT_PATH = os.path.join(DEFAULT_SOURCE_DIR, "Spatial.Game")
 
 # <editor-fold desc="Data Objects">
 
@@ -50,45 +43,15 @@ class Remote:
     name: str
     url: str
 
-
 @dataclass(init=True)
-class CmakeConfigureOptions:
-    generator: str
-    source_dir: str
-    build_dir: str
-    install_dir: str
-    build_type: str
-    with_tests: bool
-    conan_profile: str
+class Arguments:
+    preset: str
+    source_path: str
+    project_path: str
 
     @property
-    def is_debug(self) -> bool:
-        return "debug" in self.build_type.lower()
-
-    @property
-    def is_msvc(self) -> bool:
-        return "Visual Studio" in self.generator
-
-
-@dataclass(init=True)
-class CmakeBuildOptions:
-    build_dir: str
-    build_type: str
-    with_tests: bool
-
-
-@dataclass(init=True)
-class TestOptions:
-    build_dir: str
-    desktop_tests: bool
-
-
-@dataclass(init=True)
-class RunEditorOptions:
-    build_dir: str
-    project_dir: str
-    is_windows: bool
-
+    def is_windows(self) -> bool:
+        return "win" in self.preset.lowercase()
 
 @dataclass(init=True)
 class CommandResult:
@@ -114,23 +77,13 @@ class CommandResult:
 @dataclass(init=True)
 class Command:
     expression: str
-    working_directory: str = None
 
 # </editor-fold>
 
 
 def run(command: Command) -> CommandResult:
     print("\n > %s\n" % command.expression)
-    current_working_directory = os.getcwd()
-    if command.working_directory:
-        os.chdir(command.working_directory)
-
-    result = CommandResult(os.system(command.expression))
-
-    if command.working_directory:
-        os.chdir(current_working_directory)
-
-    return result
+    return CommandResult(os.system(command.expression))
 
 
 def exit_on_error(result: CommandResult):
@@ -169,72 +122,39 @@ def to_package_export(source_path):
     return h
 
 
-def cmake_configure(options: CmakeConfigureOptions) -> Command:
-    commands = ["cmake"]
-
-    commands += ["-S {}".format(options.source_dir)]
-
-    commands += ["-B {}".format(options.build_dir)]
-
-    commands += ["-G \"{}\"".format(options.generator)]
-
-    if options.install_dir:
-        commands += ["-DCMAKE_INSTALL_PREFIX={}".format(options.install_dir)]
-
-    if options.conan_profile:
-        commands += ["-DCONAN_PROFILE={}".format(options.conan_profile)]
-
-    # Force the use of MT / MTd compiler runtime on Visual Studio (Filament Library Requirement)
-    if not options.conan_profile and options.is_msvc:
-        commands += ["-DCMAKE_CXX_FLAGS=/MT{}".format(
-            "d" if options.is_debug else "")]
-
-    if options.build_type:
-        commands += ["-DCMAKE_BUILD_TYPE={}".format(
-            str(options.build_type).capitalize())]
-
-    commands += ["-DSPATIAL_BUILD_TESTS={}".format(
-        "ON" if options.with_tests else "OFF")]
-
-    return Command(" ".join(commands))
-
-
-def cmake_build(options: CmakeBuildOptions) -> Command:
-    targets = {"Spatial.Editor"}
-    if options.with_tests:
-        targets.add("Spatial.Core.Tests")
-
-    return Command("cmake --build {build_dir} --config {build_type} --target {targets}".format(
-        build_dir=options.build_dir,
-        build_type=options.build_type,
-        targets=" ".join(targets)
+def cmake_configure(options: Arguments) -> Command:
+    return Command("cmake -S {source} --preset {preset}".format(
+        source=options.source_path,
+        preset=options.preset,
     ))
 
 
-def cmake_install(options: CmakeBuildOptions) -> Command:
-    return Command("cmake --install {build_dir}".format(
-        build_dir=options.build_dir,
-        build_type=options.build_type
+def cmake_build(options: Arguments) -> Command:
+    return Command("cmake --build {source} --preset {preset} --target Spatial.Editor Spatial.Core.Tests".format(
+        source=options.source_path,
+        preset=options.preset,
     ))
 
 
-def run_tests(options: TestOptions) -> Command:
-    desktop_tests = "--gtest_filter='-Application.*:DesktopWindow.*'"
-
-    return Command(
-        expression="./Spatial.Core.Tests {options}".format(
-            options=desktop_tests if options.desktop_tests else ""),
-        working_directory=os.path.join(options.build_dir, "Spatial.Core/tests")
-    )
+def cmake_install(options: Arguments) -> Command:
+    return Command("cmake --install {source} --preset {preset}".format(
+        source=options.source_path,
+        preset=options.preset,
+    ))
 
 
-def run_editor(options: RunEditorOptions) -> Command:
-    editor_executable = "Spatial.Editor" + (".exe" if options.is_windows else "")
+def cmake_test(options: Arguments) -> Command:
+    return Command("ctest {source} --preset {preset}".format(
+        source=options.source_path,
+        preset=options.preset
+    ))
 
-    return Command(
-        expression=os.path.join(options.build_dir, "Spatial.Editor", editor_executable), 
-        working_directory=options.project_dir
-    )
+
+def run_editor(options: Arguments) -> Command:
+    return Command("cmake --build {source} --preset {preset} --target Spatial.Game".format(
+        source=options.source_path,
+        preset=options.preset
+    ))
 
 
 def parse_option_value(name: str):
@@ -260,21 +180,19 @@ def parse_option_bool(name: str):
     return h
 
 
-def parse_args(args):
-    result = {"with-tests": parse_option_bool("with-tests")(args), "desktop-tests": parse_option_bool("desktop-tests")(args)}
-
-    options = ["conan-profile", "build-type", "cmake-generator",
-               "build-path", "install-path", "source-path"]
-    for option in options:
-        value = parse_option_value(option)(args)
-        if value:
-            result[option] = value
-
-    return result
+def parse_args(args) -> Arguments:
+    return Arguments(
+        project_path= parse_option_value("project-path")(args),
+        source_path= parse_option_value("source-path")(args),
+        preset= parse_option_value("preset")(args)
+    )
 
 
-def setup_cli(args) -> CommandResult:
-    source_path = args.get("source-path", DEFAULT_SOURCE_DIR)
+def make_preset(system: str = DETECTED_OS, build_type: str = DEFAULT_BUILD_TYPE) -> str:
+    return "%s-%s" % (system, build_type)
+
+
+def setup_cli(args: Arguments) -> CommandResult:
 
     run(conan_add_remote(Remote("luizgabriel",
         "https://luizgabriel.jfrog.io/artifactory/api/conan/luizgabriel-conan")))
@@ -285,7 +203,7 @@ def setup_cli(args) -> CommandResult:
         Package("v8", "10.1.69"),
     ]
 
-    to_export = to_package_export(source_path)
+    to_export = to_package_export(args.source_path)
 
     result = CommandResult(0)
     for package in packages:
@@ -294,63 +212,34 @@ def setup_cli(args) -> CommandResult:
     return result
 
 
-def configure_cli(args) -> CommandResult:
-    command = cmake_configure(CmakeConfigureOptions(
-        source_dir=args.get("source-path", DEFAULT_SOURCE_DIR),
-        build_dir=args.get("build-path", DEFAULT_BUILD_DIR),
-        install_dir=args.get("install-path", DEFAULT_INSTALL_DIR),
-        generator=args.get("cmake-generator", DEFAULT_CMAKE_GENERATOR),
-        with_tests=args.get("with-tests", False),
-        build_type=args.get("build-type", DEFAULT_BUILD_TYPE),
-        conan_profile=args.get("conan-profile"),
-    ))
-
-    return setup_cli(args).then(lambda _: run(command))
+def configure_cli(args: Arguments) -> CommandResult:
+    return setup_cli(args) \
+        .then(lambda _: run(cmake_configure(args)))
 
 
-def build_cli(args) -> CommandResult:
-    return run(cmake_build(CmakeBuildOptions(
-        build_dir=args.get("build-path", DEFAULT_BUILD_DIR),
-        build_type=args.get("build-type", DEFAULT_BUILD_TYPE),
-        with_tests=args.get("with-tests", False)
-    )))
+def build_cli(args: Arguments) -> CommandResult:
+    return run(cmake_build(args))
 
 
-def install_cli(args) -> CommandResult:
-    return run(cmake_install(CmakeBuildOptions(
-        build_dir=args.get("build-path", DEFAULT_BUILD_DIR),
-        build_type=args.get("build-type", DEFAULT_BUILD_TYPE)
-    )))
+def install_cli(args: Arguments) -> CommandResult:
+    return run(cmake_install(args))
 
 
 def test_cli(args) -> CommandResult:
-    command = run_tests(TestOptions(
-                build_dir=args.get("build-path", DEFAULT_BUILD_DIR),
-                desktop_tests=args.get("desktop-tests", True)))
-
-    return run(command)
+    return run(cmake_test(args))
 
 
 def run_editor_cli(args) -> CommandResult:
-    source_dir = args.get("source-path", DEFAULT_SOURCE_DIR)
-
-    command = run_editor(RunEditorOptions(
-        build_dir=args.get("build-path", DEFAULT_BUILD_DIR),
-        project_dir=os.path.join(source_dir, "Spatial.Game"),
-        is_windows=IS_WINDOWS
-    ))
-
     return configure_cli(args) \
         .then(lambda _: build_cli(args)) \
-        .then(lambda _: run(command))
+        .then(lambda _: run(run_editor(args)))
 
 
 def main():
-    args = sys.argv[1:]
-    if len(args) == 0:
+    sys_args = sys.argv[1:]
+    if len(sys_args) == 0:
         print(USAGE)
         return
-
 
     action = {
         "setup": setup_cli,
@@ -359,10 +248,14 @@ def main():
         "test": test_cli,
         "run-editor": run_editor_cli,
         "install": install_cli
-    }[args[0]]
+    }[sys_args[0]]
 
-    parsed_args = parse_args(args[1:])
-    action(parsed_args).catch(exit_on_error)
+    args = parse_args(sys_args[1:])
+    args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
+    args.project_path = args.project_path if args.project_path else DEFAULT_PROJECT_PATH
+    args.preset = args.preset if args.preset else make_preset()
+
+    action(args).catch(exit_on_error)
 
 
 if __name__ == "__main__":

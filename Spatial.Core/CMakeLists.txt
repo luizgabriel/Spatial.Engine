@@ -144,6 +144,7 @@ add_library(Spatial.Core
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 
+
 cmake_policy(SET CMP0091 NEW)
 set_property(
         TARGET Spatial.Core

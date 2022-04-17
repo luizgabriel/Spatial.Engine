@@ -15,6 +15,7 @@ add_executable(Spatial.Core.Tests
         RenderingSystem.test.cpp
         FileSystem.test.cpp
         main.cpp)
+set_property(TARGET Spatial.Core.Tests PROPERTY CXX_STANDARD 20)
 
 target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)
 
