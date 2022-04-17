@@ -79,7 +79,8 @@ class Command:
 
 def run(command: Command) -> CommandResult:
     print("\n > %s\n" % command.expression)
-    return CommandResult(os.system(command.expression))
+    result = os.system(command.expression)
+    return CommandResult(result)
 
 
 def exit_on_error(result: CommandResult):
