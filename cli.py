@@ -21,8 +21,6 @@ USAGE = "Usage:" \
 DEFAULT_SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
 DETECTED_OS = platform.system()
 DEFAULT_BUILD_TYPE = "Release"
-DEFAULT_BASE_BUILD_DIR = os.path.join(DEFAULT_SOURCE_DIR, "out", "build")
-DEFAULT_PROJECT_PATH = os.path.join(DEFAULT_SOURCE_DIR, "Spatial.Game")
 
 # <editor-fold desc="Data Objects">
 
@@ -49,7 +47,6 @@ class Remote:
 class Arguments:
     preset: str
     source_path: str
-    project_path: str
 
 
 @dataclass(init=True)
@@ -129,29 +126,25 @@ def cmake_configure(options: Arguments) -> Command:
 
 
 def cmake_build(options: Arguments) -> Command:
-    return Command("cmake --build {source} --preset {preset} --target Spatial.Editor Spatial.Core.Tests".format(
-        source=options.source_path,
+    return Command("cmake --build --preset {preset} --target Spatial.Editor Spatial.Core.Tests".format(
         preset=options.preset,
     ))
 
 
 def cmake_install(options: Arguments) -> Command:
-    return Command("cmake --install {source} --preset {preset}".format(
-        source=options.source_path,
+    return Command("cmake --install --preset {preset}".format(
         preset=options.preset,
     ))
 
 
 def cmake_test(options: Arguments) -> Command:
-    return Command("ctest {source} --preset {preset}".format(
-        source=options.source_path,
+    return Command("ctest --preset {preset}".format(
         preset=options.preset
     ))
 
 
 def run_editor(options: Arguments) -> Command:
-    return Command("cmake --build {source} --preset {preset} --target Spatial.Game".format(
-        source=options.source_path,
+    return Command("cmake --build --preset {preset} --target Spatial.Game".format(
         preset=options.preset
     ))
 
@@ -181,7 +174,6 @@ def parse_option_bool(name: str):
 
 def parse_args(args) -> Arguments:
     return Arguments(
-        project_path=parse_option_value("project-path")(args),
         source_path=parse_option_value("source-path")(args),
         preset=parse_option_value("preset")(args)
     )
@@ -254,7 +246,6 @@ def main():
 
     args = parse_args(sys_args[1:])
     args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
-    args.project_path = args.project_path if args.project_path else DEFAULT_PROJECT_PATH
     args.preset = args.preset if args.preset else make_preset(
         DETECTED_OS, DEFAULT_BUILD_TYPE)
 
