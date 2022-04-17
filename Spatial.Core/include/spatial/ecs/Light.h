@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/common/Math.h>
-#include <spatial/common/StringHelpers.h>
 #include <spatial/resources/ResourcePath.h>
 
 namespace spatial::ecs

@@ -4,7 +4,6 @@ add_library(Spatial.Core
         include/spatial/common/EventQueue.h
         include/spatial/common/Key.h
         include/spatial/common/Signal.h
-        include/spatial/common/StringHelpers.h
 
         include/spatial/core/Application.h
         include/spatial/core/ApplicationUtils.h
@@ -34,6 +33,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Material.h
         include/spatial/ecs/RegistryCollection.h
         include/spatial/ecs/Tags.h
+        include/spatial/ecs/Resource.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -89,8 +89,6 @@ add_library(Spatial.Core
         include/spatial/script/Parsing.h
 
         ## SOURCES
-        src/common/StringHelpers.cpp
-
         src/core/Application.cpp
         src/core/Logger.cpp
 
@@ -107,6 +105,7 @@ add_library(Spatial.Core
         src/ecs/Mesh.cpp
         src/ecs/RegistryPublisher.cpp
         src/ecs/Script.cpp
+        src/ecs/Resource.cpp
 
         src/render/Resources.cpp
         src/render/Engine.cpp
@@ -139,11 +138,10 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp include/spatial/ecs/Resource.h src/ecs/Resource.cpp)
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
-
 
 cmake_policy(SET CMP0091 NEW)
 set_property(
@@ -220,5 +218,6 @@ install(
 install(DIRECTORY include/ DESTINATION include)
 
 if (SPATIAL_BUILD_TESTS)
+    enable_testing()
     add_subdirectory(tests)
 endif ()

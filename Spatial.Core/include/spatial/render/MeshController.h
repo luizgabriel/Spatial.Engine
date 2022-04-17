@@ -1,14 +1,11 @@
 #pragma once
 
 #include <filament/Engine.h>
-#include <list>
-#include <spatial/common/StringHelpers.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FilameshFile.h>
 #include <spatial/resources/FileSystem.h>
-#include <unordered_map>
 
 namespace spatial::render
 {
