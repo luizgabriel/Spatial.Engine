@@ -54,6 +54,7 @@
             "environment": {
                 "CONAN_REVISIONS_ENABLED": "1",
 				"CONAN_SYSREQUIRES_MODE": "enabled",
+                "CONAN_CMAKE_GENERATOR": "Ninja",
 				"CC": "clang",
 				"CXX": "clang++"
             },
@@ -71,6 +72,7 @@
             "environment": {
                 "CONAN_REVISIONS_ENABLED": "1",
 				"CONAN_SYSREQUIRES_MODE": "enabled",
+                "CONAN_CMAKE_GENERATOR": "Ninja",
 				"CC": "clang",
 				"CXX": "clang++"
             },
