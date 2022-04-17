@@ -1,10 +1,10 @@
-#include <spatial/common/StringHelpers.h>
+#include <chrono>
+#include <entt/core/hashed_string.hpp>
 #include <spatial/script/ScriptSourceStream.h>
 #include <spatial/script/Utils.h>
 #include <v8-container.h>
 #include <v8-context.h>
 #include <v8-promise.h>
-#include <chrono>
 
 namespace spatial::script
 {
@@ -28,7 +28,7 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 {
 	auto handle = v8::EscapableHandleScope{context->GetIsolate()};
 
-	auto moduleId = static_cast<int>(HashedString{moduleName.data()}.value());
+	auto moduleId = static_cast<int>(entt::hashed_string{moduleName.data()}.value());
 
 	// For some reason, V8 Caches the script source by the module name. By generating a custom module name, we avoid it.
 	// TODO: How to enable/disable this module caching when appropriate?

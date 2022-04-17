@@ -1,4 +1,3 @@
-#include <spatial/common/StringHelpers.h>
 #include <spatial/script/Isolate.h>
 #include <spatial/script/ScriptSourceStream.h>
 

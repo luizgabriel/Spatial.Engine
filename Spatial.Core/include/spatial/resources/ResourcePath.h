@@ -1,8 +1,8 @@
 #pragma once
 
+#include <entt/core/hashed_string.hpp>
 #include <entt/core/ident.hpp>
 #include <filesystem>
-#include <spatial/common/StringHelpers.h>
 
 namespace spatial
 {
@@ -11,10 +11,6 @@ enum ResourceType
 {
 	ImageTexture,
 	CubeMapTexture,
-	FilaMesh,
-	Javascript,
-	FilaMat,
-	Mat,
 };
 
 template <ResourceType t>
@@ -37,7 +33,7 @@ struct ResourcePath
 
 	[[nodiscard]] uint32_t getId() const
 	{
-		return HashedString{relativePath.c_str()}.value();
+		return entt::hashed_string{relativePath.c_str()}.value();
 	}
 
 	[[nodiscard]] bool isEmpty() const

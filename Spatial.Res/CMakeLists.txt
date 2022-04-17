@@ -1,5 +1,4 @@
 add_executable(Spatial.Res src/main.cpp)
-set_property(TARGET Spatial.Res PROPERTY CXX_STANDARD 20)
 set_project_warnings(Spatial.Res)
 enable_sanitizers(Spatial.Res)
 

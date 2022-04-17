@@ -1,7 +1,5 @@
-#include "spatial/common/StringHelpers.h"
-#include "spatial/core/Logger.h"
-#include "spatial/ecs/Light.h"
-#include <fstream>
+#include <spatial/core/Logger.h>
+#include <spatial/ecs/Light.h>
 #include <spatial/render/IndirectLightController.h>
 #include <spatial/render/SkyboxResources.h>
 
