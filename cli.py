@@ -235,20 +235,22 @@ def run_editor_cli(args) -> CommandResult:
         .then(lambda _: run(run_editor(args)))
 
 
+CLI_COMMANDS = {
+    "setup": setup_cli,
+    "configure": configure_cli,
+    "build": build_cli,
+    "test": test_cli,
+    "run-editor": run_editor_cli,
+    "install": install_cli
+}
+
 def main():
     sys_args = sys.argv[1:]
     if len(sys_args) == 0:
         print(USAGE)
         return
 
-    action = {
-        "setup": setup_cli,
-        "configure": configure_cli,
-        "build": build_cli,
-        "test": test_cli,
-        "run-editor": run_editor_cli,
-        "install": install_cli
-    }[sys_args[0]]
+    action = CLI_COMMANDS[sys_args[0]]
 
     args = parse_args(sys_args[1:])
     args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
