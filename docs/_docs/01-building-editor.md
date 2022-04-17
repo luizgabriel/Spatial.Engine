@@ -51,9 +51,6 @@ sudo apt-get install clang libc++-dev libc++abi-dev
 
 # Install conan
 pip install conan 
-
-# Forces Conan to use the Ninja generator (Because it's required to build the filament library)
-conan config set general.cmake_generator=Ninja
 ```
 
 Now, go to [Building the Engine](#building-the-engine) topic.
