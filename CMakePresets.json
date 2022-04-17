@@ -46,17 +46,17 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
             }
         },
-		{
+        {
             "name": "Linux-Debug",
             "displayName": "Linux Debug",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "environment": {
                 "CONAN_REVISIONS_ENABLED": "1",
-				"CONAN_SYSREQUIRES_MODE": "enabled",
+                "CONAN_SYSREQUIRES_MODE": "enabled",
                 "CONAN_CMAKE_GENERATOR": "Ninja",
-				"CC": "clang",
-				"CXX": "clang++"
+                "CC": "clang",
+                "CXX": "clang++"
             },
             "cacheVariables": {
                 "SPATIAL_BUILD_TESTS": "ON",
@@ -71,10 +71,10 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "environment": {
                 "CONAN_REVISIONS_ENABLED": "1",
-				"CONAN_SYSREQUIRES_MODE": "enabled",
+                "CONAN_SYSREQUIRES_MODE": "enabled",
                 "CONAN_CMAKE_GENERATOR": "Ninja",
-				"CC": "clang",
-				"CXX": "clang++"
+                "CC": "clang",
+                "CXX": "clang++"
             },
             "cacheVariables": {
                 "SPATIAL_BUILD_TESTS": "ON",
@@ -82,13 +82,13 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
             }
         },
-		{
+        {
             "name": "MacOS-Debug",
             "displayName": "MacOS Debug",
             "generator": "CodeBlocks - Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "environment": {
-                "CONAN_REVISIONS_ENABLED": "1",
+                "CONAN_REVISIONS_ENABLED": "1"
             },
             "cacheVariables": {
                 "SPATIAL_BUILD_TESTS": "ON",
@@ -102,7 +102,7 @@
             "generator": "CodeBlocks - Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "environment": {
-                "CONAN_REVISIONS_ENABLED": "1",
+                "CONAN_REVISIONS_ENABLED": "1"
             },
             "cacheVariables": {
                 "SPATIAL_BUILD_TESTS": "ON",
@@ -114,102 +114,102 @@
     "buildPresets": [
         {
             "name": "Windows-Debug",
-			"displayName": "Windows Debug - Build",
+            "displayName": "Windows Debug - Build",
             "configurePreset": "Windows-Debug",
-			"configuration": "Debug"
+            "configuration": "Debug"
         },
-		{
+        {
             "name": "Windows-Release",
             "displayName": "Windows x64 Release - Build",
             "configurePreset": "Windows-Release",
-			"configuration": "Release"
+            "configuration": "Release"
         },
-		{
+        {
             "name": "Linux-Debug",
-			"displayName": "Linux Debug - Build",
+            "displayName": "Linux Debug - Build",
             "configurePreset": "Linux-Debug",
-			"configuration": "Debug"
+            "configuration": "Debug"
         },
-		{
+        {
             "name": "Linux-Release",
             "displayName": "Linux Release - Build",
             "configurePreset": "Linux-Release",
-			"configuration": "Release"
+            "configuration": "Release"
         },
-		{
+        {
             "name": "MacOS-Debug",
-			"displayName": "MacOS Debug - Build",
+            "displayName": "MacOS Debug - Build",
             "configurePreset": "MacOS-Debug",
-			"configuration": "Debug"
+            "configuration": "Debug"
         },
-		{
+        {
             "name": "MacOS-Release",
             "displayName": "MacOS Release - Build",
             "configurePreset": "MacOS-Release",
-			"configuration": "Release"
+            "configuration": "Release"
         }
     ],
     "testPresets": [
         {
             "name": "Windows-Debug",
-			"displayName": "Windows Debug - Test",
+            "displayName": "Windows Debug - Test",
             "configurePreset": "Windows-Debug",
-			"configuration": "Debug",
+            "configuration": "Debug",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
                 }
             }
         },
-		{
+        {
             "name": "Windows-Release",
             "displayName": "Windows x64 Release - Test",
             "configurePreset": "Windows-Release",
-			"configuration": "Release",
+            "configuration": "Release",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
                 }
             }
         },
-		{
+        {
             "name": "Linux-Debug",
-			"displayName": "Linux Debug - Test",
+            "displayName": "Linux Debug - Test",
             "configurePreset": "Linux-Debug",
-			"configuration": "Debug",
+            "configuration": "Debug",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
                 }
             }
         },
-		{
+        {
             "name": "Linux-Release",
             "displayName": "Linux Release - Test",
             "configurePreset": "Linux-Release",
-			"configuration": "Release",
+            "configuration": "Release",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
                 }
             }
         },
-		{
+        {
             "name": "MacOS-Debug",
-			"displayName": "MacOS Debug - Test",
+            "displayName": "MacOS Debug - Test",
             "configurePreset": "MacOS-Debug",
-			"configuration": "Debug",
+            "configuration": "Debug",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
                 }
             }
         },
-		{
+        {
             "name": "MacOS-Release",
             "displayName": "MacOS Release - Test",
             "configurePreset": "MacOS-Release",
-			"configuration": "Release",
+            "configuration": "Release",
             "filter": {
                 "exclude": {
                     "name": "(^Application\\.\\w+)|(^Window\\.\\w+)"
