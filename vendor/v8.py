@@ -68,12 +68,6 @@ class V8Conan(ConanFile):
                    "{} or >= {})".format(verstr, py2_min, py2_max, py3_min))
             raise ConanInvalidConfiguration(msg)
 
-    def configure(self):
-        if self.settings.os == "Windows":
-            if (self.settings.compiler == "Visual Studio" and
-                    str(self.settings.compiler.version) not in ["15", "16"]):
-                raise ConanInvalidConfiguration("Only Visual Studio 16 is supported.")
-
     def system_requirements(self):
         if tools.os_info.is_linux:
             if not tools.which("lsb-release"):

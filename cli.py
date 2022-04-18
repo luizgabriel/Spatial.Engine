@@ -143,15 +143,7 @@ def cmake_test(options: Arguments) -> Command:
 
 
 def run_editor(options: Arguments) -> Command:
-    build_type = options.preset[options.preset.find("-")+1:]
-    target_name = "Spatial.Editor"
-    executable_name = os.path.join(build_type, target_name + ".exe") if "Windows" in options.preset else target_name
-    executable_path = os.path.join(options.source_path, "out", "build", options.preset, target_name, executable_name)
-    project_path = os.path.join(options.source_path, "Spatial.Game")
-
-    return Command(f"\"{executable_path}\" {project_path}".format(
-        preset=options.preset
-    ))
+    return Command(f"cmake --build --preset {options.preset} --target Spatial.Game")
 
 
 def parse_option_value(name: str):
