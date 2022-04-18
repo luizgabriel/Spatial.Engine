@@ -19,14 +19,13 @@ class SpatialEngineConan(ConanFile):
         "boost/1.77.0",
         "argh/1.3.1",
         "glfw/3.3.4",
-        "gtest/1.10.0",
+        "gtest/1.11.0",
         "spdlog/1.8.5",
         "stb/20200203",
         "entt/3.7.0",
         "cereal/1.3.0",
         "magic_enum/0.7.3",
-        "tl-expected/20190710",
-        "assimp/5.1.0",
+        # "assimp/5.1.0",
 
         # Remember to run 'setup.py' to make these dependencies available
         "imgui/docking@spatial/stable",    # Installed with vendor/imgui.py
