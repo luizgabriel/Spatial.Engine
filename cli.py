@@ -186,7 +186,6 @@ def setup_cli(args: Arguments) -> CommandResult:
 
     packages = [
         Package("filament", "1.18.0"),
-        Package("imgui", "docking"),
         Package("v8", "10.1.69"),
     ]
 
