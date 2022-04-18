@@ -15,9 +15,11 @@ add_custom_command(
 )
 
 add_custom_target(Spatial.Game
+    COMMAND $<TARGET_FILE:Spatial.Editor>
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS
         Meshes/plane_hd.filamesh
         Meshes/space_ship.filamesh
         Meshes/sphere_hd.filamesh
-    COMMENT "Running $<TARGET_FILE:Spatial.Editor> on ${CMAKE_CURRENT_SOURCE_DIR} project"
+    COMMENT Running $<TARGET_FILE:Spatial.Editor> on ${CMAKE_CURRENT_SOURCE_DIR} project
 )
