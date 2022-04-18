@@ -258,8 +258,8 @@ class V8Conan(ConanFile):
                 "winmm.lib",
                 "dbghelp.lib"
             ]
-            self.cpp_info.defines += [
-                "_HAS_ITERATOR_DEBUGGING=0"
-            ]
+            # self.cpp_info.defines += [
+            #     "_HAS_ITERATOR_DEBUGGING=0"
+            # ]
         else:
             self.cpp_info.cxxflags += ["-pthread"]

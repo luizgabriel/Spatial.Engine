@@ -7,7 +7,7 @@
 namespace spatial::ui
 {
 
-bool albedoInput(std::string_view label, math::float3& color, ResourcePath<ImageTexture>& resource,
+bool albedoInput(std::string_view label, math::float3& color, ResourcePath& resource,
 				 const filament::Texture* texture, const filament::Texture& icons)
 {
 	ImGui::PushID(label.data());
@@ -35,7 +35,7 @@ bool albedoInput(std::string_view label, math::float3& color, ResourcePath<Image
 	return changed;
 }
 
-bool mapInput(std::string_view label, ResourcePath<ImageTexture>& resource, const filament::Texture* texture,
+bool mapInput(std::string_view label, ResourcePath& resource, const filament::Texture* texture,
 			  const filament::Texture& icons, const math::float4& uv)
 {
 
@@ -51,7 +51,7 @@ bool mapInput(std::string_view label, ResourcePath<ImageTexture>& resource, cons
 	return changed;
 }
 
-bool mapInput(std::string_view label, float& value, ResourcePath<ImageTexture>& resource, const filament::Texture* texture,
+bool mapInput(std::string_view label, float& value, ResourcePath& resource, const filament::Texture* texture,
 			  const filament::Texture& icons, const math::float4& uv)
 {
 	ImGui::PushID(label.data());
@@ -105,7 +105,7 @@ bool colorPicker(std::string_view label, math::float3& color, const filament::Te
 	return changed;
 }
 
-bool cubemapInput(std::string_view label, ResourcePath<CubeMapTexture>& resource,
+bool cubemapInput(std::string_view label, ResourcePath& resource,
 				  const filament::Texture& icons)
 {
 	static constexpr auto size = math::float2{20.0f};

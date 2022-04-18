@@ -27,18 +27,18 @@ void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".js"))
 				return;
 
-			auto scriptDefaultName = registry.hasAllComponents<ecs::Name>(entity)
-										 ? registry.getComponent<ecs::Name>(entity).name
-										 : resource.relativePath.stem().string();
+			const auto scriptDefaultName = registry.hasAllComponents<ecs::Name>(entity)
+				                               ? registry.getComponent<ecs::Name>(entity).name
+				                               : resource.relativePath.stem().string();
 
 			auto scope = v8::HandleScope{mIsolate.get()};
-			auto context = v8::Context::New(mIsolate.get());
-			auto module = compileModule(context, mFileSystem, resource.relativePath.c_str());
+			const auto context = v8::Context::New(mIsolate.get());
+			const auto module = compileModule(context, mFileSystem, resource.relativePath.string());
 			auto result = parseModule(context, module, scriptDefaultName);
 
 			std::visit(
-				[&registry, entity](auto&& c) {
-					registry.addComponent<std::decay_t<decltype(c)>>(entity, std::forward<decltype(c)>(c));
+				[&registry, entity]<typename T>(T&& c) {
+					registry.addOrReplaceComponent<T>(entity, std::forward<T>(c));
 				},
 				std::move(result));
 

@@ -141,12 +141,12 @@ ImU32 blendColor(ImU32 c1, ImU32 c2, float t)
 	return color1;
 }
 
-void drawTriangles(ImDrawList* draw_list, const ImVec2& offset, const ImVector<ImVec2>& triProj,
+void drawTriangles(ImDrawList* drawList, const ImVec2& offset, const ImVector<ImVec2>& triProj,
 				   const ImVector<ImU32>& colLight, int numVertices)
 {
 	const ImVec2 uv = ImGui::GetFontTexUvWhitePixel();
 	assert(numVertices % 3 == 0);
-	draw_list->PrimReserve(numVertices, numVertices);
+	drawList->PrimReserve(numVertices, numVertices);
 	for (int ii = 0; ii < numVertices / 3; ii++)
 	{
 		ImVec2 v1 = offset + triProj[ii * 3];
@@ -163,19 +163,19 @@ void drawTriangles(ImDrawList* draw_list, const ImVec2& offset, const ImVector<I
 			v3 = v1;
 		}
 
-		draw_list->PrimWriteIdx(ImDrawIdx(draw_list->_VtxCurrentIdx));
-		draw_list->PrimWriteIdx(ImDrawIdx(draw_list->_VtxCurrentIdx + 1));
-		draw_list->PrimWriteIdx(ImDrawIdx(draw_list->_VtxCurrentIdx + 2));
-		draw_list->PrimWriteVtx(v1, uv, colLight[ii * 3]);
-		draw_list->PrimWriteVtx(v2, uv, colLight[ii * 3 + 1]);
-		draw_list->PrimWriteVtx(v3, uv, colLight[ii * 3 + 2]);
+		drawList->PrimWriteIdx(ImDrawIdx(drawList->_VtxCurrentIdx));
+		drawList->PrimWriteIdx(ImDrawIdx(drawList->_VtxCurrentIdx + 1));
+		drawList->PrimWriteIdx(ImDrawIdx(drawList->_VtxCurrentIdx + 2));
+		drawList->PrimWriteVtx(v1, uv, colLight[ii * 3]);
+		drawList->PrimWriteVtx(v2, uv, colLight[ii * 3 + 1]);
+		drawList->PrimWriteVtx(v3, uv, colLight[ii * 3 + 2]);
 	}
 }
 
 bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t color)
 {
-	ImGuiStyle& style = ImGui::GetStyle();
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+	auto& style = ImGui::GetStyle();
+	auto* drawList = ImGui::GetWindowDrawList();
 	auto directionQuaternion = math::directionToQuaternion(direction);
 
 	if (s_ArrowTri[0].empty())
@@ -244,21 +244,21 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 				value_changed = true;
 			}
 		}
-		draw_list->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size),
+		drawList->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size),
 								 ImColor(style.Colors[ImGuiCol_FrameBgActive]), style.FrameRounding);
 	}
 	else
 	{
 		auto imcolor =
 			ImColor{ImGui::IsItemHovered() ? style.Colors[ImGuiCol_FrameBgHovered] : style.Colors[ImGuiCol_FrameBg]};
-		draw_list->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size), imcolor,
+		drawList->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size), imcolor,
 								 style.FrameRounding);
 	}
 
-	ImVec2 inner_pos = orient_pos;
-	math::quatf quat = normalize(directionQuaternion);
-	ImColor alpha(1.0f, 1.0f, 1.0f, highlighted ? 1.0f : 0.75f);
-	math::float3 arrowDir = quat * math::float3(1, 0, 0);
+	auto innerPos = orient_pos;
+	auto quat = normalize(directionQuaternion);
+	auto alpha = ImColor{1.0f, 1.0f, 1.0f, highlighted ? 1.0f : 0.75f};
+	auto arrowDir = quat * math::axisX;
 
 	for (int k = 0; k < 4; ++k)
 	{
@@ -287,7 +287,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 			ImU32 col = (color | 0xff000000) & alpha;
 			s_ArrowColLight[j][i] = blendColor(0xff000000, col, abs(std::clamp(norm.z, -1.0f, 1.0f)));
 		}
-		drawTriangles(draw_list, inner_pos, s_ArrowTriProj[j], s_ArrowColLight[j], ntri);
+		drawTriangles(drawList, innerPos, s_ArrowTriProj[j], s_ArrowColLight[j], ntri);
 	}
 
 	return value_changed;
