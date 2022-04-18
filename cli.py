@@ -99,11 +99,11 @@ def exit_on_error(result: CommandResult):
 
 
 def conan_add_remote(remote: Remote) -> Command:
-    return Command("conan remote add %s %s" % (remote.name, remote.url))
+    return Command(f"conan remote add {remote.name} {remote.url}")
 
 
 def conan_export(export: PackageExport) -> Command:
-    return Command("conan export %s %s" % (export.dir, export.name))
+    return Command(f"conan export {export.dir} {export.name}")
 
 
 def vendor_package(package: Package):
@@ -127,32 +127,29 @@ def to_package_export(source_path):
 
 
 def cmake_configure(options: Arguments) -> Command:
-    return Command("cmake -S {source} --preset {preset}".format(
-        source=options.source_path,
-        preset=options.preset,
-    ))
+    return Command(f"cmake -S {options.source_path} --preset {options.preset}")
 
 
 def cmake_build(options: Arguments) -> Command:
-    return Command("cmake --build --preset {preset} --target Spatial.Editor Spatial.Core.Tests".format(
-        preset=options.preset,
-    ))
+    return Command(f"cmake --build --preset {options.preset} --target Spatial.Editor Spatial.Core.Tests")
 
 
 def cmake_install(options: Arguments) -> Command:
-    return Command("cmake --install --preset {preset}".format(
-        preset=options.preset,
-    ))
+    return Command(f"cmake --install --preset {options.preset}")
 
 
 def cmake_test(options: Arguments) -> Command:
-    return Command("ctest --preset {preset}".format(
-        preset=options.preset
-    ))
+    return Command(f"ctest --preset {options.preset}")
 
 
 def run_editor(options: Arguments) -> Command:
-    return Command("cmake --build --preset {preset} --target Spatial.Game".format(
+    build_type = options.preset[options.preset.find("-")+1:]
+    target_name = "Spatial.Editor"
+    executable_name = os.path.join(build_type, target_name + ".exe") if "Windows" in options.preset else target_name
+    executable_path = os.path.join(options.source_path, "out", "build", options.preset, target_name, executable_name)
+    project_path = os.path.join(options.source_path, "Spatial.Game")
+
+    return Command(f"\"{executable_path}\" {project_path}".format(
         preset=options.preset
     ))
 
