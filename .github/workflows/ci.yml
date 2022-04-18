@@ -56,7 +56,7 @@ jobs:
       - name: Conan Upload Binary Artifacts
         shell: bash
         run: |
-          conan user -p ${{ secrets.CONAN_REPOSITORY_SECRET_TOKEN }} -r luizgabriel ${{ secrets.CONAN_REPOSITORY_USERNAME }}
+          conan user -p ${{ secrets.CONAN_REPOSITORY_SECRET_TOKEN }} -r spatial ${{ secrets.CONAN_REPOSITORY_USERNAME }}
           conan upload v8 -r luizgabriel --all
           conan upload filament -r luizgabriel --all --confirm --retry 3 --retry-wait 10
 
