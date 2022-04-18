@@ -57,8 +57,8 @@ jobs:
         shell: bash
         run: |
           conan user -p ${{ secrets.CONAN_REPOSITORY_SECRET_TOKEN }} -r spatial ${{ secrets.CONAN_REPOSITORY_USERNAME }}
-          conan upload v8 -r luizgabriel --all
-          conan upload filament -r luizgabriel --all --confirm --retry 3 --retry-wait 10
+          conan upload v8 -r spatial --all
+          conan upload filament -r spatial --all --confirm --retry 3 --retry-wait 10
 
       - name: Build
         shell: bash
