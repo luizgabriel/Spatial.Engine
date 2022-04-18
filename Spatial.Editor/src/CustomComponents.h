@@ -40,7 +40,7 @@ struct EditorMainMenu
 		SaveScene,
 	};
 
-	static bool fileMenu(const filament::Texture& icons);
+	static FileMenuAction fileMenu(const filament::Texture& icons);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 						   const math::float3& createEntitiesPosition);
