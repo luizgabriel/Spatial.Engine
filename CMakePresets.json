@@ -9,7 +9,7 @@
       {
         "name": "Windows-Debug",
         "displayName": "Windows Debug",
-        "generator": "Visual Studio 16 2019",
+        "generator": "Visual Studio 17 2022",
         "binaryDir": "${sourceDir}/out/build/${presetName}",
         "environment": {
           "CONAN_REVISIONS_ENABLED": "1",
@@ -35,7 +35,7 @@
       {
         "name": "Windows-Release",
         "displayName": "Windows Release",
-        "generator": "Visual Studio 16 2019",
+        "generator": "Visual Studio 17 2022",
         "binaryDir": "${sourceDir}/out/build/${presetName}",
         "environment": {
           "CONAN_REVISIONS_ENABLED": "1",
@@ -54,7 +54,7 @@
         },
         "vendor": {
           "microsoft.com/VisualStudioSettings/CMake/1.0": {
-	          "hostOS": [ "Windows" ]
+            "hostOS": [ "Windows" ]
           }
         }
       },

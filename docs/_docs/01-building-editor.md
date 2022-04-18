@@ -31,7 +31,7 @@ Now, go to [Building the Engine](#building-the-engine) topic.
 Install all these tools:
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
-- [Visual Studio 2019 Community](https://my.visualstudio.com/Downloads?q=visual%20studio%20community%202019&wt.mc_id=o~msft~vscom~older-downloads)
+- [Visual Studio 2022 Community](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
 > *V8 Library Requirement:*
 > You must install "Windows 10 SDK version 10.0.19041.0" including the ["Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.) feature.
 
