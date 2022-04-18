@@ -3,11 +3,12 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/render/ResourceFinders.h>
 #include <spatial/resources/ResourcePath.h>
 
 namespace spatial::editor
 {
+
+using ResourceFinder = std::function<const filament::Texture*(const ResourcePath&)>;
 
 struct ColorMaterial
 {
@@ -38,27 +39,9 @@ struct SkyBoxMaterial
 
 	bool showSun{false};
 	math::float4 color{.0f, .0f, .0f, 1.0f};
-	ResourcePath<ResourceType::CubeMapTexture> skybox{};
+	ResourcePath skybox{};
 
-	template <typename Finder, typename = std::enable_if_t<render::is_cubemap_texture_finder_v<Finder>>>
-	void apply(filament::MaterialInstance& instance, const Finder& finder) const
-	{
-		instance.setParameter("showSun", showSun);
-		instance.setParameter("color", color);
-
-		const auto* texture = finder(skybox);
-		instance.setParameter("constantColor", texture == nullptr);
-
-		const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
-													  filament::TextureSampler::WrapMode::REPEAT};
-		if (texture != nullptr) {
-			instance.setParameter("skybox", texture, sampler);
-		} else {
-			const auto* dummy = finder(ResourcePath<ResourceType::CubeMapTexture>{"engine/dummy_cubemap"});
-			assert(dummy != nullptr);
-			instance.setParameter("skybox", dummy, sampler);
-		}
-	}
+	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
 };
 
 struct StandardOpaqueMaterial
@@ -66,30 +49,30 @@ struct StandardOpaqueMaterial
 	constexpr static auto typeName = "standard_opaque_material";
 
 	math::float3 baseColor{1.0f};
-	ResourcePath<ImageTexture> albedo{};
+	ResourcePath albedo{};
 
 	math::float2 tiling{1.0f};
 	math::float2 offset{.0f};
 
 	float metallic{.0f};
-	ResourcePath<ImageTexture> metallicMap{};
+	ResourcePath metallicMap{};
 
 	float roughness{1.0f};
-	ResourcePath<ImageTexture> roughnessMap{};
+	ResourcePath roughnessMap{};
 
 	float reflectance{.0f};
-	ResourcePath<ImageTexture> reflectanceMap{};
+	ResourcePath reflectanceMap{};
 
-	ResourcePath<ImageTexture> ambientOcclusionMap{};
+	ResourcePath ambientOcclusionMap{};
 
-	ResourcePath<ImageTexture> normalMap{};
+	ResourcePath normalMap{};
 
 	math::float4 emissive{.0f};
 
 	float height{1.0f};
-	ResourcePath<ImageTexture> heightMap{};
+	ResourcePath heightMap{};
 
-	void apply(filament::MaterialInstance& instance, const render::ImageTextureFinder& finder) const;
+	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
 };
 
 } // namespace spatial::editor

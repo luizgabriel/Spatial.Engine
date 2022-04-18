@@ -52,7 +52,6 @@ add_library(Spatial.Core
         include/spatial/render/MeshController.h
         include/spatial/render/TextureView.h
         include/spatial/render/IndirectLightController.h
-        include/spatial/render/ResourceFinders.h
         include/spatial/render/RegistryRenderingSystem.h
         include/spatial/render/MaterialInstance.h
 
@@ -75,7 +74,6 @@ add_library(Spatial.Core
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
         include/spatial/resources/FilameshFile.h
-        include/spatial/resources/ResourceFinder.h
         include/spatial/resources/ResourceError.h
         include/spatial/resources/ResourcePath.h
         include/spatial/resources/FileSystem.h

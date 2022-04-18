@@ -20,7 +20,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
-	for (const auto& entry : fileSystem.list(selectedPath.c_str()))
+	for (const auto& entry : fileSystem.list(selectedPath.string()))
 	{
 		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 5.0f);
 

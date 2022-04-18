@@ -13,11 +13,13 @@
 namespace spatial::ui
 {
 
+using TextureFinder = std::function<const filament::Texture*(const ResourcePath&)>;
+
 class EntityProperties
 {
   public:
 	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-								  const render::ImageTextureFinder& finder, bool showDebugComponents = false);
+								  const TextureFinder& finder, bool showDebugComponents = false);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
@@ -210,11 +212,11 @@ struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>
 };
 
 template <>
-struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const render::ImageTextureFinder&>
+struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const TextureFinder&>
 {
 	static constexpr auto sName = "Standard Opaque Material";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-					 const render::ImageTextureFinder& finder);
+					 const TextureFinder& finder);
 };
 
 } // namespace spatial::ui

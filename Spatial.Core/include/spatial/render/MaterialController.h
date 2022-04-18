@@ -13,11 +13,10 @@
 namespace spatial::render
 {
 
-template <ResourceType type>
 struct LoadResourceEvent
 {
-	ResourcePath<type> texture;
-	explicit LoadResourceEvent(ResourcePath<type> resource) : texture{std::move(resource)}
+	ResourcePath texture;
+	explicit LoadResourceEvent(ResourcePath resource) : texture{std::move(resource)}
 	{
 	}
 };
@@ -27,29 +26,15 @@ class MaterialController
   public:
 	explicit MaterialController(filament::Engine& engine, FileSystem& fileSystem);
 
-	void onEvent(const LoadResourceEvent<ImageTexture>& event);
-
-	void onEvent(const LoadResourceEvent<CubeMapTexture>& event);
+	void onEvent(const LoadResourceEvent& event);
 
 	void load(uint32_t resourceId, Texture&& texture);
 
-	void onStartFrame();
+	void onStartFrame() const;
 
-	template <ResourceType type, typename = std::enable_if_t<type == CubeMapTexture || type == ImageTexture>>
-	constexpr const filament::Texture* findResource(const ResourcePath<type>& resource)
-	{
-		if (resource.isEmpty())
-			return nullptr;
+	const filament::Texture* findResource(const ResourcePath& resource);
 
-		auto it = mTextures.find(resource.getId());
-		const auto* texture = (it != mTextures.end()) ? it->second.get() : nullptr;
-		if (texture == nullptr)
-			mJobQueue.enqueue(LoadResourceEvent{resource});
-
-		return texture;
-	}
-
-	void onUpdateFrame(ecs::Registry& registry);
+	void onUpdateFrame(ecs::Registry& registry) const;
 
 	template <typename MaterialComponent>
 	void applyMaterialWithFinder(ecs::Registry& registry)
@@ -61,7 +46,7 @@ class MaterialController
 	}
 
 	template <typename MaterialComponent>
-	void applyMaterial(ecs::Registry& registry)
+	static void applyMaterial(ecs::Registry& registry)
 	{
 		registry.getEntities<MaterialComponent, SharedMaterialInstance>().each(
 			[](const auto& data, auto& materialInstance) { data.apply(*materialInstance->get()); });
