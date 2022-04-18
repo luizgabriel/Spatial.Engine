@@ -25,7 +25,7 @@ void IndirectLightController::loadIrradianceValues(ResourceId resourceId, const 
 
 void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 {
-	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
+	registry.getEntities<const ecs::IndirectLight>().each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
 		auto reflectionsTextureId = component.reflectionsTexturePath.getId();
 
 		if (component.reflectionsTexturePath.isEmpty())
@@ -34,18 +34,18 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		if (mTextures.find(reflectionsTextureId) != mTextures.end())
 			return;
 
-		auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.c_str());
+		const auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.string());
 		if (data.empty())
 		{
-			gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.c_str());
+			gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.string());
 			return;
 		}
 
 		loadTexture(reflectionsTextureId, &data[0], data.size());
 	});
 
-	registry.getEntities<ecs::IndirectLight>().each([&](ecs::Entity entity, ecs::IndirectLight& component) {
-		auto irradianceValuesId = component.irradianceValuesPath.getId();
+	registry.getEntities<const ecs::IndirectLight>().each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
+		const auto irradianceValuesId = component.irradianceValuesPath.getId();
 
 		if (component.irradianceValuesPath.isEmpty())
 			return;
@@ -53,10 +53,10 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		if (mBands.find(irradianceValuesId) != mBands.end())
 			return;
 
-		auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.c_str());
+		auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.string());
 		if (stream->fail())
 		{
-			gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.c_str());
+			gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.string());
 			return;
 		}
 
@@ -66,8 +66,8 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 		loadIrradianceValues(irradianceValuesId, bands);
 	});
 
-	registry.getEntities<ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
-		.each([&](ecs::Entity entity, ecs::IndirectLight& component) {
+	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
+		.each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
 			const auto reflectionsId = component.reflectionsTexturePath.getId();
 
 			if (mTextures.find(reflectionsId) == mTextures.end())
@@ -87,8 +87,8 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 			registry.addComponent<IndirectLight>(entity, mEngine, builder.build(mEngine));
 		});
 
-	registry.getEntities<ecs::IndirectLight, IndirectLight>().each(
-		[&](ecs::IndirectLight& component, IndirectLight& light) { light->setIntensity(component.intensity); });
+	registry.getEntities<const ecs::IndirectLight, IndirectLight>().each(
+		[&](const ecs::IndirectLight& component, IndirectLight& light) { light->setIntensity(component.intensity); });
 }
 
 } // namespace spatial::render

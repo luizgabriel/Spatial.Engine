@@ -75,6 +75,10 @@ ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Modu
 		auto moduleNamespace = evaluateModule(context, module);
 		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
 
+		for (auto [key, value] : toEntries<v8::String, v8::Object>(defaultExport)) {
+			// 
+		}
+
 		return ecs::ScriptComponent{};
 	}
 	catch (const std::invalid_argument& e)

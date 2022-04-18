@@ -263,7 +263,7 @@ class MaterialInstanceEntityBuilder : public EntityBuilder
 
 	MaterialInstanceEntityBuilder& withProps(MaterialProps&& params)
 	{
-		mRegistry.template addOrReplaceComponent(mEntity, std::move(params));
+		mRegistry.addOrReplaceComponent<MaterialProps>(mEntity, std::move(params));
 		return *this;
 	}
 };

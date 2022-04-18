@@ -64,8 +64,8 @@ struct IndirectLight
 {
 	constexpr static auto typeName = "indirect_light";
 
-	ResourcePath<ResourceType::ImageTexture> reflectionsTexturePath{};
-	ResourcePath<ResourceType::ImageTexture> irradianceValuesPath{};
+	ResourcePath reflectionsTexturePath{};
+	ResourcePath irradianceValuesPath{};
 	float intensity{30000.0f};
 };
 

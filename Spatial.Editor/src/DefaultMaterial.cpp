@@ -18,10 +18,10 @@ void GridMaterial::apply(filament::MaterialInstance& instance) const
 	instance.setParameter("thickness", thickness);
 }
 
-void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const render::ImageTextureFinder& finder) const
+void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const
 {
-	const auto* dummyWhite = finder(ResourcePath<ResourceType::ImageTexture>{"engine/dummy_texture_white"});
-	const auto* dummyBlack = finder(ResourcePath<ResourceType::ImageTexture>{"engine/dummy_texture_black"});
+	const auto* dummyWhite = finder(ResourcePath{"engine/dummy_texture_white.png"});
+	const auto* dummyBlack = finder(ResourcePath{"engine/dummy_texture_black.png"});
 	assert(dummyWhite != nullptr);
 	assert(dummyBlack != nullptr);
 
@@ -58,6 +58,25 @@ void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const r
 	instance.setParameter("height", height);
 	const auto* heightMapTexture = finder(heightMap);
 	instance.setParameter("heightMap", heightMapTexture != nullptr ? heightMapTexture : dummyBlack, sampler);
+}
+
+void SkyBoxMaterial::apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const
+{
+	instance.setParameter("showSun", showSun);
+	instance.setParameter("color", color);
+
+	const auto* texture = finder(skybox);
+	instance.setParameter("constantColor", texture == nullptr);
+
+	const auto sampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
+													filament::TextureSampler::WrapMode::REPEAT};
+	if (texture != nullptr) {
+		instance.setParameter("skybox", texture, sampler);
+	} else {
+		const auto* dummy = finder(ResourcePath{"engine/dummy_cubemap.ktx"});
+		assert(dummy != nullptr);
+		instance.setParameter("skybox", dummy, sampler);
+	}
 }
 
 } // namespace spatial::editor

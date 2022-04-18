@@ -164,9 +164,9 @@ EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, Fi
 
 void EditorSystem::onStart()
 {
-	mMaterialController.load("engine/dummy_cubemap"_hs, render::createDummyCubemap(mEngine));
-	mMaterialController.load("engine/dummy_texture_white"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
-	mMaterialController.load("engine/dummy_texture_black"_hs, render::createDummyTexture<0x00000000>(mEngine));
+	mMaterialController.load("engine/dummy_cubemap.ktx"_hs, render::createDummyCubemap(mEngine));
+	mMaterialController.load("engine/dummy_texture_white.png"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
+	mMaterialController.load("engine/dummy_texture_black.png"_hs, render::createDummyTexture<0x00000000>(mEngine));
 
 	createDefaultEditorEntities(mRegistry);
 }
@@ -219,19 +219,19 @@ void EditorSystem::onDrawGui()
 		ui::EditorMainMenu::fileMenu(*mIconTexture);
 		ui::EditorMainMenu::createMenu(mRegistry, selectedEntity, createEntityPosition);
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
-
-		if (ui::OpenProjectModal::show(rootPath))
-			mJobQueue.enqueue<OpenProjectEvent>(rootPath);
-
-		if (ui::NewSceneModal::show())
-			mJobQueue.enqueue<ClearSceneEvent>();
-
-		if (ui::OpenSceneModal::show(mScenePath))
-			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
-
-		if (ui::SaveSceneModal::show(mScenePath))
-			mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
 	});
+
+	if (ui::OpenProjectModal::show(rootPath))
+		mJobQueue.enqueue<OpenProjectEvent>(rootPath);
+
+	if (ui::NewSceneModal::show())
+		mJobQueue.enqueue<ClearSceneEvent>();
+
+	if (ui::OpenSceneModal::show(mScenePath))
+		mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
+
+	if (ui::SaveSceneModal::show(mScenePath))
+		mJobQueue.enqueue<SaveSceneEvent>(mScenePath);
 
 	{
 		auto sceneView = mRegistry.getFirstEntity<ecs::SceneView, render::TextureView, tags::IsEditorView>();
@@ -343,10 +343,10 @@ void EditorSystem::loadScene()
 {
 	const auto path = getScenePath();
 
-	auto stream = mFileSystem.openReadStream(path.c_str());
+	auto stream = mFileSystem.openReadStream(path.string());
 	if (stream->fail())
 	{
-		gLogger.error("Could not open scene file: {}", path.c_str());
+		gLogger.error("Could not open scene file: {}", path.string());
 		return;
 	}
 
@@ -366,10 +366,10 @@ void EditorSystem::saveScene()
 {
 	const auto path = getScenePath();
 
-	auto stream = mFileSystem.openWriteStream(path.c_str());
+	auto stream = mFileSystem.openWriteStream(path.string());
 	if (stream->fail())
 	{
-		gLogger.error("Could not open scene file: {}", path.c_str());
+		gLogger.error("Could not open scene file: {}", path.string());
 		return;
 	}
 

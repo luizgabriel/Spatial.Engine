@@ -70,9 +70,9 @@ bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(
 }
 
 bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&,
-						const render::ImageTextureFinder&>::draw(ecs::Registry& registry, ecs::Entity entity,
+						const TextureFinder&>::draw(ecs::Registry& registry, ecs::Entity entity,
 																 const filament::Texture& icons,
-																 const render::ImageTextureFinder& finder)
+																 const TextureFinder& finder)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
@@ -117,7 +117,7 @@ bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 }
 
 bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-										 const render::ImageTextureFinder& finder, bool showDebugComponents)
+										 const TextureFinder& finder, bool showDebugComponents)
 {
 	bool isValid = registry.isValid(entity);
 	if (!isValid)

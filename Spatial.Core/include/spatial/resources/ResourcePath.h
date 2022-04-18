@@ -7,17 +7,8 @@
 namespace spatial
 {
 
-enum ResourceType
-{
-	ImageTexture,
-	CubeMapTexture,
-};
-
-template <ResourceType t>
 struct ResourcePath
 {
-	static constexpr ResourceType type{t};
-
 	std::filesystem::path relativePath;
 
 	constexpr ResourcePath() = default;
@@ -33,7 +24,8 @@ struct ResourcePath
 
 	[[nodiscard]] uint32_t getId() const
 	{
-		return entt::hashed_string{relativePath.c_str()}.value();
+		const auto hashed = entt::hashed_string{relativePath.string().c_str()};
+		return hashed.value();
 	}
 
 	[[nodiscard]] bool isEmpty() const

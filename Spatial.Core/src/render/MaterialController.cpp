@@ -1,8 +1,8 @@
-#include "spatial/ecs/Resource.h"
-#include "spatial/ecs/Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Resource.h>
+#include <spatial/ecs/Tags.h>
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/SkyboxResources.h>
 
@@ -16,8 +16,7 @@ static auto gLogger = createDefaultLogger();
 MaterialController::MaterialController(filament::Engine& engine, FileSystem& fileSystem)
 	: mEngine{engine}, mFileSystem{fileSystem}, mJobQueue{}, mTextures{}
 {
-	mJobQueue.connect<LoadResourceEvent<ImageTexture>>(*this);
-	mJobQueue.connect<LoadResourceEvent<CubeMapTexture>>(*this);
+	mJobQueue.connect<LoadResourceEvent>(*this);
 }
 
 void MaterialController::load(uint32_t resourceId, Texture&& texture)
@@ -25,76 +24,90 @@ void MaterialController::load(uint32_t resourceId, Texture&& texture)
 	mTextures.emplace(resourceId, std::move(texture));
 }
 
-void MaterialController::onStartFrame()
+void MaterialController::onStartFrame() const
 {
 	mJobQueue.update();
 }
 
-void MaterialController::onEvent(const LoadResourceEvent<ImageTexture>& event)
+void MaterialController::onEvent(const LoadResourceEvent& event)
 {
 	if (event.texture.isEmpty())
 		return;
 
-	if (!ends_with(event.texture.relativePath.c_str(), ".png")
-		&& !ends_with(event.texture.relativePath.c_str(), ".jpg"))
-		return;
+	const auto isImageTexture =
+		ends_with(event.texture.relativePath.c_str(), ".png") || ends_with(event.texture.relativePath.c_str(), ".jpg");
 
-	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
-	if (data.empty())
+	if (isImageTexture)
 	{
-		gLogger.warn("Image Texture not found: {}", event.texture.relativePath.c_str());
+		const auto data = mFileSystem.readBinary(event.texture.relativePath.string());
+		if (data.empty())
+		{
+			gLogger.warn("Image Texture not found: {}", event.texture.relativePath.string());
+			return;
+		}
+
+		auto texture = render::createTexture(mEngine, data.data(), data.size());
+		mTextures.emplace(event.texture.getId(), std::move(texture));
 		return;
 	}
 
-	auto texture = render::createTexture(mEngine, data.data(), data.size());
-	mTextures.emplace(event.texture.getId(), std::move(texture));
-}
+	const auto isCubeMapTexture = ends_with(event.texture.relativePath.c_str(), ".ktx");
 
-void MaterialController::onEvent(const LoadResourceEvent<CubeMapTexture>& event)
-{
-	if (event.texture.isEmpty())
-		return;
-
-	if (!ends_with(event.texture.relativePath.c_str(), ".ktx"))
-		return;
-
-	auto data = mFileSystem.readBinary(event.texture.relativePath.c_str());
-	if (data.empty())
+	if (isCubeMapTexture)
 	{
-		gLogger.warn("CubeMap Texture not found: {}", event.texture.relativePath.c_str());
-		return;
-	}
+		const auto data = mFileSystem.readBinary(event.texture.relativePath.string());
+		if (data.empty())
+		{
+			gLogger.warn("CubeMap Texture not found: {}", event.texture.relativePath.string());
+			return;
+		}
 
-	auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
-	mTextures.emplace(event.texture.getId(), std::move(texture));
+		auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
+		mTextures.emplace(event.texture.getId(), std::move(texture));
+	}
 }
 
-void MaterialController::onUpdateFrame(ecs::Registry& registry)
+void MaterialController::onUpdateFrame(ecs::Registry& registry) const
 {
-	registry.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+	registry
+		.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty()
-				|| !ends_with(resource.relativePath.c_str(), ".filamat"))
+			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".filamat"))
 				return;
 
-			auto data = mFileSystem.readBinary(resource.relativePath.c_str());
+			const auto data = mFileSystem.readBinary(resource.relativePath.string());
 			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, material);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
-	registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Child>(ecs::ExcludeComponents<SharedMaterialInstance>)
+	registry
+		.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Child>(
+			ecs::ExcludeComponents<SharedMaterialInstance>)
 		.each([&](ecs::Entity entity, const ecs::Child& child) {
-			auto materialEntity = child.parent;
+			const auto materialEntity = child.parent;
 
 			if (!registry.hasAllComponents<SharedMaterial>(materialEntity))
 				return;
 
-			auto material = registry.getComponent<const SharedMaterial>(materialEntity);
+			const auto material = registry.getComponent<const SharedMaterial>(materialEntity);
 			registry.addComponent<SharedMaterialInstance>(entity,
 														  toShared(render::createMaterialInstance(mEngine, material)));
 		});
+}
+
+const filament::Texture* MaterialController::findResource(const ResourcePath& resource)
+{
+	if (resource.isEmpty())
+		return nullptr;
+
+	auto it = mTextures.find(resource.getId());
+	const auto* texture = (it != mTextures.end()) ? it->second.get() : nullptr;
+	if (texture == nullptr)
+		mJobQueue.enqueue(LoadResourceEvent{resource});
+
+	return texture;
 }
 
 } // namespace spatial::render
