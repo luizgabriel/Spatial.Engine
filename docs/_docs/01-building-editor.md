@@ -32,10 +32,10 @@ Install all these tools:
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
 - [Visual Studio 2022 Community](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
-> *V8 Library Requirement:*
-> You must install "Windows 10 SDK version 10.0.19041.0" including the ["Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.) feature.
-
-> You might also have problems with your antivirus when building Boost and its dependencies. Make sure to disable it if you have problems.
+> **V8 Library Requirement:**
+> 
+> You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows" feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
+> > If you already the SDK installed, here is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
 
 Now, go to [Building the Engine](#building-the-engine) topic.
 
