@@ -18,7 +18,7 @@ jobs:
         config:
           - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
           - { name: "MacOS-Clang", os: macos-11, preset: "MacOS-Release" }
-          - { name: "Windows-MSVC", os: windows-2019, preset: "Windows-Release" }
+          - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
 
     steps:
       - uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
           python-version: ">= 3.5"
 
       - name: (Windows) Setup MSBuild
-        if: matrix.config.os == 'windows-2019'
+        if: matrix.config.os == 'windows-2022'
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
