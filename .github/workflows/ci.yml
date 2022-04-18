@@ -36,9 +36,8 @@ jobs:
 
       - name: (Windows) Setup Windows 10 SDK 10.0.19041.0
         if: matrix.config.os == 'windows-2022'
-        uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.2
-        with:
-          sdk-version: 19041
+        shell: bash
+        run: choco install windows-sdk-10-version-2004-windbg
 
       - name: (Linux) Setup Linux Dependencies
         if: matrix.config.os == 'ubuntu-20.04'
