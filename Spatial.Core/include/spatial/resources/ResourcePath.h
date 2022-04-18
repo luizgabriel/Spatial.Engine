@@ -11,7 +11,7 @@ struct ResourcePath
 {
 	std::filesystem::path relativePath;
 
-	constexpr ResourcePath() = default;
+	ResourcePath() = default;
 
 	ResourcePath(std::filesystem::path path) : relativePath{std::move(path)} // NOLINT(google-explicit-constructor)
 	{

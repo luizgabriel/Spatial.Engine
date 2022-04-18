@@ -36,6 +36,7 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::SceneView>(ar);
 
 	snapshot.template component<ecs::tags::IsMaterial>(ar);
+	snapshot.template component<ecs::tags::IsMesh>(ar);
 	snapshot.template component<ecs::tags::IsRenderable>(ar);
 	snapshot.template component<ecs::tags::IsCamera>(ar);
 	snapshot.template component<ecs::tags::IsLight>(ar);

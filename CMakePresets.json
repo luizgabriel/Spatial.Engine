@@ -1,252 +1,288 @@
 {
-    "version": 3,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 22,
-        "patch": 0
-    },
-    "configurePresets": [
-      {
-        "name": "Windows-Debug",
-        "displayName": "Windows Debug",
-        "generator": "Visual Studio 17 2022",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1",
-          "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
-        },
-        "architecture": {
-          "value": "x64",
-          "strategy": "external"
-        },
-        "cacheVariables": {
-          "WARNINGS_AS_ERRORS": "OFF",
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Debug",
-          "CMAKE_CXX_FLAGS": "/MTd",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": {
-	          "hostOS": [ "Windows" ]
-          }
-        }
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "Windows-Base",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "environment": {
+        "CONAN_REVISIONS_ENABLED": "1",
+        "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
       },
-      {
-        "name": "Windows-Release",
-        "displayName": "Windows Release",
-        "generator": "Visual Studio 17 2022",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1",
-          "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
-        },
-        "architecture": {
-          "value": "x64",
-          "strategy": "external"
-        },
-        "cacheVariables": {
-          "WARNINGS_AS_ERRORS": "OFF",
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Release",
-          "CMAKE_CXX_FLAGS": "/MT",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": {
-            "hostOS": [ "Windows" ]
-          }
-        }
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
       },
-      {
-        "name": "Linux-Debug",
-        "displayName": "Linux Debug",
-        "generator": "Ninja",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1",
-          "CONAN_SYSREQUIRES_MODE": "enabled",
-          "CONAN_CMAKE_GENERATOR": "Ninja",
-          "CC": "clang",
-          "CXX": "clang++"
-        },
-        "cacheVariables": {
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Debug",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-	        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-		        "hostOS": ["Linux"]
-	        }
-        }
+      "cacheVariables": {
+        "WARNINGS_AS_ERRORS": "OFF",
+        "SPATIAL_BUILD_TESTS": "ON"
       },
-      {
-        "name": "Linux-Release",
-        "displayName": "Linux Release",
-        "generator": "Ninja",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1",
-          "CONAN_SYSREQUIRES_MODE": "enabled",
-          "CONAN_CMAKE_GENERATOR": "Ninja",
-          "CC": "clang",
-          "CXX": "clang++"
-        },
-        "cacheVariables": {
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Release",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": {
-	          "hostOS": [ "Linux" ]
-          }
-        }
-      },
-      {
-        "name": "MacOS-Debug",
-        "displayName": "MacOS Debug",
-        "generator": "CodeBlocks - Unix Makefiles",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1"
-        },
-        "cacheVariables": {
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Debug",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-	        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-            "hostOS": [ "macOS" ]
-	        }
-        }
-      },
-      {
-        "name": "MacOS-Release",
-        "displayName": "MacOS Release",
-        "generator": "CodeBlocks - Unix Makefiles",
-        "binaryDir": "${sourceDir}/out/build/${presetName}",
-        "environment": {
-          "CONAN_REVISIONS_ENABLED": "1"
-        },
-        "cacheVariables": {
-          "SPATIAL_BUILD_TESTS": "ON",
-          "CMAKE_BUILD_TYPE": "Release",
-          "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-        },
-        "vendor": {
-	        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-		        "hostOS": [ "macOS" ]
-	        }
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ]
         }
       }
-    ],
-    "buildPresets": [
-        {
-            "name": "Windows-Debug",
-            "displayName": "Windows Debug - Build",
-            "configurePreset": "Windows-Debug",
-            "configuration": "Debug"
-        },
-        {
-            "name": "Windows-Release",
-            "displayName": "Windows x64 Release - Build",
-            "configurePreset": "Windows-Release",
-            "configuration": "Release"
-        },
-        {
-            "name": "Linux-Debug",
-            "displayName": "Linux Debug - Build",
-            "configurePreset": "Linux-Debug",
-            "configuration": "Debug"
-        },
-        {
-            "name": "Linux-Release",
-            "displayName": "Linux Release - Build",
-            "configurePreset": "Linux-Release",
-            "configuration": "Release"
-        },
-        {
-            "name": "MacOS-Debug",
-            "displayName": "MacOS Debug - Build",
-            "configurePreset": "MacOS-Debug",
-            "configuration": "Debug"
-        },
-        {
-            "name": "MacOS-Release",
-            "displayName": "MacOS Release - Build",
-            "configurePreset": "MacOS-Release",
-            "configuration": "Release"
+    },
+    {
+      "name": "Windows-Debug",
+      "displayName": "Windows Debug",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "inherits": [
+        "Windows-Base"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "/MTd",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "Windows-Release",
+      "displayName": "Windows Release",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "inherits": [
+        "Windows-Base"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "/MT",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "Windows-2019-Debug",
+      "displayName": "Windows Debug (Visual Studio 2019)",
+      "generator": "Visual Studio 16 2019",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "inherits": [
+        "Windows-Debug"
+      ],
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "Windows-2019-Release",
+      "displayName": "Windows Release (Visual Studio 2019)",
+      "generator": "Visual Studio 16 2019",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "inherits": [
+        "Windows-Release"
+      ],
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "Linux-Base",
+      "hidden": true,
+      "generator": "Ninja",
+      "environment": {
+        "CONAN_REVISIONS_ENABLED": "1",
+        "CONAN_SYSREQUIRES_MODE": "enabled",
+        "CONAN_CMAKE_GENERATOR": "Ninja",
+        "CC": "clang",
+        "CXX": "clang++"
+      },
+      "cacheVariables": {
+        "SPATIAL_BUILD_TESTS": "ON"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Linux"
+          ]
         }
-    ],
-    "testPresets": [
-        {
-            "name": "Windows-Debug",
-            "displayName": "Windows Debug - Test",
-            "configurePreset": "Windows-Debug",
-            "configuration": "Debug",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
-        },
-        {
-            "name": "Windows-Release",
-            "displayName": "Windows x64 Release - Test",
-            "configurePreset": "Windows-Release",
-            "configuration": "Release",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
-        },
-        {
-            "name": "Linux-Debug",
-            "displayName": "Linux Debug - Test",
-            "configurePreset": "Linux-Debug",
-            "configuration": "Debug",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
-        },
-        {
-            "name": "Linux-Release",
-            "displayName": "Linux Release - Test",
-            "configurePreset": "Linux-Release",
-            "configuration": "Release",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
-        },
-        {
-            "name": "MacOS-Debug",
-            "displayName": "MacOS Debug - Test",
-            "configurePreset": "MacOS-Debug",
-            "configuration": "Debug",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
-        },
-        {
-            "name": "MacOS-Release",
-            "displayName": "MacOS Release - Test",
-            "configurePreset": "MacOS-Release",
-            "configuration": "Release",
-            "filter": {
-                "exclude": {
-                    "name": "(Application)|(DesktopWindow)"
-                }
-            }
+      }
+    },
+    {
+      "name": "Linux-Debug",
+      "displayName": "Linux Debug",
+      "inherits": [
+        "Linux-Base"
+      ],
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "Linux-Release",
+      "displayName": "Linux Release",
+      "inherits": [
+        "Linux-Base"
+      ],
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "MacOS-Base",
+      "hidden": true,
+      "generator": "CodeBlocks - Unix Makefiles",
+      "environment": {
+        "CONAN_REVISIONS_ENABLED": "1"
+      },
+      "cacheVariables": {
+        "SPATIAL_BUILD_TESTS": "ON"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "macOS"
+          ]
         }
-    ]
+      }
+    },
+    {
+      "name": "MacOS-Debug",
+      "displayName": "MacOS Debug",
+      "inherits": [
+        "MacOS-Base"
+      ],
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "MacOS-Release",
+      "displayName": "MacOS Release",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Windows-Debug",
+      "displayName": "Windows Debug - Build",
+      "configurePreset": "Windows-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Windows-Release",
+      "displayName": "Windows Release - Build",
+      "configurePreset": "Windows-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "Windows-2019-Debug",
+      "displayName": "Windows Debug (Visual Studio 2019) - Build",
+      "configurePreset": "Windows-2019-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Windows-2019-Release",
+      "displayName": "Windows Release (Visual Studio 2019) - Build",
+      "configurePreset": "Windows-2019-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "Linux-Debug",
+      "displayName": "Linux Debug - Build",
+      "configurePreset": "Linux-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Linux-Release",
+      "displayName": "Linux Release - Build",
+      "configurePreset": "Linux-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "MacOS-Debug",
+      "displayName": "MacOS Debug - Build",
+      "configurePreset": "MacOS-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "MacOS-Release",
+      "displayName": "MacOS Release - Build",
+      "configurePreset": "MacOS-Release",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "Test-Base",
+      "hidden": true,
+      "filter": {
+        "exclude": {
+          "name": "(Application)|(DesktopWindow)"
+        }
+      }
+    },
+    {
+      "name": "Windows-Debug",
+      "displayName": "Windows Debug - Test",
+      "configurePreset": "Windows-Debug",
+      "configuration": "Debug",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
+      "name": "Windows-Release",
+      "displayName": "Windows Release - Test",
+      "configurePreset": "Windows-Release",
+      "configuration": "Release",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
+      "name": "Linux-Debug",
+      "displayName": "Linux Debug - Test",
+      "configurePreset": "Linux-Debug",
+      "configuration": "Debug",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
+      "name": "Linux-Release",
+      "displayName": "Linux Release - Test",
+      "configurePreset": "Linux-Release",
+      "configuration": "Release",
+      "filter": {
+        "exclude": {
+          "name": "(Application)|(DesktopWindow)"
+        }
+      }
+    },
+    {
+      "name": "MacOS-Debug",
+      "displayName": "MacOS Debug - Test",
+      "configurePreset": "MacOS-Debug",
+      "configuration": "Debug",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
+      "name": "MacOS-Release",
+      "displayName": "MacOS Release - Test",
+      "configurePreset": "MacOS-Release",
+      "configuration": "Release",
+      "inherits": [
+        "Test-Base"
+      ]
+    }
+  ]
 }

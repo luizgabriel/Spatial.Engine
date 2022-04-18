@@ -1005,9 +1005,8 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool EditorMainMenu::fileMenu(const filament::Texture& icons)
+EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture& icons)
 {
-	bool changed = false;
 	auto action = FileMenuAction::Unknown;
 
 	ImGui::SetCursorPosY(1.5f);
@@ -1029,37 +1028,7 @@ bool EditorMainMenu::fileMenu(const filament::Texture& icons)
 			action = FileMenuAction::SaveScene;
 	}
 
-	if (action != FileMenuAction::Unknown)
-	{
-		const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		const ImVec2 size = ImGui::GetWindowSize();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		ImGui::SetNextWindowSize(ImVec2(size.x / 2, size.y / 2));
-		changed = true;
-	}
-
-	switch (action)
-	{
-	case FileMenuAction::OpenProject:
-		ui::OpenProjectModal::open();
-		break;
-	case FileMenuAction::SaveScene:
-		ui::SaveSceneModal::open();
-		break;
-	case FileMenuAction::OpenScene:
-		ui::OpenSceneModal::open();
-		break;
-	case FileMenuAction::NewScene:
-		ui::NewSceneModal::open();
-		break;
-	case FileMenuAction::Unknown:
-		break;
-	}
-
-	static std::filesystem::path currentProjectFolder = "";
-	static std::filesystem::path currentScenePath = "";
-
-	return changed;
+	return action;
 }
 
 bool EditorMainMenu::viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing)
