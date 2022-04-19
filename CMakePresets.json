@@ -240,6 +240,24 @@
       ]
     },
     {
+      "name": "Windows-2019-Debug",
+      "displayName": "Windows 2019 Debug - Test",
+      "configurePreset": "Windows-2019-Debug",
+      "configuration": "Debug",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
+      "name": "Windows-2019-Release",
+      "displayName": "Windows 2019 Release - Test",
+      "configurePreset": "Windows-2019-Release",
+      "configuration": "Release",
+      "inherits": [
+        "Test-Base"
+      ]
+    },
+    {
       "name": "Linux-Debug",
       "displayName": "Linux Debug - Test",
       "configurePreset": "Linux-Debug",
