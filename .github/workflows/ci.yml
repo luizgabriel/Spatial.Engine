@@ -75,6 +75,7 @@ jobs:
         run: python $GITHUB_WORKSPACE/cli.py test --preset=${{ matrix.config.preset }}
 
       - name: Install
+        if: contains(github.ref, 'tags/v')
         shell: bash
         run: python $GITHUB_WORKSPACE/cli.py install --preset=${{ matrix.config.preset }}
 
