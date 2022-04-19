@@ -141,7 +141,8 @@ def cmake_install(options: Arguments) -> Command:
 
 
 def cmake_test(options: Arguments) -> Command:
-    return Command(f"ctest --preset {options.preset}")
+    build_type = options.preset.split("-")[-1]
+    return Command(f"ctest --preset {options.preset} --config {build_type}")
 
 
 def run_editor(options: Arguments) -> Command:

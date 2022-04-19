@@ -29,31 +29,31 @@ jobs:
         with:
           python-version: ">= 3.5"
 
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+
       - name: (Windows) Setup MSBuild
-        if: matrix.config.os == 'windows-2022'
+        if: contains(matrix.config.os, 'windows')
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
 
       - name: (Windows) Setup Windows 10 SDK 10.0.19041.0
-        if: matrix.config.os == 'windows-2022'
+        if: contains(matrix.config.os, 'windows')
         shell: bash
         run: choco install windows-sdk-10-version-2004-windbg
 
       - name: (Linux) Setup Linux Dependencies
-        if: matrix.config.os == 'ubuntu-20.04'
+        if: contains(matrix.config.os, 'ubuntu')
         shell: bash
         run: sudo apt-get install ninja-build mesa-common-dev libxi-dev libxxf86vm-dev
 
       - name: (Ubuntu) Set up Clang
-        if: matrix.config.os == 'ubuntu-20.04'
+        if: contains(matrix.config.os, 'ubuntu')
         uses: egor-tensin/setup-clang@v1
         with:
           version: latest
           platform: x64
-
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@main
 
       - name: Configure
         shell: bash
@@ -71,8 +71,9 @@ jobs:
         run: python $GITHUB_WORKSPACE/cli.py build --preset=${{ matrix.config.preset }}
 
       - name: Run Tests
+        working-directory: ${{ github.workspace }}
         shell: bash
-        run: python $GITHUB_WORKSPACE/cli.py test --preset=${{ matrix.config.preset }}
+        run: python ./cli.py test --preset=${{ matrix.config.preset }}
 
       - name: Install
         if: contains(github.ref, 'tags/v')
