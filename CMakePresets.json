@@ -19,8 +19,7 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "WARNINGS_AS_ERRORS": "OFF",
-        "SPATIAL_BUILD_TESTS": "ON"
+        "WARNINGS_AS_ERRORS": "OFF"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -93,9 +92,6 @@
         "CC": "clang",
         "CXX": "clang++"
       },
-      "cacheVariables": {
-        "SPATIAL_BUILD_TESTS": "ON"
-      },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
           "hostOS": [
@@ -134,9 +130,6 @@
       "generator": "CodeBlocks - Unix Makefiles",
       "environment": {
         "CONAN_REVISIONS_ENABLED": "1"
-      },
-      "cacheVariables": {
-        "SPATIAL_BUILD_TESTS": "ON"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {

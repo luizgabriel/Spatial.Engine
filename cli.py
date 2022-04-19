@@ -135,7 +135,9 @@ def cmake_build(options: Arguments) -> Command:
 
 
 def cmake_install(options: Arguments) -> Command:
-    return Command(f"cmake --install --preset {options.preset}")
+    build_path = os.path.join(options.source_path, "out", "build", options.preset)
+    build_type = options.preset.split("-")[-1]
+    return Command(f"cmake --install {build_path} --config {build_type}")
 
 
 def cmake_test(options: Arguments) -> Command:

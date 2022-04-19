@@ -214,7 +214,5 @@ install(
 
 install(DIRECTORY include/ DESTINATION include)
 
-if (SPATIAL_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif ()
+enable_testing()
+add_subdirectory(tests)
