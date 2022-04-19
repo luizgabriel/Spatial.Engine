@@ -34,13 +34,13 @@ struct OrthographicCamera
 {
 	constexpr static auto typeName = "orthographic_camera";
 
-	double left{-1.0};
-	double right{1.0};
-	double bottom{-1.0};
-	double top{1.0};
+	double left{-10.0};
+	double right{10.0};
+	double bottom{-10.0};
+	double top{10.0};
 
-	double near{0.1};
-	double far{1.0};
+	double near{-10.0};
+	double far{1000.0};
 
 	constexpr OrthographicCamera(double left, double right, double bottom, double top, double near, double far)
 		: left{left}, right{right}, bottom{bottom}, top{top}, near{near}, far{far}

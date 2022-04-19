@@ -1,3 +1,4 @@
+#include "spatial/core/Logger.h"
 #include <fmt/format.h>
 #include <spatial/script/Parsing.h>
 #include <spatial/script/Utils.h>
@@ -69,14 +70,18 @@ ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Modu
 {
 	auto isolate = context->GetIsolate();
 	auto handle = v8::HandleScope{isolate};
+	static auto logger = createDefaultLogger();
 
 	try
 	{
 		auto moduleNamespace = evaluateModule(context, module);
 		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
 
+		logger.info("----- Loading Script ------- {}", moduleName);
+
 		for (auto [key, value] : toEntries<v8::String, v8::Object>(defaultExport)) {
-			// 
+			const auto type = getAttribute<v8::String>(value, "Type");
+			logger.info("{} -> {}", getValue(isolate, key), getValue(isolate, type));
 		}
 
 		return ecs::ScriptComponent{};
