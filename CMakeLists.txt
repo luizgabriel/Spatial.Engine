@@ -11,8 +11,6 @@ include(Sanitizers)
 include(StandardSettings)
 include(StaticAnalyzers)
 
-option(SPATIAL_BUILD_TESTS "Build Spatial Resource Compiler" OFF)
-
 add_subdirectory(Spatial.Core)
 add_subdirectory(Spatial.Res)
 add_subdirectory(Spatial.UI)
