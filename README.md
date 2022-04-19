@@ -15,8 +15,8 @@ Spatial is a cross-platform C++ game engine created on top off google's <a href=
 </h4>
 
 <p align="center">
-  <a href="https://github.com/luizgabriel/Spatial.Engine/actions/workflows/build-macos.yml">
-    <img src="https://github.com/luizgabriel/Spatial.Engine/actions/workflows/build-macos.yml/badge.svg" />
+  <a href="https://github.com/luizgabriel/Spatial.Engine/actions/workflows/build-ci.yml">
+    <img src="https://github.com/luizgabriel/Spatial.Engine/actions/workflows/build-ci.yml/badge.svg" />
   </a>
 
   <img src="https://img.shields.io/badge/code%20quality-A-brightgreen" />
