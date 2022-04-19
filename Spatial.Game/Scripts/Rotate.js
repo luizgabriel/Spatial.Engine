@@ -39,9 +39,9 @@ const RotateSystem = {
         Excluded: ["StopRotatingFlag"]
     },
     onUpdateEntity: ({entity, delta, components}) => {
-        const {velocity} = components["RotateVelocity"][entity];
+        const { velocity } = components["RotateVelocity"][entity];
         const transform = components["Transform"][entity];
-        transform.position.x += velocity * delta;
+        transform.rotation.x += velocity * delta;
 
         return [
             log(`A log message from entity ${entity}`),
