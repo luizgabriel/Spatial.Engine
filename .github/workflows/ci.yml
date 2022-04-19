@@ -59,12 +59,12 @@ jobs:
         shell: bash
         run: python $GITHUB_WORKSPACE/cli.py configure --preset=${{ matrix.config.preset }}
 
-      - name: Conan Upload Binary Artifacts
-        shell: bash
-        run: |
-          conan user -p ${{ secrets.CONAN_REPOSITORY_SECRET_TOKEN }} -r spatial ${{ secrets.CONAN_REPOSITORY_USERNAME }}
-          conan upload v8 -r spatial --all --confirm --retry 3 --retry-wait 10
-          conan upload filament -r spatial --all --confirm --retry 3 --retry-wait 10
+      # - name: Conan Upload Binary Artifacts
+      #   shell: bash
+      #   run: |
+      #     conan user -p ${{ secrets.CONAN_REPOSITORY_SECRET_TOKEN }} -r spatial ${{ secrets.CONAN_REPOSITORY_USERNAME }}
+      #     conan upload v8 -r spatial --all --confirm --retry 3 --retry-wait 10
+      #     conan upload filament -r spatial --all --confirm --retry 3 --retry-wait 10
 
       - name: Build
         shell: bash
