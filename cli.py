@@ -184,8 +184,8 @@ def make_preset(system: str, build_type: str) -> str:
 
 
 def setup_cli(args: Arguments) -> CommandResult:
-    run(conan_add_remote(Remote("spatial",
-                                "https://luizgabriel.jfrog.io/artifactory/api/conan/spatial-conan")))
+    # run(conan_add_remote(Remote("spatial",
+    #                            "https://luizgabriel.jfrog.io/artifactory/api/conan/spatial-conan")))
 
     packages = [
         Package("filament", "1.18.0"),
