@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         config:
-          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
+          - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
           - { name: "MacOS-Clang", os: macos-11, preset: "MacOS-Release" }
           - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
           - { name: "Windows-2019-MSVC", os: windows-2019, preset: "Windows-2019-Release" }
@@ -105,6 +105,10 @@ jobs:
       - name: Upload to Release
         uses: meeDamian/github-release@2.0
         with:
-          files: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
-          gzip: folders
           token: ${{ secrets.GITHUB_TOKEN }}
+          files: >
+            Ubuntu-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            MacOS-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            Windows-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
+          gzip: folders
