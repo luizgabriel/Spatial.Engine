@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
+          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
           - { name: "MacOS-Clang", os: macos-11, preset: "MacOS-Release" }
           - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
           - { name: "Windows-2019-MSVC", os: windows-2019, preset: "Windows-2019-Release" }
@@ -88,10 +88,11 @@ jobs:
 
       - name: Upload artifacts
         if: contains(github.ref, 'tags/v')
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           path: out/install/${{ matrix.config.preset }}/*
+          if-no-files-found: error
 
   release:
     if: contains(github.ref, 'tags/v')
@@ -99,16 +100,17 @@ jobs:
     needs: build
 
     steps:
+      - name: Get the version
+        id: get_version
+        shell: bash
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        id: download
+        uses: actions/download-artifact@v3
 
       - name: Upload to Release
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: >
-            Ubuntu-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
-            MacOS-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
-            Windows-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
-            Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
-          gzip: folders
+          files: ${{ steps.download.outputs.download-path }}
