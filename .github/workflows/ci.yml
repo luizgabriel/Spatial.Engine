@@ -114,3 +114,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{ steps.download.outputs.download-path }}
+          gzip: folders
