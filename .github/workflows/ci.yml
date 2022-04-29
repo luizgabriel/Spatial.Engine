@@ -106,6 +106,7 @@ jobs:
         run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
 
       - name: Download artifact
+        id: download
         uses: actions/download-artifact@v3
 
       - name: Upload to Release
@@ -114,6 +115,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           gzip: folders
           files: >
-            MacOS-Clang-${{ steps.get_version.outputs.VERSION }}
-            Windows-MSVC-${{ steps.get_version.outputs.VERSION }}
-            Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}
+            ${{ steps.download.outputs.download-path }}/MacOS-Clang-${{ steps.get_version.outputs.VERSION }}
+            ${{ steps.download.outputs.download-path }}/Windows-MSVC-${{ steps.get_version.outputs.VERSION }}
+            ${{ steps.download.outputs.download-path }}/Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}
