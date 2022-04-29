@@ -90,7 +90,7 @@ jobs:
         if: contains(github.ref, 'tags/v')
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
           path: out/install/${{ matrix.config.preset }}/*
           if-no-files-found: error
 
@@ -115,6 +115,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           gzip: folders
           files: >
-            ${{ steps.download.outputs.download-path }}/MacOS-Clang-${{ steps.get_version.outputs.VERSION }}
-            ${{ steps.download.outputs.download-path }}/Windows-MSVC-${{ steps.get_version.outputs.VERSION }}
-            ${{ steps.download.outputs.download-path }}/Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}
+            ${{ steps.download.outputs.download-path }}/MacOS-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            ${{ steps.download.outputs.download-path }}/Windows-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            ${{ steps.download.outputs.download-path }}/Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
