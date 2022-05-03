@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class SpatialEngineConan(ConanFile):
     name = "spatial"
-    version = "1.3.7"
+    version = "1.3.8"
     license = "Apache 2.0"
     url = "https://github.com/luizgabriel/Spatial.Engine"
     description = "Spatial is a cross-platform c++ game engine created on top off google's [filament](" \
@@ -31,7 +31,7 @@ class SpatialEngineConan(ConanFile):
 
         # Remember to run 'setup.py' to make these dependencies available
         "filament/1.18.0@spatial/stable",  # Installed with vendor/filament.py
-        "v8/10.1.69@spatial/stable",        # Installed with vendor/v8.py
+        "v8/10.1.69@spatial/stable",       # Installed with vendor/v8.py
     ]
 
     def imports(self):
@@ -39,7 +39,6 @@ class SpatialEngineConan(ConanFile):
 
     def _cmake(self):
         cmake = CMake(self)
-        cmake.definitions["SPATIAL_EDITOR"] = "ON" if self.options["editor"] else "OFF"
         cmake.configure()
 
         return cmake

@@ -18,9 +18,6 @@
         "value": "x64",
         "strategy": "external"
       },
-      "cacheVariables": {
-        "WARNINGS_AS_ERRORS": "OFF"
-      },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
           "hostOS": [
@@ -40,7 +37,10 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "/MTd",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "WARNINGS_AS_ERRORS": "OFF",
+        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -54,7 +54,10 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_FLAGS": "/MT",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "WARNINGS_AS_ERRORS": "OFF",
+        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -63,10 +66,15 @@
       "generator": "Visual Studio 16 2019",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "inherits": [
-        "Windows-Debug"
+        "Windows-Base"
       ],
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "/MTd",
+        "WARNINGS_AS_ERRORS": "OFF",
+        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -75,10 +83,15 @@
       "generator": "Visual Studio 16 2019",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "inherits": [
-        "Windows-Release"
+        "Windows-Base"
       ],
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "/MT",
+        "WARNINGS_AS_ERRORS": "OFF",
+        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -109,7 +122,9 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DEB",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -121,7 +136,9 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DEB",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -148,7 +165,9 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DragNDrop",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     },
     {
@@ -157,7 +176,9 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DragNDrop",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
     }
   ],
