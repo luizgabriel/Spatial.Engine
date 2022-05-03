@@ -18,7 +18,6 @@ void serializeEditorComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<tags::IsSkyBox>(ar);
 	snapshot.template component<tags::IsEditorView>(ar);
 	snapshot.template component<tags::IsGridPlane>(ar);
-	snapshot.template component<tags::IsSkyBoxMeshResource>(ar);
 }
 
 ecs::Registry parseRegistry(std::istream& istream)

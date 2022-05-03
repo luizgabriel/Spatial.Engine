@@ -20,8 +20,8 @@ void GridMaterial::apply(filament::MaterialInstance& instance) const
 
 void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const
 {
-	const auto* dummyWhite = finder(ResourcePath{"engine/dummy_texture_white.png"});
-	const auto* dummyBlack = finder(ResourcePath{"engine/dummy_texture_black.png"});
+	const auto* dummyWhite = finder("engine/dummy_texture_white.png");
+	const auto* dummyBlack = finder("engine/dummy_texture_black.png");
 	assert(dummyWhite != nullptr);
 	assert(dummyBlack != nullptr);
 
@@ -73,7 +73,7 @@ void SkyBoxMaterial::apply(filament::MaterialInstance& instance, const ResourceF
 	if (texture != nullptr) {
 		instance.setParameter("skybox", texture, sampler);
 	} else {
-		const auto* dummy = finder(ResourcePath{"engine/dummy_cubemap.ktx"});
+		const auto* dummy = finder("engine/dummy_cubemap.ktx");
 		assert(dummy != nullptr);
 		instance.setParameter("skybox", dummy, sampler);
 	}

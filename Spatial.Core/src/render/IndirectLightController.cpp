@@ -26,18 +26,18 @@ void IndirectLightController::loadIrradianceValues(ResourceId resourceId, const 
 void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::IndirectLight>().each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
-		auto reflectionsTextureId = component.reflectionsTexturePath.getId();
+		auto reflectionsTextureId = entt::hashed_string::value(component.reflectionsTexturePath.c_str());
 
-		if (component.reflectionsTexturePath.isEmpty())
+		if (component.reflectionsTexturePath.empty())
 			return;
 
 		if (mTextures.find(reflectionsTextureId) != mTextures.end())
 			return;
 
-		const auto data = mFileSystem.readBinary(component.reflectionsTexturePath.relativePath.string());
+		const auto data = mFileSystem.readBinary(component.reflectionsTexturePath);
 		if (data.empty())
 		{
-			gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath.relativePath.string());
+			gLogger.warn("Could not load indirect light: {}", component.reflectionsTexturePath);
 			return;
 		}
 
@@ -45,18 +45,18 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 	});
 
 	registry.getEntities<const ecs::IndirectLight>().each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
-		const auto irradianceValuesId = component.irradianceValuesPath.getId();
+		const auto irradianceValuesId = entt::hashed_string::value(component.irradianceValuesPath.c_str());
 
-		if (component.irradianceValuesPath.isEmpty())
+		if (component.irradianceValuesPath.empty())
 			return;
 
 		if (mBands.find(irradianceValuesId) != mBands.end())
 			return;
 
-		auto stream = mFileSystem.openReadStream(component.irradianceValuesPath.relativePath.string());
+		auto stream = mFileSystem.openReadStream(component.irradianceValuesPath);
 		if (stream->fail())
 		{
-			gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath.relativePath.string());
+			gLogger.warn("Could not load irradiance values: {}", component.irradianceValuesPath);
 			return;
 		}
 
@@ -68,7 +68,7 @@ void IndirectLightController::onUpdateFrame(ecs::Registry& registry)
 
 	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
 		.each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
-			const auto reflectionsId = component.reflectionsTexturePath.getId();
+			const auto reflectionsId = entt::hashed_string::value(component.reflectionsTexturePath.c_str());
 
 			if (mTextures.find(reflectionsId) == mTextures.end())
 				return;

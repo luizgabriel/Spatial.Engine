@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
-#include <spatial/resources/ResourcePath.h>
 
 namespace spatial::ecs
 {

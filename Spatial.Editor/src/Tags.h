@@ -15,17 +15,12 @@ struct IsEditorView
 
 struct IsSkyBox
 {
-	constexpr static auto typeName = "tag_is_skybox_mesh_instance";
+	constexpr static auto typeName = "tag_is_skybox";
 };
 
 struct IsGridPlane
 {
 	constexpr static auto typeName = "tag_is_grid_plane";
-};
-
-struct IsSkyBoxMeshResource
-{
-	constexpr static auto typeName = "tag_is_skybox_mesh_resource";
 };
 
 } // namespace spatial::editor::tags

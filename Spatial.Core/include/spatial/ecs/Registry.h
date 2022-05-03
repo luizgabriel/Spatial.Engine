@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3native.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
@@ -216,6 +215,12 @@ class Registry : private entt::registry
 	Component* tryGetComponent(Entity entity)
 	{
 		return isValid(entity) ? try_get<Component>(entity) : nullptr;
+	}
+
+	template <typename... Component>
+	bool existsAny() const
+	{
+		return isValid(getFirstEntity<Component...>());
 	}
 
 	void destroyOrphans();

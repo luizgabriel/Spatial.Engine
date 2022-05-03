@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Resource.h"
+#include <spatial/ecs/Resource.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
-#include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
@@ -40,8 +39,6 @@ class MeshInstanceEntityBuilder;
 class MeshMaterialEntityBuilder;
 
 class SceneViewEntityBuilder;
-
-class ScriptEntityBuilder;
 
 class EntityBuilder
 {
@@ -97,15 +94,17 @@ class EntityBuilder
 		return MaterialInstanceEntityBuilder<MaterialComponent>{ mRegistry, mEntity };
 	}
 
-	[[nodiscard]] EntityHandle get() const
+	[[nodiscard]] Entity get() const
 	{
-		return {mRegistry, mEntity};
+		return mEntity;
 	}
 
 	operator Entity() const
 	{
-		return get().operator entt::entity();
+		return mEntity;
 	}
+
+	static EntityBuilder create(Registry& registry);
 
   protected:
 	Registry& mRegistry;
@@ -252,12 +251,18 @@ class MaterialInstanceEntityBuilder : public EntityBuilder
 		with<MaterialProps>({});
 	}
 
-	MaterialInstanceEntityBuilder& withMaterial(Entity material)
+	MaterialInstanceEntityBuilder& withMaterial(std::string_view relativeResourcePath)
 	{
-		if (mRegistry.hasAllComponents<Name>(material) && !mRegistry.hasAnyComponent<Name>(mEntity))
-			withName(mRegistry.getComponent<Name>(material).name);
+		withMaterial(ecs::Resource::findOrCreate(mRegistry, relativeResourcePath));
+		return *this;
+	}
 
-		withParent(material);
+	MaterialInstanceEntityBuilder& withMaterial(Entity compiledMaterialEntity)
+	{
+		if (mRegistry.hasAllComponents<Name>(compiledMaterialEntity) && !mRegistry.hasAnyComponent<Name>(mEntity))
+			withName(mRegistry.getComponent<Name>(compiledMaterialEntity).name);
+
+		withParent(compiledMaterialEntity);
 		return *this;
 	}
 
@@ -285,8 +290,11 @@ class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
 
 	MeshInstanceEntityBuilder(Registry& registry, Entity entity);
 
-	MeshInstanceEntityBuilder& withMesh(Entity meshSource);
+	MeshInstanceEntityBuilder& withMesh(std::string_view resourceRelativePath);
+	MeshInstanceEntityBuilder& withMesh(Entity meshEntity);
+
 	MeshInstanceEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
+	MeshInstanceEntityBuilder& withDefaultMaterial(Entity materialEntity);
 	MeshInstanceEntityBuilder& withMaterialAt(uint32_t primitiveIndex, Entity materialEntity);
 	MeshInstanceEntityBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
 	MeshInstanceEntityBuilder& withCulling(bool culling);

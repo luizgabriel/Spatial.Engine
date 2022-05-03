@@ -13,61 +13,12 @@ namespace spatial::render
 
 static auto gLogger = createDefaultLogger();
 
-MaterialController::MaterialController(filament::Engine& engine, FileSystem& fileSystem)
-	: mEngine{engine}, mFileSystem{fileSystem}, mJobQueue{}, mTextures{}
+MaterialLoaderController::MaterialLoaderController(filament::Engine& engine, FileSystem& fileSystem)
+	: mEngine{engine}, mFileSystem{fileSystem}
 {
-	mJobQueue.connect<LoadResourceEvent>(*this);
 }
 
-void MaterialController::load(uint32_t resourceId, Texture&& texture)
-{
-	mTextures.emplace(resourceId, std::move(texture));
-}
-
-void MaterialController::onStartFrame() const
-{
-	mJobQueue.update();
-}
-
-void MaterialController::onEvent(const LoadResourceEvent& event)
-{
-	if (event.texture.isEmpty())
-		return;
-
-	const auto isImageTexture =
-		ends_with(event.texture.relativePath.c_str(), ".png") || ends_with(event.texture.relativePath.c_str(), ".jpg");
-
-	if (isImageTexture)
-	{
-		const auto data = mFileSystem.readBinary(event.texture.relativePath.string());
-		if (data.empty())
-		{
-			gLogger.warn("Image Texture not found: {}", event.texture.relativePath.string());
-			return;
-		}
-
-		auto texture = render::createTexture(mEngine, data.data(), data.size());
-		mTextures.emplace(event.texture.getId(), std::move(texture));
-		return;
-	}
-
-	const auto isCubeMapTexture = ends_with(event.texture.relativePath.c_str(), ".ktx");
-
-	if (isCubeMapTexture)
-	{
-		const auto data = mFileSystem.readBinary(event.texture.relativePath.string());
-		if (data.empty())
-		{
-			gLogger.warn("CubeMap Texture not found: {}", event.texture.relativePath.string());
-			return;
-		}
-
-		auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
-		mTextures.emplace(event.texture.getId(), std::move(texture));
-	}
-}
-
-void MaterialController::onUpdateFrame(ecs::Registry& registry) const
+void MaterialLoaderController::onUpdateFrame(ecs::Registry& registry) const
 {
 	registry
 		.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
@@ -75,7 +26,7 @@ void MaterialController::onUpdateFrame(ecs::Registry& registry) const
 			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".filamat"))
 				return;
 
-			const auto data = mFileSystem.readBinary(resource.relativePath.string());
+			const auto data = mFileSystem.readBinary(resource.relativePath);
 			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, material);
@@ -97,15 +48,69 @@ void MaterialController::onUpdateFrame(ecs::Registry& registry) const
 		});
 }
 
-const filament::Texture* MaterialController::findResource(const ResourcePath& resource)
+MaterialController::MaterialController(filament::Engine& engine, FileSystem& fileSystem)
+	: mEngine{engine}, mFileSystem{fileSystem}, mJobQueue{}, mTextures{}
 {
-	if (resource.isEmpty())
+	mJobQueue.connect<LoadResourceEvent>(*this);
+}
+
+void MaterialController::load(uint32_t resourceId, Texture&& texture)
+{
+	mTextures.emplace(resourceId, std::move(texture));
+}
+
+void MaterialController::onStartFrame() const
+{
+	mJobQueue.update();
+}
+
+void MaterialController::onEvent(const LoadResourceEvent& event)
+{
+	if (event.texturePath.empty())
+		return;
+
+	const auto isImageTexture = ends_with(event.texturePath.c_str(), ".png") || ends_with(event.texturePath, ".jpg");
+	const auto textureId = entt::hashed_string::value(event.texturePath.c_str());
+
+	if (isImageTexture)
+	{
+		const auto data = mFileSystem.readBinary(event.texturePath);
+		if (data.empty())
+		{
+			gLogger.warn("Image Texture not found: {}", event.texturePath);
+			return;
+		}
+
+		auto texture = render::createTexture(mEngine, data.data(), data.size());
+		mTextures.emplace(textureId, std::move(texture));
+		return;
+	}
+
+	const auto isCubeMapTexture = ends_with(event.texturePath.c_str(), ".ktx");
+
+	if (isCubeMapTexture)
+	{
+		const auto data = mFileSystem.readBinary(event.texturePath);
+		if (data.empty())
+		{
+			gLogger.warn("CubeMap Texture not found: {}", event.texturePath);
+			return;
+		}
+
+		auto texture = render::createKtxTexture(mEngine, data.data(), data.size());
+		mTextures.emplace(textureId, std::move(texture));
+	}
+}
+
+const filament::Texture* MaterialController::findResource(std::string_view resource)
+{
+	if (resource.empty())
 		return nullptr;
 
-	auto it = mTextures.find(resource.getId());
+	auto it = mTextures.find(entt::hashed_string::value(resource.data()));
 	const auto* texture = (it != mTextures.end()) ? it->second.get() : nullptr;
 	if (texture == nullptr)
-		mJobQueue.enqueue(LoadResourceEvent{resource});
+		mJobQueue.enqueue(LoadResourceEvent{std::string{resource}});
 
 	return texture;
 }

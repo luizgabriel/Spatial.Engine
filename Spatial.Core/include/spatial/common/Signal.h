@@ -19,6 +19,11 @@ class Signal
 	{
 	}
 
+	auto getSize() const
+	{
+		return mSigh.size();
+	}
+
 	void operator()(Args... args) const
 	{
 		trigger(std::forward<Args>(args)...);

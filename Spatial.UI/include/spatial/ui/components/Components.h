@@ -3,7 +3,6 @@
 #include <filament/Texture.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
-#include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Light.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
@@ -27,7 +26,7 @@ void spanToAvailWidth(float weight = 1.0f);
 
 bool inputText(std::string_view label, std::string& value, std::string_view placeholder = "");
 
-bool inputPath(std::string_view label, std::filesystem::path& path, std::string_view placeholder = "");
+bool inputPath(std::string_view label, std::string& value, std::string_view placeholder = "");
 
 void spacing(std::uint32_t times = 1);
 

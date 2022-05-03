@@ -1,3 +1,4 @@
+#include "spatial/ecs/Texture.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <cassert>
 #include <fmt/format.h>
@@ -89,6 +90,11 @@ EntityBuilder& EntityBuilder::withParent(Entity parent)
 {
 	ecs::Parent::addChild(mRegistry, parent, mEntity);
 	return *this;
+}
+
+EntityBuilder EntityBuilder::create(Registry& registry)
+{
+	return {registry, registry.createEntity()};
 }
 
 TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
@@ -334,13 +340,13 @@ IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIntensity(float inte
 
 IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexturePath(const std::filesystem::path& path)
 {
-	getComponent().reflectionsTexturePath.relativePath = path;
+	getComponent().reflectionsTexturePath = path;
 	return *this;
 }
 
 IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath(const std::filesystem::path& path)
 {
-	getComponent().irradianceValuesPath.relativePath = path;
+	getComponent().irradianceValuesPath = path;
 	return *this;
 }
 
@@ -349,11 +355,23 @@ MeshInstanceEntityBuilder::MeshInstanceEntityBuilder(Registry& registry, Entity 
 	with<ecs::tags::IsRenderable>();
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity meshSource)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(std::string_view resourceRelativePath)
 {
-	getComponent().meshSource = meshSource;
+	return withMesh(ecs::Resource::findOrCreate(mRegistry, resourceRelativePath));
+}
+
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity meshEntity)
+{
+	getComponent().meshSource = meshEntity;
 	return *this;
 }
+
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withDefaultMaterial(Entity defaultMaterialInstance)
+{
+	getComponent().defaultMaterial = defaultMaterialInstance;
+	return *this;
+}
+
 
 MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
 {
@@ -437,13 +455,16 @@ ResourceEntityBuilder& ResourceEntityBuilder::withPath(const std::filesystem::pa
 
 	getComponent().relativePath = relativePath;
 
-	if (boost::ends_with(relativePath.c_str(), ".filamesh")) {
+	if (boost::ends_with(relativePath.c_str(), ".filamesh"))
 		with<ecs::tags::IsMesh>();
-	} else if (boost::ends_with(relativePath.c_str(), ".filamat")) {
+	else if (boost::ends_with(relativePath.c_str(), ".filamat"))
 		with<ecs::tags::IsMaterial>();
-	} else if (boost::ends_with(relativePath.c_str(), ".js")) {
+	else if (boost::ends_with(relativePath.c_str(), ".js"))
 		with<ecs::tags::IsScript>();
-	}
+	else if (boost::ends_with(relativePath.c_str(), ".png"))
+		with<ecs::tags::IsImageTexture>();
+	else if (boost::ends_with(relativePath.c_str(), ".ktx"))
+		with<ecs::tags::IsCubeMapTexture>();
 
 	return *this;
 }

@@ -8,10 +8,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <entt/core/hashed_string.hpp>
 
-#include <assets/generated.h>
-
 #include <spatial/render/Resources.h>
-#include <spatial/render/SkyboxResources.h>
 
 #include <spatial/ui/components/AssetsExplorer.h>
 #include <spatial/ui/components/DockSpace.h>
@@ -20,7 +17,7 @@
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <spatial/core/Logger.h>
-#include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/resources/PhysicalFileSystem.h>
@@ -42,43 +39,27 @@ static auto gLogger = createDefaultLogger();
 
 void createDefaultEditorEntities(ecs::Registry& registry)
 {
-	if (!ecs::handleOf<SkyBoxMaterial>(registry))
-	{
-		auto skyboxMaterial = ecs::handleOf(
-			registry, ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
-		skyboxMaterial.addOrReplace<tags::IsEditorEntity>();
-
-		ecs::build(registry)
+	if (!registry.existsAny<SkyBoxMaterial>())
+		ecs::EntityBuilder::create(registry)
 			.withName("SkyBox Material")
 			.asMaterialInstance<SkyBoxMaterial>()
-			.withMaterial(skyboxMaterial)
+			.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"))
 			.withProps({
 				false,
 				{math::float3{.0f}, 1.0f},
 				{"editor/textures/skybox/texture.ktx"},
 			});
-	}
 
-	if (!ecs::handleOf<GridMaterial>(registry))
-	{
-		auto gridMaterial =
-			ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "editor/materials/grid.filamat"));
-		gridMaterial.addOrReplace<tags::IsEditorEntity>();
-
-		ecs::build(registry)
+	if (!registry.existsAny<GridMaterial>())
+		ecs::EntityBuilder::create(registry)
 			.withName("Grid Material")
 			.with<tags::IsEditorEntity>()
 			.asMaterialInstance<GridMaterial>()
-			.withMaterial(gridMaterial)
+			.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/grid.filamat"))
 			.withProps({});
-	}
 
-	if (!ecs::handleOf<tags::IsGridPlane>(registry))
-	{
-		auto planeMesh = ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"));
-		planeMesh.addOrReplace<tags::IsEditorEntity>();
-
-		ecs::build(registry)
+	if (!registry.existsAny<tags::IsGridPlane>())
+		ecs::EntityBuilder::create(registry)
 			.withName("Grid Plane")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsGridPlane>()
@@ -86,40 +67,33 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withScale({100.0f, 1.0f, 100.0f})
 			.withPosition({.0f, -0.01f, .0f})
 			.asMeshInstance()
-			.withMesh(planeMesh)
-			.withMaterialAt(0, registry.getFirstEntity<GridMaterial>());
-	}
+			.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"))
+			.withDefaultMaterial(registry.getFirstEntity<GridMaterial>());
 
-	if (!ecs::handleOf<tags::IsSkyBox>(registry))
-	{
-		auto skyboxMesh = ecs::handleOf(registry, ecs::Resource::findOrCreate(registry, "engine/skybox"));
-		skyboxMesh.addOrReplace<tags::IsSkyBoxMeshResource>();
-		skyboxMesh.addOrReplace<tags::IsEditorEntity>();
-
-		ecs::build(registry)
+	if (!registry.existsAny<ecs::MeshInstance, tags::IsSkyBox>())
+		ecs::EntityBuilder::create(registry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBox>()
 			.asMeshInstance()
-			.withMesh(skyboxMesh)
-			.withMaterialAt(0, registry.getFirstEntity<SkyBoxMaterial>())
+			.withMesh(ecs::Resource::findOrCreate(registry, "engine/skybox"))
+			.withDefaultMaterial(registry.getFirstEntity<SkyBoxMaterial>())
 			.withShadowOptions(false, false)
 			.withCulling(false)
 			.withPriority(0x7);
-	}
 
-	if (!ecs::handleOf<tags::IsEditorView>(registry))
-		ecs::build(registry)
+	if (!registry.existsAny<tags::IsEditorView>())
+		ecs::EntityBuilder::create(registry)
 			.withName("Editor View")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsEditorView>()
 			.asSceneView()
-			.withIndirectLight(ecs::build(registry)
+			.withIndirectLight(ecs::EntityBuilder::create(registry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
 								   .withReflectionsTexturePath("editor/textures/skybox/ibl.ktx")
 								   .withIrradianceValuesPath("editor/textures/skybox/sh.txt"))
-			.withCamera(ecs::build(registry)
+			.withCamera(ecs::EntityBuilder::create(registry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
 							.with<tags::IsEditorEntity>()
@@ -175,14 +149,15 @@ void EditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
 
-	auto skyboxMeshResource = ecs::handleOf<tags::IsSkyBoxMeshResource>(mRegistry);
-	if (skyboxMeshResource && !skyboxMeshResource.has<ecs::tags::IsResourceLoaded>())
+	auto skyboxResourceMeshEntity = ecs::Resource::find(mRegistry, "engine/skybox");
+	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(skyboxResourceMeshEntity))
 	{
 		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
-		skyboxMeshResource.add<ecs::tags::IsResourceLoaded>();
-		skyboxMeshResource.addOrReplace(toShared(render::createFullScreenVertexBuffer(mEngine)));
-		skyboxMeshResource.addOrReplace(render::MeshGeometries{{0, ib->getIndexCount()}});
-		skyboxMeshResource.addOrReplace(std::move(ib));
+		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(skyboxResourceMeshEntity);
+		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity,
+										toShared(render::createFullScreenVertexBuffer(mEngine)));
+		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity, render::MeshGeometries{{0, ib->getIndexCount()}});
+		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity, std::move(ib));
 	}
 
 	mMaterialController.onStartFrame();
@@ -193,8 +168,8 @@ void EditorSystem::onUpdateFrame(float delta)
 	mScriptController.onUpdateFrame(mRegistry, delta);
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	mMaterialController.applyMaterial<GridMaterial>(mRegistry);
-	mMaterialController.applyMaterial<ColorMaterial>(mRegistry);
+	render::MaterialController::applyMaterial<GridMaterial>(mRegistry);
+	render::MaterialController::applyMaterial<ColorMaterial>(mRegistry);
 	mMaterialController.applyMaterialWithFinder<StandardOpaqueMaterial>(mRegistry);
 	mMaterialController.applyMaterialWithFinder<SkyBoxMaterial>(mRegistry);
 }
@@ -297,16 +272,14 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Assets Manager", [&]() {
 		static std::string search;
-		static ui::AssetsManager::AssetType type = ui::AssetsManager::AssetType::Material;
+		static ui::ResourceManager::ResourceType type = ui::ResourceManager::ResourceType::Material;
 
-		ui::AssetsManager::header(search, type);
-		ui::AssetsManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
+		ui::ResourceManager::header(search, type);
+		ui::ResourceManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
 
 		ui::EditorDragAndDrop::loadResource(mRegistry, selectedEntity);
 
-		ui::Popup::show("Asset Manager Popup", [&]() {
-			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
-		});
+		ui::Popup::show("Asset Manager Popup", [&]() { ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity); });
 	});
 
 	ui::Window::show("Materials Manager", [&]() {
@@ -401,6 +374,7 @@ void EditorSystem::saveScene()
 		gLogger.warn("Could not save scene: {}", e.what());
 	}
 }
+
 std::filesystem::path EditorSystem::getScenePath() const
 {
 	auto path = mScenePath;

@@ -12,4 +12,9 @@ RegistryCollection::RegistryCollection() : mRegistries{}
 {
 }
 
+void RegistryCollection::reserve(size_t capacity)
+{
+	mRegistries.reserve(capacity);
+}
+
 } // namespace spatial::ecs
