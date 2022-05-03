@@ -1,9 +1,12 @@
 add_subdirectory(assets)
 
-# set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
-# set_source_files_properties(${SPATIAL_EDITOR_MACOS_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
+set(SPATIAL_EDITOR_IMGUI_SETTINGS ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/imgui.ini)
 
-add_executable(Spatial.Editor
+set_source_files_properties(${SPATIAL_EDITOR_MACOS_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+set_source_files_properties(${SPATIAL_EDITOR_IMGUI_SETTINGS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+add_executable(Spatial.Editor MACOSX_BUNDLE
         src/main.cpp
         src/EditorSystem.cpp
         src/EditorCameraController.h
@@ -18,9 +21,12 @@ add_executable(Spatial.Editor
         src/CustomComponents.cpp
         src/EditorSettings.cpp
         src/Settings.h
-        ${SPATIAL_EDITOR_MACOS_ICON} src/FileSystem.h src/FileSystem.cpp)
+        src/FileSystem.h
+        src/FileSystem.cpp
+        ${SPATIAL_EDITOR_MACOS_ICON}
+        ${SPATIAL_EDITOR_IMGUI_SETTINGS})
 
-# set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
+set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
@@ -38,5 +44,8 @@ set_property(
         TARGET Spatial.Editor
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-install(TARGETS Spatial.Editor RUNTIME DESTINATION bin BUNDLE DESTINATION .)
+install(TARGETS Spatial.Editor
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION .
+        COMPONENT binaries)
 

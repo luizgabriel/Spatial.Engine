@@ -208,11 +208,12 @@ target_compile_definitions(Spatial.Core PUBLIC "$<$<CONFIG:DEBUG>:SPATIAL_DEBUG>
 install(
         TARGETS Spatial.Core
         EXPORT Spatial.Export
-        LIBRARY DESTINATION lib
-        PUBLIC_HEADER DESTINATION include
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT libraries
 )
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
 
 enable_testing()
 add_subdirectory(tests)

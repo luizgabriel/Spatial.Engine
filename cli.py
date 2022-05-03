@@ -140,6 +140,10 @@ def cmake_install(options: Arguments) -> Command:
     return Command(f"cmake --install {build_path} --config {build_type}")
 
 
+def cmake_package(options: Arguments) -> Command:
+    return Command(f"cmake --build --preset {options.preset} --target package")
+
+
 def cmake_test(options: Arguments) -> Command:
     build_type = options.preset.split("-")[-1]
     return Command(f"ctest --preset {options.preset} --config {build_type}")
@@ -214,6 +218,10 @@ def install_cli(args: Arguments) -> CommandResult:
     return run(cmake_install(args))
 
 
+def package_cli(args: Arguments) -> CommandResult:
+    return run(cmake_package(args))
+
+
 def test_cli(args) -> CommandResult:
     return run(cmake_test(args))
 
@@ -230,7 +238,8 @@ CLI_COMMANDS = {
     "build": build_cli,
     "test": test_cli,
     "run-editor": run_editor_cli,
-    "install": install_cli
+    "install": install_cli,
+    "package": package_cli
 }
 
 

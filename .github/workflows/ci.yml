@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - master
-      - feature/*
-      - release/*
+      - rc/*
     tags:
       - 'v*'
 
@@ -57,7 +56,7 @@ jobs:
 
       - name: Configure
         shell: bash
-        run: python $GITHUB_WORKSPACE/cli.py configure --preset=${{ matrix.config.preset }}
+        run: python ./cli.py configure --preset=${{ matrix.config.preset }}
 
       # - name: Conan Upload Binary Artifacts
       #   shell: bash
@@ -68,17 +67,16 @@ jobs:
 
       - name: Build
         shell: bash
-        run: python $GITHUB_WORKSPACE/cli.py build --preset=${{ matrix.config.preset }}
+        run: python ./cli.py build --preset=${{ matrix.config.preset }}
 
       - name: Run Tests
-        working-directory: ${{ github.workspace }}
         shell: bash
         run: python ./cli.py test --preset=${{ matrix.config.preset }}
 
       - name: Install
         if: contains(github.ref, 'tags/v')
         shell: bash
-        run: python $GITHUB_WORKSPACE/cli.py install --preset=${{ matrix.config.preset }}
+        run: python ./cli.py install --preset=${{ matrix.config.preset }}
 
       - name: Get the version
         if: contains(github.ref, 'tags/v')
@@ -90,7 +88,7 @@ jobs:
         if: contains(github.ref, 'tags/v')
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.tar.xz
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           path: out/install/${{ matrix.config.preset }}/*
           if-no-files-found: error
 
@@ -113,6 +111,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: >
-            MacOS-Clang-${{ steps.get_version.outputs.VERSION }}.tar.xz
-            Windows-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
-            Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}.tar.xz
+            MacOS-Clang-${{ steps.get_version.outputs.VERSION }}
+            Windows-MSVC-${{ steps.get_version.outputs.VERSION }}
+            Windows-2019-MSVC-${{ steps.get_version.outputs.VERSION }}

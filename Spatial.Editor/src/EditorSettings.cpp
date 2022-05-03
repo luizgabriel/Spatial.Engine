@@ -18,7 +18,7 @@ Settings Settings::load(int argc, char** argv)
 	args({"-h", "--height"}) >> config.windowHeight;
 
 	std::filesystem::path projectFolder = args[1];
-	config.projectFolder = fs::is_directory(projectFolder) ? projectFolder : std::filesystem::current_path();
+	config.projectFolder = fs::is_directory(projectFolder) ? projectFolder : "";
 
 	return config;
 }

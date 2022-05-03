@@ -78,8 +78,9 @@ target_link_libraries(Spatial.UI
 install(
         TARGETS Spatial.UI
         EXPORT Spatial.Export
-        LIBRARY DESTINATION lib
-        PUBLIC_HEADER DESTINATION include
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT libraries
 )
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
