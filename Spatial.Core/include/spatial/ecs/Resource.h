@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
-#include <filesystem>
 
 namespace spatial::ecs
 {
@@ -19,11 +18,13 @@ struct Resource
 {
 	constexpr static auto typeName = "resource";
 
-	std::filesystem::path relativePath;
+	std::string relativePath;
 
-	static Entity find(const Registry& registry, const std::filesystem::path& resource);
+	[[nodiscard]] std::string stem() const;
 
-	static Entity findOrCreate(Registry& registry, const std::filesystem::path& resource);
+	static Entity find(const Registry& registry, std::string_view resource);
+
+	static Entity findOrCreate(Registry& registry, std::string_view resource);
 };
 
 struct ResourceError

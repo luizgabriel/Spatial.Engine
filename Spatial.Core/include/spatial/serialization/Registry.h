@@ -2,6 +2,7 @@
 
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Tags.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Light.h>
@@ -42,6 +43,8 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsLight>(ar);
 	snapshot.template component<ecs::tags::IsMainView>(ar);
 	snapshot.template component<ecs::tags::IsMaterialInstance>(ar);
+	snapshot.template component<ecs::tags::IsImageTexture>(ar);
+	snapshot.template component<ecs::tags::IsCubeMapTexture>(ar);
 }
 
 } // namespace spatial::ecs

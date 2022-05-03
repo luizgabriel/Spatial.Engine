@@ -1,6 +1,5 @@
-#include <fmt/format.h>
+#include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Mesh.h>
-#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Relation.h>
 
 namespace spatial::ecs
@@ -19,7 +18,7 @@ Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity m
 
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex)
 {
-	auto child = build(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
+	auto child = ecs::EntityBuilder::create(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
 	ecs::Parent::addChild(registry, meshEntity, child);
 
 	return child;

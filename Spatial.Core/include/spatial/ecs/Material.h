@@ -1,9 +1,5 @@
 #pragma once
 
-#include <set>
-#include <spatial/ecs/Registry.h>
-#include <spatial/resources/ResourcePath.h>
-
 namespace spatial::ecs::tags
 {
 

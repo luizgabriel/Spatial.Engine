@@ -15,7 +15,6 @@ struct IsMainView
 };
 
 
-
 } // namespace tags
 
 struct SceneView

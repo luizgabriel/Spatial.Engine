@@ -1,8 +1,6 @@
 #include "EditorCameraController.h"
 #include "EditorCamera.h"
-#include "Tags.h"
 #include <spatial/ecs/Camera.h>
-#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/SceneView.h>
 
 using namespace spatial::math;

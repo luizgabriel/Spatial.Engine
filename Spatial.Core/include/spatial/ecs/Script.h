@@ -3,7 +3,6 @@
 #include <any>
 #include <set>
 #include <spatial/ecs/Registry.h>
-#include <spatial/resources/ResourcePath.h>
 #include <unordered_map>
 #include <variant>
 
