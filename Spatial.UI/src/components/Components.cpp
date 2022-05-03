@@ -50,20 +50,17 @@ bool inputText(const std::string_view label, std::string& value, std::string_vie
 									ImGuiInputTextFlags_CallbackResize, &inputTextCallback, &value);
 }
 
-bool inputPath(const std::string_view label, std::filesystem::path& path, std::string_view placeholder)
+bool inputPath(const std::string_view label, std::string& value, std::string_view placeholder)
 {
-	auto value = path.string();
 	if (ui::inputText(label, value, placeholder))
-	{
-		path = std::filesystem::path{value};
 		return true;
-	}
+
 	{
 		auto dnd = ui::DragAndDropTarget{};
 		auto result = dnd.getPayload<std::filesystem::path>();
 		if (result)
 		{
-			path = std::filesystem::path{result.value()};
+			value = result.value().string();
 			return true;
 		}
 	}
@@ -153,8 +150,8 @@ bool ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::
 	bool changed = false;
 
 	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	changed |= ui::inputPath("Reflections Texture", light.reflectionsTexturePath.relativePath);
-	changed |= ui::inputPath("Irradiance Values", light.irradianceValuesPath.relativePath);
+	changed |= ui::inputPath("Reflections Texture", light.reflectionsTexturePath);
+	changed |= ui::inputPath("Irradiance Values", light.irradianceValuesPath);
 
 	return changed;
 }
@@ -227,12 +224,10 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 
 	auto loaded = registry.hasAllComponents<ecs::tags::IsResourceLoaded>(entity);
 
+	ImGui::Checkbox("Is Loaded", &loaded);
+
 	if (loaded && ImGui::Button("Reload"))
 		registry.removeComponent<ecs::tags::IsResourceLoaded>(entity);
-
-	ImGui::SameLine();
-
-	ImGui::Checkbox("Is Loaded", &loaded);
 
 	ui::spacing(2);
 
@@ -260,7 +255,7 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 		auto result = dnd.getPayload<std::filesystem::path>();
 		if (result.has_value())
 		{
-			mesh.meshSource = ecs::Resource::findOrCreate(registry, result.value());
+			mesh.meshSource = ecs::Resource::findOrCreate(registry, result.value().string());
 			shouldRecreateMesh = true;
 			changed = true;
 		}

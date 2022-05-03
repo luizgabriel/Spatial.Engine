@@ -117,10 +117,10 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".filamesh"))
 				return;
 
-			auto stream = mFileSystem.openReadStream(resource.relativePath.string());
+			auto stream = mFileSystem.openReadStream(resource.relativePath);
 			if (stream->bad())
 			{
-				gLogger.warn("Could not load mesh: {}", resource.relativePath.string());
+				gLogger.warn("Could not load mesh: {}", resource.relativePath);
 				return;
 			}
 

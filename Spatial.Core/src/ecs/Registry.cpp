@@ -1,4 +1,3 @@
-#include <spatial/ecs/EntityHandle.h>
 #include <spatial/ecs/Registry.h>
 
 namespace spatial::ecs

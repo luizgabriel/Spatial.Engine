@@ -7,7 +7,7 @@
 namespace spatial::ui
 {
 
-bool albedoInput(std::string_view label, math::float3& color, ResourcePath& resource,
+bool albedoInput(std::string_view label, math::float3& color, std::string& resource,
 				 const filament::Texture* texture, const filament::Texture& icons)
 {
 	ImGui::PushID(label.data());
@@ -23,7 +23,7 @@ bool albedoInput(std::string_view label, math::float3& color, ResourcePath& reso
 	ui::spanToAvailWidth();
 	static const char* placeholder = "resource/path.png";
 
-	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
+	changed |= ui::inputPath("##Path", resource, placeholder);
 
 	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
@@ -35,7 +35,7 @@ bool albedoInput(std::string_view label, math::float3& color, ResourcePath& reso
 	return changed;
 }
 
-bool mapInput(std::string_view label, ResourcePath& resource, const filament::Texture* texture,
+bool mapInput(std::string_view label, std::string& resource, const filament::Texture* texture,
 			  const filament::Texture& icons, const math::float4& uv)
 {
 
@@ -46,12 +46,12 @@ bool mapInput(std::string_view label, ResourcePath& resource, const filament::Te
 	ImGui::SameLine();
 	static const char* placeholder = "resource/path.png";
 
-	changed |= ui::inputPath(label.data(), resource.relativePath, placeholder);
+	changed |= ui::inputPath(label.data(), resource, placeholder);
 
 	return changed;
 }
 
-bool mapInput(std::string_view label, float& value, ResourcePath& resource, const filament::Texture* texture,
+bool mapInput(std::string_view label, float& value, std::string& resource, const filament::Texture* texture,
 			  const filament::Texture& icons, const math::float4& uv)
 {
 	ImGui::PushID(label.data());
@@ -65,7 +65,7 @@ bool mapInput(std::string_view label, float& value, ResourcePath& resource, cons
 	ui::spanToAvailWidth();
 	static const char* placeholder = "resource/path.png";
 
-	changed |= ui::inputPath("##Path", resource.relativePath, placeholder);
+	changed |= ui::inputPath("##Path", resource, placeholder);
 
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(ImGui::GetColumnWidth() * 0.4f);
@@ -105,7 +105,7 @@ bool colorPicker(std::string_view label, math::float3& color, const filament::Te
 	return changed;
 }
 
-bool cubemapInput(std::string_view label, ResourcePath& resource,
+bool cubemapInput(std::string_view label, std::string& resource,
 				  const filament::Texture& icons)
 {
 	static constexpr auto size = math::float2{20.0f};
@@ -117,7 +117,7 @@ bool cubemapInput(std::string_view label, ResourcePath& resource,
 	ImGui::SameLine();
 	static const char* placeholder = "resource/path.ktx";
 
-	changed |= ui::inputPath(label.data(), resource.relativePath, placeholder);
+	changed |= ui::inputPath(label.data(), resource, placeholder);
 
 	return changed;
 }

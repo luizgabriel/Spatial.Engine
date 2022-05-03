@@ -14,12 +14,13 @@ class RegistryCollection
 
 	void append(ecs::Registry& registry);
 
+	void reserve(size_t capacity);
+
 	template <typename Func>
 	void each(Func func) const
 	{
 		std::for_each(mRegistries.begin(), mRegistries.end(), [&](ecs::Registry* r) {
-			auto& registry = *r;
-			func(registry);
+			func(*r);
 		});
 	}
 

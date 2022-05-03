@@ -13,7 +13,7 @@
 namespace spatial::ui
 {
 
-using TextureFinder = std::function<const filament::Texture*(const ResourcePath&)>;
+using TextureFinder = std::function<const filament::Texture*(std::string_view)>;
 
 class EntityProperties
 {
@@ -150,19 +150,20 @@ class SceneTree
 	static bool displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
 };
 
-class AssetsManager
+class ResourceManager
 {
   public:
-	enum class AssetType
+	enum class ResourceType
 	{
 		Material,
 		Mesh,
 		Script,
+		Texture,
 	};
 
-	static bool header(std::string& search, AssetType& filter);
+	static bool header(std::string& search, ResourceType& filter);
 	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
-					 AssetsManager::AssetType type, bool showEditorEntities);
+					 ResourceManager::ResourceType type, bool showEditorEntities);
 };
 
 class MaterialsManager

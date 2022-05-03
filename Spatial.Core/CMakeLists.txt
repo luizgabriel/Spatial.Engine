@@ -21,8 +21,6 @@ add_library(Spatial.Core
         include/spatial/ecs/Camera.h
         include/spatial/ecs/Light.h
         include/spatial/ecs/Registry.h
-        include/spatial/ecs/RegistryUtils.h
-        include/spatial/ecs/EntityHandle.h
         include/spatial/ecs/Name.h
         include/spatial/ecs/Mesh.h
         include/spatial/ecs/EntityBuilder.h
@@ -97,7 +95,6 @@ add_library(Spatial.Core
 
         src/ecs/EditorCamera.cpp
         src/ecs/Registry.cpp
-        src/ecs/RegistryUtils.cpp
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
         src/ecs/Mesh.cpp
@@ -136,7 +133,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp)
+        src/resources/MemoryFileSystem.cpp include/spatial/ecs/Texture.h)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

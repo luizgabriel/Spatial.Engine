@@ -3,12 +3,12 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
-#include <spatial/resources/ResourcePath.h>
+#include <string_view>
 
 namespace spatial::editor
 {
 
-using ResourceFinder = std::function<const filament::Texture*(const ResourcePath&)>;
+using ResourceFinder = std::function<const filament::Texture*(std::string_view)>;
 
 struct ColorMaterial
 {
@@ -39,7 +39,7 @@ struct SkyBoxMaterial
 
 	bool showSun{false};
 	math::float4 color{.0f, .0f, .0f, 1.0f};
-	ResourcePath skybox{};
+	std::string skybox{};
 
 	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
 };
@@ -49,28 +49,28 @@ struct StandardOpaqueMaterial
 	constexpr static auto typeName = "standard_opaque_material";
 
 	math::float3 baseColor{1.0f};
-	ResourcePath albedo{};
+	std::string albedo{};
 
 	math::float2 tiling{1.0f};
 	math::float2 offset{.0f};
 
 	float metallic{.0f};
-	ResourcePath metallicMap{};
+	std::string metallicMap{};
 
 	float roughness{1.0f};
-	ResourcePath roughnessMap{};
+	std::string roughnessMap{};
 
 	float reflectance{.0f};
-	ResourcePath reflectanceMap{};
+	std::string reflectanceMap{};
 
-	ResourcePath ambientOcclusionMap{};
+	std::string ambientOcclusionMap{};
 
-	ResourcePath normalMap{};
+	std::string normalMap{};
 
 	math::float4 emissive{.0f};
 
 	float height{1.0f};
-	ResourcePath heightMap{};
+	std::string heightMap{};
 
 	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
 };

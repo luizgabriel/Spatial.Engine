@@ -1,10 +1,11 @@
-#include <spatial/ecs/RegistryUtils.h>
+#include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Resource.h>
+#include <filesystem>
 
 namespace spatial::ecs
 {
 
-Entity Resource::find(const Registry& registry, const std::filesystem::path& resource)
+Entity Resource::find(const Registry& registry, std::string_view resource)
 {
 	const auto view = registry.getEntities<const ecs::Resource>();
 
@@ -20,13 +21,18 @@ Entity Resource::find(const Registry& registry, const std::filesystem::path& res
 	return *it;
 }
 
-Entity Resource::findOrCreate(Registry& registry, const std::filesystem::path& resource)
+Entity Resource::findOrCreate(Registry& registry, std::string_view resource)
 {
 	auto found = Resource::find(registry, resource);
 	if (registry.isValid(found))
 		return found;
 
-	return build(registry).asResource().withPath(resource);
+	return ecs::EntityBuilder::create(registry).asResource().withPath(resource);
+}
+
+std::string Resource::stem() const
+{
+	return std::filesystem::path{relativePath}.stem().string();
 }
 
 }

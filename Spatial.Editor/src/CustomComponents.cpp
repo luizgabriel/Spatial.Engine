@@ -5,9 +5,10 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <magic_enum.hpp>
+#include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Material.h>
-#include <spatial/ecs/RegistryUtils.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
@@ -69,10 +70,8 @@ bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(
 	return changed;
 }
 
-bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&,
-						const TextureFinder&>::draw(ecs::Registry& registry, ecs::Entity entity,
-																 const filament::Texture& icons,
-																 const TextureFinder& finder)
+bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const TextureFinder&>::draw(
+	ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons, const TextureFinder& finder)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
@@ -462,12 +461,13 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter)
+bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter)
 {
-	static const auto filterToName = std::unordered_map<AssetType, const char*>{
-		{AssetType::Material, "Materials"},
-		{AssetType::Script, "Scripts"},
-		{AssetType::Mesh, "Meshes"},
+	static const auto filterToName = std::unordered_map<ResourceType, const char*>{
+		{ResourceType::Material, "Materials"},
+		{ResourceType::Script, "Scripts"},
+		{ResourceType::Mesh, "Meshes"},
+		{ResourceType::Texture, "Textures"},
 	};
 
 	bool changed = false;
@@ -476,7 +476,7 @@ bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter
 	ui::spanToAvailWidth();
 	if (ImGui::BeginCombo("##ResourceTypeFilter", filterToName.at(filter)))
 	{
-		for (auto value : magic_enum::enum_values<AssetType>())
+		for (auto value : magic_enum::enum_values<ResourceType>())
 		{
 			if (ImGui::Selectable(filterToName.at(value), filter == value))
 			{
@@ -494,8 +494,8 @@ bool AssetsManager::header(std::string& search, AssetsManager::AssetType& filter
 	return changed;
 }
 
-bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
-						 AssetsManager::AssetType type, bool showEditorEntities)
+bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+						   ResourceManager::ResourceType type, bool showEditorEntities)
 {
 	using namespace boost::algorithm;
 	using namespace std::string_view_literals;
@@ -516,16 +516,23 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 		to_lower(lowerCaseSearch);
 
 		const auto eachFn = [&](ecs::Entity entity, const auto& resource, const auto& name) {
+			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "editor/"))
+				return;
+
 			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
-			if (type == AssetType::Material && !registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
+			if (type == ResourceType::Material && !registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
 				return;
 
-			if (type == AssetType::Mesh && !registry.hasAnyComponent<ecs::tags::IsMesh>(entity))
+			if (type == ResourceType::Mesh && !registry.hasAnyComponent<ecs::tags::IsMesh>(entity))
 				return;
 
-			if (type == AssetType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
+			if (type == ResourceType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
+				return;
+
+			if (type == ResourceType::Texture
+				&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture>(entity))
 				return;
 
 			ImGui::TableNextRow();
@@ -554,12 +561,7 @@ bool AssetsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEnt
 			ImGui::TextDisabled("%s", typeText.data());
 		};
 
-		if (showEditorEntities)
-			registry.getEntities<const ecs::Resource, const ecs::Name>().each(eachFn);
-		else
-			registry
-				.getEntities<const ecs::Resource, const ecs::Name>(ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
-				.each(eachFn);
+		registry.getEntities<const ecs::Resource, const ecs::Name>().each(eachFn);
 
 		ImGui::EndTable();
 	}
@@ -591,41 +593,30 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 
 		if (menu2.item("Standard Opaque"))
 		{
-			auto opaqueMaterial = ecs::handleOf(
-				registry, ecs::Resource::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
-			opaqueMaterial.addOrReplace<editor::tags::IsEditorEntity>();
-
-			createdEntity = ecs::build(registry)
-								.withName(mergeMaterialName("Standard Opaque"))
-								.asMaterialInstance<editor::StandardOpaqueMaterial>()
-								.withMaterial(opaqueMaterial);
+			createdEntity =
+				ecs::EntityBuilder::create(registry)
+					.withName(mergeMaterialName("Standard Opaque"))
+					.asMaterialInstance<editor::StandardOpaqueMaterial>()
+					.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
 			changed = true;
 		}
 
 		if (menu2.item("Color Material"))
 		{
-			auto colorMaterial = ecs::handleOf(
-				registry, ecs::Resource::findOrCreate(registry, "editor/materials/color.filamat"));
-			colorMaterial.addOrReplace<editor::tags::IsEditorEntity>();
-
-			createdEntity = ecs::build(registry)
+			createdEntity = ecs::EntityBuilder::create(registry)
 								.withName(mergeMaterialName("Color Material"))
 								.asMaterialInstance<editor::ColorMaterial>()
-								.withMaterial(colorMaterial);
+								.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/color.filamat"));
 			changed = true;
 		}
 	}
 
 	if (menu.item("SkyBox"))
 	{
-		auto skyboxMaterial = ecs::handleOf(
-			registry, ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
-		skyboxMaterial.addOrReplace<editor::tags::IsEditorEntity>();
-
-		createdEntity = ecs::build(registry)
+		createdEntity = ecs::EntityBuilder::create(registry)
 							.withName("Default SkyBox")
 							.asMaterialInstance<editor::SkyBoxMaterial>()
-							.withMaterial(skyboxMaterial);
+							.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
 		changed = true;
 	}
 
@@ -634,7 +625,6 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 
 	if (changed)
 		selectedEntity = createdEntity;
-
 
 	return changed;
 }
@@ -685,7 +675,8 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 			registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>().each(eachFn);
 		else
 			registry
-				.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>(ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
+				.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>(
+					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
 				.each(eachFn);
 
 		ImGui::EndTable();
@@ -700,7 +691,7 @@ bool EditorDragAndDrop::loadResource(ecs::Registry& registry, ecs::Entity& selec
 	auto result = dnd.getPayload<std::filesystem::path>();
 	if (result && !result->empty())
 	{
-		selectedEntity = ecs::Resource::findOrCreate(registry, *result);
+		selectedEntity = ecs::Resource::findOrCreate(registry, result.value().string());
 		return true;
 	}
 
@@ -729,12 +720,12 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 
 	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
 	{
-		selectedEntity = ecs::build(registry)
+		selectedEntity = ecs::EntityBuilder::create(registry)
 							 .withName(result->stem().string())
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
-							 .withMesh(ecs::Resource::findOrCreate(registry, result.value()));
+							 .withMesh( result.value().string());
 
 		return true;
 	}
@@ -750,13 +741,13 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (Menu::itemButton("Empty"))
 	{
-		newEntity = ecs::build(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
+		newEntity = ecs::EntityBuilder::create(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
 	if (Menu::itemButton("Scene View"))
 	{
-		newEntity = ecs::build(registry).withName("Scene View").asSceneView();
+		newEntity = ecs::EntityBuilder::create(registry).withName("Scene View").asSceneView();
 		changed = true;
 	}
 
@@ -787,12 +778,12 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Cube"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Cube")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/cube.filamesh"))
+						.withMesh("editor/meshes/cube.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -800,12 +791,12 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Plane"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Plane")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"))
+						.withMesh("editor/meshes/plane.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -813,12 +804,12 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Sphere"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Sphere")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/sphere.filamesh"))
+						.withMesh( "editor/meshes/sphere.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -826,12 +817,12 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Cylinder"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Cylinder")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/cylinder.filamesh"))
+						.withMesh("editor/meshes/cylinder.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -839,21 +830,20 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Skybox"))
 	{
-		auto skyboxMaterial = ecs::Resource::find(registry, "editor/materials/skybox.filamat");
-		auto materialInstance = ecs::build(registry)
-									.asMaterialInstance<editor::SkyBoxMaterial>()
-									.withMaterial(skyboxMaterial)
-									.withProps({
-										false,
-										{math::float3{.0f}, 1.0f},
-										{"editor/textures/skybox/texture.ktx"},
-									});
-
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Skybox")
 						.asMeshInstance()
-						.withMesh(ecs::Resource::findOrCreate(registry, "engine/skybox"))
-						.withMaterialAt(0, materialInstance)
+						.withMesh("engine/skybox")
+						.withDefaultMaterial(
+							ecs::EntityBuilder::create(registry)
+								.withName("Skybox Material")
+								.asMaterialInstance<editor::SkyBoxMaterial>()
+								.withMaterial("editor/materials/skybox.filamat")
+								.withProps({
+									false,
+									{math::float3{.0f}, 1.0f},
+									{"editor/textures/skybox/texture.ktx"},
+								}))
 						.withCulling(false)
 						.withPriority(0x7);
 		changed = true;
@@ -882,7 +872,7 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Point Light"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Point Light")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -892,13 +882,13 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Directional Light"))
 	{
-		newEntity = ecs::build(registry).withName("Directional Light").asDirectionalLight();
+		newEntity = ecs::EntityBuilder::create(registry).withName("Directional Light").asDirectionalLight();
 		changed = true;
 	}
 
 	if (menu.item("Spot Light"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Spot Light")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -908,7 +898,7 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Sun Light"))
 	{
-		newEntity = ecs::build(registry).withName("Sun Light").asSunLight();
+		newEntity = ecs::EntityBuilder::create(registry).withName("Sun Light").asSunLight();
 		changed = true;
 	}
 
@@ -935,7 +925,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Perspective Camera"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Perspective Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -945,7 +935,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Orthographic Camera"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Orthographic Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -955,7 +945,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Custom Camera"))
 	{
-		newEntity = ecs::build(registry)
+		newEntity = ecs::EntityBuilder::create(registry)
 						.withName("Custom Camera")
 						.asCustomCamera()
 						.withProjection(math::mat4::perspective(45.0, 1280.0 / 720.0, .1, 1000.0));

@@ -7,7 +7,6 @@
 #include <spatial/ecs/Registry.h>
 #include <spatial/render/Resources.h>
 #include <spatial/resources/FileSystem.h>
-#include <spatial/resources/ResourcePath.h>
 #include <unordered_map>
 
 namespace spatial::render
@@ -15,10 +14,19 @@ namespace spatial::render
 
 struct LoadResourceEvent
 {
-	ResourcePath texture;
-	explicit LoadResourceEvent(ResourcePath resource) : texture{std::move(resource)}
-	{
-	}
+	std::string texturePath;
+};
+
+class MaterialLoaderController
+{
+  public:
+	explicit MaterialLoaderController(filament::Engine& engine, FileSystem& fileSystem);
+
+	void onUpdateFrame(ecs::Registry& registry) const;
+
+  private:
+	filament::Engine& mEngine;
+	FileSystem& mFileSystem;
 };
 
 class MaterialController
@@ -32,7 +40,7 @@ class MaterialController
 
 	void onStartFrame() const;
 
-	const filament::Texture* findResource(const ResourcePath& resource);
+	const filament::Texture* findResource(std::string_view resource);
 
 	void onUpdateFrame(ecs::Registry& registry) const;
 

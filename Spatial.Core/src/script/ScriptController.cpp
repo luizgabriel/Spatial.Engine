@@ -29,11 +29,11 @@ void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
 
 			const auto scriptDefaultName = registry.hasAllComponents<ecs::Name>(entity)
 				                               ? registry.getComponent<ecs::Name>(entity).name
-				                               : resource.relativePath.stem().string();
+				                               : resource.stem();
 
 			auto scope = v8::HandleScope{mIsolate.get()};
 			const auto context = v8::Context::New(mIsolate.get());
-			const auto module = compileModule(context, mFileSystem, resource.relativePath.string());
+			const auto module = compileModule(context, mFileSystem, resource.relativePath);
 			auto result = parseModule(context, module, scriptDefaultName);
 
 			std::visit(

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <spatial/common/Math.h>
-#include <spatial/resources/ResourcePath.h>
 
 namespace spatial::ecs
 {
@@ -64,8 +63,8 @@ struct IndirectLight
 {
 	constexpr static auto typeName = "indirect_light";
 
-	ResourcePath reflectionsTexturePath{};
-	ResourcePath irradianceValuesPath{};
+	std::string reflectionsTexturePath{};
+	std::string irradianceValuesPath{};
 	float intensity{30000.0f};
 };
 
