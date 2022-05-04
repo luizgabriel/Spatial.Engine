@@ -45,4 +45,9 @@ std::string Resource::filename() const
 	return std::filesystem::path{relativePath}.filename().string();
 }
 
+bool Resource::exists(const Registry& registry, std::string_view resource)
+{
+	return registry.isValid(find(registry, resource));
+}
+
 }

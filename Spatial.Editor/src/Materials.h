@@ -3,12 +3,11 @@
 #include <filament/MaterialInstance.h>
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
+#include <spatial/ecs/Registry.h>
 #include <string_view>
 
 namespace spatial::editor
 {
-
-using ResourceFinder = std::function<const filament::Texture*(std::string_view)>;
 
 struct ColorMaterial
 {
@@ -19,7 +18,7 @@ struct ColorMaterial
 	float roughness{0.8f};
 	float reflectance{.1f};
 
-	void apply(filament::MaterialInstance& instance) const;
+	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
 };
 
 struct GridMaterial
@@ -30,7 +29,7 @@ struct GridMaterial
 	math::float2 scale{10.0f};
 	float thickness{0.015f};
 
-	void apply(filament::MaterialInstance& instance) const;
+	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
 };
 
 struct SkyBoxMaterial
@@ -39,9 +38,9 @@ struct SkyBoxMaterial
 
 	bool showSun{false};
 	math::float4 color{.0f, .0f, .0f, 1.0f};
-	std::string skybox{};
+	ecs::Entity skybox{ecs::NullEntity};
 
-	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
+	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
 };
 
 struct StandardOpaqueMaterial
@@ -49,30 +48,30 @@ struct StandardOpaqueMaterial
 	constexpr static auto typeName = "standard_opaque_material";
 
 	math::float3 baseColor{1.0f};
-	std::string albedo{};
+	ecs::Entity albedo{ecs::NullEntity};
 
 	math::float2 tiling{1.0f};
 	math::float2 offset{.0f};
 
 	float metallic{.0f};
-	std::string metallicMap{};
+	ecs::Entity metallicMap{ecs::NullEntity};
 
 	float roughness{1.0f};
-	std::string roughnessMap{};
+	ecs::Entity roughnessMap{ecs::NullEntity};
 
 	float reflectance{.0f};
-	std::string reflectanceMap{};
+	ecs::Entity reflectanceMap{ecs::NullEntity};
 
-	std::string ambientOcclusionMap{};
+	ecs::Entity ambientOcclusionMap{ecs::NullEntity};
 
-	std::string normalMap{};
+	ecs::Entity normalMap{ecs::NullEntity};
 
 	math::float4 emissive{.0f};
 
 	float height{1.0f};
-	std::string heightMap{};
+	ecs::Entity heightMap{ecs::NullEntity};
 
-	void apply(filament::MaterialInstance& instance, const ResourceFinder& finder) const;
+	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
 };
 
 } // namespace spatial::editor

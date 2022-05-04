@@ -33,7 +33,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
 									 ImGui::GetCursorScreenPos().y));
-	ui::image(*textureView.getColorTexture(), imageSize, math::float4{0, 1, 1, 0});
+	ui::image(textureView.getColorTexture().get(), imageSize, math::float4{0, 1, 1, 0});
 }
 
 } // namespace spatial::ui

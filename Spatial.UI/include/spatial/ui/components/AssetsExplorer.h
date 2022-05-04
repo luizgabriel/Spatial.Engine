@@ -14,10 +14,10 @@ class AssetsExplorer
 {
   public:
 	static bool displayFiles(FileSystem& fileSystem, std::filesystem::path& selectedPath,
-							 const filament::Texture& icon);
+							 const filament::Texture* icon);
 
   private:
-	static bool displayPathHeader(std::filesystem::path& selectedPath, const filament::Texture& icon);
+	static bool displayPathHeader(std::filesystem::path& selectedPath, const filament::Texture* icon);
 };
 
 } // namespace spatial::ui

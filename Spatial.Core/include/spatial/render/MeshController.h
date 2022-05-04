@@ -13,17 +13,13 @@ namespace spatial::render
 class MeshController
 {
   public:
-	explicit MeshController(filament::Engine& engine, FileSystem& fileSystem);
+	static void loadMeshes(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry);
 
-	void onUpdateFrame(ecs::Registry& registry);
+	static void createMeshInstances(filament::Engine& engine, ecs::Registry& registry);
 
-	void onStartFrame(ecs::Registry& registry);
+	static void updateMeshInstances(ecs::Registry& registry);
 
   private:
-	filament::Engine& mEngine;
-	FileSystem& mFileSystem;
-
-	void createRenderableMeshes(ecs::Registry& registry);
 	static void updateMeshGeometries(ecs::Registry& registry);
 	static void clearDirtyRenderables(ecs::Registry& registry);
 };

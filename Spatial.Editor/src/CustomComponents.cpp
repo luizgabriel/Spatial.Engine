@@ -9,6 +9,7 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
+#include <spatial/render/TextureUtils.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
@@ -56,28 +57,28 @@ bool ComponentInputImpl<editor::GridMaterial>::draw(ecs::Registry& registry, ecs
 	return changed;
 }
 
-bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>::draw(ecs::Registry& registry,
+bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture*>::draw(ecs::Registry& registry,
 																				ecs::Entity entity,
-																				const filament::Texture& icons)
+																				const filament::Texture* icons)
 {
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 	bool changed = false;
 
 	changed |= ui::colorPicker("Background Color", data.color, icons);
-	changed |= ui::cubemapInput("Cubemap", data.skybox, icons);
+	changed |= ui::cubemapInput("Cubemap", registry, data.skybox, icons);
 	changed |= ImGui::Checkbox("Show Sun", &data.showSun);
 
 	return changed;
 }
 
-bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const TextureFinder&>::draw(
-	ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons, const TextureFinder& finder)
+bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*>::draw(
+	ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
 	bool changed = false;
 
-	changed |= ui::albedoInput("Albedo", data.baseColor, data.albedo, finder(data.albedo), icons);
+	changed |= ui::albedoInput("Albedo", data.baseColor, registry, data.albedo, icons);
 
 	ui::separator(2);
 
@@ -86,27 +87,27 @@ bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Metallic", data.metallic, data.metallicMap, finder(data.metallicMap), icons);
+	changed |= ui::mapInput("Metallic", data.metallic, registry, data.metallicMap, icons);
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Roughness", data.roughness, data.roughnessMap, finder(data.roughnessMap), icons);
+	changed |= ui::mapInput("Roughness", data.roughness, registry, data.roughnessMap, icons);
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Reflectance", data.reflectance, data.reflectanceMap, finder(data.reflectanceMap), icons);
+	changed |= ui::mapInput("Reflectance", data.reflectance, registry, data.reflectanceMap, icons);
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Ambient Occlusion", data.ambientOcclusionMap, finder(data.ambientOcclusionMap), icons);
+	changed |= ui::mapInput("Ambient Occlusion", registry, data.ambientOcclusionMap, icons);
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Normal", data.normalMap, finder(data.normalMap), icons, Icons::normalMap.uv());
+	changed |= ui::mapInput("Normal", registry, data.normalMap, icons, Icons::normalMap.uv());
 
 	ui::separator(1);
 
-	changed |= ui::mapInput("Height Map", data.height, data.heightMap, finder(data.heightMap), icons);
+	changed |= ui::mapInput("Height Map", data.height, registry, data.heightMap, icons);
 
 	ui::separator(1);
 
@@ -115,8 +116,7 @@ bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&
 	return changed;
 }
 
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-										 const TextureFinder& finder, bool showDebugComponents)
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons, bool showDebugComponents)
 {
 	bool isValid = registry.isValid(entity);
 	if (!isValid)
@@ -146,7 +146,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<editor::ColorMaterial>(registry, entity);
 	componentCollapse<editor::SkyBoxMaterial>(registry, entity, icons);
 	componentCollapse<editor::GridMaterial>(registry, entity);
-	componentCollapse<editor::StandardOpaqueMaterial>(registry, entity, icons, finder);
+	componentCollapse<editor::StandardOpaqueMaterial>(registry, entity, icons);
 
 	if (showDebugComponents)
 	{
@@ -846,7 +846,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 												 .withProps({
 													 false,
 													 {math::float3{.0f}, 1.0f},
-													 {"editor/textures/skybox/texture.ktx"},
+													 ecs::Resource::findOrCreate(registry, "editor/textures/skybox/texture.ktx"),
 												 }))
 						.withCulling(false)
 						.withPriority(0x7);
@@ -999,12 +999,12 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture& icons)
+EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture* icons)
 {
 	auto action = FileMenuAction::Unknown;
 
 	ImGui::SetCursorPosY(1.5f);
-	ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
+	if (icons) ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
 	ImGui::SetCursorPosY(0.0f);
 
 	{

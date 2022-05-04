@@ -6,7 +6,6 @@
 #include "Tags.h"
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <entt/core/hashed_string.hpp>
 
 #include <spatial/render/Resources.h>
 
@@ -20,6 +19,8 @@
 #include <spatial/ecs/EntityBuilder.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Texture.h>
+#include <spatial/render/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
@@ -37,86 +38,17 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-void createDefaultEditorEntities(ecs::Registry& registry)
-{
-	if (!registry.existsAny<SkyBoxMaterial>())
-		ecs::EntityBuilder::create(registry)
-			.withName("SkyBox Material")
-			.asMaterialInstance<SkyBoxMaterial>()
-			.withMaterial("editor/materials/skybox.filamat")
-			.withProps({
-				false,
-				{math::float3{.0f}, 1.0f},
-				{"editor/textures/skybox/texture.ktx"},
-			});
-
-	if (!registry.existsAny<GridMaterial>())
-		ecs::EntityBuilder::create(registry)
-			.withName("Grid Material")
-			.with<tags::IsEditorEntity>()
-			.asMaterialInstance<GridMaterial>()
-			.withMaterial("editor/materials/grid.filamat")
-			.withProps({});
-
-	if (!registry.existsAny<tags::IsGridPlane>())
-		ecs::EntityBuilder::create(registry)
-			.withName("Grid Plane")
-			.with<tags::IsEditorEntity>()
-			.with<tags::IsGridPlane>()
-			.asTransform()
-			.withScale({100.0f, 1.0f, 100.0f})
-			.withPosition({.0f, -0.01f, .0f})
-			.asMeshInstance()
-			.withMesh("editor/meshes/plane.filamesh")
-			.withDefaultMaterial(registry.getFirstEntity<GridMaterial>());
-
-	if (!registry.existsAny<ecs::MeshInstance, tags::IsSkyBox>())
-		ecs::EntityBuilder::create(registry)
-			.withName("SkyBox")
-			.with<tags::IsSkyBox>()
-			.asMeshInstance()
-			.withMesh(ecs::Resource::findOrCreate(registry, "engine/skybox"))
-			.withDefaultMaterial(registry.getFirstEntity<SkyBoxMaterial>())
-			.withShadowOptions(false, false)
-			.withCulling(false)
-			.withPriority(0x7);
-
-	if (!registry.existsAny<tags::IsEditorView>())
-		ecs::EntityBuilder::create(registry)
-			.withName("Editor View")
-			.with<tags::IsEditorEntity>()
-			.with<tags::IsEditorView>()
-			.asSceneView()
-			.withIndirectLight(ecs::EntityBuilder::create(registry)
-								   .withName("Indirect Light")
-								   .with<tags::IsEditorEntity>()
-								   .asIndirectLight()
-								   .withReflectionsTexture("editor/textures/skybox/ibl.ktx")
-								   .withIrradianceValues("editor/textures/skybox/sh.txt"))
-			.withCamera(ecs::EntityBuilder::create(registry)
-							.withName("Editor Camera")
-							.with(EditorCamera{.5f, 10.0f})
-							.with<tags::IsEditorEntity>()
-							.asTransform()
-							.withPosition({3.0f, 3.0f, 20.0f})
-							.asPerspectiveCamera()
-							.withFieldOfView(60.0)
-							.withAspectRatio(19.0 / 6.0));
-}
-
 EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem)
 	: mEngine{engine},
 	  mWindow{window},
-
-	  mIconTexture{mEngine, nullptr},
 
 	  mFileSystem{fileSystem},
 	  mPlatformContext{},
 
 	  mRegistry{},
+	  mEditorRegistry{},
 
 	  mEditorCameraController{},
-	  mMaterialController{mEngine, mFileSystem},
 	  mScriptController{mFileSystem, mPlatformContext.createIsolate()},
 
 	  mJobQueue{},
@@ -125,43 +57,23 @@ EditorSystem::EditorSystem(filament::Engine& engine, desktop::Window& window, Fi
 	  mCurrentPath{PROJECT_DIR}
 
 {
-	{
-		auto data = mFileSystem.readBinary("editor/textures/icons.png");
-		mIconTexture = render::createTexture(mEngine, data.data(), data.size());
-	}
-
-	mJobQueue.connect<OpenProjectEvent>(*this);
-	mJobQueue.connect<ClearSceneEvent>(*this);
-	mJobQueue.connect<LoadSceneEvent>(*this);
-	mJobQueue.connect<SaveSceneEvent>(*this);
 }
 
 void EditorSystem::onStart()
 {
-	mMaterialController.load("engine/dummy_cubemap.ktx"_hs, render::createDummyCubemap(mEngine));
-	mMaterialController.load("engine/dummy_texture_white.png"_hs, render::createDummyTexture<0xFFFFFFFF>(mEngine));
-	mMaterialController.load("engine/dummy_texture_black.png"_hs, render::createDummyTexture<0x00000000>(mEngine));
+	mJobQueue.connect<OpenProjectEvent>(*this);
+	mJobQueue.connect<ClearSceneEvent>(*this);
+	mJobQueue.connect<LoadSceneEvent>(*this);
+	mJobQueue.connect<SaveSceneEvent>(*this);
 
-	createDefaultEditorEntities(mRegistry);
+	ecs::EntityBuilder::create(mEditorRegistry).asResource().withPath("editor/textures/icons.png");
+
+	createDefaultEditorEntities();
 }
 
 void EditorSystem::onStartFrame(float)
 {
 	mJobQueue.update();
-
-	auto skyboxResourceMeshEntity = ecs::Resource::find(mRegistry, "engine/skybox");
-	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(skyboxResourceMeshEntity))
-	{
-		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
-		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(skyboxResourceMeshEntity);
-		mRegistry.addOrReplaceComponent<ecs::tags::IsMesh>(skyboxResourceMeshEntity);
-		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity,
-										toShared(render::createFullScreenVertexBuffer(mEngine)));
-		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity, render::MeshGeometries{{0, ib->getIndexCount()}});
-		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity, std::move(ib));
-	}
-
-	mMaterialController.onStartFrame();
 }
 
 void EditorSystem::onUpdateFrame(float delta)
@@ -169,14 +81,16 @@ void EditorSystem::onUpdateFrame(float delta)
 	mScriptController.onUpdateFrame(mRegistry, delta);
 	mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	render::MaterialController::applyMaterial<GridMaterial>(mRegistry);
-	render::MaterialController::applyMaterial<ColorMaterial>(mRegistry);
-	mMaterialController.applyMaterialWithFinder<StandardOpaqueMaterial>(mRegistry);
-	mMaterialController.applyMaterialWithFinder<SkyBoxMaterial>(mRegistry);
+	render::MaterialController::updateMaterial<GridMaterial>(mRegistry);
+	render::MaterialController::updateMaterial<ColorMaterial>(mRegistry);
+	render::MaterialController::updateMaterial<StandardOpaqueMaterial>(mRegistry);
+	render::MaterialController::updateMaterial<SkyBoxMaterial>(mRegistry);
 }
 
 void EditorSystem::onDrawGui()
 {
+	const auto* iconTexture = render::getTexture(mEditorRegistry, "editor/textures/icons.png");
+
 	auto dockSpace = ui::DockSpace{"Spatial"};
 
 	static ecs::Entity selectedEntity{ecs::NullEntity};
@@ -193,27 +107,32 @@ void EditorSystem::onDrawGui()
 			: math::float3{};
 
 	ui::MenuBar::show([&]() {
-		fileMenuAction = ui::EditorMainMenu::fileMenu(*mIconTexture);
+		fileMenuAction = ui::EditorMainMenu::fileMenu(iconTexture);
 		ui::EditorMainMenu::createMenu(mRegistry, selectedEntity, createEntityPosition);
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 	});
 
-	switch (fileMenuAction)
+	if (fileMenuAction != ui::EditorMainMenu::FileMenuAction::Unknown)
 	{
-	case ui::EditorMainMenu::FileMenuAction::OpenProject:
-		ui::OpenProjectModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::SaveScene:
-		ui::SaveSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::OpenScene:
-		ui::OpenSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::NewScene:
-		ui::NewSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::Unknown:
-		break;
+		switch (fileMenuAction)
+		{
+		case ui::EditorMainMenu::FileMenuAction::OpenProject:
+			ui::OpenProjectModal::open();
+			break;
+		case ui::EditorMainMenu::FileMenuAction::SaveScene:
+			ui::SaveSceneModal::open();
+			break;
+		case ui::EditorMainMenu::FileMenuAction::OpenScene:
+			ui::OpenSceneModal::open();
+			break;
+		case ui::EditorMainMenu::FileMenuAction::NewScene:
+			ui::NewSceneModal::open();
+			break;
+		case ui::EditorMainMenu::FileMenuAction::Unknown:
+			break;
+		}
+
+		fileMenuAction = ui::EditorMainMenu::FileMenuAction::Unknown;
 	}
 
 	if (ui::OpenProjectModal::show(rootPath))
@@ -297,18 +216,17 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Components", [&]() {
 		ui::EntityProperties::popup(mRegistry, selectedEntity);
-		ui::EntityProperties::displayComponents(
-			mRegistry, selectedEntity, *mIconTexture,
-			[&](const auto& res) { return mMaterialController.findResource(res); }, showDebugComponents);
+		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, iconTexture, showDebugComponents);
 	});
 
 	ui::Window::show("Assets Explorer",
-					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, *mIconTexture); });
+					 [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, iconTexture); });
 }
 
 void EditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
 {
 	publisher.append(mRegistry);
+	publisher.append(mEditorRegistry);
 }
 
 void EditorSystem::onUpdateInput(const desktop::InputState& input)
@@ -329,7 +247,7 @@ void EditorSystem::setScenePath(const std::filesystem::path& path)
 void EditorSystem::clearScene()
 {
 	mRegistry = ecs::Registry{};
-	createDefaultEditorEntities(mRegistry);
+	createDefaultEditorEntities();
 }
 
 void EditorSystem::loadScene()
@@ -352,7 +270,7 @@ void EditorSystem::loadScene()
 		gLogger.warn("Could not load scene: {}", e.what());
 	}
 
-	createDefaultEditorEntities(mRegistry);
+	createDefaultEditorEntities();
 }
 
 void EditorSystem::saveScene()
@@ -420,6 +338,106 @@ void EditorSystem::onEvent(const OpenProjectEvent& event)
 	clearScene();
 	setRootPath(event.path);
 	setScenePath("scenes/default.spatial.json");
+}
+
+void EditorSystem::createDefaultEditorEntities()
+{
+	auto skyboxMesh = ecs::Resource::findOrCreate(mRegistry, "engine/skybox");
+	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(skyboxMesh))
+	{
+		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
+		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(skyboxMesh);
+		mRegistry.addOrReplaceComponent<ecs::tags::IsMesh>(skyboxMesh);
+		mRegistry.addOrReplaceComponent(skyboxMesh,
+										toShared(render::createFullScreenVertexBuffer(mEngine)));
+		mRegistry.addOrReplaceComponent(skyboxMesh, render::MeshGeometries{{0, ib->getIndexCount()}});
+		mRegistry.addOrReplaceComponent(skyboxMesh, std::move(ib));
+	}
+
+	auto dummyCubemap = ecs::Resource::findOrCreate(mRegistry, "engine/dummy_cubemap");
+	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(dummyCubemap)) {
+		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(dummyCubemap);
+		mRegistry.addOrReplaceComponent<ecs::tags::IsCubeMapTexture>(dummyCubemap);
+		mRegistry.addOrReplaceComponent(dummyCubemap, toShared(render::createDummyCubemap(mEngine)));
+	}
+
+	auto dummyWhite = ecs::Resource::findOrCreate(mRegistry, "engine/dummy_texture_white");
+	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(dummyWhite)) {
+		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(dummyWhite);
+		mRegistry.addOrReplaceComponent<ecs::tags::IsImageTexture>(dummyWhite);
+		mRegistry.addOrReplaceComponent(dummyWhite, toShared(render::createDummyTexture<0xFFFFFFFF>(mEngine)));
+	}
+
+	auto dummyBlack = ecs::Resource::findOrCreate(mRegistry, "engine/dummy_texture_black");
+	if (!mRegistry.hasAllComponents<ecs::tags::IsResourceLoaded>(dummyBlack)) {
+		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(dummyBlack);
+		mRegistry.addOrReplaceComponent<ecs::tags::IsImageTexture>(dummyBlack);
+		mRegistry.addOrReplaceComponent(dummyBlack, toShared(render::createDummyTexture<0x00000000>(mEngine)));
+	}
+
+	if (!mRegistry.existsAny<SkyBoxMaterial>())
+		ecs::EntityBuilder::create(mRegistry)
+			.withName("SkyBox Material")
+			.asMaterialInstance<SkyBoxMaterial>()
+			.withMaterial("editor/materials/skybox.filamat")
+			.withProps({
+				false,
+				{math::float3{.0f}, 1.0f},
+				ecs::Resource::findOrCreate(mRegistry, "editor/textures/skybox/texture.ktx"),
+			});
+
+	if (!mRegistry.existsAny<GridMaterial>())
+		ecs::EntityBuilder::create(mRegistry)
+			.withName("Grid Material")
+			.with<tags::IsEditorEntity>()
+			.asMaterialInstance<GridMaterial>()
+			.withMaterial("editor/materials/grid.filamat")
+			.withProps({});
+
+	if (!mRegistry.existsAny<tags::IsGridPlane>())
+		ecs::EntityBuilder::create(mRegistry)
+			.withName("Grid Plane")
+			.with<tags::IsEditorEntity>()
+			.with<tags::IsGridPlane>()
+			.asTransform()
+			.withScale({100.0f, 1.0f, 100.0f})
+			.withPosition({.0f, -0.01f, .0f})
+			.asMeshInstance()
+			.withMesh("editor/meshes/plane.filamesh")
+			.withDefaultMaterial(mRegistry.getFirstEntity<GridMaterial>());
+
+	if (!mRegistry.existsAny<ecs::MeshInstance, tags::IsSkyBox>())
+		ecs::EntityBuilder::create(mRegistry)
+			.withName("SkyBox")
+			.with<tags::IsSkyBox>()
+			.asMeshInstance()
+			.withMesh("engine/skybox")
+			.withDefaultMaterial(mRegistry.getFirstEntity<SkyBoxMaterial>())
+			.withShadowOptions(false, false)
+			.withCulling(false)
+			.withPriority(0x7);
+
+	if (!mRegistry.existsAny<tags::IsEditorView>())
+		ecs::EntityBuilder::create(mRegistry)
+			.withName("Editor View")
+			.with<tags::IsEditorEntity>()
+			.with<tags::IsEditorView>()
+			.asSceneView()
+			.withIndirectLight(ecs::EntityBuilder::create(mRegistry)
+								   .withName("Indirect Light")
+								   .with<tags::IsEditorEntity>()
+								   .asIndirectLight()
+								   .withReflectionsTexture("editor/textures/skybox/ibl.ktx")
+								   .withIrradianceValues("editor/textures/skybox/sh.txt"))
+			.withCamera(ecs::EntityBuilder::create(mRegistry)
+							.withName("Editor Camera")
+							.with(EditorCamera{.5f, 10.0f})
+							.with<tags::IsEditorEntity>()
+							.asTransform()
+							.withPosition({3.0f, 3.0f, 20.0f})
+							.asPerspectiveCamera()
+							.withFieldOfView(60.0)
+							.withAspectRatio(19.0 / 6.0));
 }
 
 } // namespace spatial::editor

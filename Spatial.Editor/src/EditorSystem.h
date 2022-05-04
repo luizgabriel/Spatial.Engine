@@ -10,14 +10,8 @@
 #include <spatial/desktop/InputState.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
-#include <spatial/render/CameraController.h>
-#include <spatial/render/IndirectLightController.h>
-#include <spatial/render/LightController.h>
 #include <spatial/render/MaterialController.h>
-#include <spatial/render/MeshController.h>
-#include <spatial/render/SceneController.h>
 #include <spatial/render/TextureView.h>
-#include <spatial/render/TransformController.h>
 #include <spatial/script/ScriptController.h>
 #include <spatial/script/PlatformContext.h>
 #include <spatial/render/RegistryRenderingSystem.h>
@@ -61,18 +55,18 @@ class EditorSystem
 	void onEvent(const SaveSceneEvent& event);
 	void onEvent(const OpenProjectEvent& event);
 
+	void createDefaultEditorEntities();
+
 	filament::Engine& mEngine;
 	desktop::Window& mWindow;
-
-	render::Texture mIconTexture;
 
 	FileSystem& mFileSystem;
 	script::PlatformContext mPlatformContext;
 
 	ecs::Registry mRegistry;
+	ecs::Registry mEditorRegistry;
 
 	EditorCameraController mEditorCameraController;
-	render::MaterialController mMaterialController;
 	script::ScriptController mScriptController;
 
 	EventQueue mJobQueue;

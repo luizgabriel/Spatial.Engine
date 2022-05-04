@@ -9,7 +9,7 @@ namespace spatial::ui
 {
 
 bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path& selectedPath,
-								  const filament::Texture& icon)
+								  const filament::Texture* icon)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
@@ -81,7 +81,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 	return selected;
 }
 
-bool AssetsExplorer::displayPathHeader(std::filesystem::path& selectedPath, const filament::Texture& icon)
+bool AssetsExplorer::displayPathHeader(std::filesystem::path& selectedPath, const filament::Texture* icon)
 {
 	bool changed = false;
 	if (selectedPath.empty())

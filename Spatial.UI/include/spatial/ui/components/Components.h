@@ -32,27 +32,27 @@ void spacing(std::uint32_t times = 1);
 
 void separator(std::uint32_t spacing = 0);
 
-void image(const filament::Texture& texture, math::float2 size = math::float2{0, 0},
+void image(const filament::Texture* texture, math::float2 size = math::float2{0, 0},
 		   math::float4 uv = math::float4{0, 0, 1, 1});
 
-bool imageButton(const filament::Texture& texture, math::float2 size = math::float2{0, 0},
+bool imageButton(const filament::Texture* texture, math::float2 size = math::float2{0, 0},
 				 math::float4 uv = math::float4{0, 0, 1, 1});
 
 template <typename Component, typename... Args>
 struct ComponentInputImpl
 {
 	static constexpr auto sName = "Unknown";
-	static bool draw(ecs::Registry&, ecs::Entity, Args&&...) = delete;
+	static bool draw(ecs::Registry&, ecs::Entity, Args...) = delete;
 };
 
 template <typename Component, typename... Args>
-bool componentInput(ecs::Registry& registry, ecs::Entity entity, Args&&... args)
+bool componentInput(ecs::Registry& registry, ecs::Entity entity, Args... args)
 {
 	return ComponentInputImpl<Component, Args...>::draw(registry, entity, std::forward<Args>(args)...);
 }
 
 template <typename Component, typename... Args>
-bool componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args&&... args)
+bool componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args... args)
 {
 	bool changed = false;
 
