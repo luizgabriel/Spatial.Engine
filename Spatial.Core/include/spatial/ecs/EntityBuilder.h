@@ -236,8 +236,11 @@ class IndirectLightEntityBuilder : public BasicEntityBuilder<IndirectLight>
 	IndirectLightEntityBuilder(Registry& registry, Entity entity);
 
 	IndirectLightEntityBuilder& withIntensity(float intensity);
-	IndirectLightEntityBuilder& withReflectionsTexturePath(const std::filesystem::path& path);
-	IndirectLightEntityBuilder& withIrradianceValuesPath(const std::filesystem::path& path);
+	IndirectLightEntityBuilder& withReflectionsTexture(std::string_view path);
+	IndirectLightEntityBuilder& withReflectionsTexture(ecs::Entity resource);
+
+	IndirectLightEntityBuilder& withIrradianceValues(std::string_view path);
+	IndirectLightEntityBuilder& withIrradianceValues(ecs::Entity resource);
 };
 
 template <typename MaterialProps>
@@ -257,12 +260,12 @@ class MaterialInstanceEntityBuilder : public EntityBuilder
 		return *this;
 	}
 
-	MaterialInstanceEntityBuilder& withMaterial(Entity compiledMaterialEntity)
+	MaterialInstanceEntityBuilder& withMaterial(Entity resource)
 	{
-		if (mRegistry.hasAllComponents<Name>(compiledMaterialEntity) && !mRegistry.hasAnyComponent<Name>(mEntity))
-			withName(mRegistry.getComponent<Name>(compiledMaterialEntity).name);
+		if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
+			withName(mRegistry.getComponent<Resource>(resource).stem());
 
-		withParent(compiledMaterialEntity);
+		withParent(resource);
 		return *this;
 	}
 
@@ -280,7 +283,7 @@ class ResourceEntityBuilder : public BasicEntityBuilder<Resource>
 
 	ResourceEntityBuilder(Registry& registry, Entity entity);
 
-	ResourceEntityBuilder& withPath(const std::filesystem::path& relativePath);
+	ResourceEntityBuilder& withPath(std::string_view relativePath);
 };
 
 class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
@@ -291,7 +294,7 @@ class MeshInstanceEntityBuilder : public BasicEntityBuilder<MeshInstance>
 	MeshInstanceEntityBuilder(Registry& registry, Entity entity);
 
 	MeshInstanceEntityBuilder& withMesh(std::string_view resourceRelativePath);
-	MeshInstanceEntityBuilder& withMesh(Entity meshEntity);
+	MeshInstanceEntityBuilder& withMesh(Entity resource);
 
 	MeshInstanceEntityBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
 	MeshInstanceEntityBuilder& withDefaultMaterial(Entity materialEntity);

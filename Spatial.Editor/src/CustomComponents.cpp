@@ -380,11 +380,10 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
 										 | ImGuiTableFlags_NoBordersInBody;
 
-	if (ImGui::BeginTable("Scene Graph Entities", 3, flags))
+	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
 	{
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 12.0f);
-		ImGui::TableSetupColumn("Visibility", ImGuiTableColumnFlags_WidthFixed, 18.0f);
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
 		auto lowerCaseSearch = std::string{search};
@@ -435,20 +434,17 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	ImGui::TableNextColumn();
 
 	if (registry.hasAnyComponent<ecs::tags::IsMainView>(entity))
-		ImGui::TextDisabled("MAIN VIEW");
+		ImGui::TextDisabled("Main View");
 	else if (registry.hasAnyComponent<editor::tags::IsEditorView>(entity))
-		ImGui::TextDisabled("EDITOR VIEW");
+		ImGui::TextDisabled("Editor View");
 	else if (registry.hasAnyComponent<ecs::tags::IsCamera>(entity))
-		ImGui::TextDisabled("CAMERA");
+		ImGui::TextDisabled("Camera");
 	else if (registry.hasAnyComponent<ecs::tags::IsLight>(entity))
-		ImGui::TextDisabled("LIGHT");
+		ImGui::TextDisabled("Light");
 	else if (registry.hasAnyComponent<editor::tags::IsEditorEntity>(entity))
-		ImGui::TextDisabled("EDITOR");
+		ImGui::TextDisabled("Editor");
 	else if (registry.hasAnyComponent<ecs::tags::IsRenderable>(entity))
-		ImGui::TextDisabled("RENDERABLE");
-
-	ImGui::TableNextColumn();
-	ImGui::TextDisabled("VISIBLE");
+		ImGui::TextDisabled("Renderable");
 
 	if (open && hasChildren)
 	{
@@ -464,10 +460,8 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter)
 {
 	static const auto filterToName = std::unordered_map<ResourceType, const char*>{
-		{ResourceType::Material, "Materials"},
-		{ResourceType::Script, "Scripts"},
-		{ResourceType::Mesh, "Meshes"},
-		{ResourceType::Texture, "Textures"},
+		{ResourceType::All, "All"},		{ResourceType::Material, "Materials"}, {ResourceType::Script, "Scripts"},
+		{ResourceType::Mesh, "Meshes"}, {ResourceType::Texture, "Textures"},
 	};
 
 	bool changed = false;
@@ -508,8 +502,8 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 
 	if (ImGui::BeginTable("AssetsManagerTable", 2, flags))
 	{
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoHide);
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
 		auto lowerCaseSearch = std::string{search};
@@ -519,21 +513,27 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "editor/"))
 				return;
 
+			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "engine/"))
+				return;
+
 			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
 				return;
 
-			if (type == ResourceType::Material && !registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
-				return;
+			if (type != ResourceType::All)
+			{
+				if (type == ResourceType::Material && !registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
+					return;
 
-			if (type == ResourceType::Mesh && !registry.hasAnyComponent<ecs::tags::IsMesh>(entity))
-				return;
+				if (type == ResourceType::Mesh && !registry.hasAllComponents<ecs::tags::IsMesh>(entity))
+					return;
 
-			if (type == ResourceType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
-				return;
+				if (type == ResourceType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
+					return;
 
-			if (type == ResourceType::Texture
-				&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture>(entity))
-				return;
+				if (type == ResourceType::Texture
+					&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture, ecs::tags::IsIrradianceValues>(entity))
+					return;
+			}
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
@@ -557,6 +557,12 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 				typeText = "Material"sv;
 			else if (registry.hasAllComponents<ecs::tags::IsScript>(entity))
 				typeText = "Script"sv;
+			else if (registry.hasAnyComponent<ecs::tags::IsImageTexture>(entity))
+				typeText = "Image Texture"sv;
+			else if (registry.hasAnyComponent<ecs::tags::IsCubeMapTexture>(entity))
+				typeText = "CubeMap Texture"sv;
+			else if (registry.hasAnyComponent<ecs::tags::IsIrradianceValues>(entity))
+				typeText = "Irradiance Values"sv;
 
 			ImGui::TextDisabled("%s", typeText.data());
 		};
@@ -688,10 +694,10 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 bool EditorDragAndDrop::loadResource(ecs::Registry& registry, ecs::Entity& selectedEntity)
 {
 	auto dnd = ui::DragAndDropTarget{};
-	auto result = dnd.getPayload<std::filesystem::path>();
+	auto result = dnd.getPayload();
 	if (result && !result->empty())
 	{
-		selectedEntity = ecs::Resource::findOrCreate(registry, result.value().string());
+		selectedEntity = ecs::Resource::findOrCreate(registry, *result);
 		return true;
 	}
 
@@ -701,8 +707,8 @@ bool EditorDragAndDrop::loadResource(ecs::Registry& registry, ecs::Entity& selec
 bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
 {
 	auto dnd = DragAndDropTarget{};
-	const auto result = dnd.getPayload<std::filesystem::path>();
-	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".spatial.json"))
+	const auto result = dnd.getPayload();
+	if (result && boost::algorithm::ends_with(result->c_str(), ".spatial.json"))
 	{
 		selectedEntity = ecs::NullEntity;
 		scenePath = std::filesystem::path{result.value()};
@@ -716,16 +722,15 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 										 math::float3 createEntityPosition)
 {
 	auto dnd = DragAndDropTarget{};
-	auto result = dnd.getPayload<std::filesystem::path>();
+	auto result = dnd.getPayload();
 
-	if (result && boost::algorithm::ends_with(result->filename().c_str(), ".filamesh"))
+	if (result && boost::algorithm::ends_with(result->c_str(), ".filamesh"))
 	{
 		selectedEntity = ecs::EntityBuilder::create(registry)
-							 .withName(result->stem().string())
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
-							 .withMesh( result.value().string());
+							 .withMesh(*result);
 
 		return true;
 	}
@@ -809,7 +814,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.asTransform()
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
-						.withMesh( "editor/meshes/sphere.filamesh")
+						.withMesh("editor/meshes/sphere.filamesh")
 						.withShadowOptions(true, true)
 						.withSubMesh(0, 1);
 		changed = true;
@@ -834,16 +839,15 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withName("Skybox")
 						.asMeshInstance()
 						.withMesh("engine/skybox")
-						.withDefaultMaterial(
-							ecs::EntityBuilder::create(registry)
-								.withName("Skybox Material")
-								.asMaterialInstance<editor::SkyBoxMaterial>()
-								.withMaterial("editor/materials/skybox.filamat")
-								.withProps({
-									false,
-									{math::float3{.0f}, 1.0f},
-									{"editor/textures/skybox/texture.ktx"},
-								}))
+						.withDefaultMaterial(ecs::EntityBuilder::create(registry)
+												 .withName("Skybox Material")
+												 .asMaterialInstance<editor::SkyBoxMaterial>()
+												 .withMaterial("editor/materials/skybox.filamat")
+												 .withProps({
+													 false,
+													 {math::float3{.0f}, 1.0f},
+													 {"editor/textures/skybox/texture.ktx"},
+												 }))
 						.withCulling(false)
 						.withPriority(0x7);
 		changed = true;

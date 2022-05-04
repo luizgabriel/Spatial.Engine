@@ -12,20 +12,12 @@ namespace spatial::render
 class IndirectLightController
 {
   public:
-	using ResourceId = uint32_t;
-	explicit IndirectLightController(filament::Engine& engine, FileSystem& fileSystem);
-
-	void loadTexture(ResourceId resourceId, const uint8_t* data, size_t size);
-	void loadIrradianceValues(ResourceId resourceId, const bands_t& bands);
+	explicit IndirectLightController(filament::Engine& engine);
 
 	void onUpdateFrame(ecs::Registry& registry);
 
   private:
 	filament::Engine& mEngine;
-	FileSystem& mFileSystem;
-
-	std::unordered_map<ResourceId, Texture> mTextures;
-	std::unordered_map<ResourceId, bands_t> mBands;
 };
 
 } // namespace spatial::render

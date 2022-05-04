@@ -5,13 +5,14 @@
 #include <spatial/render/MeshController.h>
 #include <spatial/render/RegistryRenderingSystem.h>
 #include <spatial/render/SceneController.h>
+#include <spatial/render/TextureController.h>
 #include <spatial/render/TransformController.h>
 
 namespace spatial::render
 {
 
-RegistryRenderingSystem::RegistryRenderingSystem(filament::Engine& engine, FileSystem& fileSystem)
-	: mEngine{engine}, mFileSystem{fileSystem}, mOnPublishRegistry{}, mIndirectLightController{mEngine, mFileSystem}
+RegistryRenderingSystem::RegistryRenderingSystem(FileSystem& fileSystem)
+	: mFileSystem{fileSystem}, mOnPublishRegistry{}
 {
 }
 
@@ -21,20 +22,22 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 	auto& engine = *renderer.getEngine();
 
 	registries.each([&](ecs::Registry& registry) {
-		SceneController{engine}.onStartFrame(registry);
 		MeshController{engine, mFileSystem}.onStartFrame(registry);
+		SceneController{engine}.onStartFrame(registry);
 
+		TextureController{engine, mFileSystem}.onUpdateFrame(registry);
+		MaterialLoaderController{engine, mFileSystem}.onUpdateFrame(registry);
 		SceneController{engine}.onUpdateFrame(registry);
 		TransformController{engine}.onUpdateFrame(registry);
 		CameraController{engine}.onUpdateFrame(registry);
 		LightController{engine}.onUpdateFrame(registry);
-		mIndirectLightController.onUpdateFrame(registry);
-
-		MaterialLoaderController{engine, mFileSystem}.onUpdateFrame(registry);
+		IndirectLightController{engine}.onUpdateFrame(registry);
 		MeshController{engine, mFileSystem}.onUpdateFrame(registry);
 
 		auto textureViews = registry.getEntities<const render::TextureView>();
-		textureViews.each([&](const auto& textureView) { renderer.render(textureView.getView().get()); });
+		textureViews.each([&](const auto& textureView) {
+			renderer.render(textureView.getView().get());
+		});
 	});
 }
 

@@ -32,6 +32,7 @@ add_library(Spatial.Core
         include/spatial/ecs/RegistryCollection.h
         include/spatial/ecs/Tags.h
         include/spatial/ecs/Resource.h
+        include/spatial/ecs/Texture.h
 
         include/spatial/render/Engine.h
         include/spatial/render/EngineResource.h
@@ -52,6 +53,7 @@ add_library(Spatial.Core
         include/spatial/render/IndirectLightController.h
         include/spatial/render/RegistryRenderingSystem.h
         include/spatial/render/MaterialInstance.h
+        include/spatial/render/TextureController.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -73,7 +75,6 @@ add_library(Spatial.Core
         include/spatial/resources/BoundingBox.h
         include/spatial/resources/FilameshFile.h
         include/spatial/resources/ResourceError.h
-        include/spatial/resources/ResourcePath.h
         include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
 
@@ -121,6 +122,7 @@ add_library(Spatial.Core
         src/render/MaterialController.cpp
         src/render/SceneRenderingSystem.cpp
         src/render/MaterialInstance.cpp
+        src/render/TextureController.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
@@ -133,7 +135,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp include/spatial/ecs/Texture.h)
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

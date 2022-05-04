@@ -67,7 +67,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 			{
 				auto dnd = DragAndDropSource{};
 				if (dnd.isStarted())
-					dnd.setPayload(selectedPath / entry.path);
+					dnd.setPayload((selectedPath / entry.path).string());
 			}
 		}
 
