@@ -155,6 +155,7 @@ class ResourceManager
   public:
 	enum class ResourceType
 	{
+		All,
 		Material,
 		Mesh,
 		Script,

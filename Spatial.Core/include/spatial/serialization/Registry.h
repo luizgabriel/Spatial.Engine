@@ -45,6 +45,7 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsMaterialInstance>(ar);
 	snapshot.template component<ecs::tags::IsImageTexture>(ar);
 	snapshot.template component<ecs::tags::IsCubeMapTexture>(ar);
+	snapshot.template component<ecs::tags::IsIrradianceValues>(ar);
 }
 
 } // namespace spatial::ecs

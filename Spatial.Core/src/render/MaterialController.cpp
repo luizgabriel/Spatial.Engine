@@ -29,7 +29,7 @@ void MaterialLoaderController::onUpdateFrame(ecs::Registry& registry) const
 			const auto data = mFileSystem.readBinary(resource.relativePath);
 			auto material = toShared(render::createMaterial(mEngine, data.data(), data.size()));
 
-			registry.addOrReplaceComponent<SharedMaterial>(entity, material);
+			registry.addOrReplaceComponent<SharedMaterial>(entity, std::move(material));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 

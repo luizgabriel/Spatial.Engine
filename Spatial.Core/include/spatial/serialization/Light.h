@@ -51,8 +51,8 @@ template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::IndirectLight& light)
 {
 	ar(make_nvp("intensity", light.intensity));
-	ar(make_nvp("reflectionsTexturePath", light.reflectionsTexturePath));
-	ar(make_nvp("irradianceValuesPath", light.irradianceValuesPath));
+	ar(make_nvp("reflectionsTexture", light.reflectionsTexture));
+	ar(make_nvp("irradianceValues", light.irradianceValues));
 }
 
 } // namespace cereal
