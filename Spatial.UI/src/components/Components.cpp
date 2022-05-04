@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/render/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
@@ -57,10 +58,10 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 
 	{
 		auto dnd = ui::DragAndDropTarget{};
-		auto result = dnd.getPayload<std::filesystem::path>();
+		auto result = dnd.getPayload();
 		if (result)
 		{
-			value = result.value().string();
+			value = *result;
 			return true;
 		}
 	}
@@ -150,8 +151,10 @@ bool ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::
 	bool changed = false;
 
 	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	changed |= ui::inputPath("Reflections Texture", light.reflectionsTexturePath);
-	changed |= ui::inputPath("Irradiance Values", light.irradianceValuesPath);
+	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>("Reflections Texture", registry,
+																	 light.reflectionsTexture);
+	changed |= ui::Search::searchResource<ecs::tags::IsIrradianceValues>("Irradiance Values", registry,
+																		 light.irradianceValues);
 
 	return changed;
 }
@@ -246,20 +249,9 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 	bool changed = false;
-	bool shouldRecreateMesh = false;
 	const size_t smallStep = 1, largeStep = 5;
 
-	changed |= Search::searchEntity<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
-	{
-		auto dnd = ui::DragAndDropTarget{};
-		auto result = dnd.getPayload<std::filesystem::path>();
-		if (result.has_value())
-		{
-			mesh.meshSource = ecs::Resource::findOrCreate(registry, result.value().string());
-			shouldRecreateMesh = true;
-			changed = true;
-		}
-	}
+	bool shouldRecreateMesh = Search::searchResource<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
 
 	spacing(3);
 

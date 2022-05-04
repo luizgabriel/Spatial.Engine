@@ -4,6 +4,7 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ui/components/Combo.h>
+#include <spatial/ui/components/DragAndDrop.h>
 #include <string>
 
 namespace spatial::ui
@@ -40,6 +41,24 @@ class Search
 						changed = true;
 					}
 				}
+			}
+		}
+
+		return changed;
+	}
+
+	template <typename... FilterComponents>
+	static bool searchResource(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity)
+	{
+		bool changed = searchEntity<FilterComponents...>(name, registry, selectedEntity);
+
+		{
+			auto dnd = ui::DragAndDropTarget{};
+			auto result = dnd.getPayload();
+			if (result)
+			{
+				selectedEntity = ecs::Resource::findOrCreate(registry, *result);
+				changed = true;
 			}
 		}
 

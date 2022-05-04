@@ -22,6 +22,10 @@ struct Resource
 
 	[[nodiscard]] std::string stem() const;
 
+	[[nodiscard]] std::string extension() const;
+
+	[[nodiscard]] std::string filename() const;
+
 	static Entity find(const Registry& registry, std::string_view resource);
 
 	static Entity findOrCreate(Registry& registry, std::string_view resource);

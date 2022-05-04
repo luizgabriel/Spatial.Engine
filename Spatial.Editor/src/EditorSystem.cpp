@@ -43,7 +43,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 		ecs::EntityBuilder::create(registry)
 			.withName("SkyBox Material")
 			.asMaterialInstance<SkyBoxMaterial>()
-			.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"))
+			.withMaterial("editor/materials/skybox.filamat")
 			.withProps({
 				false,
 				{math::float3{.0f}, 1.0f},
@@ -55,7 +55,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withName("Grid Material")
 			.with<tags::IsEditorEntity>()
 			.asMaterialInstance<GridMaterial>()
-			.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/grid.filamat"))
+			.withMaterial("editor/materials/grid.filamat")
 			.withProps({});
 
 	if (!registry.existsAny<tags::IsGridPlane>())
@@ -67,7 +67,7 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 			.withScale({100.0f, 1.0f, 100.0f})
 			.withPosition({.0f, -0.01f, .0f})
 			.asMeshInstance()
-			.withMesh(ecs::Resource::findOrCreate(registry, "editor/meshes/plane.filamesh"))
+			.withMesh("editor/meshes/plane.filamesh")
 			.withDefaultMaterial(registry.getFirstEntity<GridMaterial>());
 
 	if (!registry.existsAny<ecs::MeshInstance, tags::IsSkyBox>())
@@ -91,8 +91,8 @@ void createDefaultEditorEntities(ecs::Registry& registry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
-								   .withReflectionsTexturePath("editor/textures/skybox/ibl.ktx")
-								   .withIrradianceValuesPath("editor/textures/skybox/sh.txt"))
+								   .withReflectionsTexture("editor/textures/skybox/ibl.ktx")
+								   .withIrradianceValues("editor/textures/skybox/sh.txt"))
 			.withCamera(ecs::EntityBuilder::create(registry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
@@ -154,6 +154,7 @@ void EditorSystem::onStartFrame(float)
 	{
 		auto ib = toShared(render::createFullScreenIndexBuffer(mEngine));
 		mRegistry.addComponent<ecs::tags::IsResourceLoaded>(skyboxResourceMeshEntity);
+		mRegistry.addOrReplaceComponent<ecs::tags::IsMesh>(skyboxResourceMeshEntity);
 		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity,
 										toShared(render::createFullScreenVertexBuffer(mEngine)));
 		mRegistry.addOrReplaceComponent(skyboxResourceMeshEntity, render::MeshGeometries{{0, ib->getIndexCount()}});
@@ -270,9 +271,9 @@ void EditorSystem::onDrawGui()
 		});
 	});
 
-	ui::Window::show("Assets Manager", [&]() {
+	ui::Window::show("Resources Manager", [&]() {
 		static std::string search;
-		static ui::ResourceManager::ResourceType type = ui::ResourceManager::ResourceType::Material;
+		static ui::ResourceManager::ResourceType type = ui::ResourceManager::ResourceType::All;
 
 		ui::ResourceManager::header(search, type);
 		ui::ResourceManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);

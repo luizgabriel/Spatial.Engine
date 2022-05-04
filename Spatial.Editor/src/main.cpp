@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	auto rendering = render::RenderingSystem{window};
 	auto input = desktop::InputSystem{window};
 
-	auto scene = render::RegistryRenderingSystem{rendering.getEngine(), *fileSystem};
+	auto scene = render::RegistryRenderingSystem{*fileSystem};
 
 	auto ui = UserInterfaceSystem{rendering.getEngine(), window};
 	ui.setMaterial(*fileSystem, "editor/materials/ui_blit.filamat");

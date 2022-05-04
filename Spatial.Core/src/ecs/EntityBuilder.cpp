@@ -78,12 +78,12 @@ SceneViewEntityBuilder EntityBuilder::asSceneView()
 
 MeshMaterialEntityBuilder EntityBuilder::asMeshMaterial()
 {
-	return { mRegistry, mEntity };
+	return {mRegistry, mEntity};
 }
 
 ResourceEntityBuilder EntityBuilder::asResource()
 {
-	return { mRegistry, mEntity };
+	return {mRegistry, mEntity};
 }
 
 EntityBuilder& EntityBuilder::withParent(Entity parent)
@@ -338,15 +338,25 @@ IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIntensity(float inte
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexturePath(const std::filesystem::path& path)
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexture(std::string_view path)
 {
-	getComponent().reflectionsTexturePath = path;
+	return withReflectionsTexture(ecs::Resource::findOrCreate(mRegistry, path));
+}
+
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexture(ecs::Entity resource)
+{
+	getComponent().reflectionsTexture = resource;
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValuesPath(const std::filesystem::path& path)
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValues(std::string_view path)
 {
-	getComponent().irradianceValuesPath = path;
+	return withIrradianceValues(ecs::Resource::findOrCreate(mRegistry, path));
+}
+
+IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValues(ecs::Entity resource)
+{
+	getComponent().irradianceValues = resource;
 	return *this;
 }
 
@@ -360,9 +370,12 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(std::string_view 
 	return withMesh(ecs::Resource::findOrCreate(mRegistry, resourceRelativePath));
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity meshEntity)
+MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity resource)
 {
-	getComponent().meshSource = meshEntity;
+	if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAllComponents<Name>(mEntity))
+		withName(mRegistry.getComponent<Resource>(resource).stem());
+
+	getComponent().meshSource = resource;
 	return *this;
 }
 
@@ -371,7 +384,6 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withDefaultMaterial(Entity
 	getComponent().defaultMaterial = defaultMaterialInstance;
 	return *this;
 }
-
 
 MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
 {
@@ -406,7 +418,6 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMaterialAt(uint32_t pr
 	ecs::MeshInstance::addMaterial(mRegistry, mEntity, materialEntity, primitiveIndex);
 	return *this;
 }
-
 
 SceneViewEntityBuilder::SceneViewEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
@@ -448,23 +459,28 @@ ResourceEntityBuilder::ResourceEntityBuilder(Registry& registry, Entity entity) 
 {
 }
 
-ResourceEntityBuilder& ResourceEntityBuilder::withPath(const std::filesystem::path& relativePath)
+ResourceEntityBuilder& ResourceEntityBuilder::withPath(std::string_view relativePath)
 {
-	if (!relativePath.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
-		withName(relativePath.filename().string());
-
 	getComponent().relativePath = relativePath;
 
-	if (boost::ends_with(relativePath.c_str(), ".filamesh"))
+	const auto fileName = getComponent().filename();
+	const auto ext = getComponent().extension();
+
+	if (!relativePath.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
+		withName(fileName);
+
+	if (ext == ".filamesh")
 		with<ecs::tags::IsMesh>();
-	else if (boost::ends_with(relativePath.c_str(), ".filamat"))
+	else if (ext == ".filamat")
 		with<ecs::tags::IsMaterial>();
-	else if (boost::ends_with(relativePath.c_str(), ".js"))
+	else if (ext == ".js")
 		with<ecs::tags::IsScript>();
-	else if (boost::ends_with(relativePath.c_str(), ".png"))
+	else if (ext ==  ".png")
 		with<ecs::tags::IsImageTexture>();
-	else if (boost::ends_with(relativePath.c_str(), ".ktx"))
+	else if (ext == ".ktx")
 		with<ecs::tags::IsCubeMapTexture>();
+	else if (fileName == "sh.txt")
+		with<ecs::tags::IsIrradianceValues>();
 
 	return *this;
 }
