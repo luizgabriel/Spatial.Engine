@@ -475,7 +475,7 @@ ResourceEntityBuilder& ResourceEntityBuilder::withPath(std::string_view relative
 		with<ecs::tags::IsMaterial>();
 	else if (ext == ".js")
 		with<ecs::tags::IsScript>();
-	else if (ext ==  ".png")
+	else if (ext ==  ".png" || ext == ".jpg")
 		with<ecs::tags::IsImageTexture>();
 	else if (ext == ".ktx")
 		with<ecs::tags::IsCubeMapTexture>();

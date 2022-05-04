@@ -4,6 +4,8 @@
 #include <spatial/render/Transform.h>
 
 #include <spatial/ecs/Light.h>
+#include <spatial/render/Resources.h>
+#include <spatial/render/SkyboxResources.h>
 
 namespace spatial::render
 {
@@ -42,7 +44,7 @@ void update(const ecs::SpotLight& data, Light& light)
 }
 
 template <typename Component, Light::Type type>
-void createLights(ecs::Registry& registry, filament::Engine& engine)
+void createComponentLights(ecs::Registry& registry, filament::Engine& engine)
 {
 	auto view = registry.getEntities<Entity, Component>(ecs::ExcludeComponents<Light>);
 
@@ -54,7 +56,7 @@ void createLights(ecs::Registry& registry, filament::Engine& engine)
 }
 
 template <typename Component>
-void updateLights(ecs::Registry& registry)
+void updateComponentLights(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<Component, Light>();
 
@@ -73,21 +75,49 @@ void clearRemovedLights(ecs::Registry& registry)
 	registry.removeComponent<Light>(view.begin(), view.end());
 }
 
-LightController::LightController(filament::Engine& engine) : mEngine{engine}
+void LightController::createLights(filament::Engine& engine, ecs::Registry& registry)
 {
+	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
+		.each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
+			const auto* reflectionsTexture =
+				registry.tryGetComponent<const SharedTexture>(component.reflectionsTexture);
+
+			if (!reflectionsTexture)
+				return;
+
+			auto builder = filament::IndirectLight::Builder()
+							   .intensity(component.intensity)
+							   .reflections(reflectionsTexture->get());
+
+			const auto* irradianceValues = registry.tryGetComponent<bands_t>(component.irradianceValues);
+
+			if (irradianceValues)
+				builder = builder.irradiance(3, &irradianceValues->at(0));
+
+			registry.addComponent<IndirectLight>(entity, engine, builder.build(engine));
+		});
+
+	createComponentLights<ecs::DirectionalLight, Light::Type::DIRECTIONAL>(registry, engine);
+	createComponentLights<ecs::PointLight, Light::Type::POINT>(registry, engine);
+	createComponentLights<ecs::SunLight, Light::Type::SUN>(registry, engine);
+	createComponentLights<ecs::SpotLight, Light::Type::SPOT>(registry, engine);
 }
 
-void LightController::onUpdateFrame(ecs::Registry& registry) const
+void LightController::updateLights(ecs::Registry& registry)
 {
-	createLights<ecs::DirectionalLight, Light::Type::DIRECTIONAL>(registry, mEngine);
-	createLights<ecs::PointLight, Light::Type::POINT>(registry, mEngine);
-	createLights<ecs::SunLight, Light::Type::SUN>(registry, mEngine);
-	createLights<ecs::SpotLight, Light::Type::SPOT>(registry, mEngine);
+	registry.getEntities<const ecs::IndirectLight, IndirectLight>().each(
+		[&](const ecs::IndirectLight& component, IndirectLight& light) { light->setIntensity(component.intensity); });
 
-	updateLights<ecs::DirectionalLight>(registry);
-	updateLights<ecs::PointLight>(registry);
-	updateLights<ecs::SunLight>(registry);
-	updateLights<ecs::SpotLight>(registry);
+	updateComponentLights<ecs::DirectionalLight>(registry);
+	updateComponentLights<ecs::PointLight>(registry);
+	updateComponentLights<ecs::SunLight>(registry);
+	updateComponentLights<ecs::SpotLight>(registry);
+}
+
+void LightController::deleteLights(ecs::Registry& registry)
+{
+	auto view = registry.getEntities<IndirectLight>(ecs::ExcludeComponents<ecs::IndirectLight>);
+	registry.removeComponent<Camera>(view.begin(), view.end());
 
 	clearRemovedLights<ecs::DirectionalLight, ecs::PointLight, ecs::SunLight, ecs::SpotLight>(registry);
 }

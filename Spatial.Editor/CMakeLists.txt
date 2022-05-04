@@ -14,7 +14,7 @@ add_executable(Spatial.Editor MACOSX_BUNDLE
         src/EditorCamera.h
         src/Jobs.h
         src/Materials.h
-        src/DefaultMaterial.cpp
+        src/Materials.cpp
         src/Serialization.h
         src/Serialization.cpp
         src/CustomComponents.h

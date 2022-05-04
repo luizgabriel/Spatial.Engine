@@ -13,13 +13,10 @@
 namespace spatial::ui
 {
 
-using TextureFinder = std::function<const filament::Texture*(std::string_view)>;
-
 class EntityProperties
 {
   public:
-	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-								  const TextureFinder& finder, bool showDebugComponents = false);
+	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons, bool showDebugComponents = false);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
@@ -40,7 +37,7 @@ struct EditorMainMenu
 		SaveScene,
 	};
 
-	static FileMenuAction fileMenu(const filament::Texture& icons);
+	static FileMenuAction fileMenu(const filament::Texture* icons);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 						   const math::float3& createEntitiesPosition);
@@ -207,18 +204,17 @@ struct ComponentInputImpl<editor::GridMaterial>
 };
 
 template <>
-struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture&>
+struct ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture*>
 {
 	static constexpr auto sName = "SkyBox Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
-struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture&, const TextureFinder&>
+struct ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*>
 {
 	static constexpr auto sName = "Standard Opaque Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture& icons,
-					 const TextureFinder& finder);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 } // namespace spatial::ui

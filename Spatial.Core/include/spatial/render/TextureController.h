@@ -1,22 +1,15 @@
 #pragma once
 
-#include <spatial/resources/FileSystem.h>
 #include <filament/Engine.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/resources/FileSystem.h>
 
 namespace spatial::render
 {
 
-class TextureController
+struct TextureController
 {
-  public:
-	TextureController(filament::Engine& engine, FileSystem& fileSystem);
-
-	void onUpdateFrame(ecs::Registry& registry);
-
-  private:
-	filament::Engine& mEngine;
-	FileSystem& mFileSystem;
+	static void loadTextures(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry);
 };
 
-}
+} // namespace spatial::render

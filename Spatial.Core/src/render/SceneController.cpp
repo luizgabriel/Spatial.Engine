@@ -10,46 +10,36 @@
 namespace spatial::render
 {
 
-SceneController::SceneController(filament::Engine& engine) : mEngine{engine}
-{
-}
-
-void SceneController::onStartFrame(ecs::Registry& registry)
-{
-	cleanUpDestroyableEntities(registry);
-}
-
-void SceneController::createRenderable(ecs::Registry& registry) const
+void SceneController::createRenderables(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>).each([&](ecs::Entity entity) {
-		registry.addComponent(entity, createEntity(mEngine));
+		registry.addComponent(entity, createEntity(engine));
 	});
 }
 
-void SceneController::createScenes(ecs::Registry& registry) const
+void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::SceneView>(ecs::ExcludeComponents<Scene>)
 		.each([&](ecs::Entity entity, const auto&) {
-			registry.addComponent(entity, createScene(mEngine));
+			registry.addComponent(entity, createScene(engine));
 			registry.removeComponentFromEntities<ecs::tags::AddedToScene>();
 		});
-}
-
-void SceneController::onUpdateFrame(ecs::Registry& registry)
-{
-	createScenes(registry);
-	createRenderable(registry);
-	addToScene(registry);
 
 	registry.getEntities<const ecs::SceneView, Scene>(ecs::ExcludeComponents<TextureView>)
 		.each([&](ecs::Entity entity, const auto& sceneView, auto& scene) {
-			auto* camera = registry.tryGetComponent<Camera>(sceneView.camera);
-			if (!camera)
-				return;
+			registry.addComponent<TextureView>(entity, engine, sceneView.size);
+		});
+}
 
-			auto& textureView = registry.addComponent<TextureView>(entity, mEngine, sceneView.size);
+void SceneController::updateScenes(ecs::Registry& registry)
+{
+	registry.getEntities<const ecs::SceneView, Scene, TextureView>()
+		.each([&](const auto& sceneView, auto& scene, auto& textureView) {
 			textureView.setScene(scene.get());
-			textureView.setCamera(camera->getInstance());
+
+			auto* camera = registry.tryGetComponent<Camera>(sceneView.camera);
+			if (camera)
+				textureView.setCamera(camera->getInstance());
 		});
 
 	registry.getEntities<const ecs::SceneView, Scene>().each(
@@ -86,7 +76,7 @@ void SceneController::cleanUpDestroyableEntities(ecs::Registry& registry)
 	});
 }
 
-void SceneController::addToScene(ecs::Registry& registry)
+void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<Entity>(ecs::ExcludeComponents<ecs::tags::AddedToScene>);
 

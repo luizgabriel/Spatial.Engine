@@ -6,21 +6,11 @@
 namespace spatial::render
 {
 
-TransformController::TransformController(filament::Engine& engine) : mEngine{engine}
-{
-}
-
-void TransformController::onUpdateFrame(ecs::Registry& registry) const
-{
-	createTransforms(registry);
-	updateTransforms(registry);
-}
-
-void TransformController::createTransforms(ecs::Registry& registry) const
+void TransformController::createTransforms(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const Entity, ecs::Transform>(ecs::ExcludeComponents<Transform>)
 		.each([&](const auto entity, const auto& renderable, const auto& transform) {
-			registry.addComponent<Transform>(entity, mEngine, renderable.get());
+			registry.addComponent<Transform>(entity, engine, renderable.get());
 		});
 }
 
