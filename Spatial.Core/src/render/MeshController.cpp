@@ -13,19 +13,13 @@ namespace spatial::render
 
 static auto gLogger = createDefaultLogger();
 
-MeshController::MeshController(filament::Engine& engine, FileSystem& fileSystem)
-	: mEngine{engine}, mFileSystem{fileSystem}
+void MeshController::updateMeshInstances(ecs::Registry& registry)
 {
-}
-
-void MeshController::onUpdateFrame(ecs::Registry& registry)
-{
-	createRenderableMeshes(registry);
 	updateMeshGeometries(registry);
 	clearDirtyRenderables(registry);
 }
 
-void MeshController::createRenderableMeshes(ecs::Registry& registry)
+void MeshController::createMeshInstances(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const Entity, const ecs::MeshInstance>(ecs::ExcludeComponents<Renderable>)
 		.each([&](ecs::Entity e, const auto& entity, const auto& meshInstance) {
@@ -37,7 +31,7 @@ void MeshController::createRenderableMeshes(ecs::Registry& registry)
 				return;
 
 			const auto partsCount = meshInstance.slice.count == 0 ? meshPartsCount : meshInstance.slice.count;
-			registry.addComponent<Renderable>(e, mEngine, entity.get(), partsCount);
+			registry.addComponent<Renderable>(e, engine, entity.get(), partsCount);
 		});
 }
 
@@ -108,7 +102,7 @@ void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 	registry.removeComponentFromEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
 }
 
-void MeshController::onStartFrame(ecs::Registry& registry)
+void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
 	using namespace boost::algorithm;
 
@@ -117,7 +111,7 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".filamesh"))
 				return;
 
-			auto stream = mFileSystem.openReadStream(resource.relativePath);
+			auto stream = fileSystem.openReadStream(resource.relativePath);
 			if (stream->bad())
 			{
 				gLogger.warn("Could not load mesh: {}", resource.relativePath);
@@ -127,8 +121,8 @@ void MeshController::onStartFrame(ecs::Registry& registry)
 			auto filamesh = FilameshFile{};
 			*stream >> filamesh;
 
-			registry.addOrReplaceComponent(entity, toShared(createVertexBuffer(mEngine, filamesh)));
-			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(mEngine, filamesh)));
+			registry.addOrReplaceComponent(entity, toShared(createVertexBuffer(engine, filamesh)));
+			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(engine, filamesh)));
 			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
 			registry.addOrReplaceComponent(entity, createMeshGeometries(filamesh));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);

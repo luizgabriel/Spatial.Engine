@@ -69,19 +69,25 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 	return false;
 }
 
-void image(const filament::Texture& texture, math::float2 size, math::float4 uv)
+void image(const filament::Texture* texture, math::float2 size, math::float4 uv)
 {
+	if (texture == nullptr)
+		return;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
-	ImGui::Image((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+	ImGui::Image((ImTextureID)texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 #pragma clang diagnostic pop
 }
 
-bool imageButton(const filament::Texture& texture, math::float2 size, math::float4 uv)
+bool imageButton(const filament::Texture* texture, math::float2 size, math::float4 uv)
 {
+	if (texture == nullptr)
+		return false;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
-	return ImGui::ImageButton((ImTextureID)&texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+	return ImGui::ImageButton((ImTextureID)texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 #pragma clang diagnostic pop
 }
 

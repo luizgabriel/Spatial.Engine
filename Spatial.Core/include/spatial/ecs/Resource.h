@@ -26,6 +26,8 @@ struct Resource
 
 	[[nodiscard]] std::string filename() const;
 
+	static bool exists(const Registry& registry, std::string_view resource);
+
 	static Entity find(const Registry& registry, std::string_view resource);
 
 	static Entity findOrCreate(Registry& registry, std::string_view resource);

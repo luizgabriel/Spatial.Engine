@@ -6,16 +6,9 @@
 namespace spatial::render
 {
 
-class TransformController
+struct TransformController
 {
-  public:
-	explicit TransformController(filament::Engine& engine);
-
-	void onUpdateFrame(ecs::Registry& registry) const;
-
-  private:
-	filament::Engine& mEngine;
-	void createTransforms(ecs::Registry& registry) const;
+	static void createTransforms(filament::Engine& engine, ecs::Registry& registry);
 	static void updateTransforms(ecs::Registry& registry);
 };
 

@@ -6,15 +6,11 @@
 namespace spatial::render
 {
 
-class LightController
+struct LightController
 {
-  public:
-	explicit LightController(filament::Engine& engine);
-
-	void onUpdateFrame(ecs::Registry& registry) const;
-
-  private:
-	filament::Engine& mEngine;
+	static void createLights(filament::Engine& engine, ecs::Registry& registry);
+	static void updateLights(ecs::Registry& registry);
+	static void deleteLights(ecs::Registry& registry);
 };
 
 } // namespace spatial::render

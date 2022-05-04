@@ -50,10 +50,10 @@ add_library(Spatial.Core
         include/spatial/render/CameraController.h
         include/spatial/render/MeshController.h
         include/spatial/render/TextureView.h
-        include/spatial/render/IndirectLightController.h
         include/spatial/render/RegistryRenderingSystem.h
         include/spatial/render/MaterialInstance.h
         include/spatial/render/TextureController.h
+        include/spatial/render/TextureUtils.h
 
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
@@ -118,11 +118,11 @@ add_library(Spatial.Core
         src/render/MeshController.cpp
         src/render/SceneController.cpp
         src/render/TextureView.cpp
-        src/render/IndirectLightController.cpp
         src/render/MaterialController.cpp
         src/render/SceneRenderingSystem.cpp
         src/render/MaterialInstance.cpp
         src/render/TextureController.cpp
+        src/render/TextureUtils.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
