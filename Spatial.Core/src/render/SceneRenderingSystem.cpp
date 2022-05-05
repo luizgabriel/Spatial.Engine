@@ -15,16 +15,37 @@ RegistryRenderingSystem::RegistryRenderingSystem(FileSystem& fileSystem) : mFile
 {
 }
 
+void RegistryRenderingSystem::onStartFrame(float)
+{
+	auto registries = getPublishedRegistries();
+
+	registries.each([&](ecs::Registry& registry) {
+		SceneController::cleanUpDestroyableEntities(registry);
+		LightController::deleteLights(registry);
+		CameraController::deleteCameras(registry);
+	});
+}
+
+void RegistryRenderingSystem::onUpdateFrame(float)
+{
+	auto registries = getPublishedRegistries();
+
+	registries.each([&](ecs::Registry& registry) {
+		SceneController::updateScenes(registry);
+		SceneController::organizeSceneRenderables(registry);
+		TransformController::updateTransforms(registry);
+		CameraController::updateCameras(registry);
+		LightController::updateLights(registry);
+		MeshController::updateMeshInstances(registry);
+	});
+}
+
 void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 {
 	auto registries = getPublishedRegistries();
 	auto& engine = *renderer.getEngine();
 
 	registries.each([&](ecs::Registry& registry) {
-		SceneController::cleanUpDestroyableEntities(registry);
-		LightController::deleteLights(registry);
-		CameraController::deleteCameras(registry);
-
 		MeshController::loadMeshes(engine, mFileSystem, registry);
 		TextureController::loadTextures(engine, mFileSystem, registry);
 		MaterialController::loadMaterials(engine, mFileSystem, registry);
@@ -36,13 +57,6 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 		LightController::createLights(engine, registry);
 		MaterialController::createMaterialInstances(engine, registry);
 		MeshController::createMeshInstances(engine, registry);
-
-		SceneController::updateScenes(registry);
-		SceneController::organizeSceneRenderables(registry);
-		TransformController::updateTransforms(registry);
-		CameraController::updateCameras(registry);
-		LightController::updateLights(registry);
-		MeshController::updateMeshInstances(registry);
 
 		auto textureViews = registry.getEntities<const render::TextureView>();
 		textureViews.each([&](const auto& textureView) { renderer.render(textureView.getView().get()); });
