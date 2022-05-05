@@ -15,12 +15,15 @@ add_executable(Spatial.Core.Tests
         RenderingSystem.test.cpp
         FileSystem.test.cpp
         main.cpp)
-set_property(TARGET Spatial.Core.Tests PROPERTY CXX_STANDARD 20)
+
 set_property(
         TARGET Spatial.Core.Tests
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-target_link_libraries(Spatial.Core.Tests PUBLIC Spatial.Core CONAN_PKG::gtest)
+target_link_libraries(Spatial.Core.Tests
+        PUBLIC
+            Spatial.Core
+            CONAN_PKG::gtest)
 
 include(GoogleTest)
 gtest_discover_tests(Spatial.Core.Tests)

@@ -8,10 +8,10 @@
 namespace spatial::render
 {
 
-static auto gLogger = createDefaultLogger();
-
 void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
+	static auto logger = createDefaultLogger();
+
 	registry
 		.getEntities<const ecs::Resource, ecs::tags::IsImageTexture>(
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
@@ -19,10 +19,10 @@ void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileS
 			if (resource.relativePath.empty())
 				return;
 
-			const auto data = fileSystem.readBinary(resource.relativePath);
+			auto data = fileSystem.readBinary(resource.relativePath);
 			if (data.empty())
 			{
-				gLogger.warn("Could not load resource: {}", resource.relativePath);
+				logger.warn("Could not load texture: {}", resource.relativePath);
 				return;
 			}
 
@@ -39,10 +39,10 @@ void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileS
 			if (resource.relativePath.empty())
 				return;
 
-			const auto data = fileSystem.readBinary(resource.relativePath);
+			auto data = fileSystem.readBinary(resource.relativePath);
 			if (data.empty())
 			{
-				gLogger.warn("Could not load resource: {}", resource.relativePath);
+				logger.warn("Could not load texture: {}", resource.relativePath);
 				return;
 			}
 
@@ -59,10 +59,10 @@ void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileS
 			if (resource.relativePath.empty())
 				return;
 
-			const auto stream = fileSystem.openReadStream(resource.relativePath);
+			auto stream = fileSystem.openReadStream(resource.relativePath);
 			if (stream->bad())
 			{
-				gLogger.warn("Could not load resource: {}", resource.relativePath);
+				logger.warn("Could not load texture: {}", resource.relativePath);
 				return;
 			}
 

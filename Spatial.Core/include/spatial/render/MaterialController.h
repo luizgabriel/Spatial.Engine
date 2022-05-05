@@ -12,19 +12,16 @@
 namespace spatial::render
 {
 
-struct LoadResourceEvent
-{
-	std::string texturePath;
-};
-
 struct MaterialController
 {
 	static void loadMaterials(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry);
 
+	static void createMaterialInstances(filament::Engine& engine, ecs::Registry& registry);
+
 	template <typename MaterialComponent>
 	static void updateMaterial(ecs::Registry& registry)
 	{
-		registry.getEntities<MaterialComponent, SharedMaterialInstance>().each(
+		registry.getEntities<const MaterialComponent, SharedMaterialInstance>().each(
 			[&](const auto& data, auto& materialInstance) { data.apply(*materialInstance->get(), std::as_const(registry)); });
 	}
 };

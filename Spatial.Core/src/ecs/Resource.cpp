@@ -1,6 +1,6 @@
-#include <spatial/ecs/EntityBuilder.h>
-#include <spatial/ecs/Resource.h>
 #include <filesystem>
+#include <spatial/ecs/Builder.h>
+#include <spatial/ecs/Resource.h>
 
 namespace spatial::ecs
 {
@@ -27,7 +27,7 @@ Entity Resource::findOrCreate(Registry& registry, std::string_view resource)
 	if (registry.isValid(found))
 		return found;
 
-	return ecs::EntityBuilder::create(registry).asResource().withPath(resource);
+	return ecs::Builder::create(registry).asResource().withPath(resource);
 }
 
 std::string Resource::stem() const

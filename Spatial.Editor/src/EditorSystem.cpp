@@ -16,7 +16,7 @@
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 #include <spatial/core/Logger.h>
-#include <spatial/ecs/EntityBuilder.h>
+#include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Texture.h>
@@ -66,7 +66,7 @@ void EditorSystem::onStart()
 	mJobQueue.connect<LoadSceneEvent>(*this);
 	mJobQueue.connect<SaveSceneEvent>(*this);
 
-	ecs::EntityBuilder::create(mEditorRegistry).asResource().withPath("editor/textures/icons.png");
+	ecs::Builder::create(mEditorRegistry).asResource().withPath("editor/textures/icons.png");
 
 	createDefaultEditorEntities();
 }
@@ -376,7 +376,7 @@ void EditorSystem::createDefaultEditorEntities()
 	}
 
 	if (!mRegistry.existsAny<SkyBoxMaterial>())
-		ecs::EntityBuilder::create(mRegistry)
+		ecs::Builder::create(mRegistry)
 			.withName("SkyBox Material")
 			.asMaterialInstance<SkyBoxMaterial>()
 			.withMaterial("editor/materials/skybox.filamat")
@@ -387,7 +387,7 @@ void EditorSystem::createDefaultEditorEntities()
 			});
 
 	if (!mRegistry.existsAny<GridMaterial>())
-		ecs::EntityBuilder::create(mRegistry)
+		ecs::Builder::create(mRegistry)
 			.withName("Grid Material")
 			.with<tags::IsEditorEntity>()
 			.asMaterialInstance<GridMaterial>()
@@ -395,7 +395,7 @@ void EditorSystem::createDefaultEditorEntities()
 			.withProps({});
 
 	if (!mRegistry.existsAny<tags::IsGridPlane>())
-		ecs::EntityBuilder::create(mRegistry)
+		ecs::Builder::create(mRegistry)
 			.withName("Grid Plane")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsGridPlane>()
@@ -407,7 +407,7 @@ void EditorSystem::createDefaultEditorEntities()
 			.withDefaultMaterial(mRegistry.getFirstEntity<GridMaterial>());
 
 	if (!mRegistry.existsAny<ecs::MeshInstance, tags::IsSkyBox>())
-		ecs::EntityBuilder::create(mRegistry)
+		ecs::Builder::create(mRegistry)
 			.withName("SkyBox")
 			.with<tags::IsSkyBox>()
 			.asMeshInstance()
@@ -418,18 +418,18 @@ void EditorSystem::createDefaultEditorEntities()
 			.withPriority(0x7);
 
 	if (!mRegistry.existsAny<tags::IsEditorView>())
-		ecs::EntityBuilder::create(mRegistry)
+		ecs::Builder::create(mRegistry)
 			.withName("Editor View")
 			.with<tags::IsEditorEntity>()
 			.with<tags::IsEditorView>()
 			.asSceneView()
-			.withIndirectLight(ecs::EntityBuilder::create(mRegistry)
+			.withIndirectLight(ecs::Builder::create(mRegistry)
 								   .withName("Indirect Light")
 								   .with<tags::IsEditorEntity>()
 								   .asIndirectLight()
 								   .withReflectionsTexture("editor/textures/skybox/ibl.ktx")
 								   .withIrradianceValues("editor/textures/skybox/sh.txt"))
-			.withCamera(ecs::EntityBuilder::create(mRegistry)
+			.withCamera(ecs::Builder::create(mRegistry)
 							.withName("Editor Camera")
 							.with(EditorCamera{.5f, 10.0f})
 							.with<tags::IsEditorEntity>()
