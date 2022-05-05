@@ -13,7 +13,10 @@ include(StandardSettings)
 include(StaticAnalyzers)
 include(CMakePackageConfigHelpers)
 include(PackageSettings)
+
+set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CTest)
+enable_testing()
 
 add_subdirectory(Spatial.Core)
 add_subdirectory(Spatial.Res)

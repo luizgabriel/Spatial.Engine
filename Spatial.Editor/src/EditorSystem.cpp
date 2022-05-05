@@ -96,7 +96,6 @@ void EditorSystem::onDrawGui()
 	static ecs::Entity selectedEntity{ecs::NullEntity};
 	static bool showDebugEntities{false};
 	static bool showDebugComponents{false};
-	static ui::EditorMainMenu::FileMenuAction fileMenuAction{ui::EditorMainMenu::FileMenuAction::Unknown};
 	static std::filesystem::path rootPath = std::filesystem::current_path();
 
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
@@ -107,33 +106,10 @@ void EditorSystem::onDrawGui()
 			: math::float3{};
 
 	ui::MenuBar::show([&]() {
-		fileMenuAction = ui::EditorMainMenu::fileMenu(iconTexture);
+		ui::EditorMainMenu::fileMenu(iconTexture);
 		ui::EditorMainMenu::createMenu(mRegistry, selectedEntity, createEntityPosition);
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 	});
-
-	if (fileMenuAction != ui::EditorMainMenu::FileMenuAction::Unknown)
-	{
-		switch (fileMenuAction)
-		{
-		case ui::EditorMainMenu::FileMenuAction::OpenProject:
-			ui::OpenProjectModal::open();
-			break;
-		case ui::EditorMainMenu::FileMenuAction::SaveScene:
-			ui::SaveSceneModal::open();
-			break;
-		case ui::EditorMainMenu::FileMenuAction::OpenScene:
-			ui::OpenSceneModal::open();
-			break;
-		case ui::EditorMainMenu::FileMenuAction::NewScene:
-			ui::NewSceneModal::open();
-			break;
-		case ui::EditorMainMenu::FileMenuAction::Unknown:
-			break;
-		}
-
-		fileMenuAction = ui::EditorMainMenu::FileMenuAction::Unknown;
-	}
 
 	if (ui::OpenProjectModal::show(rootPath))
 		mJobQueue.enqueue<OpenProjectEvent>(rootPath);
@@ -159,9 +135,8 @@ void EditorSystem::onDrawGui()
 			auto style2 = ui::WindowPaddingStyle{4};
 			ui::Popup::show("Scene View Popup", [&]() {
 				auto menu = ui::Menu{"Create"};
-				if (!menu.isOpen())
-					return;
-				ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
+				if (menu.isOpen())
+					ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
 			});
 		}
 

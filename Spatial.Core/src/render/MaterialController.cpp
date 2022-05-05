@@ -7,10 +7,10 @@
 namespace spatial::render
 {
 
+static auto gLogger = createDefaultLogger();
+
 void MaterialController::loadMaterials(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
-	static auto logger = createDefaultLogger();
-
 	registry
 		.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
@@ -20,7 +20,7 @@ void MaterialController::loadMaterials(filament::Engine& engine, FileSystem& fil
 			const auto data = fileSystem.readBinary(resource.relativePath);
 			if (data.empty())
 			{
-				logger.warn("Could not load material: {}", resource.relativePath);
+				gLogger.warn("Could not load material: {}", resource.relativePath);
 				return;
 			}
 
