@@ -1,10 +1,7 @@
 #pragma once
 
 #include <filament/Engine.h>
-#include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/render/Resources.h>
-#include <spatial/resources/FilameshFile.h>
 #include <spatial/resources/FileSystem.h>
 
 namespace spatial::render

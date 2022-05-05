@@ -34,6 +34,7 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 		TransformController::createTransforms(engine, registry);
 		CameraController::createCameras(engine, registry);
 		LightController::createLights(engine, registry);
+		MaterialController::createMaterialInstances(engine, registry);
 		MeshController::createMeshInstances(engine, registry);
 
 		SceneController::updateScenes(registry);

@@ -2,7 +2,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <cassert>
 #include <fmt/format.h>
-#include <spatial/ecs/EntityBuilder.h>
+#include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
@@ -11,133 +11,133 @@
 namespace spatial::ecs
 {
 
-EntityBuilder::EntityBuilder(Registry& registry, Entity entity) : mRegistry{registry}, mEntity{entity}
+Builder::Builder(Registry& registry, Entity entity) : mRegistry{registry}, mEntity{entity}
 {
 }
 
-EntityBuilder& EntityBuilder::withName(std::string name)
+Builder& Builder::withName(std::string name)
 {
 	with<ecs::Name>(std::move(name));
 	return *this;
 }
 
-TransformEntityBuilder EntityBuilder::asTransform()
+TransformBuilder Builder::asTransform()
 {
 	return {mRegistry, mEntity};
 }
 
-PerspectiveCameraEntityBuilder EntityBuilder::asPerspectiveCamera()
+PerspectiveCameraBuilder Builder::asPerspectiveCamera()
 {
 	return {mRegistry, mEntity};
 }
 
-OrthographicCameraEntityBuilder EntityBuilder::asOrthographicCamera()
+OrthographicCameraBuilder Builder::asOrthographicCamera()
 {
 	return {mRegistry, mEntity};
 }
 
-CustomCameraEntityBuilder EntityBuilder::asCustomCamera()
+CustomCameraBuilder Builder::asCustomCamera()
 {
 	return {mRegistry, mEntity};
 }
 
-PointLightEntityBuilder EntityBuilder::asPointLight()
+PointLightBuilder Builder::asPointLight()
 {
 	return {mRegistry, mEntity};
 }
 
-SpotLightEntityBuilder EntityBuilder::asSpotLight()
+SpotLightBuilder Builder::asSpotLight()
 {
 	return {mRegistry, mEntity};
 }
 
-DirectionalLightEntityBuilder EntityBuilder::asDirectionalLight()
+DirectionalLightBuilder Builder::asDirectionalLight()
 {
 	return {mRegistry, mEntity};
 }
 
-SunLightEntityBuilder EntityBuilder::asSunLight()
+SunLightBuilder Builder::asSunLight()
 {
 	return {mRegistry, mEntity};
 }
 
-MeshInstanceEntityBuilder EntityBuilder::asMeshInstance()
+MeshInstanceBuilder Builder::asMeshInstance()
 {
 	return {mRegistry, mEntity};
 }
 
-IndirectLightEntityBuilder EntityBuilder::asIndirectLight()
+IndirectLightBuilder Builder::asIndirectLight()
 {
 	return {mRegistry, mEntity};
 }
 
-SceneViewEntityBuilder EntityBuilder::asSceneView()
+SceneViewBuilder Builder::asSceneView()
 {
 	return {mRegistry, mEntity};
 }
 
-MeshMaterialEntityBuilder EntityBuilder::asMeshMaterial()
+MeshMaterialBuilder Builder::asMeshMaterial()
 {
 	return {mRegistry, mEntity};
 }
 
-ResourceEntityBuilder EntityBuilder::asResource()
+ResourceBuilder Builder::asResource()
 {
 	return {mRegistry, mEntity};
 }
 
-EntityBuilder& EntityBuilder::withParent(Entity parent)
+Builder& Builder::withParent(Entity parent)
 {
 	ecs::Parent::addChild(mRegistry, parent, mEntity);
 	return *this;
 }
 
-EntityBuilder EntityBuilder::create(Registry& registry)
+Builder Builder::create(Registry& registry)
 {
 	return {registry, registry.createEntity()};
 }
 
-TransformEntityBuilder::TransformEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+TransformBuilder::TransformBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 }
 
-TransformEntityBuilder& TransformEntityBuilder::withPosition(math::float3 position)
+TransformBuilder& TransformBuilder::withPosition(math::float3 position)
 {
 	getComponent().position = position;
 	return *this;
 }
 
-TransformEntityBuilder& TransformEntityBuilder::withScale(math::float3 scale)
+TransformBuilder& TransformBuilder::withScale(math::float3 scale)
 {
 	getComponent().scale = scale;
 	return *this;
 }
 
-TransformEntityBuilder& TransformEntityBuilder::withRotation(math::float3 rotation)
+TransformBuilder& TransformBuilder::withRotation(math::float3 rotation)
 {
 	getComponent().rotation = rotation;
 	return *this;
 }
 
-PerspectiveCameraEntityBuilder::PerspectiveCameraEntityBuilder(Registry& registry, Entity entity)
+PerspectiveCameraBuilder::PerspectiveCameraBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
-PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withFieldOfView(double fieldOfView)
+PerspectiveCameraBuilder& PerspectiveCameraBuilder::withFieldOfView(double fieldOfView)
 {
 	getComponent().fieldOfView = fieldOfView;
 	return *this;
 }
 
-PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withAspectRatio(double aspectRatio)
+PerspectiveCameraBuilder& PerspectiveCameraBuilder::withAspectRatio(double aspectRatio)
 {
 	getComponent().aspectRatio = aspectRatio;
 	return *this;
 }
 
-PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withClippingPlanes(double near, double far)
+PerspectiveCameraBuilder& PerspectiveCameraBuilder::withClippingPlanes(double near, double far)
 {
 	auto& component = getComponent();
 	component.near = near;
@@ -145,13 +145,13 @@ PerspectiveCameraEntityBuilder& PerspectiveCameraEntityBuilder::withClippingPlan
 	return *this;
 }
 
-OrthographicCameraEntityBuilder::OrthographicCameraEntityBuilder(Registry& registry, Entity entity)
+OrthographicCameraBuilder::OrthographicCameraBuilder(Registry& registry, Entity entity)
 	: Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
-OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withProjection(double left, double right,
+OrthographicCameraBuilder& OrthographicCameraBuilder::withProjection(double left, double right,
 																				 double bottom, double top)
 {
 	auto& component = getComponent();
@@ -162,7 +162,7 @@ OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withProjection
 	return *this;
 }
 
-OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withClippingPlanes(double near, double far)
+OrthographicCameraBuilder& OrthographicCameraBuilder::withClippingPlanes(double near, double far)
 {
 	auto& component = getComponent();
 	component.near = near;
@@ -170,18 +170,18 @@ OrthographicCameraEntityBuilder& OrthographicCameraEntityBuilder::withClippingPl
 	return *this;
 }
 
-CustomCameraEntityBuilder::CustomCameraEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+CustomCameraBuilder::CustomCameraBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
-CustomCameraEntityBuilder& CustomCameraEntityBuilder::withProjection(math::mat4 projectionMatrix)
+CustomCameraBuilder& CustomCameraBuilder::withProjection(math::mat4 projectionMatrix)
 {
 	getComponent().projectionMatrix = projectionMatrix;
 	return *this;
 }
 
-CustomCameraEntityBuilder& CustomCameraEntityBuilder::withClippingPlanes(double near, double far)
+CustomCameraBuilder& CustomCameraBuilder::withClippingPlanes(double near, double far)
 {
 	auto& component = getComponent();
 	component.near = near;
@@ -189,47 +189,47 @@ CustomCameraEntityBuilder& CustomCameraEntityBuilder::withClippingPlanes(double 
 	return *this;
 }
 
-PointLightEntityBuilder::PointLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+PointLightBuilder::PointLightBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-PointLightEntityBuilder& PointLightEntityBuilder::withFalloff(float falloff)
+PointLightBuilder& PointLightBuilder::withFalloff(float falloff)
 {
 	getComponent().falloff = falloff;
 	return *this;
 }
 
-PointLightEntityBuilder& PointLightEntityBuilder::withIntensity(float intensity)
+PointLightBuilder& PointLightBuilder::withIntensity(float intensity)
 {
 	getComponent().intensity = intensity;
 	return *this;
 }
 
-PointLightEntityBuilder& PointLightEntityBuilder::withColor(math::float3 color)
+PointLightBuilder& PointLightBuilder::withColor(math::float3 color)
 {
 	getComponent().color = color;
 	return *this;
 }
 
-SpotLightEntityBuilder::SpotLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+SpotLightBuilder::SpotLightBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withDirection(math::float3 direction)
+SpotLightBuilder& SpotLightBuilder::withDirection(math::float3 direction)
 {
 	getComponent().direction = direction;
 	return *this;
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withFalloff(float falloff)
+SpotLightBuilder& SpotLightBuilder::withFalloff(float falloff)
 {
 	getComponent().falloff = falloff;
 	return *this;
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withAngles(float innerAngle, float outerAngle)
+SpotLightBuilder& SpotLightBuilder::withAngles(float innerAngle, float outerAngle)
 {
 	assert(innerAngle <= outerAngle);
 	auto& component = getComponent();
@@ -238,139 +238,139 @@ SpotLightEntityBuilder& SpotLightEntityBuilder::withAngles(float innerAngle, flo
 	return *this;
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withCastShadows(bool castShadows)
+SpotLightBuilder& SpotLightBuilder::withCastShadows(bool castShadows)
 {
 	getComponent().castShadows = castShadows;
 	return *this;
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withIntensity(float intensity)
+SpotLightBuilder& SpotLightBuilder::withIntensity(float intensity)
 {
 	getComponent().intensity = intensity;
 	return *this;
 }
 
-SpotLightEntityBuilder& SpotLightEntityBuilder::withColor(math::float3 color)
+SpotLightBuilder& SpotLightBuilder::withColor(math::float3 color)
 {
 	getComponent().color = color;
 	return *this;
 }
 
-DirectionalLightEntityBuilder::DirectionalLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+DirectionalLightBuilder::DirectionalLightBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withIntensity(float intensity)
+DirectionalLightBuilder& DirectionalLightBuilder::withIntensity(float intensity)
 {
 	getComponent().intensity = intensity;
 	return *this;
 }
 
-DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withColor(math::float3 color)
+DirectionalLightBuilder& DirectionalLightBuilder::withColor(math::float3 color)
 {
 	getComponent().color = color;
 	return *this;
 }
 
-DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withDirection(math::float3 direction)
+DirectionalLightBuilder& DirectionalLightBuilder::withDirection(math::float3 direction)
 {
 	getComponent().direction = direction;
 	return *this;
 }
 
-DirectionalLightEntityBuilder& DirectionalLightEntityBuilder::withCastShadows(bool castShadows)
+DirectionalLightBuilder& DirectionalLightBuilder::withCastShadows(bool castShadows)
 {
 	getComponent().castShadows = castShadows;
 	return *this;
 }
 
-SunLightEntityBuilder::SunLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+SunLightBuilder::SunLightBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withIntensity(float intensity)
+SunLightBuilder& SunLightBuilder::withIntensity(float intensity)
 {
 	getComponent().intensity = intensity;
 	return *this;
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withColor(math::float3 color)
+SunLightBuilder& SunLightBuilder::withColor(math::float3 color)
 {
 	getComponent().color = color;
 	return *this;
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withAngularRadius(float angularRadius)
+SunLightBuilder& SunLightBuilder::withAngularRadius(float angularRadius)
 {
 	getComponent().angularRadius = angularRadius;
 	return *this;
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withHaloFalloff(float haloFalloff)
+SunLightBuilder& SunLightBuilder::withHaloFalloff(float haloFalloff)
 {
 	getComponent().haloFalloff = haloFalloff;
 	return *this;
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withHaloSize(float haloSize)
+SunLightBuilder& SunLightBuilder::withHaloSize(float haloSize)
 {
 	getComponent().haloSize = haloSize;
 	return *this;
 }
 
-SunLightEntityBuilder& SunLightEntityBuilder::withCastShadows(bool castShadows)
+SunLightBuilder& SunLightBuilder::withCastShadows(bool castShadows)
 {
 	getComponent().castShadows = castShadows;
 	return *this;
 }
 
-IndirectLightEntityBuilder::IndirectLightEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+IndirectLightBuilder::IndirectLightBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIntensity(float intensity)
+IndirectLightBuilder& IndirectLightBuilder::withIntensity(float intensity)
 {
 	auto& component = getComponent();
 	component.intensity = intensity;
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexture(std::string_view path)
+IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(std::string_view path)
 {
 	return withReflectionsTexture(ecs::Resource::findOrCreate(mRegistry, path));
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withReflectionsTexture(ecs::Entity resource)
+IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity resource)
 {
 	getComponent().reflectionsTexture = resource;
 	return *this;
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValues(std::string_view path)
+IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(std::string_view path)
 {
 	return withIrradianceValues(ecs::Resource::findOrCreate(mRegistry, path));
 }
 
-IndirectLightEntityBuilder& IndirectLightEntityBuilder::withIrradianceValues(ecs::Entity resource)
+IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(ecs::Entity resource)
 {
 	getComponent().irradianceValues = resource;
 	return *this;
 }
 
-MeshInstanceEntityBuilder::MeshInstanceEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+MeshInstanceBuilder::MeshInstanceBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>();
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(std::string_view resourceRelativePath)
+MeshInstanceBuilder& MeshInstanceBuilder::withMesh(std::string_view resourceRelativePath)
 {
 	return withMesh(ecs::Resource::findOrCreate(mRegistry, resourceRelativePath));
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity resource)
+MeshInstanceBuilder& MeshInstanceBuilder::withMesh(Entity resource)
 {
 	if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAllComponents<Name>(mEntity))
 		withName(mRegistry.getComponent<Resource>(resource).stem());
@@ -379,13 +379,13 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMesh(Entity resource)
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withDefaultMaterial(Entity defaultMaterialInstance)
+MeshInstanceBuilder& MeshInstanceBuilder::withDefaultMaterial(Entity defaultMaterialInstance)
 {
 	getComponent().defaultMaterial = defaultMaterialInstance;
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
+MeshInstanceBuilder& MeshInstanceBuilder::withShadowOptions(bool castShadows, bool receiveShadows)
 {
 	auto& component = getComponent();
 	component.castShadows = castShadows;
@@ -393,7 +393,7 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withShadowOptions(bool cas
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
+MeshInstanceBuilder& MeshInstanceBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
 {
 	auto& component = getComponent();
 	component.slice.count = count;
@@ -401,46 +401,46 @@ MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withSubMesh(std::uint8_t o
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withCulling(bool culling)
+MeshInstanceBuilder& MeshInstanceBuilder::withCulling(bool culling)
 {
 	getComponent().culling = culling;
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withPriority(uint8_t priority)
+MeshInstanceBuilder& MeshInstanceBuilder::withPriority(uint8_t priority)
 {
 	getComponent().priority = priority;
 	return *this;
 }
 
-MeshInstanceEntityBuilder& MeshInstanceEntityBuilder::withMaterialAt(uint32_t primitiveIndex, Entity materialEntity)
+MeshInstanceBuilder& MeshInstanceBuilder::withMaterialAt(uint32_t primitiveIndex, Entity materialEntity)
 {
 	ecs::MeshInstance::addMaterial(mRegistry, mEntity, materialEntity, primitiveIndex);
 	return *this;
 }
 
-SceneViewEntityBuilder::SceneViewEntityBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+SceneViewBuilder::SceneViewBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 }
 
-SceneViewEntityBuilder& SceneViewEntityBuilder::withCamera(ecs::Entity cameraEntity)
+SceneViewBuilder& SceneViewBuilder::withCamera(ecs::Entity cameraEntity)
 {
 	getComponent().camera = cameraEntity;
 	return *this;
 }
 
-SceneViewEntityBuilder& SceneViewEntityBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
+SceneViewBuilder& SceneViewBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
 	getComponent().indirectLight = indirectLightEntity;
 	return *this;
 }
 
-MeshMaterialEntityBuilder::MeshMaterialEntityBuilder(Registry& registry, Entity entity)
-	: BasicEntityBuilder(registry, entity)
+MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity)
+	: BasicBuilder(registry, entity)
 {
 }
 
-MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withPrimitiveIndex(uint32_t primitiveIndex)
+MeshMaterialBuilder& MeshMaterialBuilder::withPrimitiveIndex(uint32_t primitiveIndex)
 {
 	if (!mRegistry.hasAllComponents<Name>(mEntity))
 		withName(fmt::format("Primitive {}", primitiveIndex));
@@ -449,17 +449,17 @@ MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withPrimitiveIndex(uint32_
 	return *this;
 }
 
-MeshMaterialEntityBuilder& MeshMaterialEntityBuilder::withMaterial(Entity materialInstance)
+MeshMaterialBuilder& MeshMaterialBuilder::withMaterial(Entity materialInstance)
 {
 	getComponent().materialInstanceEntity = materialInstance;
 	return *this;
 }
 
-ResourceEntityBuilder::ResourceEntityBuilder(Registry& registry, Entity entity) : BasicEntityBuilder(registry, entity)
+ResourceBuilder::ResourceBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
 }
 
-ResourceEntityBuilder& ResourceEntityBuilder::withPath(std::string_view relativePath)
+ResourceBuilder& ResourceBuilder::withPath(std::string_view relativePath)
 {
 	getComponent().relativePath = relativePath;
 

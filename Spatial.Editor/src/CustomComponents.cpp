@@ -5,7 +5,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <magic_enum.hpp>
-#include <spatial/ecs/EntityBuilder.h>
+#include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
@@ -600,7 +600,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 		if (menu2.item("Standard Opaque"))
 		{
 			createdEntity =
-				ecs::EntityBuilder::create(registry)
+				ecs::Builder::create(registry)
 					.withName(mergeMaterialName("Standard Opaque"))
 					.asMaterialInstance<editor::StandardOpaqueMaterial>()
 					.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
@@ -609,7 +609,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 
 		if (menu2.item("Color Material"))
 		{
-			createdEntity = ecs::EntityBuilder::create(registry)
+			createdEntity = ecs::Builder::create(registry)
 								.withName(mergeMaterialName("Color Material"))
 								.asMaterialInstance<editor::ColorMaterial>()
 								.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/color.filamat"));
@@ -619,7 +619,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 
 	if (menu.item("SkyBox"))
 	{
-		createdEntity = ecs::EntityBuilder::create(registry)
+		createdEntity = ecs::Builder::create(registry)
 							.withName("Default SkyBox")
 							.asMaterialInstance<editor::SkyBoxMaterial>()
 							.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
@@ -726,7 +726,7 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 
 	if (result && boost::algorithm::ends_with(result->c_str(), ".filamesh"))
 	{
-		selectedEntity = ecs::EntityBuilder::create(registry)
+		selectedEntity = ecs::Builder::create(registry)
 							 .asTransform()
 							 .withPosition(createEntityPosition)
 							 .asMeshInstance()
@@ -746,13 +746,13 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (Menu::itemButton("Empty"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
+		newEntity = ecs::Builder::create(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
 		changed = true;
 	}
 
 	if (Menu::itemButton("Scene View"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry).withName("Scene View").asSceneView();
+		newEntity = ecs::Builder::create(registry).withName("Scene View").asSceneView();
 		changed = true;
 	}
 
@@ -783,7 +783,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Cube"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Cube")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -796,7 +796,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Plane"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Plane")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -809,7 +809,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Sphere"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Sphere")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -822,7 +822,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Cylinder"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Cylinder")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -835,11 +835,11 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 
 	if (menu.item("Skybox"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Skybox")
 						.asMeshInstance()
 						.withMesh("engine/skybox")
-						.withDefaultMaterial(ecs::EntityBuilder::create(registry)
+						.withDefaultMaterial(ecs::Builder::create(registry)
 												 .withName("Skybox Material")
 												 .asMaterialInstance<editor::SkyBoxMaterial>()
 												 .withMaterial("editor/materials/skybox.filamat")
@@ -876,7 +876,7 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Point Light"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Point Light")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -886,13 +886,13 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Directional Light"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry).withName("Directional Light").asDirectionalLight();
+		newEntity = ecs::Builder::create(registry).withName("Directional Light").asDirectionalLight();
 		changed = true;
 	}
 
 	if (menu.item("Spot Light"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Spot Light")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -902,7 +902,7 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 
 	if (menu.item("Sun Light"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry).withName("Sun Light").asSunLight();
+		newEntity = ecs::Builder::create(registry).withName("Sun Light").asSunLight();
 		changed = true;
 	}
 
@@ -929,7 +929,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Perspective Camera"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Perspective Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -939,7 +939,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Orthographic Camera"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Orthographic Camera")
 						.asTransform()
 						.withPosition(createEntitiesPosition)
@@ -949,7 +949,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 
 	if (menu.item("Custom Camera"))
 	{
-		newEntity = ecs::EntityBuilder::create(registry)
+		newEntity = ecs::Builder::create(registry)
 						.withName("Custom Camera")
 						.asCustomCamera()
 						.withProjection(math::mat4::perspective(45.0, 1280.0 / 720.0, .1, 1000.0));

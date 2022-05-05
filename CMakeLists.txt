@@ -13,6 +13,7 @@ include(StandardSettings)
 include(StaticAnalyzers)
 include(CMakePackageConfigHelpers)
 include(PackageSettings)
+include(CTest)
 
 add_subdirectory(Spatial.Core)
 add_subdirectory(Spatial.Res)

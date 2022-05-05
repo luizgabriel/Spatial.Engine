@@ -23,7 +23,7 @@ add_library(Spatial.Core
         include/spatial/ecs/Registry.h
         include/spatial/ecs/Name.h
         include/spatial/ecs/Mesh.h
-        include/spatial/ecs/EntityBuilder.h
+        include/spatial/ecs/Builder.h
         include/spatial/ecs/Relation.h
         include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SceneView.h
