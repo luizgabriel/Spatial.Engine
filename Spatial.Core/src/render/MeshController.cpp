@@ -100,10 +100,10 @@ void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 	registry.removeComponentFromEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
 }
 
+static auto gLogger = createDefaultLogger();
+
 void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
-	static auto logger = createDefaultLogger();
-
 	registry.getEntities<const ecs::Resource, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
 			if (resource.relativePath.empty())
@@ -112,7 +112,7 @@ void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem
 			auto stream = fileSystem.openReadStream(resource.relativePath);
 			if (stream->bad())
 			{
-				logger.warn("Could not load mesh: {}", resource.relativePath);
+				gLogger.warn("Could not load mesh: {}", resource.relativePath);
 				return;
 			}
 

@@ -15,6 +15,10 @@ class RegistryRenderingSystem
   public:
 	RegistryRenderingSystem(FileSystem& fileSystem);
 
+	void onStartFrame(float);
+
+	void onUpdateFrame(float);
+
 	void onRender(filament::Renderer& renderer);
 
 	auto& getOnPublishRegistrySignal()

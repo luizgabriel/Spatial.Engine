@@ -71,8 +71,9 @@ bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture*>::draw(
 	return changed;
 }
 
-bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*>::draw(
-	ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons)
+bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*>::draw(ecs::Registry& registry,
+																						ecs::Entity entity,
+																						const filament::Texture* icons)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
@@ -116,7 +117,8 @@ bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*
 	return changed;
 }
 
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons, bool showDebugComponents)
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons,
+										 bool showDebugComponents)
 {
 	bool isValid = registry.isValid(entity);
 	if (!isValid)
@@ -531,7 +533,8 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 					return;
 
 				if (type == ResourceType::Texture
-					&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture, ecs::tags::IsIrradianceValues>(entity))
+					&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture,
+												 ecs::tags::IsIrradianceValues>(entity))
 					return;
 			}
 
@@ -839,15 +842,16 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withName("Skybox")
 						.asMeshInstance()
 						.withMesh("engine/skybox")
-						.withDefaultMaterial(ecs::Builder::create(registry)
-												 .withName("Skybox Material")
-												 .asMaterialInstance<editor::SkyBoxMaterial>()
-												 .withMaterial("editor/materials/skybox.filamat")
-												 .withProps({
-													 false,
-													 {math::float3{.0f}, 1.0f},
-													 ecs::Resource::findOrCreate(registry, "editor/textures/skybox/texture.ktx"),
-												 }))
+						.withDefaultMaterial(
+							ecs::Builder::create(registry)
+								.withName("Skybox Material")
+								.asMaterialInstance<editor::SkyBoxMaterial>()
+								.withMaterial("editor/materials/skybox.filamat")
+								.withProps({
+									false,
+									{math::float3{.0f}, 1.0f},
+									ecs::Resource::findOrCreate(registry, "editor/textures/skybox/texture.ktx"),
+								}))
 						.withCulling(false)
 						.withPriority(0x7);
 		changed = true;
@@ -1004,7 +1008,8 @@ EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture*
 	auto action = FileMenuAction::Unknown;
 
 	ImGui::SetCursorPosY(1.5f);
-	if (icons) ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
+	if (icons)
+		ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
 	ImGui::SetCursorPosY(0.0f);
 
 	{
@@ -1020,6 +1025,24 @@ EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture*
 
 		if (menu.item("Save Scene", "CTRL+S"))
 			action = FileMenuAction::SaveScene;
+	}
+
+	switch (action)
+	{
+	case ui::EditorMainMenu::FileMenuAction::OpenProject:
+		ui::OpenProjectModal::open();
+		break;
+	case ui::EditorMainMenu::FileMenuAction::SaveScene:
+		ui::SaveSceneModal::open();
+		break;
+	case ui::EditorMainMenu::FileMenuAction::OpenScene:
+		ui::OpenSceneModal::open();
+		break;
+	case ui::EditorMainMenu::FileMenuAction::NewScene:
+		ui::NewSceneModal::open();
+		break;
+	case ui::EditorMainMenu::FileMenuAction::Unknown:
+		break;
 	}
 
 	return action;

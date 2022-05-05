@@ -214,5 +214,4 @@ install(
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
 
-enable_testing()
 add_subdirectory(tests)

@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	auto editor = editor::EditorSystem{rendering.getEngine(), window, *fileSystem};
 
 	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> ui >> editor;
+	app >> desktopContext >> input >> rendering >> ui >> editor >> scene;
 
 	// Connect Desktop Events to All Systems
 	desktopContext >> app >> input >> rendering >> ui >> editor;
