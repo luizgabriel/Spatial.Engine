@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <spatial/ecs/EntityBuilder.h>
+#include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/serialization/Archives.h>
 #include <spatial/serialization/Registry.h>
@@ -24,7 +24,7 @@ TEST(Registry, EmptySerialization)
 TEST(Registry, SimpleSerialization)
 {
 	auto registry = ecs::Registry{};
-	ecs::EntityBuilder::create(registry).withName("Entity 1").asTransform().withPosition(5.0f).asPointLight();
+	ecs::Builder::create(registry).withName("Entity 1").asTransform().withPosition(5.0f).asPointLight();
 
 	auto ss = std::stringstream{};
 
@@ -50,7 +50,7 @@ struct CustomComponent
 TEST(Registry, CustomComponentSerialization)
 {
 	auto registry = ecs::Registry{};
-	ecs::EntityBuilder::create(registry)
+	ecs::Builder::create(registry)
 				  .withName("Entity 1")
 				  .asTransform()
 				  .withPosition(5.0f)
