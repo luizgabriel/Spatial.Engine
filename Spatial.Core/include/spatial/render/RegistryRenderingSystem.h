@@ -13,7 +13,7 @@ namespace spatial::render
 class RegistryRenderingSystem
 {
   public:
-	RegistryRenderingSystem(FileSystem& fileSystem);
+	explicit RegistryRenderingSystem(FileSystem& fileSystem);
 
 	void onStartFrame(float);
 

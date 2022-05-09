@@ -119,8 +119,7 @@ TransformBuilder& TransformBuilder::withRotation(math::float3 rotation)
 	return *this;
 }
 
-PerspectiveCameraBuilder::PerspectiveCameraBuilder(Registry& registry, Entity entity)
-	: Base(registry, entity)
+PerspectiveCameraBuilder::PerspectiveCameraBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
@@ -145,14 +144,13 @@ PerspectiveCameraBuilder& PerspectiveCameraBuilder::withClippingPlanes(double ne
 	return *this;
 }
 
-OrthographicCameraBuilder::OrthographicCameraBuilder(Registry& registry, Entity entity)
-	: Base(registry, entity)
+OrthographicCameraBuilder::OrthographicCameraBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsCamera>();
 }
 
-OrthographicCameraBuilder& OrthographicCameraBuilder::withProjection(double left, double right,
-																				 double bottom, double top)
+OrthographicCameraBuilder& OrthographicCameraBuilder::withProjection(double left, double right, double bottom,
+																	 double top)
 {
 	auto& component = getComponent();
 	component.left = left;
@@ -340,7 +338,7 @@ IndirectLightBuilder& IndirectLightBuilder::withIntensity(float intensity)
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(std::string_view path)
 {
-	return withReflectionsTexture(ecs::Resource::findOrCreate(mRegistry, path));
+	return withReflectionsTexture(ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(mRegistry, path));
 }
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity resource)
@@ -351,7 +349,7 @@ IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity r
 
 IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(std::string_view path)
 {
-	return withIrradianceValues(ecs::Resource::findOrCreate(mRegistry, path));
+	return withIrradianceValues(ecs::Resource::findOrCreate<ecs::tags::IsIrradianceValues>(mRegistry, path));
 }
 
 IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(ecs::Entity resource)
@@ -365,9 +363,9 @@ MeshInstanceBuilder::MeshInstanceBuilder(Registry& registry, Entity entity) : Ba
 	with<ecs::tags::IsRenderable>();
 }
 
-MeshInstanceBuilder& MeshInstanceBuilder::withMesh(std::string_view resourceRelativePath)
+MeshInstanceBuilder& MeshInstanceBuilder::withMesh(std::string_view resource)
 {
-	return withMesh(ecs::Resource::findOrCreate(mRegistry, resourceRelativePath));
+	return withMesh(ecs::Resource::findOrCreate<ecs::tags::IsMesh>(mRegistry, resource));
 }
 
 MeshInstanceBuilder& MeshInstanceBuilder::withMesh(Entity resource)
@@ -379,9 +377,9 @@ MeshInstanceBuilder& MeshInstanceBuilder::withMesh(Entity resource)
 	return *this;
 }
 
-MeshInstanceBuilder& MeshInstanceBuilder::withDefaultMaterial(Entity defaultMaterialInstance)
+MeshInstanceBuilder& MeshInstanceBuilder::withDefaultMaterialInstance(Entity materialEntity)
 {
-	getComponent().defaultMaterial = defaultMaterialInstance;
+	getComponent().defaultMaterial = materialEntity;
 	return *this;
 }
 
@@ -435,8 +433,7 @@ SceneViewBuilder& SceneViewBuilder::withIndirectLight(ecs::Entity indirectLightE
 	return *this;
 }
 
-MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity)
-	: BasicBuilder(registry, entity)
+MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
 }
 
@@ -464,23 +461,9 @@ ResourceBuilder& ResourceBuilder::withPath(std::string_view relativePath)
 	getComponent().relativePath = relativePath;
 
 	const auto fileName = getComponent().filename();
-	const auto ext = getComponent().extension();
 
 	if (!relativePath.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
 		withName(fileName);
-
-	if (ext == ".filamesh")
-		with<ecs::tags::IsMesh>();
-	else if (ext == ".filamat")
-		with<ecs::tags::IsMaterial>();
-	else if (ext == ".js")
-		with<ecs::tags::IsScript>();
-	else if (ext ==  ".png" || ext == ".jpg")
-		with<ecs::tags::IsImageTexture>();
-	else if (ext == ".ktx")
-		with<ecs::tags::IsCubeMapTexture>();
-	else if (fileName == "sh.txt")
-		with<ecs::tags::IsIrradianceValues>();
 
 	return *this;
 }

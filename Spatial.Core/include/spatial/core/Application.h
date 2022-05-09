@@ -13,8 +13,8 @@ class Application final
   private:
 	bool mRunning;
 
-	Clock<float> mClock;
-	float mDesiredDelta;
+	Clock mClock;
+	fseconds mDesiredDelta;
 
 	// region Signals
 	Signal<> mStartSignal;

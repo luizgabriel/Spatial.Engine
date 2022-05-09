@@ -13,19 +13,11 @@ namespace spatial::editor
 class EditorCameraController : public ecs::UpdateController<ecs::Transform, EditorCamera>
 {
   public:
-	using Base = ecs::UpdateController<ecs::Transform, EditorCamera>;
-
 	EditorCameraController() = default;
-
-	bool toggleControl() noexcept;
-
-	void disable() noexcept;
 
 	void onUpdateInput(const desktop::InputState& state);
 
   protected:
-	void beforeUpdateEntities(ecs::Registry& registry) override;
-
 	void onUpdateEntity(float delta, ecs::Transform& transform, EditorCamera& editor) const noexcept override;
 
   private:
@@ -36,13 +28,6 @@ class EditorCameraController : public ecs::UpdateController<ecs::Transform, Edit
 	};
 
 	InputControls mControls{};
-	bool mEnabled{false};
-	int mJustStarted{0};
-
-	[[nodiscard]] bool hasEnabledControls() const noexcept
-	{
-		return mEnabled && mJustStarted >= 10;
-	};
 };
 
 } // namespace spatial::editor

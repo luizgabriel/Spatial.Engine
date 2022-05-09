@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Resources.h"
+#include <spatial/render/Resources.h>
+
 namespace spatial::render
 {
 
@@ -13,9 +14,9 @@ class TextureView
 
 	void updateSize(math::int2 size);
 
-	void setCamera(filament::Camera* camera);
+	void setCamera(const SharedCamera& camera);
 
-	void setScene(filament::Scene* scene);
+	void setScene(const SharedScene& scene);
 
 	[[nodiscard]] const auto& getColorTexture() const
 	{
@@ -27,10 +28,32 @@ class TextureView
 		return mView;
 	}
 
+	auto& getScene()
+	{
+		return mScene;
+	}
+
+	[[nodiscard]] const auto& getScene() const
+	{
+		return mScene;
+	}
+
+	[[nodiscard]] const auto& getCamera() const
+	{
+		return mScene;
+	}
+
+	[[nodiscard]] auto& getCamera()
+	{
+		return mScene;
+	}
+
   private:
 	filament::Engine* mEngine;
-	View mView;
+	SharedCamera mCamera;
+	SharedScene mScene;
 
+	View mView;
 	Texture mRenderColorTexture;
 	Texture mRenderDepthTexture;
 	RenderTarget mRenderTarget;

@@ -17,7 +17,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
 	}
 
-	if (!registry.isValid(sceneViewEntity))
+	if (!registry.hasAllComponents<ecs::SceneView, render::TextureView>(sceneViewEntity))
 		return;
 
 	const auto& sceneView = registry.getComponent<const ecs::SceneView>(sceneViewEntity);
@@ -34,6 +34,43 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
 									 ImGui::GetCursorScreenPos().y));
 	ui::image(textureView.getColorTexture().get(), imageSize, math::float4{0, 1, 1, 0});
+}
+
+bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity)
+{
+	auto windowWidth = ImGui::GetContentRegionAvail().x;
+	auto sceneViewName = registry.tryGetComponent<ecs::Name>(sceneViewEntity);
+	bool changed = false;
+
+	auto cursorPosition = ImGui::GetCursorPos();
+	constexpr auto comboWidth = 200;
+
+	auto view = registry.getEntities<const ecs::Name, const ecs::SceneView>();
+
+	ImGui::SetCursorPos(ImVec2(windowWidth - comboWidth - 10, 30));
+
+	if (view.size_hint() <= 1)
+		return false;
+
+	{
+		ImGui::SetNextItemWidth(comboWidth);
+		auto combo = ui::Combo{"##SceneViewSelector", sceneViewName ? sceneViewName->name : "No View Selected"};
+		if (combo.isOpen())
+		{
+			registry.getEntities<const ecs::Name, const ecs::SceneView>().each(
+				[&](ecs::Entity entity, const ecs::Name& name, const auto&) {
+					if (combo.item(name.name, entity == sceneViewEntity))
+					{
+						sceneViewEntity = entity;
+						changed = true;
+					}
+				});
+		}
+	}
+
+	ImGui::SetCursorPos(cursorPosition);
+
+	return changed;
 }
 
 } // namespace spatial::ui

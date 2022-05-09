@@ -12,6 +12,22 @@ static auto gLogger = createDefaultLogger();
 
 void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
+	registry.getEntities<const ecs::DummyCubeMapTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity) {
+			auto texture = toShared(createDummyCubemap(engine));
+
+			registry.addOrReplaceComponent(entity, std::move(texture));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		});
+
+	registry.getEntities<const ecs::RuntimeTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::RuntimeTexture& runtimeTexture) {
+			auto texture = toShared(createTexture(engine, runtimeTexture.pixels, runtimeTexture.width));
+
+			registry.addOrReplaceComponent(entity, std::move(texture));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		});
+
 	registry
 		.getEntities<const ecs::Resource, ecs::tags::IsImageTexture>(
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)

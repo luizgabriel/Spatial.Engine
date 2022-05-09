@@ -21,15 +21,6 @@ Entity Resource::find(const Registry& registry, std::string_view resource)
 	return *it;
 }
 
-Entity Resource::findOrCreate(Registry& registry, std::string_view resource)
-{
-	auto found = Resource::find(registry, resource);
-	if (registry.isValid(found))
-		return found;
-
-	return ecs::Builder::create(registry).asResource().withPath(resource);
-}
-
 std::string Resource::stem() const
 {
 	return std::filesystem::path{relativePath}.stem().string();
@@ -48,6 +39,11 @@ std::string Resource::filename() const
 bool Resource::exists(const Registry& registry, std::string_view resource)
 {
 	return registry.isValid(find(registry, resource));
+}
+
+Entity Resource::createEmpty(Registry& registry, std::string_view resource)
+{
+	return ecs::Builder::create(registry).asResource().withPath(resource);
 }
 
 }

@@ -37,6 +37,7 @@ struct Icons
 	constexpr static Icon picker = Icon{{3, 2}};
 	constexpr static Icon cubemap = Icon{{1, 1}};
 	constexpr static Icon normalMap = Icon{{5, 2}};
+	constexpr static Icon search = Icon{{0, 3}};
 	Icons() = delete;
 };
 

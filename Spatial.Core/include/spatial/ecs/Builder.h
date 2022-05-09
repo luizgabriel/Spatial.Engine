@@ -256,7 +256,7 @@ class MaterialInstanceBuilder : public Builder
 
 	MaterialInstanceBuilder& withMaterial(std::string_view relativeResourcePath)
 	{
-		withMaterial(ecs::Resource::findOrCreate(mRegistry, relativeResourcePath));
+		withMaterial(ecs::Resource::findOrCreate<ecs::tags::IsMaterial>(mRegistry, relativeResourcePath));
 		return *this;
 	}
 
@@ -293,11 +293,11 @@ class MeshInstanceBuilder : public BasicBuilder<MeshInstance>
 
 	MeshInstanceBuilder(Registry& registry, Entity entity);
 
-	MeshInstanceBuilder& withMesh(std::string_view resourceRelativePath);
+	MeshInstanceBuilder& withMesh(std::string_view resource);
 	MeshInstanceBuilder& withMesh(Entity resource);
 
 	MeshInstanceBuilder& withShadowOptions(bool castShadows, bool receiveShadows);
-	MeshInstanceBuilder& withDefaultMaterial(Entity materialEntity);
+	MeshInstanceBuilder& withDefaultMaterialInstance(Entity materialEntity);
 	MeshInstanceBuilder& withMaterialAt(uint32_t primitiveIndex, Entity materialEntity);
 	MeshInstanceBuilder& withSubMesh(std::uint8_t offset, std::uint8_t count);
 	MeshInstanceBuilder& withCulling(bool culling);

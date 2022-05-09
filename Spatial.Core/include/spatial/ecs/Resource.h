@@ -30,7 +30,26 @@ struct Resource
 
 	static Entity find(const Registry& registry, std::string_view resource);
 
-	static Entity findOrCreate(Registry& registry, std::string_view resource);
+	template <typename ResourceTypeFlag>
+	static Entity create(Registry& registry, std::string_view resource)
+	{
+		auto entity = createEmpty(registry, resource);
+		registry.template addComponent<ResourceTypeFlag>(entity);
+		return entity;
+	}
+
+	template <typename ResourceTypeFlag>
+	static Entity findOrCreate(Registry& registry, std::string_view resource)
+	{
+		auto entity = find(registry, resource);
+		if (registry.isValid(entity))
+			return entity;
+
+		return create<ResourceTypeFlag>(registry, resource);
+	}
+
+  private:
+	static Entity createEmpty(Registry& registry, std::string_view resource);
 };
 
 struct ResourceError

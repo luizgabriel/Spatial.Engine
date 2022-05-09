@@ -15,9 +15,7 @@ void serializeEditorComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<StandardOpaqueMaterial>(ar);
 	snapshot.template component<EditorCamera>(ar);
 	snapshot.template component<tags::IsEditorEntity>(ar);
-	snapshot.template component<tags::IsSkyBox>(ar);
 	snapshot.template component<tags::IsEditorView>(ar);
-	snapshot.template component<tags::IsGridPlane>(ar);
 }
 
 ecs::Registry parseRegistry(std::istream& istream)

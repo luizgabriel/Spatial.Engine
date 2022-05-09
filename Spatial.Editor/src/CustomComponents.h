@@ -28,38 +28,27 @@ class EntityProperties
 
 struct EditorMainMenu
 {
-	enum class FileMenuAction
+	enum class Action
 	{
-		Unknown,
+		None,
 		OpenProject,
 		NewScene,
 		OpenScene,
 		SaveScene,
 	};
 
-	static FileMenuAction fileMenu(const filament::Texture* icons);
+	static bool fileMenu(const filament::Texture* icons, Action& action);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 						   const math::float3& createEntitiesPosition);
 };
 
-class NewSceneModal
+struct EditorModals
 {
-  public:
-	NewSceneModal();
-	bool onConfirm();
-
-	static void open();
-
-	static bool show()
-	{
-		auto modal = NewSceneModal{};
-		return modal.onConfirm();
-	}
-
-  private:
-	PopupModal mModal;
-	bool mIsConfirmed{false};
+  static bool newScene();
+  static bool openScene(std::filesystem::path& openPath);
+  static bool saveScene(std::filesystem::path& savePath);
+  static bool openProject(std::filesystem::path& openPath);
 };
 
 class OpenSceneModal
@@ -73,44 +62,6 @@ class OpenSceneModal
 	static bool show(std::filesystem::path& openPath)
 	{
 		auto modal = OpenSceneModal{openPath};
-		return modal.onConfirm();
-	}
-
-  private:
-	PopupModal mModal;
-	bool mIsConfirmed;
-};
-
-class SaveSceneModal
-{
-  public:
-	explicit SaveSceneModal(std::filesystem::path& savePath);
-	bool onConfirm();
-
-	static void open();
-
-	static bool show(std::filesystem::path& savePath)
-	{
-		auto modal = SaveSceneModal{savePath};
-		return modal.onConfirm();
-	}
-
-  private:
-	PopupModal mModal;
-	bool mConfirmed;
-};
-
-class OpenProjectModal
-{
-  public:
-	explicit OpenProjectModal(std::filesystem::path& openPath);
-	bool onConfirm();
-
-	static void open();
-
-	static bool show(std::filesystem::path& openPath)
-	{
-		auto modal = OpenProjectModal{openPath};
 		return modal.onConfirm();
 	}
 
@@ -159,7 +110,7 @@ class ResourceManager
 		Texture,
 	};
 
-	static bool header(std::string& search, ResourceType& filter);
+	static bool header(std::string& search, ResourceType& filter, const filament::Texture* icons);
 	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
 					 ResourceManager::ResourceType type, bool showEditorEntities);
 };
@@ -168,7 +119,6 @@ class MaterialsManager
 {
   public:
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool header(std::string& search);
 	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
 					 bool showEditorEntities);
 };
@@ -177,7 +127,6 @@ class EditorDragAndDrop
 {
   public:
 	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
-	static bool loadResource(ecs::Registry& registry, ecs::Entity& selectedEntity);
 	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								 math::float3 createEntityPosition = {});
 };
