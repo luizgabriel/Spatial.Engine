@@ -151,15 +151,16 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::IndirectLight>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+												  const filament::Texture* icons)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 	bool changed = false;
 
 	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
-	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>("Reflections Texture", registry,
-																	 light.reflectionsTexture);
-	changed |= ui::Search::searchResource<ecs::tags::IsIrradianceValues>("Irradiance Values", registry,
+	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>("Reflections Texture", icons, registry,
+																	   light.reflectionsTexture);
+	changed |= ui::Search::searchResource<ecs::tags::IsIrradianceValues>("Irradiance Values", icons, registry,
 																		 light.irradianceValues);
 
 	return changed;
@@ -251,13 +252,14 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::MeshInstance, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																		   const filament::Texture* icons)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 	bool changed = false;
 	const size_t smallStep = 1, largeStep = 5;
 
-	bool shouldRecreateMesh = Search::searchResource<ecs::tags::IsMesh>("Resource", registry, mesh.meshSource);
+	bool shouldRecreateMesh = Search::searchResource<ecs::tags::IsMesh>("Resource", icons, registry, mesh.meshSource);
 
 	spacing(3);
 
@@ -272,7 +274,8 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 
 	spacing(3);
 
-	changed |= Search::searchEntity<ecs::tags::IsMaterialInstance>("Default Material", registry, mesh.defaultMaterial);
+	changed |=
+		Search::searchEntity<ecs::tags::IsMaterialInstance>("Default Material", icons, registry, mesh.defaultMaterial);
 
 	spacing(3);
 
@@ -319,7 +322,7 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("##Material", registry,
+					ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("##Material", icons, registry,
 																			meshMaterial.materialInstanceEntity);
 
 					ImGui::TableNextColumn();
@@ -373,7 +376,8 @@ bool ComponentInputImpl<ecs::MeshInstance>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::MeshMaterial, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																		   const filament::Texture* icons)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
 	const size_t smallStep = 1, largeStep = 1;
@@ -381,7 +385,7 @@ bool ComponentInputImpl<ecs::MeshMaterial>::draw(ecs::Registry& registry, ecs::E
 
 	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep,
 								  &largeStep, "%lu");
-	changed |= ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("Material", registry,
+	changed |= ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("Material", icons, registry,
 																	   meshMaterial.materialInstanceEntity);
 
 	return changed;
@@ -450,14 +454,15 @@ bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::SceneView, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																		const filament::Texture* icons)
 {
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
 	auto changed = false;
 
 	changed |= ImGui::DragInt2("Size", &sceneView.size.x);
-	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", registry, sceneView.indirectLight);
-	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", registry, sceneView.camera);
+	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", icons, registry, sceneView.indirectLight);
+	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", icons, registry, sceneView.camera);
 
 	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
 		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
@@ -483,13 +488,14 @@ bool ComponentInputImpl<ecs::SceneView>::draw(ecs::Registry& registry, ecs::Enti
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Parent>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Parent, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	 const filament::Texture* icons)
 {
 	auto& parent = registry.getComponent<ecs::Parent>(entity);
 	bool changed = false;
 
-	changed |= ui::Search::searchEntity<ecs::Name>("First Child", registry, parent.first);
-	changed |= ui::Search::searchEntity<ecs::Name>("Last Child", registry, parent.last);
+	changed |= ui::Search::searchEntity<ecs::Name>("First Child", icons, registry, parent.first);
+	changed |= ui::Search::searchEntity<ecs::Name>("Last Child", icons, registry, parent.last);
 
 	size_t stepSlow = 1, stepFast = 5;
 	changed |=
@@ -498,14 +504,14 @@ bool ComponentInputImpl<ecs::Parent>::draw(ecs::Registry& registry, ecs::Entity 
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Child>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::Child, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons)
 {
 	auto& child = registry.getComponent<ecs::Child>(entity);
 	bool changed = false;
 
-	changed |= ui::Search::searchEntity<ecs::Name>("Parent", registry, child.parent);
-	changed |= ui::Search::searchEntity<ecs::Name>("Previous Sibling", registry, child.previous);
-	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", registry, child.next);
+	changed |= ui::Search::searchEntity<ecs::Name>("Parent", icons, registry, child.parent);
+	changed |= ui::Search::searchEntity<ecs::Name>("Previous Sibling", icons, registry, child.previous);
+	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", icons,  registry, child.next);
 
 	return changed;
 }

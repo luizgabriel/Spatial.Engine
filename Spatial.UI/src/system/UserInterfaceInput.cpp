@@ -69,4 +69,11 @@ void UserInterfaceInput::setText(const std::string& text)
 	io.AddInputCharactersUTF8(text.c_str());
 }
 
+void UserInterfaceInput::setScrollOffset(double xOffset, double yOffset)
+{
+	auto& io = ImGui::GetIO();
+	io.MouseWheel = static_cast<float>(yOffset);
+	io.MouseWheelH = static_cast<float>(xOffset);
+}
+
 } // namespace spatial

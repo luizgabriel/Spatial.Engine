@@ -16,6 +16,7 @@ class UserInterfaceInput
 	void setMousePosition(filament::math::float2 position);
 	void setKey(Key key, KeyAction action);
 	void setText(const std::string& text);
+	void setScrollOffset(double xOffset, double yOffset);
 };
 
 } // namespace spatial
