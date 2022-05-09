@@ -97,7 +97,7 @@ void ImGuiRenderer::setupEngineTheme()
 	colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
 	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 	colors[ImGuiCol_TextSelectedBg] = ImVec4(0.73f, 0.73f, 0.73f, 0.35f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.6f);
 	colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
 	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
@@ -213,8 +213,8 @@ void ImGuiRenderer::renderDrawData()
 	for (int cmdListIndex = 0; cmdListIndex < imguiData->CmdListsCount; cmdListIndex++)
 	{
 		const auto* commands = imguiData->CmdLists[cmdListIndex];
-		size_t indexOffset = 0;
-		populateVertexData(bufferIndex, commands->VtxBuffer, commands->IdxBuffer);
+		populateVertexData(bufferIndex, commands->VtxBuffer);
+		populateIndexData(bufferIndex, commands->IdxBuffer);
 
 		for (const auto& command : commands->CmdBuffer)
 		{
@@ -237,15 +237,13 @@ void ImGuiRenderer::renderDrawData()
 
 				builder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
-							  mVertexBuffers[bufferIndex].get(), mIndexBuffers[bufferIndex].get(), indexOffset,
+							  mVertexBuffers[bufferIndex].get(), mIndexBuffers[bufferIndex].get(), command.IdxOffset,
 							  command.ElemCount)
 					.blendOrder(primIndex, static_cast<uint16_t>(primIndex))
 					.material(primIndex, mi.get());
 
 				primIndex++;
 			}
-
-			indexOffset += command.ElemCount;
 		}
 
 		bufferIndex++;
@@ -293,30 +291,28 @@ void ImGuiRenderer::createMaterialInstances(size_t numRequiredInstances)
 	}
 }
 
-void ImGuiRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb,
-									   const ImVector<ImDrawIdx>& ib)
+void ImGuiRenderer::populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb)
 {
 	// Create a new vertex buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
-	{
-		const size_t capacityVertCount = mVertexBuffers[bufferIndex]->getVertexCount();
-		if (static_cast<size_t>(vb.Size) > capacityVertCount)
-			mVertexBuffers[bufferIndex] = ui::imguiCreateVertexBuffer(mEngine, static_cast<uint32_t>(vb.Size));
+	const size_t capacityVertCount = mVertexBuffers[bufferIndex]->getVertexCount();
+	if (static_cast<size_t>(vb.Size) > capacityVertCount)
+		mVertexBuffers[bufferIndex] = ui::imguiCreateVertexBuffer(mEngine, static_cast<uint32_t>(vb.Size));
 
-		auto vbDescriptor = ui::imguiCreateDescriptor<ImDrawVert>(vb);
-		mVertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
-	}
+	auto vbDescriptor = ui::imguiCreateDescriptor<ImDrawVert>(vb);
+	mVertexBuffers[bufferIndex]->setBufferAt(mEngine, 0, std::move(vbDescriptor));
+}
 
+void ImGuiRenderer::populateIndexData(size_t bufferIndex, const ImVector<ImDrawIdx>& ib)
+{
 	// Create a new index buffer if the size isn't large enough, then copy the ImGui data into
 	// a staging area since Filament's render thread might consume the data at any time.
-	{
-		const size_t capacityIndexCount = mIndexBuffers[bufferIndex]->getIndexCount();
-		if (static_cast<size_t>(ib.Size) > capacityIndexCount)
-			mIndexBuffers[bufferIndex] = ui::imguiCreateIndexBuffer(mEngine, static_cast<uint32_t>(ib.Size));
+	const size_t capacityIndexCount = mIndexBuffers[bufferIndex]->getIndexCount();
+	if (static_cast<size_t>(ib.Size) > capacityIndexCount)
+		mIndexBuffers[bufferIndex] = ui::imguiCreateIndexBuffer(mEngine, static_cast<uint32_t>(ib.Size));
 
-		auto ibDescriptor = ui::imguiCreateDescriptor<ImDrawIdx>(ib);
-		mIndexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
-	}
+	auto ibDescriptor = ui::imguiCreateDescriptor<ImDrawIdx>(ib);
+	mIndexBuffers[bufferIndex]->setBuffer(mEngine, std::move(ibDescriptor));
 }
 
 void ImGuiRenderer::createFontTextureAtlas()

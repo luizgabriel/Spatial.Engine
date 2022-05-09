@@ -32,11 +32,11 @@ void RegistryRenderingSystem::onUpdateFrame(float)
 
 	registries.each([&](ecs::Registry& registry) {
 		SceneController::updateScenes(registry);
-		SceneController::organizeSceneRenderables(registry);
 		TransformController::updateTransforms(registry);
 		CameraController::updateCameras(registry);
 		LightController::updateLights(registry);
 		MeshController::updateMeshInstances(registry);
+		SceneController::organizeSceneRenderables(registry);
 	});
 }
 
@@ -58,8 +58,7 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 		MaterialController::createMaterialInstances(engine, registry);
 		MeshController::createMeshInstances(engine, registry);
 
-		auto textureViews = registry.getEntities<const render::TextureView>();
-		textureViews.each([&](const auto& textureView) { renderer.render(textureView.getView().get()); });
+		SceneController::renderViews(renderer, registry);
 	});
 }
 

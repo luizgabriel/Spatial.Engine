@@ -20,9 +20,7 @@
 #include <spatial/render/MaterialInstance.h>
 #include <spatial/resources/FilameshFile.h>
 
-#include <memory>
 #include <string_view>
-#include <vector>
 
 namespace spatial::render
 {
@@ -48,7 +46,8 @@ using SharedMaterial = SharedEngineResource<filament::Material>;
 using SharedMaterialInstance = std::shared_ptr<render::MaterialInstance>;
 using SharedView = SharedEngineResource<filament::View>;
 using SharedTexture = SharedEngineResource<filament::Texture>;
-using SharedCamera = SharedEngineResource<filament::Camera>;
+using SharedCamera = SharedEngineResource<Camera>;
+using SharedIndirectLight = SharedEngineResource<filament::IndirectLight>;
 
 struct MeshGeometry
 {
@@ -105,31 +104,11 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 
 Texture createDummyCubemap(filament::Engine& engine);
 
-template <uint32_t color>
-Texture createDummyTexture(filament::Engine& engine)
-{
-	auto texture = createTexture(engine, {1, 1}, filament::Texture::InternalFormat::RGBA8,
-								 filament::Texture::Usage::DEFAULT, filament::Texture::Sampler::SAMPLER_2D);
-
-	static const uint32_t pixel = color;
-	auto buffer = filament::Texture::PixelBufferDescriptor(&pixel, 4, filament::Texture::Format::RGBA,
-														   filament::Texture::Type::UBYTE);
-
-	auto bufferDescriptor = filament::Texture::PixelBufferDescriptor{&pixel, 4, filament::Texture::Format::RGBA,
-																	 filament::Texture::Type::UBYTE};
-
-	texture->setImage(engine, 0, std::move(bufferDescriptor));
-
-	return texture;
-}
+Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pixels, size_t width);
 
 VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 
 IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
-
-VertexBuffer createFullScreenVertexBuffer(filament::Engine& engine);
-
-IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine);
 
 MeshGeometries createMeshGeometries(const FilameshFile& filamesh);
 

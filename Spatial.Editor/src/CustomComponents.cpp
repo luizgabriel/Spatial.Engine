@@ -237,132 +237,100 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
 	}
 }
 
-NewSceneModal::NewSceneModal() : mModal{"New Scene"}
+bool EditorModals::newScene()
 {
-	if (!mModal.isOpen())
-		return;
+	ImGui::Text("Are you sure?");
+	ImGui::Text("If you continue, all unsaved changes will be discarded.");
 
-	ImGui::Text("Are you sure? If you continue, all unsaved changes will be discarded.");
+	ui::separator(2);
 
-	ImGui::Separator();
-
-	mIsConfirmed = ImGui::Button("Discard unsaved changes and create a new scene.");
-	if (mIsConfirmed)
-		mModal.close();
+	bool isConfirmed = ImGui::Button("Continue");
+	if (isConfirmed)
+		ImGui::CloseCurrentPopup();
 
 	ImGui::SetItemDefaultFocus();
 	ImGui::SameLine();
 
 	if (ImGui::Button("Cancel"))
-		mModal.close();
+		ImGui::CloseCurrentPopup();
+
+	return isConfirmed;
 }
 
-bool NewSceneModal::onConfirm()
+bool EditorModals::openScene(std::filesystem::path& openPath)
 {
-	return mModal.isOpen() && mIsConfirmed;
-}
+	ImGui::Text("Are you sure?");
+	ImGui::Text("If you continue, all unsaved changes will be discarded.");
 
-void NewSceneModal::open()
-{
-	ImGui::OpenPopup("New Scene");
-}
-
-OpenSceneModal::OpenSceneModal(std::filesystem::path& openPath) : mModal{"Open Scene"}
-{
-	if (!mModal.isOpen())
-		return;
-
-	ImGui::Text("Are you sure? If you continue, all unsaved changes will be discarded.");
+	ui::spacing(2);
 
 	auto openPathValue = openPath.string();
-	ui::inputText("Path", openPathValue);
+	ui::inputText("Path", openPathValue, "scenes/*");
 	openPath = std::filesystem::path{openPathValue};
 
-	ImGui::Separator();
+	ui::separator(2);
 
-	mIsConfirmed = ImGui::Button("Open");
-	if (mIsConfirmed)
-		mModal.close();
+	bool confirmed = ImGui::Button("Continue");
+	if (confirmed)
+		ImGui::CloseCurrentPopup();
 
 	ImGui::SetItemDefaultFocus();
 	ImGui::SameLine();
 
 	if (ImGui::Button("Cancel"))
-		mModal.close();
+		ImGui::CloseCurrentPopup();
+
+	return confirmed;
 }
 
-bool OpenSceneModal::onConfirm()
+bool EditorModals::saveScene(std::filesystem::path& savePath)
 {
-	return mModal.isOpen() && mIsConfirmed;
-}
+	ImGui::Text("Save your current scene to this file:");
 
-void OpenSceneModal::open()
-{
-	ImGui::OpenPopup("Open Scene");
-}
-
-SaveSceneModal::SaveSceneModal(std::filesystem::path& savePath) : mModal{"Save Scene"}
-{
-	if (!mModal.isOpen())
-		return;
+	ui::spacing(2);
 
 	auto savePathValue = savePath.string();
-	ui::inputText("Scene File Path", savePathValue);
+	ui::inputText("Scene File Path", savePathValue, "scenes/*");
 	savePath = std::filesystem::path{savePathValue};
 
-	ImGui::Separator();
+	ui::separator(2);
 
-	mConfirmed = ImGui::Button("Save");
-	if (mConfirmed)
-		mModal.close();
+	bool confirmed = ImGui::Button("Continue");
+	if (confirmed)
+		ImGui::CloseCurrentPopup();
 
 	ImGui::SetItemDefaultFocus();
 	ImGui::SameLine();
 
 	if (ImGui::Button("Cancel"))
-		mModal.close();
+		ImGui::CloseCurrentPopup();
+
+	return confirmed;
 }
 
-bool SaveSceneModal::onConfirm()
+bool EditorModals::openProject(std::filesystem::path& openPath)
 {
-	return mModal.isOpen() && mConfirmed;
-}
+	ImGui::Text("Open you project source in the specified folder:");
 
-void SaveSceneModal::open()
-{
-	ImGui::OpenPopup("Save Scene");
-}
-
-OpenProjectModal::OpenProjectModal(std::filesystem::path& openPath) : mModal{"Open Project"}
-{
-	if (!mModal.isOpen())
-		return;
+	ui::spacing(2);
 
 	auto openPathValue = openPath.string();
 	ui::inputText("Path", openPathValue);
 	openPath = std::filesystem::path{openPathValue};
 
-	ImGui::Separator();
+	ui::separator(2);
 
-	mIsConfirmed = ImGui::Button("Open");
-	if (mIsConfirmed)
-		mModal.close();
+	bool confirmed = ImGui::Button("Continue");
+	if (confirmed)
+		ImGui::CloseCurrentPopup();
 
 	ImGui::SetItemDefaultFocus();
 	ImGui::SameLine();
 
 	if (ImGui::Button("Cancel"))
-		mModal.close();
-}
+		ImGui::CloseCurrentPopup();
 
-bool OpenProjectModal::onConfirm()
-{
-	return mModal.isOpen() && mIsConfirmed;
-}
-
-void OpenProjectModal::open()
-{
-	ImGui::OpenPopup("Open Project");
+	return confirmed;
 }
 
 bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities,
@@ -378,9 +346,8 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		changed = true;
 	}
 
-	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-										 | ImGuiTableFlags_NoBordersInBody;
+	const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable
+								  | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody;
 
 	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
 	{
@@ -459,7 +426,7 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter)
+bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter, const filament::Texture* icons)
 {
 	static const auto filterToName = std::unordered_map<ResourceType, const char*>{
 		{ResourceType::All, "All"},		{ResourceType::Material, "Materials"}, {ResourceType::Script, "Scripts"},
@@ -469,6 +436,7 @@ bool ResourceManager::header(std::string& search, ResourceManager::ResourceType&
 	bool changed = false;
 
 	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 100.0f);
 	ui::spanToAvailWidth();
 	if (ImGui::BeginCombo("##ResourceTypeFilter", filterToName.at(filter)))
 	{
@@ -483,7 +451,7 @@ bool ResourceManager::header(std::string& search, ResourceManager::ResourceType&
 		ImGui::EndCombo();
 	}
 	ImGui::NextColumn();
-	changed |= ui::Search::searchText(search);
+	changed |= ui::Search::text(search, icons);
 
 	ImGui::Columns(1);
 
@@ -602,11 +570,10 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 
 		if (menu2.item("Standard Opaque"))
 		{
-			createdEntity =
-				ecs::Builder::create(registry)
-					.withName(mergeMaterialName("Standard Opaque"))
-					.asMaterialInstance<editor::StandardOpaqueMaterial>()
-					.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/standard_lit.filamat"));
+			createdEntity = ecs::Builder::create(registry)
+								.withName(mergeMaterialName("Standard Opaque"))
+								.asMaterialInstance<editor::StandardOpaqueMaterial>()
+								.withMaterial("editor/materials/standard_lit.filamat");
 			changed = true;
 		}
 
@@ -615,7 +582,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 			createdEntity = ecs::Builder::create(registry)
 								.withName(mergeMaterialName("Color Material"))
 								.asMaterialInstance<editor::ColorMaterial>()
-								.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/color.filamat"));
+								.withMaterial("editor/materials/color.filamat");
 			changed = true;
 		}
 	}
@@ -625,7 +592,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 		createdEntity = ecs::Builder::create(registry)
 							.withName("Default SkyBox")
 							.asMaterialInstance<editor::SkyBoxMaterial>()
-							.withMaterial(ecs::Resource::findOrCreate(registry, "editor/materials/skybox.filamat"));
+							.withMaterial("editor/materials/skybox.filamat");
 		changed = true;
 	}
 
@@ -636,11 +603,6 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 		selectedEntity = createdEntity;
 
 	return changed;
-}
-
-bool MaterialsManager::header(std::string& search)
-{
-	return ui::Search::searchText(search);
 }
 
 bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
@@ -692,19 +654,6 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 	}
 
 	return changed;
-}
-
-bool EditorDragAndDrop::loadResource(ecs::Registry& registry, ecs::Entity& selectedEntity)
-{
-	auto dnd = ui::DragAndDropTarget{};
-	auto result = dnd.getPayload();
-	if (result && !result->empty())
-	{
-		selectedEntity = ecs::Resource::findOrCreate(registry, *result);
-		return true;
-	}
-
-	return false;
 }
 
 bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
@@ -842,16 +791,16 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withName("Skybox")
 						.asMeshInstance()
 						.withMesh("engine/skybox")
-						.withDefaultMaterial(
-							ecs::Builder::create(registry)
-								.withName("Skybox Material")
-								.asMaterialInstance<editor::SkyBoxMaterial>()
-								.withMaterial("editor/materials/skybox.filamat")
-								.withProps({
-									false,
-									{math::float3{.0f}, 1.0f},
-									ecs::Resource::findOrCreate(registry, "editor/textures/skybox/texture.ktx"),
-								}))
+						.withDefaultMaterialInstance(ecs::Builder::create(registry)
+														 .withName("Skybox Material")
+														 .asMaterialInstance<editor::SkyBoxMaterial>()
+														 .withMaterial("editor/materials/skybox.filamat")
+														 .withProps({
+															 false,
+															 {math::float3{.0f}, 1.0f},
+															 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(
+																 registry, "editor/textures/skybox/texture.ktx"),
+														 }))
 						.withCulling(false)
 						.withPriority(0x7);
 		changed = true;
@@ -1003,9 +952,9 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture* icons)
+bool EditorMainMenu::fileMenu(const filament::Texture* icons, EditorMainMenu::Action& action)
 {
-	auto action = FileMenuAction::Unknown;
+	bool changed = false;
 
 	ImGui::SetCursorPosY(1.5f);
 	if (icons)
@@ -1015,37 +964,32 @@ EditorMainMenu::FileMenuAction EditorMainMenu::fileMenu(const filament::Texture*
 	{
 		auto menu = ui::Menu{"File"};
 		if (menu.item("Open Project", "CTRL+SHIFT+O"))
-			action = FileMenuAction::OpenProject;
+		{
+			action = Action::OpenProject;
+			changed = true;
+		}
 
 		if (menu.item("New Scene", "CTRL+N"))
-			action = FileMenuAction::NewScene;
+		{
+			action = Action::NewScene;
+			changed = true;
+		}
 
 		if (menu.item("Open Scene", "CTRL+O"))
-			action = FileMenuAction::OpenScene;
+		{
+			action = Action::OpenScene;
+			changed = true;
+		}
 
 		if (menu.item("Save Scene", "CTRL+S"))
-			action = FileMenuAction::SaveScene;
+		{
+			action = Action::SaveScene;
+			changed = true;
+		}
 	}
 
-	switch (action)
-	{
-	case ui::EditorMainMenu::FileMenuAction::OpenProject:
-		ui::OpenProjectModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::SaveScene:
-		ui::SaveSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::OpenScene:
-		ui::OpenSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::NewScene:
-		ui::NewSceneModal::open();
-		break;
-	case ui::EditorMainMenu::FileMenuAction::Unknown:
-		break;
-	}
 
-	return action;
+	return changed;
 }
 
 bool EditorMainMenu::viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing)

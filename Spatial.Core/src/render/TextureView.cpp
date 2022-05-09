@@ -34,14 +34,16 @@ void TextureView::updateSize(math::int2 size)
 	mView->setRenderTarget(mRenderTarget.get());
 }
 
-void TextureView::setCamera(filament::Camera* camera)
+void TextureView::setCamera(const SharedCamera& camera)
 {
-	mView->setCamera(camera);
+	mCamera = camera;
+	mView->setCamera(mCamera->getInstance());
 }
 
-void TextureView::setScene(filament::Scene* scene)
+void TextureView::setScene(const SharedScene& scene)
 {
-	mView->setScene(scene);
+	mScene = scene;
+	mView->setScene(mScene.get());
 }
 
 } // namespace spatial::render

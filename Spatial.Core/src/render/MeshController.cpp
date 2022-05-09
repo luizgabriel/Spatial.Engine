@@ -1,6 +1,6 @@
-#include <spatial/ecs/Relation.h>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Tags.h>
 #include <spatial/render/MeshController.h>
@@ -104,6 +104,29 @@ static auto gLogger = createDefaultLogger();
 
 void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
 {
+	registry.getEntities<const ecs::RuntimeMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::RuntimeMesh& runtimeMesh) {
+
+			auto vb = toShared(render::VertexBuffer{engine, filament::VertexBuffer::Builder()
+						   .vertexCount(runtimeMesh.vertexData.size())
+						   .bufferCount(1)
+						   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
+						   .build(engine)});
+			vb->setBufferAt(engine, 0, {runtimeMesh.vertexData.data(), sizeof(decltype(runtimeMesh.vertexData)::value_type) * runtimeMesh.vertexData.size()});
+
+			auto ib = toShared(render::IndexBuffer{engine, filament::IndexBuffer::Builder()
+				.indexCount(runtimeMesh.indexData.size())
+				.bufferType(filament::IndexBuffer::IndexType::USHORT)
+				.build(engine)});
+
+			ib->setBuffer(engine, {runtimeMesh.indexData.data(), sizeof(decltype(runtimeMesh.indexData)::value_type) * runtimeMesh.indexData.size()});
+
+			registry.addOrReplaceComponent(entity, render::MeshGeometries{{0, ib->getIndexCount()}});
+			registry.addOrReplaceComponent(entity, std::move(vb));
+			registry.addOrReplaceComponent(entity, std::move(ib));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		});
+
 	registry.getEntities<const ecs::Resource, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
 			if (resource.relativePath.empty())
@@ -118,6 +141,18 @@ void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem
 
 			auto filamesh = FilameshFile{};
 			*stream >> filamesh;
+
+			if (filamesh.vertexData.empty())
+			{
+				gLogger.warn("Empty Vertex Data: {}", resource.relativePath);
+				return;
+			}
+
+			if (filamesh.indexData.empty())
+			{
+				gLogger.warn("Empty Index Data: {}", resource.relativePath);
+				return;
+			}
 
 			registry.addOrReplaceComponent(entity, toShared(createVertexBuffer(engine, filamesh)));
 			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(engine, filamesh)));

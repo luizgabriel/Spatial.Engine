@@ -56,7 +56,6 @@ add_library(Spatial.UI
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)
-set_property(TARGET Spatial.UI PROPERTY CXX_STANDARD 20)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(

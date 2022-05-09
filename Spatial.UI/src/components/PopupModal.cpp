@@ -7,8 +7,8 @@ namespace spatial::ui
 PopupModal::PopupModal(const std::string_view name)
 {
 	auto& io = ImGui::GetIO();
-    auto pos = ImVec2{io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f};
-    ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+	auto pos = ImVec2{io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f};
+	ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
 	auto flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings;
 	mOpened = ImGui::BeginPopupModal(name.data(), nullptr, flags);
@@ -25,9 +25,15 @@ bool PopupModal::isOpen() const
 	return mOpened;
 }
 
-void PopupModal::close()
+void PopupModal::close() const
 {
-	ImGui::CloseCurrentPopup();
+	if (mOpened)
+		ImGui::CloseCurrentPopup();
+}
+
+void PopupModal::open(std::string_view name)
+{
+	ImGui::OpenPopup(name.data());
 }
 
 } // namespace spatial::ui

@@ -77,7 +77,7 @@ void clearRemovedLights(ecs::Registry& registry)
 
 void LightController::createLights(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<IndirectLight>)
+	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<SharedIndirectLight>)
 		.each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
 			const auto* reflectionsTexture =
 				registry.tryGetComponent<const SharedTexture>(component.reflectionsTexture);
@@ -94,7 +94,9 @@ void LightController::createLights(filament::Engine& engine, ecs::Registry& regi
 			if (irradianceValues)
 				builder = builder.irradiance(3, &irradianceValues->at(0));
 
-			registry.addComponent<IndirectLight>(entity, engine, builder.build(engine));
+			auto indirectLight = toShared(createResource(engine, builder.build(engine)));
+
+			registry.addComponent<SharedIndirectLight>(entity, indirectLight);
 		});
 
 	createComponentLights<ecs::DirectionalLight, Light::Type::DIRECTIONAL>(registry, engine);

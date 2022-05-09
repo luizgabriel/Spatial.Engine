@@ -14,7 +14,6 @@ namespace spatial::render
 class Camera
 {
   public:
-	explicit Camera(filament::Engine& engine);
 	Camera(filament::Engine& engine, utils::Entity entity);
 
 	~Camera();

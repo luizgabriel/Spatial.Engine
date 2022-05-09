@@ -20,6 +20,7 @@ class SceneController
 
 	static void updateScenes(ecs::Registry& registry);
 
+	static void renderViews(filament::Renderer& renderer, ecs::Registry& registry);
 };
 
 } // namespace spatial::render

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <spatial/ecs/Registry.h>
+#include <spatial/common/Math.h>
+#include <vector>
 
 namespace spatial::ecs
 {
@@ -15,17 +17,22 @@ struct IsMesh
 
 } // namespace tags
 
+struct RuntimeMesh
+{
+	constexpr static auto typeName = "runtime_mesh";
+
+	std::vector<math::float3> vertexData{};
+	std::vector<uint16_t> indexData{};
+};
+
 struct MeshMaterial
 {
 	constexpr static auto typeName = "mesh_material";
 
-	size_t primitiveIndex;
-	Entity materialInstanceEntity;
+	size_t primitiveIndex{0};
+	Entity materialInstanceEntity{ecs::NullEntity};
 
-	constexpr explicit MeshMaterial(size_t primitiveIndex = 0, Entity materialEntity = ecs::NullEntity)
-		: primitiveIndex(primitiveIndex), materialInstanceEntity(materialEntity)
-	{
-	}
+	MeshMaterial() = default;
 };
 
 struct MeshInstance
@@ -34,13 +41,8 @@ struct MeshInstance
 
 	struct Slice
 	{
-		size_t offset;
-		size_t count;
-
-		Slice() = default;
-		constexpr Slice(size_t offset, size_t count) : offset(offset), count(count)
-		{
-		}
+		size_t offset{0};
+		size_t count{0};
 	};
 
 	Entity meshSource{ecs::NullEntity};

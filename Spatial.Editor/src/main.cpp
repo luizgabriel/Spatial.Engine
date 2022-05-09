@@ -9,12 +9,12 @@
 #include <spatial/desktop/InputSystemUtils.h>
 #include <spatial/desktop/PlatformEventUtils.h>
 #include <spatial/desktop/Window.h>
+#include <spatial/render/RegistryRenderingSystem.h>
+#include <spatial/render/RegistryRenderingSystemUtils.h>
 #include <spatial/render/RenderingSystem.h>
 #include <spatial/render/RenderingSystemUtils.h>
 #include <spatial/ui/system/UserInterfaceSystem.h>
 #include <spatial/ui/system/UserInterfaceUtils.h>
-#include <spatial/render/RegistryRenderingSystem.h>
-#include <spatial/render/RegistryRenderingSystemUtils.h>
 
 using namespace spatial;
 
@@ -37,10 +37,10 @@ int main(int argc, char* argv[])
 	ui.addFont(*fileSystem, "editor/fonts/roboto_medium.ttf");
 	ui.getRenderer().createFontTextureAtlas();
 
-	auto editor = editor::EditorSystem{rendering.getEngine(), window, *fileSystem};
+	auto editor = editor::EditorSystem{*fileSystem};
 
 	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> ui >> editor >> scene;
+	app >> desktopContext >> input >> rendering >> ui >> scene >> editor;
 
 	// Connect Desktop Events to All Systems
 	desktopContext >> app >> input >> rendering >> ui >> editor;

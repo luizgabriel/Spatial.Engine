@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
@@ -13,7 +14,7 @@ namespace spatial::ui
 class Search
 {
   public:
-	static bool searchText(std::string& search);
+	static bool text(std::string& search, const filament::Texture* texture);
 
 	template <typename... FilterComponents>
 	static bool searchEntity(const std::string_view name, const ecs::Registry& registry, ecs::Entity& selectedEntity)
@@ -21,7 +22,7 @@ class Search
 		bool changed = false;
 
 		const auto* selectedName = registry.tryGetComponent<const ecs::Name>(selectedEntity);
-		const auto* selectedEntityName = selectedName ? selectedName->c_str() : "---";
+		const auto* selectedEntityName = selectedName ? selectedName->c_str() : "";
 
 		{
 			auto combo = Combo{name.data(), selectedEntityName};
@@ -29,7 +30,8 @@ class Search
 			{
 				auto view = registry.getEntities<const FilterComponents...>();
 
-				if (combo.item("---", !registry.isValid(selectedEntity))) {
+				if (combo.item("##Empty", !registry.isValid(selectedEntity)))
+				{
 					selectedEntity = ecs::NullEntity;
 					changed = true;
 				}
@@ -52,17 +54,17 @@ class Search
 		return changed;
 	}
 
-	template <typename... FilterComponents>
+	template <typename ResourceTypeTag>
 	static bool searchResource(const std::string_view name, ecs::Registry& registry, ecs::Entity& selectedEntity)
 	{
-		bool changed = searchEntity<FilterComponents...>(name, registry, selectedEntity);
+		bool changed = searchEntity<ResourceTypeTag>(name, registry, selectedEntity);
 
 		{
 			auto dnd = ui::DragAndDropTarget{};
 			auto result = dnd.getPayload();
 			if (result)
 			{
-				selectedEntity = ecs::Resource::findOrCreate(registry, *result);
+				selectedEntity = ecs::Resource::findOrCreate<ResourceTypeTag>(registry, *result);
 				changed = true;
 			}
 		}
