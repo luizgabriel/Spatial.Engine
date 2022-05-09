@@ -15,7 +15,7 @@ bool Search::text(std::string& search, const filament::Texture* texture)
 	ui::imageButton(texture, math::float2{15.0f}, Icons::search.uv());
 	ImGui::PopStyleColor(3);
 
-	ImGui::SameLine(30.0f);
+	ImGui::SameLine(.0f, .0f);
 	ui::spanToAvailWidth();
 	return ui::inputText("##Search", search);
 }

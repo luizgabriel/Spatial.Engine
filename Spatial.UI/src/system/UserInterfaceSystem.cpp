@@ -34,6 +34,11 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 	mInput.setText(event.text);
 }
 
+void UserInterfaceSystem::onEvent(const MouseScrolledEvent& event)
+{
+	mInput.setScrollOffset(event.xOffset, event.yOffset);
+}
+
 void UserInterfaceSystem::onUpdateFrame(float delta)
 {
 	mRenderer.initNewFrame(delta);

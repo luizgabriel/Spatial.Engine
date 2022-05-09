@@ -223,7 +223,7 @@ void EditorSystem::onUpdateInput(const desktop::InputState& input)
 	if (input.combined(Key::LControl, Key::S))
 		mMenuAction = ui::EditorMainMenu::Action::SaveScene;
 
-	if (input.combined(Key::LControl, Key::LShift, Key::O))
+	if (input.combined(Key::LControl, Key::P))
 		mMenuAction = ui::EditorMainMenu::Action::OpenProject;
 
 	if (input.combined(Key::LControl, Key::O))
