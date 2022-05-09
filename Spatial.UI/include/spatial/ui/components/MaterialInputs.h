@@ -7,8 +7,6 @@
 namespace spatial::ui
 {
 
-void previewTexture(const filament::Texture* texture, const filament::Texture* icons, const math::float4& uv = {0, 0, 1, 1});
-
 bool colorPicker(std::string_view label, math::float4& color, const filament::Texture* icons);
 
 bool colorPicker(std::string_view label, math::float3& color, const filament::Texture* icons);

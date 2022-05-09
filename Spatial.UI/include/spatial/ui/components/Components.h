@@ -104,10 +104,10 @@ struct ComponentInputImpl<ecs::SunLight>
 };
 
 template <>
-struct ComponentInputImpl<ecs::IndirectLight>
+struct ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>
 {
 	static constexpr auto sName = "Indirect Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
@@ -118,17 +118,17 @@ struct ComponentInputImpl<ecs::Resource>
 };
 
 template <>
-struct ComponentInputImpl<ecs::MeshInstance>
+struct ComponentInputImpl<ecs::MeshInstance, const filament::Texture*>
 {
 	static constexpr auto sName = "Mesh Instance";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
-struct ComponentInputImpl<ecs::MeshMaterial>
+struct ComponentInputImpl<ecs::MeshMaterial, const filament::Texture*>
 {
 	static constexpr auto sName = "Mesh Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
@@ -153,10 +153,10 @@ struct ComponentInputImpl<ecs::OrthographicCamera>
 };
 
 template <>
-struct ComponentInputImpl<ecs::SceneView>
+struct ComponentInputImpl<ecs::SceneView, const filament::Texture*>
 {
 	static constexpr auto sName = "Scene Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
@@ -174,17 +174,17 @@ struct ComponentInputImpl<ecs::ScriptInfo>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Parent>
+struct ComponentInputImpl<ecs::Parent, const filament::Texture*>
 {
 	static constexpr auto sName = "Parent";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 template <>
-struct ComponentInputImpl<ecs::Child>
+struct ComponentInputImpl<ecs::Child, const filament::Texture*>
 {
 	static constexpr auto sName = "Child";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
 } // namespace spatial::ui

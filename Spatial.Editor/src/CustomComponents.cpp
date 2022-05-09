@@ -137,12 +137,12 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::DirectionalLight>(registry, entity);
 	componentCollapse<ecs::SpotLight>(registry, entity);
 	componentCollapse<ecs::PointLight>(registry, entity);
-	componentCollapse<ecs::IndirectLight>(registry, entity);
+	componentCollapse<ecs::IndirectLight>(registry, entity, icons);
 	componentCollapse<ecs::SunLight>(registry, entity);
 	componentCollapse<ecs::Resource>(registry, entity);
-	componentCollapse<ecs::MeshInstance>(registry, entity);
-	componentCollapse<ecs::MeshMaterial>(registry, entity);
-	componentCollapse<ecs::SceneView>(registry, entity);
+	componentCollapse<ecs::MeshInstance>(registry, entity, icons);
+	componentCollapse<ecs::MeshMaterial>(registry, entity, icons);
+	componentCollapse<ecs::SceneView>(registry, entity, icons);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
 	componentCollapse<editor::ColorMaterial>(registry, entity);
@@ -152,8 +152,8 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 
 	if (showDebugComponents)
 	{
-		componentCollapse<ecs::Parent>(registry, entity);
-		componentCollapse<ecs::Child>(registry, entity);
+		componentCollapse<ecs::Parent>(registry, entity, icons);
+		componentCollapse<ecs::Child>(registry, entity, icons);
 	}
 
 	return changed;
@@ -355,11 +355,8 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
-		auto lowerCaseSearch = std::string{search};
-		to_lower(lowerCaseSearch);
-
 		const auto onEachNodeFn = [&](ecs::Entity entity, const auto& name) {
-			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
+			if (!icontains(name.name, search))
 				return;
 
 			changed |= displayNode(registry, entity, selectedEntity);
@@ -476,9 +473,6 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
-		auto lowerCaseSearch = std::string{search};
-		to_lower(lowerCaseSearch);
-
 		const auto eachFn = [&](ecs::Entity entity, const auto& resource, const auto& name) {
 			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "editor/"))
 				return;
@@ -486,7 +480,7 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "engine/"))
 				return;
 
-			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
+			if (!icontains(name.name, search))
 				return;
 
 			if (type != ResourceType::All)
@@ -622,11 +616,8 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableHeadersRow();
 
-		auto lowerCaseSearch = std::string{search};
-		to_lower(lowerCaseSearch);
-
 		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
-			if (!contains(to_lower_copy(name.name), lowerCaseSearch))
+			if (!icontains(name.name, search))
 				return;
 
 			ImGui::TableNextRow();
@@ -963,7 +954,7 @@ bool EditorMainMenu::fileMenu(const filament::Texture* icons, EditorMainMenu::Ac
 
 	{
 		auto menu = ui::Menu{"File"};
-		if (menu.item("Open Project", "CTRL+SHIFT+O"))
+		if (menu.item("Open Project", "CTRL+P"))
 		{
 			action = Action::OpenProject;
 			changed = true;

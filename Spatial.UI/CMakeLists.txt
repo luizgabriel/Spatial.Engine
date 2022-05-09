@@ -52,7 +52,7 @@ add_library(Spatial.UI
         src/components/MaterialInputs.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
-        src/components/styles/WindowPaddingStyle.cpp)
+        src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/PreviewTexture.h src/components/PreviewTexture.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)

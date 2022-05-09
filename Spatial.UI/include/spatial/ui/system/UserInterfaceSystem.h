@@ -31,6 +31,8 @@ class UserInterfaceSystem
 
 	void onEvent(const MouseMovedEvent& event);
 
+	void onEvent(const MouseScrolledEvent& event);
+
 	void onEvent(const KeyEvent& event);
 
 	void onEvent(const TextEvent& event);

@@ -5,6 +5,7 @@
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
 #include <spatial/ui/components/MaterialInputs.h>
+#include <spatial/ui/components/PreviewTexture.h>
 
 namespace spatial::ui
 {
@@ -19,12 +20,12 @@ bool albedoInput(std::string_view label, math::float3& color, ecs::Registry& reg
 
 	constexpr auto size = math::float2{20.0f};
 
-	ui::previewTexture(render::getTexture(registry, resource), icons, Icons::picture.uv());
+	ui::previewTexture(registry, resource, icons, Icons::picture.uv());
 
 	ImGui::SameLine();
 	ui::spanToAvailWidth();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", registry, resource);
+	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
 
 	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
@@ -36,15 +37,16 @@ bool albedoInput(std::string_view label, math::float3& color, ecs::Registry& reg
 	return changed;
 }
 
-bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons, const math::float4& uv)
+bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons,
+			  const math::float4& uv)
 {
 	bool changed = false;
 
-	ui::previewTexture(render::getTexture(registry, resource), icons, uv);
+	ui::previewTexture(registry, resource, icons, uv);
 
 	ImGui::SameLine();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>(label.data(), registry, resource);
+	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>(label.data(), icons, registry, resource);
 
 	return changed;
 }
@@ -57,12 +59,12 @@ bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs
 
 	bool changed = false;
 
-	ui::previewTexture(render::getTexture(registry, resource), icons, uv);
+	ui::previewTexture(registry, resource, icons, uv);
 
 	ImGui::SameLine();
 	ui::spanToAvailWidth();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", registry, resource);
+	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
 
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(ImGui::GetColumnWidth() * 0.4f);
@@ -101,7 +103,8 @@ bool colorPicker(std::string_view label, math::float3& color, const filament::Te
 	return changed;
 }
 
-bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons)
+bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource,
+				  const filament::Texture* icons)
 {
 	static constexpr auto size = math::float2{20.0f};
 
@@ -110,39 +113,9 @@ bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& 
 	ui::image(icons, size, Icons::cubemap.uv());
 
 	ImGui::SameLine();
-	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>(label.data(), registry, resource);
+	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>(label.data(), icons, registry, resource);
 
 	return changed;
-}
-
-void previewTexture(const filament::Texture* texture, const filament::Texture* icons, const math::float4& uv)
-{
-	constexpr auto size = math::float2{20.0f};
-
-	ui::image(texture, size);
-
-	if (texture == nullptr)
-		ui::image(icons, size, uv);
-
-	const auto& colors = ImGui::GetStyle().Colors;
-
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-
-		if (texture)
-		{
-			ImGui::Text("Preview");
-			ui::image(texture, math::float2{300.0f});
-		}
-		else
-		{
-			ImGui::Text("No Texture Attached.");
-			ImGui::TextColored(colors[ImGuiCol_TextSelectedBg], "Drag and drop image assets to fill");
-		}
-
-		ImGui::EndTooltip();
-	}
 }
 
 } // namespace spatial::ui
