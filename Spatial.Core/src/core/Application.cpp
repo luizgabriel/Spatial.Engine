@@ -40,12 +40,12 @@ int Application::run()
 
 	while (mRunning)
 	{
-		const auto delta = mClock.getDeltaTime().count();
-		std::this_thread::sleep_for(Clock<float>::delta_t{mDesiredDelta - delta});
+		const auto delta = mClock.getElapsedTime();
+		std::this_thread::sleep_for(mDesiredDelta - delta);
 
-		mStartFrameSignal(delta);
+		mStartFrameSignal(delta.count());
 
-		mUpdateFrameSignal(delta);
+		mUpdateFrameSignal(delta.count());
 
 		mEndFrameSignal();
 
@@ -59,7 +59,7 @@ int Application::run()
 
 void Application::setMaxFps(float fps)
 {
-	mDesiredDelta = 1.0f / fps;
+	mDesiredDelta = fseconds{1.0f / fps};
 }
 
 } // namespace spatial

@@ -17,47 +17,6 @@ void SceneController::createRenderables(filament::Engine& engine, ecs::Registry&
 	});
 }
 
-void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
-{
-	registry.getEntities<const ecs::SceneView>(ecs::ExcludeComponents<Scene>)
-		.each([&](ecs::Entity entity, const auto&) {
-			registry.addComponent(entity, createScene(engine));
-			registry.removeComponentFromEntities<ecs::tags::AddedToScene>();
-		});
-
-	registry.getEntities<const ecs::SceneView, Scene>(ecs::ExcludeComponents<TextureView>)
-		.each([&](ecs::Entity entity, const auto& sceneView, auto& scene) {
-			registry.addComponent<TextureView>(entity, engine, sceneView.size);
-		});
-}
-
-void SceneController::updateScenes(ecs::Registry& registry)
-{
-	registry.getEntities<const ecs::SceneView, Scene, TextureView>()
-		.each([&](const auto& sceneView, auto& scene, auto& textureView) {
-			textureView.setScene(scene.get());
-
-			auto* camera = registry.tryGetComponent<Camera>(sceneView.camera);
-			if (camera)
-				textureView.setCamera(camera->getInstance());
-		});
-
-	registry.getEntities<const ecs::SceneView, Scene>().each(
-		[&](const ecs::SceneView& component, render::Scene& scene) {
-			auto* indirectLight = registry.tryGetComponent<IndirectLight>(component.indirectLight);
-			if (indirectLight)
-				scene->setIndirectLight(indirectLight->get());
-		});
-
-	registry.getEntities<const ecs::SceneView, TextureView>().each(
-		[&](ecs::Entity entity, const auto& sceneView, auto& textureView) {
-			auto* camera = registry.tryGetComponent<Camera>(sceneView.camera);
-			if (!camera)
-				return;
-
-			textureView.setCamera(camera->getInstance());
-		});
-}
 
 void SceneController::cleanUpDestroyableEntities(ecs::Registry& registry)
 {
@@ -81,7 +40,7 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 	auto view = registry.getEntities<Entity>(ecs::ExcludeComponents<ecs::tags::AddedToScene>);
 
 	view.each([&](ecs::Entity entity, auto& renderEntity) {
-		registry.getEntities<Scene>().each([&](auto& scene) {
+		registry.getEntities<SharedScene>().each([&](auto& scene) {
 			auto contains = scene->hasEntity(renderEntity.get());
 			if (!contains)
 				scene->addEntity(renderEntity.get());
@@ -89,6 +48,58 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 	});
 
 	registry.insertComponent<ecs::tags::AddedToScene>(view.begin(), view.end());
+}
+
+void SceneController::renderViews(filament::Renderer& renderer, ecs::Registry& registry)
+{
+	registry.getEntities<const render::TextureView>().each([&](const render::TextureView& textureView) {
+		const auto& view = textureView.getView();
+		renderer.render(view.get());
+	});
+}
+
+void updateScene(const ecs::Registry& registry, const ecs::SceneView& component, render::TextureView& textureView)
+{
+	auto* indirectLight = registry.tryGetComponent<const SharedIndirectLight>(component.indirectLight);
+	if (indirectLight)
+		textureView.getScene()->setIndirectLight(indirectLight->get());
+
+	if (registry.hasAllComponents<SharedCamera>(component.camera))
+	{
+		const auto& camera = registry.getComponent<const SharedCamera>(component.camera);
+		textureView.setCamera(camera);
+	}
+}
+
+void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
+{
+	auto sceneViews = registry.getEntities<const ecs::SceneView>(ecs::ExcludeComponents<SharedScene>);
+	if (sceneViews.size_hint() > 0)
+		registry.removeComponentFromEntities<ecs::tags::AddedToScene>();
+
+	sceneViews.each(
+		[&](ecs::Entity entity, const auto&) {
+			registry.addComponent(entity, toShared(createScene(engine)));
+		});
+
+	registry.getEntities<const ecs::SceneView, const SharedScene>(ecs::ExcludeComponents<TextureView>)
+		.each([&](ecs::Entity entity, const auto& sceneView, const auto& scene) {
+			if (!registry.hasAllComponents<SharedCamera>(sceneView.camera))
+				return;
+
+			auto& textureView = registry.addComponent<TextureView>(entity, engine, sceneView.size);
+			textureView.setScene(scene);
+
+			updateScene(registry, sceneView, textureView);
+		});
+}
+
+void SceneController::updateScenes(ecs::Registry& registry)
+{
+	registry.getEntities<const ecs::SceneView, TextureView>()
+		.each([&](ecs::Entity entity, const auto& sceneView, auto& textureView) {
+			updateScene(registry, sceneView, textureView);
+		});
 }
 
 } // namespace spatial::render

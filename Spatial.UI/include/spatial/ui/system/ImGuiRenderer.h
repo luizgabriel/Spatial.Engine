@@ -34,7 +34,10 @@ class ImGuiRenderer
 	void renderDrawData();
 	void createBuffers(size_t numRequiredBuffers);
 	void createMaterialInstances(size_t numRequiredInstances);
-	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb, const ImVector<ImDrawIdx>& ib);
+
+	void populateVertexData(size_t bufferIndex, const ImVector<ImDrawVert>& vb);
+
+	void populateIndexData(size_t bufferIndex, const ImVector<ImDrawIdx>& ib);
 
   public:
 	explicit ImGuiRenderer(filament::Engine& engine);

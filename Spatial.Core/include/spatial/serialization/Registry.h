@@ -12,6 +12,7 @@
 #include <spatial/serialization/SceneView.h>
 #include <spatial/serialization/Script.h>
 #include <spatial/serialization/Transform.h>
+#include <spatial/serialization/Texture.h>
 
 namespace spatial::ecs
 {
@@ -35,6 +36,9 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::Child>(ar);
 	snapshot.template component<ecs::Resource>(ar);
 	snapshot.template component<ecs::SceneView>(ar);
+	snapshot.template component<ecs::DummyCubeMapTexture>(ar);
+	snapshot.template component<ecs::RuntimeTexture>(ar);
+	snapshot.template component<ecs::RuntimeMesh>(ar);
 
 	snapshot.template component<ecs::tags::IsMaterial>(ar);
 	snapshot.template component<ecs::tags::IsMesh>(ar);

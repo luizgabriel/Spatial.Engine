@@ -6,10 +6,10 @@
 namespace spatial::ui
 {
 
-class SceneView
+struct SceneView
 {
-  public:
 	static void image(const ecs::Registry& registry, ecs::Entity sceneViewEntity, math::float2 size);
+	static bool selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity);
 };
 
 } // namespace spatial::ui

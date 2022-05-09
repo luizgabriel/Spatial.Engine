@@ -171,34 +171,6 @@ Texture createDummyCubemap(filament::Engine& engine)
 	return texture;
 }
 
-VertexBuffer createFullScreenVertexBuffer(filament::Engine& engine)
-{
-	static constexpr math::float3 sFullScreenTriangleVertices[3] = {
-		{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}};
-
-	auto* vb = filament::VertexBuffer::Builder()
-				   .vertexCount(3)
-				   .bufferCount(1)
-				   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
-				   .build(engine);
-	vb->setBufferAt(engine, 0, {sFullScreenTriangleVertices, sizeof(sFullScreenTriangleVertices)});
-
-	return VertexBuffer{engine, vb};
-}
-
-IndexBuffer createFullScreenIndexBuffer(filament::Engine& engine)
-{
-	static const uint16_t sFullScreenTriangleIndices[3] = {0, 1, 2};
-
-	auto* ib = filament::IndexBuffer::Builder()
-				   .indexCount(3)
-				   .bufferType(filament::IndexBuffer::IndexType::USHORT)
-				   .build(engine);
-	ib->setBuffer(engine, {sFullScreenTriangleIndices, sizeof(sFullScreenTriangleIndices)});
-
-	return IndexBuffer{engine, ib};
-}
-
 MeshGeometries createMeshGeometries(const FilameshFile& filamesh)
 {
 	auto geometries = MeshGeometries(filamesh.parts.size());
@@ -210,6 +182,23 @@ MeshGeometries createMeshGeometries(const FilameshFile& filamesh)
 	}
 
 	return geometries;
+}
+
+Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pixels, size_t width)
+{
+	auto dimensions = math::int2{width, pixels.size() / width};
+
+	auto texture = createTexture(engine, dimensions, filament::Texture::InternalFormat::RGBA8,
+								 filament::Texture::Usage::DEFAULT, filament::Texture::Sampler::SAMPLER_2D);
+
+	auto size = dimensions.x * dimensions.y * sizeof(uint32_t);
+
+	auto buffer = filament::Texture::PixelBufferDescriptor(
+		pixels.data(), size, filament::Texture::Format::RGBA, filament::Texture::Type::UBYTE);
+
+	texture->setImage(engine, 0, std::move(buffer));
+
+	return texture;
 }
 
 } // namespace spatial::render

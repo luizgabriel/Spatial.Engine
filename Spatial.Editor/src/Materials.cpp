@@ -26,8 +26,8 @@ void GridMaterial::apply(filament::MaterialInstance& instance, const ecs::Regist
 
 void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const
 {
-	const auto* dummyWhite = render::getTexture(registry, "engine/dummy_texture_white");
-	const auto* dummyBlack = render::getTexture(registry, "engine/dummy_texture_black");
+	const auto* dummyWhite = render::getTexture(registry, "engine/white");
+	const auto* dummyBlack = render::getTexture(registry, "engine/black");
 	assert(dummyWhite != nullptr);
 	assert(dummyBlack != nullptr);
 

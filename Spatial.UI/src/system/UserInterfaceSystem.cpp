@@ -1,4 +1,5 @@
 #include <spatial/ui/system/UserInterfaceSystem.h>
+#include <spatial/ui/components/DockSpace.h>
 
 namespace spatial
 {
@@ -36,7 +37,12 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 void UserInterfaceSystem::onUpdateFrame(float delta)
 {
 	mRenderer.initNewFrame(delta);
-	mRenderGuiSignal();
+
+	{
+		auto dockSpace = ui::DockSpace{"Spatial"};
+		mRenderGuiSignal();
+	}
+
 	mRenderer.drawFrame();
 }
 

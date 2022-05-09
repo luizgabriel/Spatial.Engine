@@ -22,6 +22,13 @@ void serialize(Archive& ar, spatial::ecs::MeshInstance& mesh)
 }
 
 template <typename Archive>
+void serialize(Archive& ar, spatial::ecs::RuntimeMesh& mesh)
+{
+	ar(make_nvp("vertexData", mesh.vertexData));
+	ar(make_nvp("indexData", mesh.indexData));
+}
+
+template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MeshMaterial& meshMaterial)
 {
 	ar(make_nvp("primitiveIndex", meshMaterial.primitiveIndex));

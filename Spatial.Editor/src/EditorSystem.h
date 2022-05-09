@@ -1,20 +1,16 @@
 #pragma once
 
+#include "CustomComponents.h"
 #include "EditorCamera.h"
 #include "EditorCameraController.h"
-#include "Settings.h"
 #include "Jobs.h"
+#include "Settings.h"
 
 #include <filament/Viewport.h>
-#include <spatial/common/Math.h>
 #include <spatial/desktop/InputState.h>
-#include <spatial/desktop/PlatformEvent.h>
-#include <spatial/desktop/Window.h>
-#include <spatial/render/MaterialController.h>
-#include <spatial/render/TextureView.h>
-#include <spatial/script/ScriptController.h>
+#include <spatial/ecs/RegistryCollection.h>
 #include <spatial/script/PlatformContext.h>
-#include <spatial/render/RegistryRenderingSystem.h>
+#include <spatial/script/ScriptController.h>
 
 namespace fl = filament;
 
@@ -26,7 +22,7 @@ class EditorSystem
   public:
 	constexpr static auto PROJECT_DIR = "project";
 
-	EditorSystem(filament::Engine& engine, desktop::Window& window, FileSystem& fileSystem);
+	explicit EditorSystem(FileSystem& fileSystem);
 
 	void onStart();
 
@@ -57,22 +53,24 @@ class EditorSystem
 
 	void createDefaultEditorEntities();
 
-	filament::Engine& mEngine;
-	desktop::Window& mWindow;
-
 	FileSystem& mFileSystem;
 	script::PlatformContext mPlatformContext;
 
 	ecs::Registry mRegistry;
 	ecs::Registry mEditorRegistry;
+	ecs::Entity mIconTexture{ecs::NullEntity};
 
 	EditorCameraController mEditorCameraController;
 	script::ScriptController mScriptController;
 
 	EventQueue mJobQueue;
+	ui::EditorMainMenu::Action mMenuAction{ui::EditorMainMenu::Action::None};
+	bool mIsCameraControlEnabled;
+	bool mIsCameraViewWindowHovered;
 
 	std::filesystem::path mScenePath;
 	std::filesystem::path mCurrentPath;
+
 	std::filesystem::path getScenePath() const;
 };
 

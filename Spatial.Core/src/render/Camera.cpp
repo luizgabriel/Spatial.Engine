@@ -3,14 +3,9 @@
 namespace spatial::render
 {
 
-Camera::Camera(filament::Engine& engine) : Camera(engine, {})
-{
-}
-
 Camera::Camera(filament::Engine& engine, utils::Entity entity) : mEngine{engine}, mEntity{entity}
 {
-	if (!entity.isNull())
-		engine.createCamera(entity);
+	engine.createCamera(entity);
 }
 
 Camera::~Camera()

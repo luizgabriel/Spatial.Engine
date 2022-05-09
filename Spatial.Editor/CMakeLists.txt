@@ -31,13 +31,12 @@ set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
 target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)
-target_link_libraries(Spatial.Editor PUBLIC
+target_link_libraries(Spatial.Editor PRIVATE
+        Spatial.Editor.Resources
         Spatial.Core
         Spatial.UI
         CONAN_PKG::fmt
         CONAN_PKG::argh)
-
-target_link_libraries(Spatial.Editor PRIVATE Spatial.Editor.Resources)
 
 cmake_policy(SET CMP0091 NEW)
 set_property(
