@@ -1,11 +1,11 @@
 #pragma once
 
 #include "EditorCamera.h"
-#include <spatial/desktop/InputState.h>
 #include <spatial/desktop/Window.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Transform.h>
 #include <spatial/ecs/UpdateController.h>
+#include <spatial/input/InputState.h>
 
 namespace spatial::editor
 {

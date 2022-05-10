@@ -7,8 +7,8 @@
 #include "Settings.h"
 
 #include <filament/Viewport.h>
-#include <spatial/desktop/InputState.h>
 #include <spatial/ecs/RegistryCollection.h>
+#include <spatial/input/InputState.h>
 #include <spatial/script/PlatformContext.h>
 #include <spatial/script/ScriptController.h>
 
