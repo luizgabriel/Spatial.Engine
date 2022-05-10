@@ -38,7 +38,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "/MTd",
         "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CPACK_GENERATOR": "ZIP;WIX",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
@@ -55,7 +55,7 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_FLAGS": "/MT",
         "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CPACK_GENERATOR": "ZIP;WIX",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
@@ -72,7 +72,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "/MTd",
         "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CPACK_GENERATOR": "ZIP;WIX",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
@@ -89,7 +89,7 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_FLAGS": "/MT",
         "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;NSIS64",
+        "CPACK_GENERATOR": "ZIP;WIX",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
       }
