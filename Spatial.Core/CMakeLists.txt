@@ -70,6 +70,7 @@ add_library(Spatial.Core
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
         include/spatial/serialization/Script.h
+        include/spatial/serialization/Texture.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
@@ -135,7 +136,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp include/spatial/serialization/Texture.h)
+        src/resources/MemoryFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
