@@ -5,10 +5,10 @@
 
 #include <spatial/core/Application.h>
 #include <spatial/core/ApplicationUtils.h>
-#include <spatial/desktop/InputSystem.h>
-#include <spatial/desktop/InputSystemUtils.h>
 #include <spatial/desktop/PlatformEventUtils.h>
 #include <spatial/desktop/Window.h>
+#include <spatial/input/InputSystem.h>
+#include <spatial/input/InputSystemUtils.h>
 #include <spatial/render/RegistryRenderingSystem.h>
 #include <spatial/render/RegistryRenderingSystemUtils.h>
 #include <spatial/render/RenderingSystem.h>
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
 	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
 	auto rendering = render::RenderingSystem{window};
-	auto input = desktop::InputSystem{window};
+	auto input = desktop::InputSystem{};
 
 	auto scene = render::RegistryRenderingSystem{*fileSystem};
 

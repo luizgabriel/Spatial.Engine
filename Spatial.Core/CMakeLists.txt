@@ -13,9 +13,10 @@ add_library(Spatial.Core
         include/spatial/desktop/PlatformEvent.h
         include/spatial/desktop/PlatformEventUtils.h
         include/spatial/desktop/Window.h
-        include/spatial/desktop/InputSystem.h
-        include/spatial/desktop/InputSystemUtils.h
-        include/spatial/desktop/InputState.h
+
+        include/spatial/input/InputSystem.h
+        include/spatial/input/InputSystemUtils.h
+        include/spatial/input/InputState.h
 
         include/spatial/ecs/Transform.h
         include/spatial/ecs/Camera.h
@@ -92,8 +93,9 @@ add_library(Spatial.Core
 
         src/desktop/Window.cpp
         src/desktop/WindowContext.cpp
-        src/desktop/InputSystem.cpp
-        src/desktop/InputState.cpp
+
+        src/input/InputSystem.cpp
+        src/input/InputState.cpp
 
         src/ecs/EditorCamera.cpp
         src/ecs/Registry.cpp
