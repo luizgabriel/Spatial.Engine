@@ -22,6 +22,7 @@ add_library(Spatial.UI
         include/spatial/ui/components/Combo.h
         include/spatial/ui/components/SceneView.h
         include/spatial/ui/components/MaterialInputs.h
+        include/spatial/ui/components/PreviewTexture.h
 
         include/spatial/ui/components/Icons.h
 
@@ -50,9 +51,10 @@ add_library(Spatial.UI
         src/components/SceneView.cpp
         src/components/Search.cpp
         src/components/MaterialInputs.cpp
+        src/components/PreviewTexture.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
-        src/components/styles/WindowPaddingStyle.cpp include/spatial/ui/components/PreviewTexture.h src/components/PreviewTexture.cpp)
+        src/components/styles/WindowPaddingStyle.cpp)
 
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)
