@@ -1,18 +1,18 @@
 #pragma once
 
-#include <filesystem>
+#include <string>
 
 namespace spatial::editor
 {
 
 struct LoadSceneEvent
 {
-	std::filesystem::path path;
+	std::string path;
 };
 
 struct SaveSceneEvent
 {
-	std::filesystem::path path;
+	std::string path;
 };
 
 struct ClearSceneEvent
@@ -21,7 +21,7 @@ struct ClearSceneEvent
 
 struct OpenProjectEvent
 {
-	std::filesystem::path path;
+	std::string path;
 };
 
 } // namespace spatial::editor

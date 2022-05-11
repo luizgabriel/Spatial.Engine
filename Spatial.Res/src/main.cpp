@@ -87,9 +87,8 @@ int main(int argc, char** argv)
 		outputSource << fmt::format("\nextern const unsigned char {0}[] = {{\n", variableName);
 
 		{
-			auto ifs = std::ifstream{inputFile};
-			auto ift = std::istreambuf_iterator<char>{ifs};
-			std::for_each(ift, std::istreambuf_iterator<char>{}, [&](char c) {
+			auto ifs = std::ifstream{inputFile, std::ios_base::binary};
+			std::for_each(std::istreambuf_iterator<char>{ifs}, std::istreambuf_iterator<char>{}, [&](char c) {
 				outputSource << formatToHex(c) << ',';
 				count++;
 

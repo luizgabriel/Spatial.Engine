@@ -1,12 +1,13 @@
 add_subdirectory(assets)
 
+set(SPATIAL_EDITOR_WINDOWS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.rc)
 set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
 set(SPATIAL_EDITOR_IMGUI_SETTINGS ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/imgui.ini)
 
 set_source_files_properties(${SPATIAL_EDITOR_MACOS_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 set_source_files_properties(${SPATIAL_EDITOR_IMGUI_SETTINGS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-add_executable(Spatial.Editor MACOSX_BUNDLE
+add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/main.cpp
         src/EditorSystem.cpp
         src/EditorCameraController.h
@@ -24,13 +25,15 @@ add_executable(Spatial.Editor MACOSX_BUNDLE
         src/FileSystem.h
         src/FileSystem.cpp
         ${SPATIAL_EDITOR_MACOS_ICON}
-        ${SPATIAL_EDITOR_IMGUI_SETTINGS})
+        ${SPATIAL_EDITOR_IMGUI_SETTINGS}
+        ${SPATIAL_EDITOR_WINDOWS_ICON})
 
 set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 
 set_project_warnings(Spatial.Editor)
 enable_sanitizers(Spatial.Editor)
 target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)
+
 target_link_libraries(Spatial.Editor PRIVATE
         Spatial.Editor.Resources
         Spatial.Core
@@ -48,3 +51,12 @@ install(TARGETS Spatial.Editor
         BUNDLE DESTINATION .
         COMPONENT binaries)
 
+if (WIN32)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.ico ${CMAKE_CURRENT_BINARY_DIR}/ COPYONLY)
+        configure_file(${SPATIAL_EDITOR_IMGUI_SETTINGS} ${CMAKE_CURRENT_BINARY_DIR}/ COPYONLY)
+        install(FILES
+                assets/AppIcon.ico
+                assets/config/imgui.ini
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT configs)
+endif()

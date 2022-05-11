@@ -1,6 +1,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
-#include <spatial/ui/components/AssetsExplorer.h>
+#include <spatial/ui/components/FilesExplorer.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
@@ -8,7 +8,7 @@
 namespace spatial::ui
 {
 
-bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path& selectedPath,
+bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPath,
 								  const filament::Texture* icon)
 {
 	using namespace boost::algorithm;
@@ -16,20 +16,21 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 
 	displayPathHeader(selectedPath, icon);
 
-	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "AssetsExplorer", false);
+	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "FilesExplorer", false);
 
 	bool selected = false;
 	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
-	for (const auto& entry : fileSystem.list(selectedPath.string()))
+	for (const auto& entry : fileSystem.list(selectedPath))
 	{
 		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 5.0f);
+		auto newPath = selectedPath.empty() ? entry.path : selectedPath + FileSystem::SEPARATOR + entry.path;
 
 		if (entry.isDirectory())
 		{
 			ImGui::PushID(entry.path.c_str());
 			if (imageButton(icon, size, Icons::folder.uv()))
 			{
-				selectedPath = selectedPath / entry.path;
+				selectedPath = newPath;
 				selected = true;
 			}
 			ImGui::PopID();
@@ -67,7 +68,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 			{
 				auto dnd = DragAndDropSource{};
 				if (dnd.isStarted())
-					dnd.setPayload((selectedPath / entry.path).string());
+					dnd.setPayload(newPath);
 			}
 		}
 
@@ -81,7 +82,7 @@ bool AssetsExplorer::displayFiles(FileSystem& fileSystem, std::filesystem::path&
 	return selected;
 }
 
-bool AssetsExplorer::displayPathHeader(std::filesystem::path& selectedPath, const filament::Texture* icon)
+bool FilesExplorer::displayPathHeader(std::string& selectedPath, const filament::Texture* icon)
 {
 	bool changed = false;
 	if (selectedPath.empty())
@@ -89,13 +90,19 @@ bool AssetsExplorer::displayPathHeader(std::filesystem::path& selectedPath, cons
 
 	ImGui::PushID("BackButton");
 	changed = imageButton(icon, math::float2{20}, Icons::back.uv());
-	if (changed)
-		selectedPath = selectedPath.parent_path();
+	if (changed) {
+		auto lastSeparator = selectedPath.find_last_of(FileSystem::SEPARATOR);
+		if (lastSeparator == std::string::npos)
+			selectedPath = "";
+		else
+			selectedPath = selectedPath.substr(0, lastSeparator);
+	}
+		
 	ImGui::PopID();
 
 	ImGui::SameLine();
 	ImGui::AlignTextToFramePadding();
-	ImGui::TextWrapped("%s", selectedPath.c_str());
+	ImGui::Text("%s", selectedPath.c_str());
 	ImGui::Separator();
 
 	return changed;

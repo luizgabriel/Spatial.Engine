@@ -257,16 +257,14 @@ bool EditorModals::newScene()
 	return isConfirmed;
 }
 
-bool EditorModals::openScene(std::filesystem::path& openPath)
+bool EditorModals::openScene(std::string& openPath)
 {
 	ImGui::Text("Are you sure?");
 	ImGui::Text("If you continue, all unsaved changes will be discarded.");
 
 	ui::spacing(2);
 
-	auto openPathValue = openPath.string();
-	ui::inputText("Path", openPathValue, "scenes/*");
-	openPath = std::filesystem::path{openPathValue};
+	ui::inputText("Path", openPath, "scenes/*");
 
 	ui::separator(2);
 
@@ -283,15 +281,13 @@ bool EditorModals::openScene(std::filesystem::path& openPath)
 	return confirmed;
 }
 
-bool EditorModals::saveScene(std::filesystem::path& savePath)
+bool EditorModals::saveScene(std::string& savePath)
 {
 	ImGui::Text("Save your current scene to this file:");
 
 	ui::spacing(2);
 
-	auto savePathValue = savePath.string();
-	ui::inputText("Scene File Path", savePathValue, "scenes/*");
-	savePath = std::filesystem::path{savePathValue};
+	ui::inputText("Scene File Path", savePath, "scenes/*");
 
 	ui::separator(2);
 
@@ -308,15 +304,13 @@ bool EditorModals::saveScene(std::filesystem::path& savePath)
 	return confirmed;
 }
 
-bool EditorModals::openProject(std::filesystem::path& openPath)
+bool EditorModals::openProject(std::string& openPath)
 {
 	ImGui::Text("Open you project source in the specified folder:");
 
 	ui::spacing(2);
 
-	auto openPathValue = openPath.string();
-	ui::inputText("Path", openPathValue);
-	openPath = std::filesystem::path{openPathValue};
+	ui::inputText("Path", openPath);
 
 	ui::separator(2);
 
@@ -647,14 +641,14 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool EditorDragAndDrop::loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity)
+bool EditorDragAndDrop::loadScene(std::string& scenePath, ecs::Entity& selectedEntity)
 {
 	auto dnd = DragAndDropTarget{};
 	const auto result = dnd.getPayload();
 	if (result && boost::algorithm::ends_with(result->c_str(), ".spatial.json"))
 	{
 		selectedEntity = ecs::NullEntity;
-		scenePath = std::filesystem::path{result.value()};
+		scenePath = std::string{result.value()};
 		return true;
 	}
 
@@ -954,7 +948,7 @@ bool EditorMainMenu::fileMenu(const filament::Texture* icons, EditorMainMenu::Ac
 
 	{
 		auto menu = ui::Menu{"File"};
-		if (menu.item("Open Project", "CTRL+P"))
+		if (menu.item("Open Project", "CTRL+SHIFT+O"))
 		{
 			action = Action::OpenProject;
 			changed = true;

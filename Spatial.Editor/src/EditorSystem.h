@@ -37,7 +37,7 @@ class EditorSystem
 	void onPublishRegistry(ecs::RegistryCollection& publisher);
 
 	void setRootPath(const std::filesystem::path& path);
-	void setScenePath(const std::filesystem::path& path);
+	void setScenePath(const std::string& path);
 
 	void clearScene();
 	void loadScene();
@@ -68,10 +68,10 @@ class EditorSystem
 	bool mIsCameraControlEnabled;
 	bool mIsCameraViewWindowHovered;
 
-	std::filesystem::path mScenePath;
-	std::filesystem::path mCurrentPath;
+	std::string mScenePath;
+	std::string mCurrentPath;
 
-	std::filesystem::path getScenePath() const;
+	std::string getScenePath() const;
 };
 
 } // namespace spatial::editor
