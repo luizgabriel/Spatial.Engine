@@ -5,6 +5,7 @@
 #include <spatial/common/Key.h>
 #include <spatial/common/Math.h>
 #include <spatial/common/Signal.h>
+#include <spatial/resources/FileSystem.h>
 #include <string_view>
 #include <type_traits>
 
@@ -32,6 +33,7 @@ class Window
 	~Window();
 
 	void setIcon(const uint8_t* pixelsData, uint32_t size);
+	void setIcon(FileSystem& fileSystem, std::string_view resourcePath);
 
 	void* getNativeHandle() const;
 	GLFWwindow* getHandle() const

@@ -103,4 +103,12 @@ void Window::setIcon(const uint8_t* pixelsData, uint32_t size)
 	stbi_image_free(icons[0].pixels);
 }
 
+void Window::setIcon(FileSystem& fileSystem, std::string_view resourcePath)
+{
+	auto iconData = fileSystem.readBinary(resourcePath);
+	assert(!iconData.empty());
+	setIcon(iconData.data(), iconData.size());
+}
+
+
 } // namespace spatial::desktop
