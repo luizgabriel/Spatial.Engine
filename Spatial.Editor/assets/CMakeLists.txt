@@ -67,6 +67,10 @@ set(SPATIAL_EDITOR_RESOURCE_FILES
         ${CMAKE_CURRENT_BINARY_DIR}/meshes/sphere.filamesh
         ${CMAKE_CURRENT_BINARY_DIR}/meshes/cylinder.filamesh)
 
+if (WIN32)
+        list(APPEND SPATIAL_EDITOR_RESOURCE_FILES AppIcon.png)
+endif()
+
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated.h
         DEPENDS ${SPATIAL_EDITOR_RESOURCE_FILES}

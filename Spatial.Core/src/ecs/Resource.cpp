@@ -22,19 +22,25 @@ Entity Resource::find(const Registry& registry, std::string_view resource)
 
 std::string Resource::stem() const
 {
-	return "";
+	if (relativePath.empty()) return "";
+	auto fileName = filename();
+	auto firstDot = fileName.find_first_of(".");
+	return firstDot == std::string::npos ? fileName : fileName.substr(0, firstDot);
 }
 
 std::string Resource::extension() const
 {
-	auto firstDot = relativePath.find_first_of(".");
-	return filename().substr(firstDot);
+	if (relativePath.empty()) return "";
+	auto fileName = filename();
+	auto firstDot = fileName.find_first_of(".");
+	return firstDot == std::string::npos ? "" : fileName.substr(firstDot);
 }
 
 std::string Resource::filename() const
 {
+	if (relativePath.empty()) return "";
 	auto lastSeparator = relativePath.find_last_of(SEPARATOR);
-	return relativePath.substr(lastSeparator);
+	return relativePath.substr(lastSeparator + 1);
 }
 
 bool Resource::exists(const Registry& registry, std::string_view resource)

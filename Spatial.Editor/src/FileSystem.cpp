@@ -9,6 +9,9 @@ namespace spatial::editor
 SharedFileSystem createEditorFileSystem()
 {
 	auto editorFs = std::make_shared<MemoryFileSystem>();
+	#if defined(SPATIAL_PLATFORM_WINDOWS)
+	editorFs->define("AppIcon.png", {ASSETS_APPICON_PNG, ASSETS_APPICON_PNG_SIZE});
+	#endif
 	editorFs->define("meshes/cube.filamesh", {ASSETS_CUBE_FILAMESH, ASSETS_CUBE_FILAMESH_SIZE});
 	editorFs->define("meshes/sphere.filamesh", {ASSETS_SPHERE_FILAMESH, ASSETS_SPHERE_FILAMESH_SIZE});
 	editorFs->define("meshes/plane.filamesh", {ASSETS_PLANE_FILAMESH, ASSETS_PLANE_FILAMESH_SIZE});
