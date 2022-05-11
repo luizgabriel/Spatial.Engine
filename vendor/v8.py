@@ -105,7 +105,7 @@ class V8Conan(ConanFile):
                 self.run("echo \"mac-arm64\" > .cipd_client_platform")
 
         self._set_environment_vars()
-        self.run("fetch v8")
+        self.run("fetch v8 --force")
 
         with tools.chdir("v8"):
             self.run("git checkout {}".format(self.version))
