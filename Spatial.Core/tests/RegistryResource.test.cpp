@@ -3,6 +3,22 @@
 
 using namespace spatial;
 
+TEST(RegistryResource, OnlyFile)
+{
+	auto resource = ecs::Resource{"file.txt"};
+    ASSERT_EQ(resource.filename(), "file.txt");
+    ASSERT_EQ(resource.extension(), ".txt");
+    ASSERT_EQ(resource.stem(), "file");
+}
+
+TEST(RegistryResource, Empty)
+{
+	auto resource = ecs::Resource{""};
+    ASSERT_EQ(resource.filename(), "");
+    ASSERT_EQ(resource.extension(), "");
+    ASSERT_EQ(resource.stem(), "");
+}
+
 TEST(RegistryResource, BasicPath)
 {
 	auto resource = ecs::Resource{"some/test/folder/file.txt"};
@@ -30,7 +46,7 @@ TEST(RegistryResource, NoExtension)
 TEST(RegistryResource, HiddenFile)
 {
     auto resource = ecs::Resource{"some/test/folder/.hidden"};
-    ASSERT_EQ(resource.filename(), "");
+    ASSERT_EQ(resource.filename(), ".hidden");
     ASSERT_EQ(resource.extension(), ".hidden");
     ASSERT_EQ(resource.stem(), "");
 }

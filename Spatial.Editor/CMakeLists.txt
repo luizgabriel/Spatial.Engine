@@ -1,6 +1,5 @@
 add_subdirectory(assets)
 
-set(SPATIAL_EDITOR_WINDOWS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.rc)
 set(SPATIAL_EDITOR_MACOS_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.icns)
 set(SPATIAL_EDITOR_IMGUI_SETTINGS ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/imgui.ini)
 
@@ -25,8 +24,7 @@ add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/FileSystem.h
         src/FileSystem.cpp
         ${SPATIAL_EDITOR_MACOS_ICON}
-        ${SPATIAL_EDITOR_IMGUI_SETTINGS}
-        ${SPATIAL_EDITOR_WINDOWS_ICON})
+        ${SPATIAL_EDITOR_IMGUI_SETTINGS})
 
 set_target_properties(Spatial.Editor PROPERTIES MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
 
@@ -52,11 +50,7 @@ install(TARGETS Spatial.Editor
         COMPONENT binaries)
 
 if (WIN32)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/assets/AppIcon.ico ${CMAKE_CURRENT_BINARY_DIR}/ COPYONLY)
-        configure_file(${SPATIAL_EDITOR_IMGUI_SETTINGS} ${CMAKE_CURRENT_BINARY_DIR}/ COPYONLY)
-        install(FILES
-                assets/AppIcon.ico
-                assets/config/imgui.ini
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        COMPONENT configs)
+        install(FILES assets/config/imgui.ini
+                DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT configs)
 endif()
