@@ -294,8 +294,9 @@ void EditorSystem::saveScene()
 std::string EditorSystem::getScenePath() const
 {
 	auto path = mScenePath;
-	if (!boost::starts_with(mScenePath, "project/"))
-		path = "project" + FileSystem::SEPARATOR + path;
+	auto projectPath = std::string{"project"} + FileSystem::SEPARATOR;
+	if (!boost::starts_with(mScenePath, projectPath))
+		path = projectPath + path;
 
 	if (!boost::ends_with(mScenePath, ".spatial.json"))
 		path = path + ".spatial.json";
