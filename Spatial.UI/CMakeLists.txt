@@ -13,7 +13,7 @@ add_library(Spatial.UI
         include/spatial/ui/components/MenuBar.h
         include/spatial/ui/components/Menu.h
         include/spatial/ui/components/PopupModal.h
-        include/spatial/ui/components/AssetsExplorer.h
+        include/spatial/ui/components/FilesExplorer.h
         include/spatial/ui/components/DirectionInput.h
         include/spatial/ui/components/VectorInput.h
         include/spatial/ui/components/DragAndDrop.h
@@ -42,7 +42,7 @@ add_library(Spatial.UI
         src/components/MenuBar.cpp
         src/components/Menu.cpp
         src/components/PopupModal.cpp
-        src/components/AssetsExplorer.cpp
+        src/components/FilesExplorer.cpp
         src/components/VectorInput.cpp
         src/components/DragAndDrop.cpp
         src/components/DirectionInput.cpp

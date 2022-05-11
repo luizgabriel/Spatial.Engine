@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Resource.h>
 
@@ -23,17 +22,19 @@ Entity Resource::find(const Registry& registry, std::string_view resource)
 
 std::string Resource::stem() const
 {
-	return std::filesystem::path{relativePath}.stem().string();
+	return "";
 }
 
 std::string Resource::extension() const
 {
-	return std::filesystem::path{relativePath}.extension().string();
+	auto firstDot = relativePath.find_first_of(".");
+	return filename().substr(firstDot);
 }
 
 std::string Resource::filename() const
 {
-	return std::filesystem::path{relativePath}.filename().string();
+	auto lastSeparator = relativePath.find_last_of(SEPARATOR);
+	return relativePath.substr(lastSeparator);
 }
 
 bool Resource::exists(const Registry& registry, std::string_view resource)

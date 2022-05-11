@@ -11,13 +11,13 @@ PhysicalFileSystem::PhysicalFileSystem(std::filesystem::path rootPath) : mRootPa
 std::unique_ptr<std::istream> PhysicalFileSystem::openReadStreamImpl(std::string_view path) noexcept
 {
 	auto absolutePath = makeFullPath(path);
-	return std::make_unique<std::ifstream>(absolutePath);
+	return std::make_unique<std::ifstream>(absolutePath, std::ios_base::binary);
 }
 
 std::unique_ptr<std::ostream> PhysicalFileSystem::openWriteStreamImpl(std::string_view path) noexcept
 {
 	auto absolutePath = makeFullPath(path);
-	return std::make_unique<std::ofstream>(absolutePath);
+	return std::make_unique<std::ofstream>(absolutePath, std::ios_base::binary);
 }
 
 std::filesystem::path PhysicalFileSystem::makeFullPath(std::string_view path) const noexcept
