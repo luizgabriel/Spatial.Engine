@@ -31,7 +31,7 @@ install(EXPORT Spatial.Export
         COMPONENT configs)
 write_basic_package_version_file(SpatialEngineConfigVersion.cmake VERSION ${PACKAGE_VERSION} COMPATIBILITY AnyNewerVersion)
 install(FILES
-            LICENSE
+            LICENSE.txt
             ${CMAKE_CURRENT_BINARY_DIR}/SpatialEngineConfigVersion.cmake
         DESTINATION .
         COMPONENT configs)
