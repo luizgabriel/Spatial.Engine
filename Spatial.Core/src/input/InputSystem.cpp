@@ -7,9 +7,10 @@ InputSystem::InputSystem() : mInputState{}, mOnChangeStateSignal{}
 {
 }
 
-void InputSystem::onUpdateFrame(float)
+void InputSystem::onUpdateFrame(float delta)
 {
 	mOnChangeStateSignal.trigger(mInputState);
+	mInputState.approximateMouseOffset(delta);
 }
 
 void InputSystem::onEndFrame()

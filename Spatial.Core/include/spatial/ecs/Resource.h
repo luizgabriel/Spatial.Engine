@@ -17,6 +17,7 @@ struct IsResourceLoaded
 struct Resource
 {
 	constexpr static auto typeName = "resource";
+	constexpr static auto SEPARATOR = "/";
 
 	std::string relativePath;
 

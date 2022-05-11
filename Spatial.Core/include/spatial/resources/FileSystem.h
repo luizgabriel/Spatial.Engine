@@ -5,7 +5,6 @@
 #include <memory>
 #include <optional>
 #include <set>
-#include <spatial/resources/ResourceError.h>
 #include <string_view>
 
 namespace spatial
@@ -103,7 +102,7 @@ class FileSystem
 	bool write(std::string_view path, std::string&& data) noexcept;
 
   private:
-	std::map<std::string, std::shared_ptr<FileSystem>> mNodes;
+	std::map<std::string, SharedFileSystem> mNodes;
 
   protected:
 	[[nodiscard]] virtual std::unique_ptr<std::istream> openReadStreamImpl(std::string_view path) noexcept = 0;

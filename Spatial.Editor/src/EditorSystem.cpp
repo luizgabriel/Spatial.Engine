@@ -9,7 +9,7 @@
 
 #include <spatial/render/Resources.h>
 
-#include <spatial/ui/components/AssetsExplorer.h>
+#include <spatial/ui/components/FilesExplorer.h>
 #include <spatial/ui/components/Window.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
@@ -93,7 +93,7 @@ void EditorSystem::onDrawGui()
 	static ecs::Entity selectedView{ecs::NullEntity};
 	static bool showDebugEntities{false};
 	static bool showDebugComponents{false};
-	static std::filesystem::path rootPath = {};
+	static std::string rootPath = {};
 
 	const auto* icons = render::getTexture(mEditorRegistry, mIconTexture);
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
@@ -203,7 +203,14 @@ void EditorSystem::onDrawGui()
 		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, icons, showDebugComponents);
 	});
 
-	ui::Window::show("Assets Explorer", [&]() { ui::AssetsExplorer::displayFiles(mFileSystem, mCurrentPath, icons); });
+	ui::Window::show("Assets Explorer", [&]() {
+		ui::FilesExplorer::displayFiles(mFileSystem, mCurrentPath, icons);
+		if (mFileSystem.list(PROJECT_DIR).size() == 0) {
+			ImGui::Text("No files inside this project.");
+			if (ImGui::Button("Open Project"))
+				mMenuAction = ui::EditorMainMenu::Action::OpenProject;
+		}
+	});
 }
 
 void EditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
@@ -223,14 +230,14 @@ void EditorSystem::onUpdateInput(const desktop::InputState& input)
 	if (input.combined(Key::LControl, Key::S))
 		mMenuAction = ui::EditorMainMenu::Action::SaveScene;
 
-	if (input.combined(Key::LControl, Key::P))
+	if (input.combined(Key::LControl, Key::LShift, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenProject;
 
 	if (input.combined(Key::LControl, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenScene;
 }
 
-void EditorSystem::setScenePath(const std::filesystem::path& path)
+void EditorSystem::setScenePath(const std::string& path)
 {
 	mScenePath = path;
 }
@@ -243,12 +250,12 @@ void EditorSystem::clearScene()
 
 void EditorSystem::loadScene()
 {
-	const auto path = getScenePath();
+	auto path = getScenePath();
 
-	auto stream = mFileSystem.openReadStream(path.string());
+	auto stream = mFileSystem.openReadStream(path);
 	if (stream->fail())
 	{
-		gLogger.error("Could not open scene file: {}", path.string());
+		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
@@ -265,12 +272,12 @@ void EditorSystem::loadScene()
 
 void EditorSystem::saveScene()
 {
-	const auto path = getScenePath();
+	auto path = getScenePath();
 
-	auto stream = mFileSystem.openWriteStream(path.string());
+	auto stream = mFileSystem.openWriteStream(path);
 	if (stream->fail())
 	{
-		gLogger.error("Could not open scene file: {}", path.string());
+		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
@@ -284,14 +291,14 @@ void EditorSystem::saveScene()
 	}
 }
 
-std::filesystem::path EditorSystem::getScenePath() const
+std::string EditorSystem::getScenePath() const
 {
 	auto path = mScenePath;
-	if (!boost::starts_with(path.parent_path().c_str(), "project/"))
-		path = "project" / path;
+	if (!boost::starts_with(mScenePath, "project/"))
+		path = "project" + FileSystem::SEPARATOR + path;
 
-	if (!boost::ends_with(mScenePath.filename().c_str(), ".spatial.json"))
-		path = std::filesystem::path{path.string() + ".spatial.json"};
+	if (!boost::ends_with(mScenePath, ".spatial.json"))
+		path = path + ".spatial.json";
 
 	return path;
 }

@@ -11,14 +11,9 @@ constexpr int keysCount = static_cast<size_t>(Key::Count);
 
 class InputState
 {
-  private:
-	std::bitset<keysCount> mKeyPressed;
-	std::bitset<keysCount> mKeyReleased;
-
-	math::float2 mLastMousePosition;
-	math::float2 mCurrentMousePosition;
-
   public:
+	using BitSet = std::bitset<keysCount>;
+
 	InputState();
 
 	void set(Key key, KeyAction action);
@@ -28,6 +23,8 @@ class InputState
 	void setReleased(Key key);
 
 	void reset(Key key);
+
+	void approximateMouseOffset(float delta);
 
 	void reset();
 
@@ -61,6 +58,13 @@ class InputState
 	bool combined(Key alt1, Key alt2, Key alt3, Key alt4, Key key) const;
 
 	float axis(Key positive, Key negative) const;
+
+private:
+	BitSet mKeyPressed;
+	BitSet mKeyReleased;
+
+	math::float2 mLastMousePosition;
+	math::float2 mCurrentMousePosition;
 };
 
 } // namespace spatial::desktop

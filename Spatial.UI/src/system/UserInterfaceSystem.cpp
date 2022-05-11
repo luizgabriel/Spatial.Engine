@@ -58,14 +58,14 @@ void UserInterfaceSystem::onRender(filament::Renderer& renderer) const
 
 void UserInterfaceSystem::setMaterial(FileSystem& fileSystem, std::string_view materialResourcePath)
 {
-	const auto materialData = fileSystem.readBinary(materialResourcePath);
+	auto materialData = fileSystem.readBinary(materialResourcePath);
 	assert(!materialData.empty());
 	mRenderer.setMaterial(materialData.data(), materialData.size());
 }
 
 void UserInterfaceSystem::addFont(FileSystem& fileSystem, std::string_view fontPath)
 {
-	const auto fontData = fileSystem.readBinary(fontPath);
+	auto fontData = fileSystem.readBinary(fontPath);
 	assert(!fontData.empty());
 	mRenderer.addFont(fontData.data(), fontData.size());
 }

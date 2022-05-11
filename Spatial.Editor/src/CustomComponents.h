@@ -46,20 +46,20 @@ struct EditorMainMenu
 struct EditorModals
 {
   static bool newScene();
-  static bool openScene(std::filesystem::path& openPath);
-  static bool saveScene(std::filesystem::path& savePath);
-  static bool openProject(std::filesystem::path& openPath);
+  static bool openScene(std::string& openPath);
+  static bool saveScene(std::string& savePath);
+  static bool openProject(std::string& openPath);
 };
 
 class OpenSceneModal
 {
   public:
-	explicit OpenSceneModal(std::filesystem::path& openPath);
+	explicit OpenSceneModal(std::string& openPath);
 	bool onConfirm();
 
 	static void open();
 
-	static bool show(std::filesystem::path& openPath)
+	static bool show(std::string& openPath)
 	{
 		auto modal = OpenSceneModal{openPath};
 		return modal.onConfirm();
@@ -126,7 +126,7 @@ class MaterialsManager
 class EditorDragAndDrop
 {
   public:
-	static bool loadScene(std::filesystem::path& scenePath, ecs::Entity& selectedEntity);
+	static bool loadScene(std::string& scenePath, ecs::Entity& selectedEntity);
 	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								 math::float3 createEntityPosition = {});
 };

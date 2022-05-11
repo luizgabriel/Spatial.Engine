@@ -26,3 +26,7 @@ if (SPATIAL_ENABLE_CCACHE)
         set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
     endif()
 endif()
+
+if(WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")  
+endif()
