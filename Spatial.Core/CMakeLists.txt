@@ -138,7 +138,7 @@ add_library(Spatial.Core
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
-        src/resources/MemoryFileSystem.cpp)
+        src/resources/MemoryFileSystem.cpp include/spatial/ecs/ResourceController.h src/ecs/ResourceController.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

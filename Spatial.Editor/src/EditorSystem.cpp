@@ -360,6 +360,12 @@ void EditorSystem::createDefaultEditorEntities()
 
 	ecs::Builder::create(mRegistry)
 		.asResource()
+		.withPath("engine/gray")
+		.with<ecs::tags::IsImageTexture>()
+		.with(ecs::RuntimeTexture{{0xFFDDDDDD}, 1});
+
+	ecs::Builder::create(mRegistry)
+		.asResource()
 		.withPath("engine/black")
 		.with<ecs::tags::IsImageTexture>()
 		.with(ecs::RuntimeTexture{{0xFF000000}, 1});
