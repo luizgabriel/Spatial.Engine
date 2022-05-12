@@ -1,11 +1,10 @@
 #pragma once
 
-#include <filesystem>
 #include <map>
 #include <memory>
-#include <optional>
 #include <set>
 #include <string_view>
+#include <future>
 
 namespace spatial
 {
@@ -98,6 +97,8 @@ class FileSystem
 	std::string readString(std::string_view path) noexcept;
 
 	std::vector<uint8_t> readBinary(std::string_view path) noexcept;
+
+	std::future<std::vector<uint8_t>> readBinaryAsync(std::string_view path) noexcept;
 
 	bool write(std::string_view path, std::string&& data) noexcept;
 

@@ -8,9 +8,7 @@
 namespace spatial::render
 {
 
-static auto gLogger = createDefaultLogger();
-
-void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
+void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::DummyCubeMapTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity) {
@@ -29,64 +27,22 @@ void TextureController::loadTextures(filament::Engine& engine, FileSystem& fileS
 		});
 
 	registry
-		.getEntities<const ecs::Resource, ecs::tags::IsImageTexture>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty())
-				return;
-
-			auto data = fileSystem.readBinary(resource.relativePath);
-			if (data.empty())
-			{
-				gLogger.warn("Could not load texture: {}", resource.relativePath);
-				return;
-			}
-
-			auto texture = toShared(createTexture(engine, data.data(), data.size()));
-
-			registry.addOrReplaceComponent(entity, std::move(texture));
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		.getEntities<const ecs::ResourceData, ecs::tags::IsCubeMapTexture>(
+			ecs::ExcludeComponents<render::SharedTexture>)
+		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
+			registry.addComponent(entity,
+								  toShared(createKtxTexture(engine, resource.data.data(), resource.data.size())));
 		});
 
 	registry
-		.getEntities<const ecs::Resource, ecs::tags::IsCubeMapTexture>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty())
-				return;
-
-			auto data = fileSystem.readBinary(resource.relativePath);
-			if (data.empty())
-			{
-				gLogger.warn("Could not load texture: {}", resource.relativePath);
-				return;
-			}
-
-			auto texture = toShared(createKtxTexture(engine, data.data(), data.size()));
-
-			registry.addOrReplaceComponent<SharedTexture>(entity, std::move(texture));
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		.getEntities<const ecs::ResourceData, ecs::tags::IsImageTexture>(ecs::ExcludeComponents<render::SharedTexture>)
+		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
+			registry.addComponent(entity, toShared(createTexture(engine, resource.data.data(), resource.data.size())));
 		});
 
-	registry
-		.getEntities<const ecs::Resource, ecs::tags::IsIrradianceValues>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty())
-				return;
-
-			auto stream = fileSystem.openReadStream(resource.relativePath);
-			if (stream->bad())
-			{
-				gLogger.warn("Could not load texture: {}", resource.relativePath);
-				return;
-			}
-
-			auto bands = bands_t{};
-			*stream >> bands;
-
-			registry.addOrReplaceComponent<bands_t>(entity, bands);
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+	registry.getEntities<const ecs::ResourceData, ecs::tags::IsIrradianceValues>(ecs::ExcludeComponents<bands_t>)
+		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
+			registry.addComponent<bands_t>(entity, parseShFile(resource.data.data(), resource.data.size()));
 		});
 }
 

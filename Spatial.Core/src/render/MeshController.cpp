@@ -100,26 +100,28 @@ void MeshController::clearDirtyRenderables(ecs::Registry& registry)
 	registry.removeComponentFromEntities<ecs::tags::ShouldRecreateRenderable, Renderable>();
 }
 
-static auto gLogger = createDefaultLogger();
-
-void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
+void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::RuntimeMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::RuntimeMesh& runtimeMesh) {
-
-			auto vb = toShared(render::VertexBuffer{engine, filament::VertexBuffer::Builder()
-						   .vertexCount(runtimeMesh.vertexData.size())
-						   .bufferCount(1)
-						   .attribute(filament::VertexAttribute::POSITION, 0, filament::VertexBuffer::AttributeType::FLOAT3, 0)
-						   .build(engine)});
-			vb->setBufferAt(engine, 0, {runtimeMesh.vertexData.data(), sizeof(decltype(runtimeMesh.vertexData)::value_type) * runtimeMesh.vertexData.size()});
+			auto vb =
+				toShared(render::VertexBuffer{engine, filament::VertexBuffer::Builder()
+														  .vertexCount(runtimeMesh.vertexData.size())
+														  .bufferCount(1)
+														  .attribute(filament::VertexAttribute::POSITION, 0,
+																	 filament::VertexBuffer::AttributeType::FLOAT3, 0)
+														  .build(engine)});
+			vb->setBufferAt(engine, 0,
+							{runtimeMesh.vertexData.data(),
+							 sizeof(decltype(runtimeMesh.vertexData)::value_type) * runtimeMesh.vertexData.size()});
 
 			auto ib = toShared(render::IndexBuffer{engine, filament::IndexBuffer::Builder()
-				.indexCount(runtimeMesh.indexData.size())
-				.bufferType(filament::IndexBuffer::IndexType::USHORT)
-				.build(engine)});
+															   .indexCount(runtimeMesh.indexData.size())
+															   .bufferType(filament::IndexBuffer::IndexType::USHORT)
+															   .build(engine)});
 
-			ib->setBuffer(engine, {runtimeMesh.indexData.data(), sizeof(decltype(runtimeMesh.indexData)::value_type) * runtimeMesh.indexData.size()});
+			ib->setBuffer(engine, {runtimeMesh.indexData.data(),
+								   sizeof(decltype(runtimeMesh.indexData)::value_type) * runtimeMesh.indexData.size()});
 
 			registry.addOrReplaceComponent(entity, render::MeshGeometries{{0, ib->getIndexCount()}});
 			registry.addOrReplaceComponent(entity, std::move(vb));
@@ -127,30 +129,20 @@ void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
-	registry.getEntities<const ecs::Resource, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty())
-				return;
+	registry.getEntities<const ecs::ResourceData, ecs::tags::IsMesh>(ecs::ExcludeComponents<SharedVertexBuffer>)
+		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 
-			auto stream = fileSystem.openReadStream(resource.relativePath);
-			if (stream->bad())
-			{
-				gLogger.warn("Could not load mesh: {}", resource.relativePath);
-				return;
-			}
-
-			auto filamesh = FilameshFile{};
-			*stream >> filamesh;
+			auto filamesh = loadFilameshFromMemory(resource.data.data(), resource.data.size());
 
 			if (filamesh.vertexData.empty())
 			{
-				gLogger.warn("Empty Vertex Data: {}", resource.relativePath);
+				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty vertex data");
 				return;
 			}
 
 			if (filamesh.indexData.empty())
 			{
-				gLogger.warn("Empty Index Data: {}", resource.relativePath);
+				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty index data");
 				return;
 			}
 
@@ -158,7 +150,6 @@ void MeshController::loadMeshes(filament::Engine& engine, FileSystem& fileSystem
 			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(engine, filamesh)));
 			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
 			registry.addOrReplaceComponent(entity, createMeshGeometries(filamesh));
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
 

@@ -70,7 +70,6 @@ std::vector<uint8_t> FileSystem::readBinary(std::string_view path) noexcept
 	return std::vector<uint8_t>{std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>()};
 }
 
-
 bool FileSystem::write(std::string_view path, std::string&& data) noexcept
 {
 	auto stream = openWriteStream(path);
@@ -90,6 +89,17 @@ std::set<FileSystem::Entry> FileSystem::list(std::string_view path) noexcept
 		pathList.emplace(k, FileType::Directory);
 
 	return pathList;
+}
+
+std::future<std::vector<uint8_t>> FileSystem::readBinaryAsync(std::string_view path) noexcept
+{
+	return std::async(std::launch::async,
+					  [this, p = std::string{path}]() -> std::vector<uint8_t> {
+						  using namespace std::chrono_literals;
+						  if (p.ends_with(".png"))
+						  	std::this_thread::sleep_for(2s);
+						  return this->readBinary(p);
+					  });
 }
 
 std::unique_ptr<std::istream> AggregateFileSystem::openReadStreamImpl(std::string_view path) noexcept
