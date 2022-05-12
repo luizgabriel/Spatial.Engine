@@ -89,8 +89,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
-          path: out/package/${{ matrix.config.preset }}/*
           if-no-files-found: error
+          path: |
+            out/package/${{ matrix.config.preset }}/*
+            !out/package/${{ matrix.config.preset }}/_CPack_Packages
 
   release:
     if: contains(github.ref, 'tags/v')
