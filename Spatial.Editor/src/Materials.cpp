@@ -26,6 +26,7 @@ void GridMaterial::apply(filament::MaterialInstance& instance, const ecs::Regist
 
 void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const
 {
+	const auto* dummyGray = render::getTexture(registry, "engine/gray");
 	const auto* dummyWhite = render::getTexture(registry, "engine/white");
 	const auto* dummyBlack = render::getTexture(registry, "engine/black");
 	assert(dummyWhite != nullptr);
@@ -33,7 +34,7 @@ void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const e
 
 	instance.setParameter("baseColor", baseColor);
 	const auto* albedoTexture = render::getTexture(registry, albedo);
-	instance.setParameter("albedo", albedoTexture != nullptr ? albedoTexture : dummyWhite, gDefaultSampler);
+	instance.setParameter("albedo", albedoTexture != nullptr ? albedoTexture : dummyGray, gDefaultSampler);
 	instance.setParameter("tilingOffset", math::float4{tiling, offset});
 
 	instance.setParameter("metallic", metallic);

@@ -9,22 +9,19 @@ namespace spatial::render
 
 static auto gLogger = createDefaultLogger();
 
-void MaterialController::loadMaterials(filament::Engine& engine, FileSystem& fileSystem, ecs::Registry& registry)
+void MaterialController::loadMaterials(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry
-		.getEntities<const ecs::Resource, ecs::tags::IsMaterial>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty())
-				return;
-
-			const auto data = fileSystem.readBinary(resource.relativePath);
-			if (data.empty())
+		.getEntities<const ecs::ResourceData, ecs::tags::IsMaterial>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
+			if (resource.data.empty())
 			{
-				gLogger.warn("Could not load material: {}", resource.relativePath);
+				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty material data");
 				return;
 			}
 
-			auto material = toShared(render::createMaterial(engine, data.data(), data.size()));
+			auto material = toShared(render::createMaterial(engine, resource.data.data(), resource.data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, std::move(material));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
