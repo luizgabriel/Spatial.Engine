@@ -53,6 +53,11 @@ struct Resource
 	static Entity createEmpty(Registry& registry, std::string_view resource);
 };
 
+struct ResourceData
+{
+	std::vector<uint8_t> data;
+};
+
 struct ResourceError
 {
 	std::string errorMessage;

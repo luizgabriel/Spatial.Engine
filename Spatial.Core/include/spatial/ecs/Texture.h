@@ -33,7 +33,7 @@ struct DummyCubeMapTexture
 
 struct RuntimeTexture
 {
-	constexpr static auto typeName = "color_texture";
+	constexpr static auto typeName = "runtime_texture";
 
 	std::vector<uint32_t> pixels{0xFFFFFFFF};
 	size_t width{1};
