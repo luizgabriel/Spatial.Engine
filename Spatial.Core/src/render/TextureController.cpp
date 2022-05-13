@@ -39,6 +39,7 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 			registry.addOrReplaceComponent(entity, createTexture(engine, resource));
+			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
@@ -48,6 +49,7 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 			registry.addOrReplaceComponent(entity,
 										   toShared(createTexture(engine, resource.data.data(), resource.data.size())));
+			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
@@ -56,6 +58,7 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 			registry.addOrReplaceComponent(entity, parseShFile(resource.data.data(), resource.data.size()));
+			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
