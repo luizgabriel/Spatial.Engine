@@ -8,6 +8,16 @@
 namespace spatial::render
 {
 
+render::SharedTexture createTexture(filament::Engine& engine, const ecs::RuntimeTexture& runtimeTexture)
+{
+	return toShared(createTexture(engine, runtimeTexture.pixels, runtimeTexture.width));
+}
+
+render::SharedTexture createTexture(filament::Engine& engine, const ecs::ResourceData& resourceData)
+{
+	return toShared(createKtxTexture(engine, resourceData.data.data(), resourceData.data.size()));
+}
+
 void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::DummyCubeMapTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
@@ -20,29 +30,33 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 
 	registry.getEntities<const ecs::RuntimeTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::RuntimeTexture& runtimeTexture) {
-			auto texture = toShared(createTexture(engine, runtimeTexture.pixels, runtimeTexture.width));
-
-			registry.addOrReplaceComponent(entity, std::move(texture));
+			registry.addOrReplaceComponent(entity, createTexture(engine, runtimeTexture));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
 	registry
 		.getEntities<const ecs::ResourceData, ecs::tags::IsCubeMapTexture>(
-			ecs::ExcludeComponents<render::SharedTexture>)
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
-			registry.addComponent(entity,
-								  toShared(createKtxTexture(engine, resource.data.data(), resource.data.size())));
+			registry.addOrReplaceComponent(entity, createTexture(engine, resource));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
 	registry
-		.getEntities<const ecs::ResourceData, ecs::tags::IsImageTexture>(ecs::ExcludeComponents<render::SharedTexture>)
+		.getEntities<const ecs::ResourceData, ecs::tags::IsImageTexture>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
-			registry.addComponent(entity, toShared(createTexture(engine, resource.data.data(), resource.data.size())));
+			registry.addOrReplaceComponent(entity,
+										   toShared(createTexture(engine, resource.data.data(), resource.data.size())));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
-	registry.getEntities<const ecs::ResourceData, ecs::tags::IsIrradianceValues>(ecs::ExcludeComponents<bands_t>)
+	registry
+		.getEntities<const ecs::ResourceData, ecs::tags::IsIrradianceValues>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
-			registry.addComponent<bands_t>(entity, parseShFile(resource.data.data(), resource.data.size()));
+			registry.addOrReplaceComponent(entity, parseShFile(resource.data.data(), resource.data.size()));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
 
