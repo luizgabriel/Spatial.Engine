@@ -1,4 +1,3 @@
-#include <spatial/core/Logger.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
 #include <spatial/render/MaterialController.h>
@@ -7,23 +6,16 @@
 namespace spatial::render
 {
 
-static auto gLogger = createDefaultLogger();
-
 void MaterialController::loadMaterials(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry
 		.getEntities<const ecs::ResourceData, ecs::tags::IsMaterial>(
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
-			if (resource.data.empty())
-			{
-				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty material data");
-				return;
-			}
-
 			auto material = toShared(render::createMaterial(engine, resource.data.data(), resource.data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, std::move(material));
+			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }

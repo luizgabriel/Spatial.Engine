@@ -1,4 +1,4 @@
-#include <spatial/ecs/ResourceController.h>
+#include "spatial/resources/ResourceController.h"
 #include <spatial/render/CameraController.h>
 #include <spatial/render/LightController.h>
 #include <spatial/render/MaterialController.h>
@@ -32,7 +32,7 @@ void RegistryRenderingSystem::onUpdateFrame(float)
 	auto registries = getPublishedRegistries();
 
 	registries.each([&](ecs::Registry& registry) {
-		ecs::ResourceController::loadResources(mFileSystem, registry);
+		ResourceController::loadResources(mFileSystem, registry);
 
 		SceneController::updateScenes(registry);
 		TransformController::updateTransforms(registry);
@@ -50,8 +50,8 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 
 	registries.each([&](ecs::Registry& registry) {
 		MeshController::loadMeshes(engine, registry);
-		TextureController::loadTextures(engine, registry);
 		MaterialController::loadMaterials(engine, registry);
+		TextureController::loadTextures(engine, registry);
 
 		SceneController::createScenes(engine, registry);
 		SceneController::createRenderables(engine, registry);
