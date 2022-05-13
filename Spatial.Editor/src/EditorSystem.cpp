@@ -362,7 +362,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.asResource()
 		.withPath("engine/gray")
 		.with<ecs::tags::IsImageTexture>()
-		.with(ecs::RuntimeTexture{{0xFFDDDDDD}, 1});
+		.with(ecs::RuntimeTexture{{0xFF777777}, 1});
 
 	ecs::Builder::create(mRegistry)
 		.asResource()
