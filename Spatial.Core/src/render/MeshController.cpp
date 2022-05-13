@@ -1,4 +1,3 @@
-#include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
@@ -133,19 +132,7 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 
 			auto filamesh = loadFilameshFromMemory(resource.data.data(), resource.data.size());
-
-			if (filamesh.vertexData.empty())
-			{
-				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty vertex data");
-				return;
-			}
-
-			if (filamesh.indexData.empty())
-			{
-				registry.addOrReplaceComponent<ecs::ResourceError>(entity, "Empty index data");
-				return;
-			}
-
+			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addOrReplaceComponent(entity, toShared(createVertexBuffer(engine, filamesh)));
 			registry.addOrReplaceComponent(entity, toShared(createIndexBuffer(engine, filamesh)));
 			registry.addOrReplaceComponent(entity, filament::Box{filamesh.header.aabb});
