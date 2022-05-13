@@ -3,7 +3,7 @@
 #include <spatial/resources/FileSystem.h>
 #include <spatial/ecs/Registry.h>
 
-namespace spatial::ecs
+namespace spatial
 {
 
 struct ResourceController
