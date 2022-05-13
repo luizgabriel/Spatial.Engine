@@ -106,7 +106,15 @@ Texture createDummyCubemap(filament::Engine& engine);
 
 Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pixels, size_t width);
 
+filament::VertexBuffer::Builder createVertexBufferBuilder(const FilameshFileHeader& header);
+
+filament::VertexBuffer::BufferDescriptor createVertexBufferDescriptor(const FilameshFile& filamesh);
+
 VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
+
+filament::IndexBuffer::Builder createIndexBufferBuilder(const FilameshFileHeader& header);
+
+filament::IndexBuffer::BufferDescriptor createIndexBufferDescriptor(const FilameshFile& filamesh);
 
 IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& filamesh);
 

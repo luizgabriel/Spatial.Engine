@@ -83,6 +83,7 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 	int width, height, n;
 	const auto* imageData = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &n, 4);
 
+	// TODO: Can we move this "PixelBufferDescriptor" to the async continuation?
 	auto bufferDescriptor = fl::Texture::PixelBufferDescriptor{
 		imageData, size_t(width) * height * 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE,
 		reinterpret_cast<fl::Texture::PixelBufferDescriptor::Callback>(&stbi_image_free)};
@@ -91,13 +92,13 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 								 fl::Texture::InternalFormat::RGBA8, usage, sampler);
 	texture->setImage(engine, 0, std::move(bufferDescriptor));
 
+	fl::Fence::waitAndDestroy(engine.createFence());
+
 	return std::move(texture);
 }
 
-VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
+filament::VertexBuffer::Builder createVertexBufferBuilder(const FilameshFileHeader& header)
 {
-	const auto& header = filamesh.header;
-
 	const uint32_t FLAG_SNORM16_UV = 0x2;
 	auto uvType = fl::VertexBuffer::AttributeType::HALF2;
 	if (header.flags & FLAG_SNORM16_UV)
@@ -128,29 +129,40 @@ VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFile& filamesh
 			.normalized(filament::UV1, uvNormalized);
 	}
 
-	auto vb = VertexBuffer{engine, vbBuilder.build(engine)};
+	return vbBuilder;
+}
 
-	auto vbBufferDescriptor = fl::VertexBuffer::BufferDescriptor(&filamesh.vertexData[0], header.vertexSize);
-	vb->setBufferAt(engine, 0, std::move(vbBufferDescriptor));
+filament::VertexBuffer::BufferDescriptor createVertexBufferDescriptor(const FilameshFile& filamesh)
+{
+	return {filamesh.vertexData.data(), filamesh.header.vertexSize};
+}
+
+VertexBuffer createVertexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
+{
+	auto vb = VertexBuffer{engine, createVertexBufferBuilder(filamesh.header).build(engine)};
+	vb->setBufferAt(engine, 0, createVertexBufferDescriptor(filamesh));
 
 	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return vb;
 }
 
+filament::IndexBuffer::Builder createIndexBufferBuilder(const FilameshFileHeader& header)
+{
+	return fl::IndexBuffer::Builder()
+		.indexCount(header.indexCount)
+		.bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
+}
+
+filament::IndexBuffer::BufferDescriptor createIndexBufferDescriptor(const FilameshFile& filamesh)
+{
+	return {filamesh.indexData.data(), filamesh.header.indexSize};
+}
+
 IndexBuffer createIndexBuffer(fl::Engine& engine, const FilameshFile& filamesh)
 {
-	const auto& header = filamesh.header;
-
-	auto ibBuilder =
-		fl::IndexBuffer::Builder()
-			.indexCount(header.indexCount)
-			.bufferType(header.indexType ? fl::IndexBuffer::IndexType::USHORT : fl::IndexBuffer::IndexType::UINT);
-
-	auto ib = IndexBuffer{engine, ibBuilder.build(engine)};
-
-	auto ibBufferDescriptor = fl::IndexBuffer::BufferDescriptor(&filamesh.indexData[0], header.indexSize);
-	ib->setBuffer(engine, std::move(ibBufferDescriptor));
+	auto ib = IndexBuffer{engine, createIndexBufferBuilder(filamesh.header).build(engine)};
+	ib->setBuffer(engine, createIndexBufferDescriptor(filamesh));
 
 	fl::Fence::waitAndDestroy(engine.createFence());
 
@@ -162,11 +174,13 @@ Texture createDummyCubemap(filament::Engine& engine)
 	auto texture = createTexture(engine, math::int2{1}, fl::Texture::InternalFormat::RGBA8, fl::Texture::Usage::DEFAULT,
 								 filament::Texture::Sampler::SAMPLER_CUBEMAP);
 
-	static const uint32_t pixel = 0;
+	static const uint32_t pixel = 0xFF888888;
 	auto buffer =
 		filament::Texture::PixelBufferDescriptor(&pixel, 4, fl::Texture::Format::RGBA, fl::Texture::Type::UBYTE);
 	const auto offsets = filament::Texture::FaceOffsets{};
 	texture->setImage(engine, 0, std::move(buffer), offsets);
+
+	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return texture;
 }
@@ -193,10 +207,12 @@ Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pix
 
 	auto size = dimensions.x * dimensions.y * sizeof(uint32_t);
 
-	auto buffer = filament::Texture::PixelBufferDescriptor(
-		pixels.data(), size, filament::Texture::Format::RGBA, filament::Texture::Type::UBYTE);
+	auto buffer = filament::Texture::PixelBufferDescriptor(pixels.data(), size, filament::Texture::Format::RGBA,
+														   filament::Texture::Type::UBYTE);
 
 	texture->setImage(engine, 0, std::move(buffer));
+
+	fl::Fence::waitAndDestroy(engine.createFence());
 
 	return texture;
 }
