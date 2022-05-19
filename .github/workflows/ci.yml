@@ -90,9 +90,7 @@ jobs:
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
-          path: |
-            out/package/${{ matrix.config.preset }}/*
-            !out/package/${{ matrix.config.preset }}/_CPack_Packages
+          path: out/package/${{ matrix.config.preset }}/*
 
   release:
     if: contains(github.ref, 'tags/v')
