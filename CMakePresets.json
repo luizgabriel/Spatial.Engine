@@ -236,6 +236,13 @@
     {
       "name": "Test-Base",
       "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      },
       "filter": {
         "exclude": {
           "name": "(Application)|(DesktopWindow)"
