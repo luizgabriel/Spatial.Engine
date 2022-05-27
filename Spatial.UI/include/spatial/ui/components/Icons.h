@@ -7,15 +7,15 @@ namespace spatial::ui
 
 struct Icon
 {
-	math::float2 pos;
-	constexpr explicit Icon(math::float2 pos) : pos(pos)
+	math::vec2 pos;
+	constexpr explicit Icon(math::vec2 pos) : pos{pos}
 	{
 	}
 
 	[[nodiscard]] constexpr auto uv() const
 	{
-		const auto offset = math::float2{1.0f / 8.0f};
-		return math::float4{pos * offset, (pos + math::float2{1, 1}) * offset};
+		const auto offset = math::vec2{1.0f / 8.0f};
+		return math::vec4{pos * offset, (pos + math::vec2{1, 1}) * offset};
 	}
 };
 

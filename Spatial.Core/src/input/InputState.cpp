@@ -53,7 +53,7 @@ void InputState::reset()
 	mKeyReleased.reset();
 }
 
-void InputState::setMousePosition(math::float2 position)
+void InputState::setMousePosition(math::vec2 position)
 {
 	mLastMousePosition = mCurrentMousePosition;
 	mCurrentMousePosition = position;

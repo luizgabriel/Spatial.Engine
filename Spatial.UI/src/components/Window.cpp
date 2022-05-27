@@ -15,27 +15,27 @@ Window::~Window()
 	ImGui::End();
 }
 
-math::float2 Window::getSize() const
+math::vec2 Window::getSize() const
 {
 	if (!mIsOpen)
-		return {.0f};
+		return math::vec2{.0f};
 	auto size = ImGui::GetWindowSize();
 	return {size.x, size.y};
 }
 
-void Window::setSize(const math::float2& size)
+void Window::setSize(const math::vec2& size)
 {
 	if (isOpen())
 		ImGui::SetWindowSize(ImVec2(size.x, size.y));
 }
 
-math::float2 Window::getPosition() const
+math::vec2 Window::getPosition() const
 {
 	auto position = ImGui::GetWindowPos();
 	return {position.x, position.y};
 }
 
-void Window::setPosition(const math::float2& size)
+void Window::setPosition(const math::vec2& size)
 {
 	if (isOpen())
 		ImGui::SetWindowPos(ImVec2(size.x, size.y));

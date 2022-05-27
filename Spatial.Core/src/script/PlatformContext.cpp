@@ -21,7 +21,7 @@ Isolate PlatformContext::createIsolate()
 PlatformContext::~PlatformContext()
 {
 	v8::V8::Dispose();
-	v8::V8::ShutdownPlatform();
+	v8::V8::DisposePlatform();
 }
 
 } // namespace spatial::script

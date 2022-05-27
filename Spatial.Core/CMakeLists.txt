@@ -4,6 +4,7 @@ add_library(Spatial.Core
         include/spatial/common/EventQueue.h
         include/spatial/common/Key.h
         include/spatial/common/Signal.h
+        include/spatial/common/AxisAlignedBoundingBox.h
 
         include/spatial/core/Application.h
         include/spatial/core/ApplicationUtils.h
@@ -35,27 +36,6 @@ add_library(Spatial.Core
         include/spatial/ecs/Resource.h
         include/spatial/ecs/Texture.h
 
-        include/spatial/render/Engine.h
-        include/spatial/render/EngineResource.h
-        include/spatial/render/Entity.h
-        include/spatial/render/RenderingSystem.h
-        include/spatial/render/Resources.h
-        include/spatial/render/SkyboxResources.h
-        include/spatial/resources/FilameshFile.h
-        include/spatial/render/Light.h
-        include/spatial/render/Transform.h
-        include/spatial/render/Renderable.h
-        include/spatial/render/SceneController.h
-        include/spatial/render/TransformController.h
-        include/spatial/render/LightController.h
-        include/spatial/render/CameraController.h
-        include/spatial/render/MeshController.h
-        include/spatial/render/TextureView.h
-        include/spatial/render/RegistryRenderingSystem.h
-        include/spatial/render/MaterialInstance.h
-        include/spatial/render/TextureController.h
-        include/spatial/render/TextureUtils.h
-
         include/spatial/serialization/Archives.h
         include/spatial/serialization/Math.h
         include/spatial/serialization/Camera.h
@@ -80,6 +60,7 @@ add_library(Spatial.Core
         include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
         include/spatial/resources/ResourceController.h
+        include/spatial/resources/FilameshFile.h
 
         include/spatial/script/Isolate.h
         include/spatial/script/PlatformContext.h
@@ -107,27 +88,6 @@ add_library(Spatial.Core
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
 
-        src/render/Resources.cpp
-        src/render/Engine.cpp
-        src/render/Entity.cpp
-        src/render/RenderingSystem.cpp
-        src/render/SkyboxResources.cpp
-        src/render/Camera.cpp
-        src/render/Transform.cpp
-        src/render/Light.cpp
-        src/render/Renderable.cpp
-        src/render/TransformController.cpp
-        src/render/LightController.cpp
-        src/render/CameraController.cpp
-        src/render/MeshController.cpp
-        src/render/SceneController.cpp
-        src/render/TextureView.cpp
-        src/render/MaterialController.cpp
-        src/render/SceneRenderingSystem.cpp
-        src/render/MaterialInstance.cpp
-        src/render/TextureController.cpp
-        src/render/TextureUtils.cpp
-
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
         src/script/ScriptController.cpp
@@ -135,7 +95,6 @@ add_library(Spatial.Core
         src/script/Utils.cpp
         src/script/Parsing.cpp
 
-        src/resources/BoundingBox.cpp
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
@@ -144,10 +103,6 @@ add_library(Spatial.Core
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
-
-set_property(
-        TARGET Spatial.Core
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_precompile_headers(Spatial.Core
         PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits> <set> <random> <array> <functional>)
@@ -163,11 +118,11 @@ target_link_libraries(Spatial.Core
         PUBLIC
         CONAN_PKG::boost
         CONAN_PKG::entt
-        CONAN_PKG::filament
         CONAN_PKG::spdlog
         CONAN_PKG::stb
         CONAN_PKG::glfw
         CONAN_PKG::cereal
+        CONAN_PKG::glm
         CONAN_PKG::magic_enum
         CONAN_PKG::v8)
 
@@ -191,15 +146,6 @@ elseif (APPLE)
     message(STATUS "Detected Apple Device")
     target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)
 
-    target_link_libraries(Spatial.Core PRIVATE
-            "-framework Cocoa"
-            "-framework Metal"
-            "-framework CoreVideo"
-            "-framework Carbon"
-            "-framework IOKit"
-            "-framework CoreAudio"
-            "-framework AudioToolbox"
-            "-framework ForceFeedback")
     target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperCocoa.mm)
     set_source_files_properties(src/desktop/native/WindowHelperCocoa.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 else ()

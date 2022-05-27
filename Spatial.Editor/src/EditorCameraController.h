@@ -23,8 +23,8 @@ class EditorCameraController : public ecs::UpdateController<ecs::Transform, Edit
   private:
 	struct InputControls
 	{
-		math::float3 movementOffset{.0f};
-		math::float2 viewOffset{.0f};
+		math::vec3 movementOffset{.0f};
+		math::vec2 viewOffset{.0f};
 	};
 
 	InputControls mControls{};

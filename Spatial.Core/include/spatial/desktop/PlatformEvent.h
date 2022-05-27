@@ -9,11 +9,11 @@ namespace spatial
 
 struct WindowResizedEvent
 {
-	math::int2 windowSize;
-	math::int2 frameBufferSize;
+	math::uvec2 windowSize;
+	math::uvec2 frameBufferSize;
 
-	WindowResizedEvent(math::int2 windowSize, math::int2 frameBufferSize)
-		: windowSize{std::move(windowSize)}, frameBufferSize{std::move(frameBufferSize)}
+	WindowResizedEvent(math::uvec2 windowSize, math::uvec2 frameBufferSize)
+		: windowSize{windowSize}, frameBufferSize{frameBufferSize}
 	{
 	}
 };

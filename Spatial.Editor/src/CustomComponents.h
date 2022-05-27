@@ -40,7 +40,7 @@ struct EditorMainMenu
 	static bool fileMenu(const filament::Texture* icons, Action& action);
 	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
 	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-						   const math::float3& createEntitiesPosition);
+						   const math::vec3& createEntitiesPosition);
 };
 
 struct EditorModals
@@ -74,18 +74,18 @@ class SceneOptionsMenu
 {
   public:
 	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								   math::float3 createEntitiesPosition, bool addAsChild = false);
+								   math::vec3 createEntitiesPosition, bool addAsChild = false);
 
-	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::float3 createEntitiesPosition);
+	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition);
 	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
 
   private:
 	static bool createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-							   math::float3 createEntitiesPosition, bool addAsChild = false);
+							   math::vec3 createEntitiesPosition, bool addAsChild = false);
 	static bool createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								math::float3 createEntitiesPosition, bool addAsChild = false);
+								math::vec3 createEntitiesPosition, bool addAsChild = false);
 	static bool createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								 math::float3 createEntitiesPosition, bool addAsChild = false);
+								 math::vec3 createEntitiesPosition, bool addAsChild = false);
 };
 
 class SceneTree
@@ -128,7 +128,7 @@ class EditorDragAndDrop
   public:
 	static bool loadScene(std::string& scenePath, ecs::Entity& selectedEntity);
 	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								 math::float3 createEntityPosition = {});
+								 math::vec3 createEntityPosition = {});
 };
 
 template <>

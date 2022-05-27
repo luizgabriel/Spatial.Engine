@@ -26,7 +26,6 @@ target_link_libraries(Spatial.Core.Tests
             Spatial.Core
             CONAN_PKG::gtest)
 
-include(GoogleTest)
 gtest_discover_tests(Spatial.Core.Tests)
 
 file(COPY fs DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

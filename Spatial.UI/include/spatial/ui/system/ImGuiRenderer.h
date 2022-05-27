@@ -2,13 +2,13 @@
 
 #include <imgui.h>
 #include <spatial/common/Math.h>
-#include <spatial/render/Resources.h>
+#include <spatial/graphics/Resources.h>
 #include <vector>
 
 #include <filesystem>
 #include <string_view>
 
-namespace spatial
+namespace spatial::ui
 {
 
 class ImGuiRenderer
@@ -16,18 +16,18 @@ class ImGuiRenderer
   private:
 	filament::Engine& mEngine;
 
-	render::View mView;
-	render::Scene mScene;
-	render::Entity mCameraEntity;
-	render::Camera mCamera;
-	render::Entity mEntity;
-	render::Skybox mSkybox;
-	render::SharedMaterial mMaterial;
-	render::Texture mFontTexture;
+	graphics::View mView;
+	graphics::Scene mScene;
+	graphics::Entity mCameraEntity;
+	graphics::Camera mCamera;
+	graphics::Entity mEntity;
+	graphics::Skybox mSkybox;
+	graphics::SharedMaterial mMaterial;
+	graphics::Texture mFontTexture;
 
-	std::vector<render::VertexBuffer> mVertexBuffers;
-	std::vector<render::IndexBuffer> mIndexBuffers;
-	std::vector<render::MaterialInstance> mMaterialInstances;
+	std::vector<graphics::VertexBuffer> mVertexBuffers;
+	std::vector<graphics::IndexBuffer> mIndexBuffers;
+	std::vector<graphics::MaterialInstance> mMaterialInstances;
 
 	ImGuiContext* mImguiContext;
 
@@ -46,15 +46,13 @@ class ImGuiRenderer
 	ImGuiRenderer(const ImGuiRenderer& other) = delete;
 	ImGuiRenderer& operator=(const ImGuiRenderer& other) = delete;
 
-	void setViewport(const math::float2& windowSize, const math::float2& frameBufferSize);
+	void setViewport(const math::vec2& windowSize, const math::vec2& frameBufferSize);
 
 	void setMaterial(const uint8_t* data, size_t size);
 
 	void addFont(const uint8_t* data, size_t size);
 
 	void createFontTextureAtlas();
-
-	void setupEngineTheme();
 
 	/**
 	 * \brief Should be called every frame start

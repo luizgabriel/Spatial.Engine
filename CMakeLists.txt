@@ -13,14 +13,16 @@ include(StandardSettings)
 include(StaticAnalyzers)
 include(CMakePackageConfigHelpers)
 include(PackageSettings)
+include(GoogleTest)
 
 set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CTest)
 enable_testing()
 
 add_subdirectory(Spatial.Core)
-add_subdirectory(Spatial.Res)
+add_subdirectory(Spatial.Graphics)
 add_subdirectory(Spatial.UI)
+add_subdirectory(Spatial.Res)
 add_subdirectory(Spatial.Editor)
 add_subdirectory(Spatial.Game)
 

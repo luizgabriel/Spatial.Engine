@@ -15,7 +15,7 @@ class PopupModal
 	template <typename Func>
 	static void show(std::string_view name, Func func)
 	{
-		auto style = ui::WindowPaddingStyle{10.0f};
+		auto style = ui::WindowPaddingStyle{math::vec2{10.0f}};
 		auto modal = PopupModal{name};
 		if (modal.isOpen())
 			func();

@@ -18,24 +18,27 @@ class SpatialEngineConan(ConanFile):
     requires = [
         "boost/1.78.0",
         "argh/1.3.1",
-        "glfw/3.3.4",
+        "glfw/3.3.7",
         "gtest/1.11.0",
-        "spdlog/1.8.5",
+        "spdlog/1.10.0",
         "stb/20200203",
-        "entt/3.7.0",
-        "cereal/1.3.0",
-        "magic_enum/0.7.3",
+        "entt/3.10.1",
+        "cereal/1.3.1",
+        "magic_enum/0.8.0",
+        "glm/0.9.9.8",
         "imgui/cci.20220207+1.87.docking",
 
         # "assimp/5.1.0",
 
         # Remember to run 'setup.py' to make these dependencies available
-        "filament/1.18.0@spatial/stable",  # Installed with vendor/filament.py
-        "v8/10.1.69@spatial/stable",       # Installed with vendor/v8.py
+        "filament/1.22.2@spatial/stable",  # Installed with vendor/filament.py
+        "v8/10.4.66@spatial/stable",       # Installed with vendor/v8.py
     ]
 
     def imports(self):
-        self.copy("*", "bin", "bin", "filament")
+        self.copy("*", dst="bin", src="bin")
+        self.copy("*.dll", dst="lib", src="lib", keep_path=False)
+        self.copy("*.dylib*", dst="lib", src="lib", keep_path=False)
 
     def _cmake(self):
         cmake = CMake(self)
