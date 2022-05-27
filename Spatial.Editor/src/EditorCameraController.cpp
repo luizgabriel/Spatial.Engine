@@ -18,7 +18,7 @@ void EditorCameraController::onUpdateEntity(float delta, ecs::Transform& transfo
 	transform.position += math::axisY * movementDelta.z;
 
 	const auto viewRotation = mControls.viewOffset * math::pi * camera.sensitivity * delta;
-	transform.rotation = math::float3{
+	transform.rotation = math::vec3{
 		std::clamp(transform.rotation.x + viewRotation.y, -math::pi / 2.0f,
 				   math::pi / 2.0f), // clamp the pitch
 		transform.rotation.y + viewRotation.x,

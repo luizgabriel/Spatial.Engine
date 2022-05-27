@@ -27,24 +27,9 @@ void Registry::destroyEntity(Entity entity)
 	destroy(entity);
 }
 
-Registry::VersionType Registry::getVersion(Entity entity) noexcept
-{
-	return entt::registry::version(entity);
-}
-
 const ecs::Entity* Registry::getEntities() const
 {
 	return data();
-}
-
-ecs::Entity Registry::getLastDestroyedEntity() const
-{
-	return destroyed();
-}
-
-void Registry::destroyOrphans()
-{
-	orphans([this](const auto e) { destroyEntity(e); });
 }
 
 } // namespace spatial::ecs

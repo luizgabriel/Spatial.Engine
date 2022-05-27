@@ -21,8 +21,8 @@ struct PointLight
 	constexpr static auto typeName = "point_light";
 
 	float intensity{10000.0f};
-	math::float3 color{1.0f, 1.0f, 1.0f};
 	float falloff{1.0f};
+	math::vec3 color{1.0f, 1.0f, 1.0f};
 };
 
 struct SpotLight
@@ -30,8 +30,8 @@ struct SpotLight
 	constexpr static auto typeName = "spot_light";
 
 	float intensity{10000.0f};
-	math::float3 direction{.0f, -1.0f, .0f};
-	math::float3 color{1.0f, 1.0f, 1.0f};
+	math::vec3 direction{.0f, -1.0f, .0f};
+	math::vec3 color{1.0f, 1.0f, 1.0f};
 	bool castShadows{true};
 	float falloff{1.0f};
 	float innerAngle{math::pi / 4.0f};
@@ -43,8 +43,8 @@ struct DirectionalLight
 	constexpr static auto typeName = "directional_light";
 
 	float intensity{10000.0f};
-	math::float3 direction{.0f, -1.0f, .0f};
-	math::float3 color{1.0f, 1.0f, 1.0f};
+	math::vec3 direction{.0f, -1.0f, .0f};
+	math::vec3 color{1.0f, 1.0f, 1.0f};
 	bool castShadows{true};
 };
 
@@ -53,7 +53,7 @@ struct SunLight
 	constexpr static auto typeName = "sun_light";
 
 	float intensity{10000.0f};
-	math::float3 color{1.0f, 1.0f, 1.0f};
+	math::vec3 color{1.0f, 1.0f, 1.0f};
 	float angularRadius{0.545f};
 	float haloFalloff{80.0f};
 	float haloSize{10.0f};

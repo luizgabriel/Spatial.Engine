@@ -90,7 +90,6 @@ class Snapshot
 		std::copy(reg.getEntities(), reg.getEntities() + sz, std::back_inserter(entitiesVector));
 
 		archive(cereal::make_nvp("entities", entitiesVector));
-		archive(cereal::make_nvp("last_destroyed", reg.getLastDestroyedEntity()));
 
 		return *this;
 	}
@@ -121,10 +120,7 @@ class SnapshotLoader
 		std::vector<ecs::Entity> entities{};
 		archive(cereal::make_nvp("entities", entities));
 
-		ecs::Entity destroyed;
-		archive(cereal::make_nvp("last_destroyed", destroyed));
-
-		reg.assign(entities.cbegin(), entities.cend(), destroyed);
+		reg.assign(entities.cbegin(), entities.cend(), entt::tombstone);
 
 		return *this;
 	}

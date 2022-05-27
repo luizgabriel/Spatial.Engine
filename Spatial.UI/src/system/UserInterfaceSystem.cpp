@@ -1,17 +1,18 @@
-#include <spatial/ui/system/UserInterfaceSystem.h>
 #include <spatial/ui/components/DockSpace.h>
+#include <spatial/ui/system/ImGuiHelpers.h>
+#include <spatial/ui/system/UserInterfaceSystem.h>
 
-namespace spatial
+namespace spatial::ui
 {
 
-UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{engine}, mInput{}
+UserInterfaceSystem::UserInterfaceSystem(filament::Engine& engine) : mRenderer{engine}
 {
 }
 
 void UserInterfaceSystem::onStart()
 {
-	mRenderer.setupEngineTheme();
-	mInput.setup();
+	imguiSetupTheme();
+	imguiSetupInput();
 }
 
 void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
@@ -21,22 +22,22 @@ void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
 {
-	mInput.setMousePosition({event.x, event.y});
+	imguiSetMousePosition({event.x, event.y});
 }
 
 void UserInterfaceSystem::onEvent(const KeyEvent& event)
 {
-	mInput.setKey(event.key, event.action);
+	imguiSetKey(event.key, event.action);
 }
 
 void UserInterfaceSystem::onEvent(const TextEvent& event)
 {
-	mInput.setText(event.text);
+	imguiSetText(event.text);
 }
 
 void UserInterfaceSystem::onEvent(const MouseScrolledEvent& event)
 {
-	mInput.setScrollOffset(event.xOffset, event.yOffset);
+	imguiSetScrollOffset(event.xOffset, event.yOffset);
 }
 
 void UserInterfaceSystem::onUpdateFrame(float delta)

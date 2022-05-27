@@ -9,7 +9,7 @@ class WindowPaddingStyle
 {
   public:
 	WindowPaddingStyle();
-	WindowPaddingStyle(const math::float2& padding);
+	WindowPaddingStyle(const math::vec2& padding);
 	~WindowPaddingStyle();
 };
 

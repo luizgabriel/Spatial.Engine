@@ -1,14 +1,14 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/render/TextureView.h>
+#include <spatial/graphics/TextureView.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/SceneView.h>
 
 namespace spatial::ui
 {
 
-void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity, math::float2 size)
+void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity, math::vec2 size)
 {
 	{
 		const auto currentPosition = ImGui::GetCursorScreenPos();
@@ -17,23 +17,23 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
 	}
 
-	if (!registry.hasAllComponents<ecs::SceneView, render::TextureView>(sceneViewEntity))
+	if (!registry.hasAllComponents<ecs::SceneView, graphics::TextureView>(sceneViewEntity))
 		return;
 
 	const auto& sceneView = registry.getComponent<const ecs::SceneView>(sceneViewEntity);
-	const auto& textureView = registry.getComponent<const render::TextureView>(sceneViewEntity);
+	const auto& textureView = registry.getComponent<const graphics::TextureView>(sceneViewEntity);
 
 	double aspectRatio = 1.0;
 	const auto* perspectiveCamera = registry.tryGetComponent<const ecs::PerspectiveCamera>(sceneView.camera);
 	if (perspectiveCamera)
 		aspectRatio = perspectiveCamera->aspectRatio;
 
-	const auto imageSize = aspectRatio >= 1 ? math::int2{static_cast<double>(size.y) * aspectRatio, size.y}
-											: math::int2{size.x, static_cast<double>(size.x) / aspectRatio};
+	const auto imageSize = aspectRatio >= 1 ? math::uvec2{static_cast<double>(size.y) * aspectRatio, size.y}
+											: math::uvec2{size.x, static_cast<double>(size.x) / aspectRatio};
 
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
 									 ImGui::GetCursorScreenPos().y));
-	ui::image(textureView.getColorTexture().get(), imageSize, math::float4{0, 1, 1, 0});
+	ui::image(textureView.getColorTexture().get(), imageSize, math::vec4{0, 1, 1, 0});
 }
 
 bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity)

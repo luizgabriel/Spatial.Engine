@@ -3,19 +3,18 @@
 #include <spatial/common/Math.h>
 #include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
-#include <spatial/ui/system/ImGuiRenderer.h>
-#include <spatial/ui/system/UserInterfaceInput.h>
 #include <spatial/resources/FileSystem.h>
+#include <spatial/ui/system/ImGuiRenderer.h>
 
 #include <string_view>
 
-namespace spatial
+namespace spatial::ui
 {
+
 class UserInterfaceSystem
 {
   private:
 	ImGuiRenderer mRenderer;
-	UserInterfaceInput mInput;
 	Signal<> mRenderGuiSignal;
 
   public:
@@ -58,4 +57,4 @@ class UserInterfaceSystem
 	void addFont(FileSystem& fileSystem, std::string_view fontPath);
 };
 
-} // namespace spatial
+} // namespace spatial::ui

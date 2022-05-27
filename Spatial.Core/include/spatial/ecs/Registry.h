@@ -27,22 +27,20 @@ class Registry : private entt::registry
 
 	Entity createEntity();
 
-	bool isValid(Entity entity) const noexcept;
+	[[nodiscard]] bool isValid(Entity entity) const noexcept;
 
-	size_t getEntitiesCount() const noexcept;
+	[[nodiscard]] size_t getEntitiesCount() const noexcept;
 
-	const ecs::Entity* getEntities() const;
-
-	ecs::Entity getLastDestroyedEntity() const;
+	[[nodiscard]] const ecs::Entity* getEntities() const;
 
 	template <typename Component>
-	size_t getEntitiesCount() const noexcept
+	[[nodiscard]] size_t getEntitiesCount() const noexcept
 	{
 		return size<Component>();
 	}
 
 	template <typename... Components>
-	bool hasAnyEntity() const noexcept
+	[[nodiscard]] bool hasAnyEntity() const noexcept
 	{
 		return isValid(getFirstEntity<Components...>());
 	}
@@ -177,18 +175,16 @@ class Registry : private entt::registry
 	}
 
 	template <typename... Component>
-	bool hasAllComponents(Entity entity) const
+	[[nodiscard]] bool hasAllComponents(Entity entity) const
 	{
 		return isValid(entity) && all_of<Component...>(entity);
 	}
 
 	template <typename... Component>
-	bool hasAnyComponent(Entity entity) const
+	[[nodiscard]] bool hasAnyComponent(Entity entity) const
 	{
 		return isValid(entity) && any_of<Component...>(entity);
 	}
-
-	static VersionType getVersion(Entity entity) noexcept;
 
 	void destroyEntity(Entity entity);
 
@@ -218,12 +214,10 @@ class Registry : private entt::registry
 	}
 
 	template <typename... Component>
-	bool existsAny() const
+	[[nodiscard]] bool existsAny() const
 	{
 		return isValid(getFirstEntity<Component...>());
 	}
-
-	void destroyOrphans();
 
 	friend class SnapshotLoader;
 };

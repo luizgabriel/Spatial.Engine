@@ -8,7 +8,7 @@
 namespace spatial
 {
 
-class Application final
+class Application
 {
   private:
 	bool mRunning;

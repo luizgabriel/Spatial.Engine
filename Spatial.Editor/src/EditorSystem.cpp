@@ -17,8 +17,8 @@
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Texture.h>
-#include <spatial/render/MaterialController.h>
-#include <spatial/render/TextureUtils.h>
+#include <spatial/graphics/MaterialController.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
@@ -71,10 +71,10 @@ void EditorSystem::onUpdateFrame(float delta)
 	if (mIsCameraViewWindowHovered && mIsCameraControlEnabled)
 		mEditorCameraController.onUpdateFrame(mRegistry, delta);
 
-	render::MaterialController::updateMaterial<GridMaterial>(mRegistry);
-	render::MaterialController::updateMaterial<ColorMaterial>(mRegistry);
-	render::MaterialController::updateMaterial<StandardOpaqueMaterial>(mRegistry);
-	render::MaterialController::updateMaterial<SkyBoxMaterial>(mRegistry);
+	graphics::MaterialController::updateMaterial<GridMaterial>(mRegistry);
+	graphics::MaterialController::updateMaterial<ColorMaterial>(mRegistry);
+	graphics::MaterialController::updateMaterial<StandardOpaqueMaterial>(mRegistry);
+	graphics::MaterialController::updateMaterial<SkyBoxMaterial>(mRegistry);
 }
 
 void EditorSystem::onDrawGui()
@@ -85,13 +85,13 @@ void EditorSystem::onDrawGui()
 	static bool showDebugComponents{false};
 	static std::string rootPath = {};
 
-	const auto* icons = render::getTexture(mEditorRegistry, mIconTexture);
+	const auto* icons = graphics::getTexture(mEditorRegistry, mIconTexture);
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
 	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =
 		cameraTransform
 			? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0f) - (math::axisY * 0.1f))
-			: math::float3{};
+			: math::vec3{};
 
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(icons, mMenuAction);
@@ -144,7 +144,7 @@ void EditorSystem::onDrawGui()
 		if (!mRegistry.isValid(selectedView))
 			selectedView = mRegistry.getFirstEntity<ecs::SceneView, tags::IsEditorView>();
 
-		const auto imageSize = window.getSize() - math::float2{0, 24};
+		const auto imageSize = window.getSize() - math::vec2{0, 24};
 		ui::SceneView::image(mRegistry, selectedView, imageSize);
 
 		if (ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity))
@@ -366,7 +366,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.withMaterial("editor/materials/skybox.filamat")
 		.withProps({
 			false,
-			{math::float3{.0f}, 1.0f},
+			math::vec4{math::vec3{0.3f}, 1.0f},
 			ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(mRegistry, "editor/textures/skybox/texture.ktx"),
 		});
 

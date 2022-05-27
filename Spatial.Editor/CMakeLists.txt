@@ -35,6 +35,7 @@ target_precompile_headers(Spatial.Editor REUSE_FROM Spatial.Core)
 target_link_libraries(Spatial.Editor PRIVATE
         Spatial.Editor.Resources
         Spatial.Core
+        Spatial.Graphics
         Spatial.UI
         CONAN_PKG::fmt
         CONAN_PKG::argh)

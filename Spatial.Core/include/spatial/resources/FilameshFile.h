@@ -1,12 +1,11 @@
 #pragma once
 
-#include <spatial/common/Math.h>
+#include <spatial/common/AxisAlignedBoundingBox.h>
 #include <spatial/resources/BoundingBox.h>
 
 #include <cstdint>
 #include <istream>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace spatial
@@ -16,7 +15,7 @@ struct FilameshFileHeader
 {
 	uint32_t version{};
 	uint32_t partsCount{};
-	filament::Box aabb{};
+	math::AxisAlignedBoundingBox aabb{};
 	uint32_t flags{};
 	uint32_t offsetPosition{};
 	uint32_t stridePosition{};
@@ -42,7 +41,7 @@ struct FilameshFilePart
 	uint32_t minIndex{};
 	uint32_t maxIndex{};
 	uint32_t materialID{};
-	filament::Box boundingBox{};
+	math::AxisAlignedBoundingBox boundingBox{};
 	std::string materialName{};
 };
 

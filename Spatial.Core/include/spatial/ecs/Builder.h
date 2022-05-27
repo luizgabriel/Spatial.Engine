@@ -134,9 +134,9 @@ class TransformBuilder : public BasicBuilder<Transform>
 
 	TransformBuilder(Registry& registry, Entity entity);
 
-	TransformBuilder& withPosition(math::float3 position);
-	TransformBuilder& withScale(math::float3 scale);
-	TransformBuilder& withRotation(math::float3 rotation);
+	TransformBuilder& withPosition(math::vec3 position);
+	TransformBuilder& withScale(math::vec3 scale);
+	TransformBuilder& withRotation(math::vec3 rotation);
 };
 
 class PerspectiveCameraBuilder : public BasicBuilder<PerspectiveCamera>
@@ -181,7 +181,7 @@ class PointLightBuilder : public BasicBuilder<PointLight>
 	PointLightBuilder(Registry& registry, Entity entity);
 
 	PointLightBuilder& withIntensity(float intensity);
-	PointLightBuilder& withColor(math::float3 color);
+	PointLightBuilder& withColor(math::vec3 color);
 	PointLightBuilder& withFalloff(float falloff);
 };
 
@@ -193,8 +193,8 @@ class SpotLightBuilder : public BasicBuilder<SpotLight>
 	SpotLightBuilder(Registry& registry, Entity entity);
 
 	SpotLightBuilder& withIntensity(float intensity);
-	SpotLightBuilder& withColor(math::float3 color);
-	SpotLightBuilder& withDirection(math::float3 direction);
+	SpotLightBuilder& withColor(math::vec3 color);
+	SpotLightBuilder& withDirection(math::vec3 direction);
 	SpotLightBuilder& withFalloff(float falloff);
 	SpotLightBuilder& withAngles(float innerAngle, float outerAngle);
 	SpotLightBuilder& withCastShadows(bool castShadows);
@@ -208,8 +208,8 @@ class DirectionalLightBuilder : public BasicBuilder<DirectionalLight>
 	DirectionalLightBuilder(Registry& registry, Entity entity);
 
 	DirectionalLightBuilder& withIntensity(float intensity);
-	DirectionalLightBuilder& withColor(math::float3 color);
-	DirectionalLightBuilder& withDirection(math::float3 direction);
+	DirectionalLightBuilder& withColor(math::vec3 color);
+	DirectionalLightBuilder& withDirection(math::vec3 direction);
 	DirectionalLightBuilder& withCastShadows(bool castShadows);
 };
 
@@ -221,7 +221,7 @@ class SunLightBuilder : public BasicBuilder<SunLight>
 	SunLightBuilder(Registry& registry, Entity entity);
 
 	SunLightBuilder& withIntensity(float intensity);
-	SunLightBuilder& withColor(math::float3 color);
+	SunLightBuilder& withColor(math::vec3 color);
 	SunLightBuilder& withAngularRadius(float angularRadius);
 	SunLightBuilder& withHaloFalloff(float haloFalloff);
 	SunLightBuilder& withHaloSize(float haloSize);

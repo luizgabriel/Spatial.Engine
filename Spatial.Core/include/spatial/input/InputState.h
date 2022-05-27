@@ -28,7 +28,7 @@ class InputState
 
 	void reset();
 
-	void setMousePosition(filament::math::float2 position);
+	void setMousePosition(math::vec2 position);
 
 	const auto& getMousePosition() const
 	{
@@ -63,8 +63,8 @@ private:
 	BitSet mKeyPressed;
 	BitSet mKeyReleased;
 
-	math::float2 mLastMousePosition;
-	math::float2 mCurrentMousePosition;
+	math::vec2 mLastMousePosition;
+	math::vec2 mCurrentMousePosition;
 };
 
 } // namespace spatial::desktop

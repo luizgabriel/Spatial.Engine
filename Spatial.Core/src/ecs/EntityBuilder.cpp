@@ -101,19 +101,19 @@ TransformBuilder::TransformBuilder(Registry& registry, Entity entity) : Base(reg
 {
 }
 
-TransformBuilder& TransformBuilder::withPosition(math::float3 position)
+TransformBuilder& TransformBuilder::withPosition(math::vec3 position)
 {
 	getComponent().position = position;
 	return *this;
 }
 
-TransformBuilder& TransformBuilder::withScale(math::float3 scale)
+TransformBuilder& TransformBuilder::withScale(math::vec3 scale)
 {
 	getComponent().scale = scale;
 	return *this;
 }
 
-TransformBuilder& TransformBuilder::withRotation(math::float3 rotation)
+TransformBuilder& TransformBuilder::withRotation(math::vec3 rotation)
 {
 	getComponent().rotation = rotation;
 	return *this;
@@ -204,7 +204,7 @@ PointLightBuilder& PointLightBuilder::withIntensity(float intensity)
 	return *this;
 }
 
-PointLightBuilder& PointLightBuilder::withColor(math::float3 color)
+PointLightBuilder& PointLightBuilder::withColor(math::vec3 color)
 {
 	getComponent().color = color;
 	return *this;
@@ -215,7 +215,7 @@ SpotLightBuilder::SpotLightBuilder(Registry& registry, Entity entity) : Base(reg
 	with<ecs::tags::IsRenderable>().with<ecs::tags::IsLight>();
 }
 
-SpotLightBuilder& SpotLightBuilder::withDirection(math::float3 direction)
+SpotLightBuilder& SpotLightBuilder::withDirection(math::vec3 direction)
 {
 	getComponent().direction = direction;
 	return *this;
@@ -248,7 +248,7 @@ SpotLightBuilder& SpotLightBuilder::withIntensity(float intensity)
 	return *this;
 }
 
-SpotLightBuilder& SpotLightBuilder::withColor(math::float3 color)
+SpotLightBuilder& SpotLightBuilder::withColor(math::vec3 color)
 {
 	getComponent().color = color;
 	return *this;
@@ -265,13 +265,13 @@ DirectionalLightBuilder& DirectionalLightBuilder::withIntensity(float intensity)
 	return *this;
 }
 
-DirectionalLightBuilder& DirectionalLightBuilder::withColor(math::float3 color)
+DirectionalLightBuilder& DirectionalLightBuilder::withColor(math::vec3 color)
 {
 	getComponent().color = color;
 	return *this;
 }
 
-DirectionalLightBuilder& DirectionalLightBuilder::withDirection(math::float3 direction)
+DirectionalLightBuilder& DirectionalLightBuilder::withDirection(math::vec3 direction)
 {
 	getComponent().direction = direction;
 	return *this;
@@ -294,7 +294,7 @@ SunLightBuilder& SunLightBuilder::withIntensity(float intensity)
 	return *this;
 }
 
-SunLightBuilder& SunLightBuilder::withColor(math::float3 color)
+SunLightBuilder& SunLightBuilder::withColor(math::vec3 color)
 {
 	getComponent().color = color;
 	return *this;
