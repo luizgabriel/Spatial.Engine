@@ -56,23 +56,23 @@
         },
         26,
         {
-            "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
+            "name": "Ground_Wet_Rocks_basecolor.jpg"
         },
         25,
         {
-            "name": "Ground_Wet_Rocks_roughness.jpg"
+            "name": "Ground_Wet_Rocks_height.png"
         },
         24,
         {
-            "name": "Ground_Wet_Rocks_normal.jpg"
+            "name": "Ground_Wet_Rocks_roughness.jpg"
         },
         23,
         {
-            "name": "Ground_Wet_Rocks_height.png"
+            "name": "Ground_Wet_Rocks_normal.jpg"
         },
         22,
         {
-            "name": "Ground_Wet_Rocks_basecolor.jpg"
+            "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
         },
         21,
         {
@@ -167,9 +167,9 @@
         28,
         {
             "position": {
-                "x": 1.940680980682373,
+                "x": 0.0,
                 "y": 2.0,
-                "z": -3.003146171569824
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -203,13 +203,13 @@
         17,
         {
             "position": {
-                "x": -6.123321056365967,
-                "y": 2.2673702239990236,
-                "z": -4.573337078094482
+                "x": -9.3278226852417,
+                "y": 3.6086044311523439,
+                "z": -4.073774337768555
             },
             "rotation": {
-                "x": -0.10329806804656983,
-                "y": 4.167415618896484,
+                "x": -0.2114465832710266,
+                "y": 10.57314682006836,
                 "z": 0.0
             },
             "scale": {
@@ -252,11 +252,11 @@
     "directional_light": [
         27,
         {
-            "intensity": 14652.015625,
+            "intensity": 10000.0,
             "direction": {
-                "x": 0.5126349925994873,
-                "y": -0.5902270674705505,
-                "z": -0.6235683560371399
+                "x": 0.4298625588417053,
+                "y": -0.8659564852714539,
+                "z": -0.25561225414276125
             },
             "color": {
                 "x": 1.0,
@@ -353,26 +353,26 @@
         30,
         {
             "parent": 31,
-            "next": 1048575,
-            "previous": 1048575
+            "next": 4294967295,
+            "previous": 4294967295
         },
         20,
         {
             "parent": 21,
-            "next": 1048575,
-            "previous": 1048575
+            "next": 4294967295,
+            "previous": 4294967295
         },
         8,
         {
             "parent": 9,
-            "next": 1048575,
-            "previous": 1048575
+            "next": 4294967295,
+            "previous": 4294967295
         },
         5,
         {
             "parent": 6,
-            "next": 1048575,
-            "previous": 1048575
+            "next": 4294967295,
+            "previous": 4294967295
         }
     ],
     "resource": [
@@ -386,23 +386,23 @@
         },
         26,
         {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_basecolor.jpg"
         },
         25,
         {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_roughness.jpg"
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
         },
         24,
         {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_roughness.jpg"
         },
         23,
         {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
         },
         22,
         {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_basecolor.jpg"
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
         },
         21,
         {
@@ -461,8 +461,8 @@
         13,
         {
             "size": {
-                "x": 1280,
-                "y": 720
+                "x": 4560,
+                "y": 1440
             },
             "camera": 17,
             "indirectLight": 14
@@ -482,7 +482,7 @@
         3,
         {
             "pixels": [
-                4292730333
+                4286019447
             ],
             "width": 1
         },
@@ -582,7 +582,7 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "roughness": 0.44999998807907107,
+            "roughness": 0.38999998569488528,
             "metallic": 0.800000011920929,
             "reflectance": 0.10000000149011612
         }
@@ -593,9 +593,9 @@
             "skybox": 7,
             "showSun": false,
             "color": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
+                "x": 0.30000001192092898,
+                "y": 0.30000001192092898,
+                "z": 0.30000001192092898,
                 "w": 1.0
             }
         }
@@ -623,7 +623,7 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "albedo": 22,
+            "albedo": 26,
             "tiling": {
                 "x": 1.0,
                 "y": 1.0
@@ -633,13 +633,13 @@
                 "y": 0.0
             },
             "metallic": 0.0,
-            "metallicMap": 1048575,
+            "metallicMap": 4294967295,
             "roughness": 1.0,
-            "roughnessMap": 25,
+            "roughnessMap": 24,
             "reflectance": 0.0,
-            "reflectanceMap": 1048575,
-            "ambientOcclusionMap": 26,
-            "normalMap": 24,
+            "reflectanceMap": 4294967295,
+            "ambientOcclusionMap": 22,
+            "normalMap": 23,
             "emissive": {
                 "x": 0.0,
                 "y": 0.0,
@@ -647,7 +647,7 @@
                 "w": 0.0
             },
             "height": 1.0,
-            "heightMap": 23
+            "heightMap": 25
         }
     ],
     "editor_camera": [

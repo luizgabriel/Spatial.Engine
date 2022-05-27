@@ -321,6 +321,7 @@ class SceneViewBuilder : public BasicBuilder<SceneView>
 	using Base = BasicBuilder<SceneView>;
 
 	SceneViewBuilder(Registry& registry, Entity entity);
+	SceneViewBuilder& withDimensions(math::uvec2 dimensions);
 	SceneViewBuilder& withCamera(ecs::Entity cameraEntity);
 	SceneViewBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
 };

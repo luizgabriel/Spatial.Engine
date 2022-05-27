@@ -433,6 +433,12 @@ SceneViewBuilder& SceneViewBuilder::withIndirectLight(ecs::Entity indirectLightE
 	return *this;
 }
 
+SceneViewBuilder& SceneViewBuilder::withDimensions(math::uvec2 dimensions)
+{
+	getComponent().size = dimensions;
+	return *this;
+}
+
 MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
 }
