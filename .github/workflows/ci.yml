@@ -20,10 +20,6 @@ jobs:
           - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
           # - { name: "Windows-2019-MSVC", os: windows-2019, preset: "Windows-2019-Release" }
 
-    env:
-      CONAN_USER_HOME: "${{ github.workspace }}/.conan/"
-      CONAN_USER_HOME_SHORT: "${{ github.workspace }}/.cn/"
-
     steps:
       - uses: actions/checkout@v3
 
@@ -61,9 +57,7 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@v3
         with:
-          path: |
-            ${{ env.CONAN_USER_HOME }}
-            ${{ env.CONAN_USER_HOME_SHORT }}
+          path: ~/.conan
           key: host-${{ runner.os }}-target-${{ runner.os }}-${{ hashFiles('conanfile.py', 'vendor/filament.py', 'vendor/v8.py') }}
 
       - name: Configure
