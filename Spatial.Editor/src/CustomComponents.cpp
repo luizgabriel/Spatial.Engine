@@ -9,8 +9,8 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
-#include <spatial/render/TextureUtils.h>
-#include <spatial/render/TextureView.h>
+#include <spatial/graphics/TextureUtils.h>
+#include <spatial/graphics/TextureView.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
@@ -656,7 +656,7 @@ bool EditorDragAndDrop::loadScene(std::string& scenePath, ecs::Entity& selectedE
 }
 
 bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
-										 math::float3 createEntityPosition)
+										 math::vec3 createEntityPosition)
 {
 	auto dnd = DragAndDropTarget{};
 	auto result = dnd.getPayload();
@@ -676,7 +676,7 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 }
 
 bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-										  math::float3 createEntitiesPosition, bool addAsChild)
+										  math::vec3 createEntitiesPosition, bool addAsChild)
 {
 	bool changed = false;
 	ecs::Entity newEntity = ecs::NullEntity;
@@ -709,7 +709,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 }
 
 bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-									  math::float3 createEntitiesPosition, bool addAsChild)
+									  math::vec3 createEntitiesPosition, bool addAsChild)
 {
 	auto menu = Menu{"Mesh"};
 	if (!menu.isOpen())
@@ -782,7 +782,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 														 .withMaterial("editor/materials/skybox.filamat")
 														 .withProps({
 															 false,
-															 {math::float3{.0f}, 1.0f},
+															 {math::vec3{.0f}, 1.0f},
 															 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(
 																 registry, "editor/textures/skybox/texture.ktx"),
 														 }))
@@ -803,7 +803,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 }
 
 bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-									   math::float3 createEntitiesPosition, bool addAsChild)
+									   math::vec3 createEntitiesPosition, bool addAsChild)
 {
 	auto menu = Menu{"Light"};
 	if (!menu.isOpen())
@@ -856,7 +856,7 @@ bool SceneOptionsMenu::createLightMenu(ecs::Registry& registry, ecs::Entity& sel
 }
 
 bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-										math::float3 createEntitiesPosition, bool addAsChild)
+										math::vec3 createEntitiesPosition, bool addAsChild)
 {
 	auto menu = Menu{"Camera"};
 	if (!menu.isOpen())
@@ -890,7 +890,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 		newEntity = ecs::Builder::create(registry)
 						.withName("Custom Camera")
 						.asCustomCamera()
-						.withProjection(math::mat4::perspective(45.0, 1280.0 / 720.0, .1, 1000.0));
+						.withProjection(math::perspective(45.0, 1280.0 / 720.0, .1, 1000.0));
 		changed = true;
 	}
 
@@ -906,7 +906,7 @@ bool SceneOptionsMenu::createCameraMenu(ecs::Registry& registry, ecs::Entity& se
 }
 
 bool SceneOptionsMenu::addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-									math::float3 createEntitiesPosition)
+									math::vec3 createEntitiesPosition)
 {
 	if (!registry.isValid(selectedEntity))
 		return false;
@@ -943,7 +943,7 @@ bool EditorMainMenu::fileMenu(const filament::Texture* icons, EditorMainMenu::Ac
 
 	ImGui::SetCursorPosY(1.5f);
 	if (icons)
-		ui::image(icons, math::float2{20.0f}, Icons::logo.uv());
+		ui::image(icons, math::vec2{20.0f}, Icons::logo.uv());
 	ImGui::SetCursorPosY(0.0f);
 
 	{
@@ -1001,7 +1001,7 @@ bool EditorMainMenu::viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEdit
 }
 
 bool EditorMainMenu::createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								const math::float3& createEntitiesPosition)
+								const math::vec3& createEntitiesPosition)
 {
 	auto menu = Menu{"Create"};
 	if (!menu.isOpen())

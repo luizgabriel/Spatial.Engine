@@ -36,7 +36,7 @@ bool buttonInput(const std::string_view label, float& value, float resetValue, f
 	return changed;
 }
 
-bool vec2Input(const std::string_view label, math::float2& v, float resetValue, float speed, float min, float max,
+bool vec2Input(const std::string_view label, math::vec2& v, float resetValue, float speed, float min, float max,
 			   const std::string_view format)
 {
 	bool changed = false;
@@ -73,7 +73,7 @@ bool vec2Input(const std::string_view label, math::float2& v, float resetValue, 
 	return changed;
 }
 
-bool vec3Input(const std::string_view label, math::float3& v, float resetValue, float speed, float min, float max,
+bool vec3Input(const std::string_view label, math::vec3& v, float resetValue, float speed, float min, float max,
 			   const std::string_view format)
 {
 	bool changed = false;
@@ -116,7 +116,7 @@ bool vec3Input(const std::string_view label, math::float3& v, float resetValue, 
 	return changed;
 }
 
-bool vec4Input(const std::string_view label, math::float4& v, float resetValue, float speed, float min, float max,
+bool vec4Input(const std::string_view label, math::vec4& v, float resetValue, float speed, float min, float max,
 			   const std::string_view format)
 {
 	bool changed = false;

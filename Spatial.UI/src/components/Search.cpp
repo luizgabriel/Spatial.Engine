@@ -12,7 +12,7 @@ bool Search::text(std::string& search, const filament::Texture* texture)
 	ImGui::PushStyleColor(ImGuiCol_Button, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
-	ui::imageButton(texture, math::float2{15.0f}, Icons::search.uv());
+	ui::imageButton(texture, math::vec2{15.0f}, Icons::search.uv());
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine(.0f, .0f);

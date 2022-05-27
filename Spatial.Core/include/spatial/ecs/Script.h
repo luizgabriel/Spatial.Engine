@@ -52,6 +52,26 @@ struct ScriptComponent
 
 	std::string name;
 	std::unordered_map<std::string, Property> properties;
+
+	bool operator<(const ScriptComponent& rhs) const
+	{
+		return name < rhs.name;
+	}
+
+	bool operator>(const ScriptComponent& rhs) const
+	{
+		return rhs < *this;
+	}
+
+	bool operator<=(const ScriptComponent& rhs) const
+	{
+		return !(rhs < *this);
+	}
+
+	bool operator>=(const ScriptComponent& rhs) const
+	{
+		return !(*this < rhs);
+	}
 };
 
 struct ScriptSystem
@@ -59,12 +79,56 @@ struct ScriptSystem
 	std::string name;
 	std::set<std::string> requiredComponents;
 	std::set<std::string> excludedComponents;
+
+	bool operator<(const ScriptSystem& rhs) const
+	{
+		return name < rhs.name;
+	}
+
+	bool operator>(const ScriptSystem& rhs) const
+	{
+		return rhs < *this;
+	}
+
+	bool operator<=(const ScriptSystem& rhs) const
+	{
+		return !(rhs < *this);
+	}
+
+	bool operator>=(const ScriptSystem& rhs) const
+	{
+		return !(*this < rhs);
+	}
 };
 
 struct ScriptInfo
 {
 	std::set<ScriptComponent> components;
 	std::set<ScriptSystem> systems;
+
+	bool operator<(const ScriptInfo& rhs) const
+	{
+		if (components < rhs.components)
+			return true;
+		if (rhs.components < components)
+			return false;
+		return systems < rhs.systems;
+	}
+
+	bool operator>(const ScriptInfo& rhs) const
+	{
+		return rhs < *this;
+	}
+
+	bool operator<=(const ScriptInfo& rhs) const
+	{
+		return !(rhs < *this);
+	}
+
+	bool operator>=(const ScriptInfo& rhs) const
+	{
+		return !(*this < rhs);
+	}
 };
 
 } // namespace spatial::ecs

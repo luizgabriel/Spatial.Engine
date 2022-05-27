@@ -8,13 +8,9 @@ namespace spatial
 template <typename... Args>
 class Signal
 {
+  public:
 	using CallbackFn = void(Args...);
 
-  private:
-	entt::sigh<CallbackFn> mSigh;
-	entt::sink<CallbackFn> mSink;
-
-  public:
 	Signal() : mSigh{}, mSink{mSigh}
 	{
 	}
@@ -37,7 +33,7 @@ class Signal
 	template <auto Function>
 	void connect()
 	{
-		mSink.template connect<Function>();
+		mSigh.template connect<Function>();
 	}
 
 	template <auto MemberFunction, typename Listener>
@@ -57,6 +53,10 @@ class Signal
 	{
 		mSink.template disconnect<MemberFunction>(listener);
 	}
+
+  private:
+	entt::sigh<CallbackFn> mSigh;
+	typename decltype(mSigh)::sink_type mSink;
 };
 
 } // namespace spatial

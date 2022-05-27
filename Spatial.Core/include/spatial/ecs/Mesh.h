@@ -21,7 +21,7 @@ struct RuntimeMesh
 {
 	constexpr static auto typeName = "runtime_mesh";
 
-	std::vector<math::float3> vertexData{};
+	std::vector<math::vec3> vertexData{};
 	std::vector<uint16_t> indexData{};
 };
 

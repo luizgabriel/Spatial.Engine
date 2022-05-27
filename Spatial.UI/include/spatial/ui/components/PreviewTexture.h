@@ -8,6 +8,6 @@ namespace spatial::ui
 {
 
 void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, const filament::Texture* icons,
-					const math::float4& uv = {0, 0, 1, 1});
+					const math::vec4 uv = {0, 0, 1, 1});
 
 }

@@ -192,8 +192,8 @@ def setup_cli(args: Arguments) -> CommandResult:
     #                            "https://luizgabriel.jfrog.io/artifactory/api/conan/spatial-conan")))
 
     packages = [
-        Package("filament", "1.18.0"),
-        Package("v8", "10.1.69"),
+        Package("filament", "1.22.2"),
+        Package("v8", "10.4.66"),
     ]
 
     to_export = to_package_export(args.source_path)

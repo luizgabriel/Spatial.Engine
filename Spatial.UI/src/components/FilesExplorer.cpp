@@ -19,7 +19,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "FilesExplorer", false);
 
 	bool selected = false;
-	const auto size = math::float2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
+	const auto size = math::vec2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
 	for (const auto& entry : fileSystem.list(selectedPath))
 	{
 		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 5.0f);
@@ -41,7 +41,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 			if (starts_with(entry.path, "."))
 				continue;
 
-			const auto fileButton = [&](const math::float4& uv) {
+			const auto fileButton = [&](const math::vec4& uv) {
 				ImGui::PushID(entry.path.c_str());
 				if (imageButton(icon, size, uv))
 					selected = true;
@@ -89,7 +89,7 @@ bool FilesExplorer::displayPathHeader(std::string& selectedPath, const filament:
 		return false;
 
 	ImGui::PushID("BackButton");
-	changed = imageButton(icon, math::float2{20}, Icons::back.uv());
+	changed = imageButton(icon, math::vec2{20}, Icons::back.uv());
 	if (changed) {
 		auto lastSeparator = selectedPath.find_last_of(FileSystem::SEPARATOR);
 		if (lastSeparator == std::string::npos)

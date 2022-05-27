@@ -3,7 +3,7 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
-#include <spatial/render/TextureView.h>
+#include <spatial/graphics/TextureView.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
@@ -69,7 +69,7 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 	return false;
 }
 
-void image(const filament::Texture* texture, math::float2 size, math::float4 uv)
+void image(const filament::Texture* texture, math::vec2 size, math::vec4 uv)
 {
 	if (texture == nullptr)
 		return;
@@ -80,7 +80,7 @@ void image(const filament::Texture* texture, math::float2 size, math::float4 uv)
 #pragma clang diagnostic pop
 }
 
-bool imageButton(const filament::Texture* texture, math::float2 size, math::float4 uv)
+bool imageButton(const filament::Texture* texture, math::vec2 size, math::vec4 uv)
 {
 	if (texture == nullptr)
 		return false;
@@ -152,7 +152,7 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 }
 
 bool ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-												  const filament::Texture* icons)
+																			const filament::Texture* icons)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 	bool changed = false;
@@ -460,7 +460,10 @@ bool ComponentInputImpl<ecs::SceneView, const filament::Texture*>::draw(ecs::Reg
 	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
 	auto changed = false;
 
-	changed |= ImGui::DragInt2("Size", &sceneView.size.x);
+	auto size = std::array<int, 2>{static_cast<int>(sceneView.size.x), static_cast<int>(sceneView.size.y)};
+	changed |= ImGui::DragInt2("Size", size.data());
+	sceneView.size = math::uvec2{size[0], size[1]};
+
 	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", icons, registry, sceneView.indirectLight);
 	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", icons, registry, sceneView.camera);
 
@@ -478,7 +481,7 @@ bool ComponentInputImpl<ecs::SceneView, const filament::Texture*>::draw(ecs::Reg
 		ImGui::TreePop();
 	}
 
-	if (registry.hasAllComponents<render::TextureView>(entity)
+	if (registry.hasAllComponents<graphics::TextureView>(entity)
 		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
@@ -504,14 +507,15 @@ bool ComponentInputImpl<ecs::Parent, const filament::Texture*>::draw(ecs::Regist
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Child, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons)
+bool ComponentInputImpl<ecs::Child, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	const filament::Texture* icons)
 {
 	auto& child = registry.getComponent<ecs::Child>(entity);
 	bool changed = false;
 
 	changed |= ui::Search::searchEntity<ecs::Name>("Parent", icons, registry, child.parent);
 	changed |= ui::Search::searchEntity<ecs::Name>("Previous Sibling", icons, registry, child.previous);
-	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", icons,  registry, child.next);
+	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", icons, registry, child.next);
 
 	return changed;
 }
