@@ -1,5 +1,5 @@
 #include <imgui.h>
-#include <spatial/render/TextureUtils.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/PreviewTexture.h>
 
@@ -7,10 +7,10 @@ namespace spatial::ui
 {
 
 void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, const filament::Texture* icons,
-					const math::float4& uv)
+					const math::vec4 uv)
 {
-	constexpr auto size = math::float2{20.0f};
-	const auto* texture = render::getTexture(registry, resourceEntity);
+	constexpr auto size = math::vec2{20.0f};
+	const auto* texture = graphics::getTexture(registry, resourceEntity);
 
 	ui::image(texture, size);
 
@@ -26,7 +26,7 @@ void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, c
 		if (texture)
 		{
 			ImGui::Text("Preview");
-			ui::image(texture, math::float2{300.0f});
+			ui::image(texture, math::vec2{300.0f});
 		}
 		else
 		{

@@ -45,11 +45,11 @@ class Window
 	explicit Window(std::string_view name, WindowFlags flags = WindowFlags::None);
 	~Window();
 
-	[[nodiscard]] math::float2 getSize() const;
-	void setSize(const math::float2& size);
+	[[nodiscard]] math::vec2 getSize() const;
+	void setSize(const math::vec2& size);
 
-	[[nodiscard]] math::float2 getPosition() const;
-	void setPosition(const math::float2& size);
+	[[nodiscard]] math::vec2 getPosition() const;
+	void setPosition(const math::vec2& size);
 
 	[[nodiscard]] bool isOpen() const;
 

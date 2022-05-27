@@ -9,27 +9,27 @@ struct Transform
 {
 	static constexpr auto typeName = "transform";
 
-	math::float3 position;
-	math::float3 scale;
-	math::float3 rotation;
+	math::vec3 position;
+	math::vec3 scale;
+	math::vec3 rotation;
 
-	explicit constexpr Transform(const math::float3& position = {0}, const math::float3& scale = {1},
-								 const math::float3& rotation = {0})
+	explicit Transform(const math::vec3& position = math::vec3{0}, const math::vec3& scale = math::vec3{1},
+								 const math::vec3& rotation = math::vec3{0})
 		: position(position), scale(scale), rotation(rotation)
 	{
 	}
 
-	[[nodiscard]] math::float3 getEulerAnglesRotation() const noexcept;
+	[[nodiscard]] math::vec3 getEulerAnglesRotation() const noexcept;
 
-	[[nodiscard]] math::mat4f getTranslationMatrix() const noexcept;
+	[[nodiscard]] math::mat4 getTranslationMatrix() const noexcept;
 
-	[[nodiscard]] math::mat4f getScaleMatrix() const noexcept;
+	[[nodiscard]] math::mat4 getScaleMatrix() const noexcept;
 
-	[[nodiscard]] math::mat4f getRotationMatrix() const noexcept;
+	[[nodiscard]] math::mat4 getRotationMatrix() const noexcept;
 
-	[[nodiscard]] math::mat4f getMatrix() const noexcept;
+	[[nodiscard]] math::mat4 getMatrix() const noexcept;
 
-	[[nodiscard]] math::float3 getForwardVector() const noexcept;
+	[[nodiscard]] math::vec3 getForwardVector() const noexcept;
 };
 
 } // namespace spatial::ecs

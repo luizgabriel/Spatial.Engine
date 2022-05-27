@@ -4,19 +4,19 @@ namespace spatial
 {
 
 template <typename Listener>
-void connect(UserInterfaceSystem& ui, Listener& listener)
+void connect(ui::UserInterfaceSystem& ui, Listener& listener)
 {
 	ui.getDrawGuiSignal().connect<&Listener::onDrawGui>(listener);
 }
 
 template <typename Listener>
-void disconnect(UserInterfaceSystem& ui, Listener& listener)
+void disconnect(ui::UserInterfaceSystem& ui, Listener& listener)
 {
 	ui.getDrawGuiSignal().disconnect<&Listener::onDrawGui>(listener);
 }
 
 template <typename Listener>
-auto& operator>>(UserInterfaceSystem& ui, Listener& listener)
+auto& operator>>(ui::UserInterfaceSystem& ui, Listener& listener)
 {
 	connect(ui, listener);
 	return ui;

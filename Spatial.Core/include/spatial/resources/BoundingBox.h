@@ -1,10 +1,24 @@
-#include <filament/Box.h>
+#pragma once
+
 #include <istream>
-#include <spatial/common/Math.h>
+#include <spatial/common/AxisAlignedBoundingBox.h>
+#include <spatial/resources/Math.h>
 
 namespace spatial
 {
 
-std::istream& operator>>(std::istream& stream, filament::Box& box);
+template <typename T, math::precision P>
+std::istream& operator>>(std::istream& stream, math::BaseAxisAlignedBoundingBox<T, P>& box)
+{
+	using PointType = typename math::BaseAxisAlignedBoundingBox<T, P>::PointType;
+
+	PointType center;
+	PointType halfExtent;
+	stream >> center >> halfExtent;
+	box.maximumPoint = center + halfExtent;
+	box.minimumPoint = center - halfExtent;
+
+	return stream;
+}
 
 }

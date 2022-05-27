@@ -12,10 +12,7 @@
 #endif
 #include <GLFW/glfw3native.h>
 #include <array>
-
 #include <stb_image.h>
-
-using namespace filament::math;
 
 namespace spatial::desktop
 {
@@ -45,7 +42,7 @@ Window::~Window()
 		glfwDestroyWindow(mWindowHandle);
 }
 
-math::int2 Window::getFrameBufferSize() const
+math::uvec2 Window::getFrameBufferSize() const
 {
 	int dsw, dsh;
 	glfwGetFramebufferSize(mWindowHandle, &dsw, &dsh);
@@ -53,7 +50,7 @@ math::int2 Window::getFrameBufferSize() const
 	return {dsw, dsh};
 }
 
-math::int2 Window::getSize() const
+math::uvec2 Window::getSize() const
 {
 	int w, h;
 	glfwGetWindowSize(mWindowHandle, &w, &h);
@@ -61,7 +58,7 @@ math::int2 Window::getSize() const
 	return {w, h};
 }
 
-math::double2 Window::getMousePosition() const
+math::dvec2 Window::getMousePosition() const
 {
 	double xPos, yPos;
 	glfwGetCursorPos(mWindowHandle, &xPos, &yPos);
@@ -87,7 +84,7 @@ void* Window::getNativeHandle() const
 #endif
 }
 
-void Window::warpMouse(const math::float2& position) const
+void Window::warpMouse(const math::vec2& position) const
 {
 	glfwSetCursorPos(mWindowHandle, position.x, position.y);
 }

@@ -4,7 +4,6 @@ add_library(Spatial.UI
         include/spatial/ui/system/ImGuiHelpers.h
         include/spatial/ui/system/UserInterfaceSystem.h
         include/spatial/ui/system/ImGuiRenderer.h
-        include/spatial/ui/system/UserInterfaceInput.h
 
         include/spatial/ui/components/Window.h
         include/spatial/ui/components/Collapse.h
@@ -32,8 +31,7 @@ add_library(Spatial.UI
         ## SOURCES
         src/system/ImGuiHelpers.cpp
         src/system/UserInterfaceSystem.cpp
-        src/system/UserInterfaceRenderer.cpp
-        src/system/UserInterfaceInput.cpp
+        src/system/ImGuiRenderer.cpp
 
         src/components/Window.cpp
         src/components/Collapse.cpp
@@ -74,6 +72,7 @@ target_include_directories(Spatial.UI
 target_link_libraries(Spatial.UI
         PUBLIC
         Spatial.Core
+        Spatial.Graphics
         CONAN_PKG::imgui)
 
 install(

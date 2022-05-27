@@ -21,7 +21,7 @@ struct SceneView
 {
 	constexpr static auto typeName = "scene_view";
 
-	math::int2 size{1280, 720};
+	math::uvec2 size{1280, 720};
 	Entity camera{ecs::NullEntity};
 	Entity indirectLight{ecs::NullEntity};
 };

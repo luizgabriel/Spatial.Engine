@@ -45,9 +45,9 @@ inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
 	return {lhs.x - rhs.x, lhs.y - rhs.y};
 }
 
-static ImVector<math::float3> s_ArrowTri[4];
+static ImVector<math::vec3> s_ArrowTri[4];
 static ImVector<ImVec2> s_ArrowTriProj[4];
-static ImVector<math::float3> s_ArrowNorm[4];
+static ImVector<math::vec3> s_ArrowNorm[4];
 static ImVector<ImU32> s_ArrowColLight[4];
 
 void initArrowData()
@@ -80,46 +80,46 @@ void initArrowData()
 		z0 = sinf(a0);
 		y1 = cosf(a1);
 		z1 = sinf(a1);
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x1, CYL_RADIUS * y0, CYL_RADIUS * z0));
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x0, CYL_RADIUS * y0, CYL_RADIUS * z0));
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x1, CYL_RADIUS * y0, CYL_RADIUS * z0));
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
-		s_ArrowTri[ARROW_CYL].push_back(math::float3(x1, CYL_RADIUS * y1, CYL_RADIUS * z1));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y0, z0));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y0, z0));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y1, z1));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y0, z0));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y1, z1));
-		s_ArrowNorm[ARROW_CYL].push_back(math::float3(0, y1, z1));
-		s_ArrowTri[ARROW_CAP].push_back(math::float3(x0, 0, 0));
-		s_ArrowTri[ARROW_CAP].push_back(math::float3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
-		s_ArrowTri[ARROW_CAP].push_back(math::float3(x0, CYL_RADIUS * y0, CYL_RADIUS * z0));
-		s_ArrowNorm[ARROW_CAP].push_back(math::float3(-1, 0, 0));
-		s_ArrowNorm[ARROW_CAP].push_back(math::float3(-1, 0, 0));
-		s_ArrowNorm[ARROW_CAP].push_back(math::float3(-1, 0, 0));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x1, CYL_RADIUS * y0, CYL_RADIUS * z0));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x0, CYL_RADIUS * y0, CYL_RADIUS * z0));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x1, CYL_RADIUS * y0, CYL_RADIUS * z0));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
+		s_ArrowTri[ARROW_CYL].push_back(math::vec3(x1, CYL_RADIUS * y1, CYL_RADIUS * z1));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y0, z0));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y0, z0));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y1, z1));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y0, z0));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y1, z1));
+		s_ArrowNorm[ARROW_CYL].push_back(math::vec3(0, y1, z1));
+		s_ArrowTri[ARROW_CAP].push_back(math::vec3(x0, 0, 0));
+		s_ArrowTri[ARROW_CAP].push_back(math::vec3(x0, CYL_RADIUS * y1, CYL_RADIUS * z1));
+		s_ArrowTri[ARROW_CAP].push_back(math::vec3(x0, CYL_RADIUS * y0, CYL_RADIUS * z0));
+		s_ArrowNorm[ARROW_CAP].push_back(math::vec3(-1, 0, 0));
+		s_ArrowNorm[ARROW_CAP].push_back(math::vec3(-1, 0, 0));
+		s_ArrowNorm[ARROW_CAP].push_back(math::vec3(-1, 0, 0));
 		x0 = ARROW_END - CONE_LENGTH;
 		x1 = ARROW_END;
 		nx = CONE_RADIUS / (x1 - x0);
 		nn = 1.0f / sqrtf(nx * nx + 1);
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x1, 0, 0));
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x0, CONE_RADIUS * y0, CONE_RADIUS * z0));
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x1, 0, 0));
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
-		s_ArrowTri[ARROW_CONE].push_back(math::float3(x1, 0, 0));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y0, nn * z0));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y0, nn * z0));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y1, nn * z1));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y0, nn * z0));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y1, nn * z1));
-		s_ArrowNorm[ARROW_CONE].push_back(math::float3(nn * nx, nn * y1, nn * z1));
-		s_ArrowTri[ARROW_CONE_CAP].push_back(math::float3(x0, 0, 0));
-		s_ArrowTri[ARROW_CONE_CAP].push_back(math::float3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
-		s_ArrowTri[ARROW_CONE_CAP].push_back(math::float3(x0, CONE_RADIUS * y0, CONE_RADIUS * z0));
-		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::float3(-1, 0, 0));
-		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::float3(-1, 0, 0));
-		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::float3(-1, 0, 0));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x1, 0, 0));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x0, CONE_RADIUS * y0, CONE_RADIUS * z0));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x1, 0, 0));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
+		s_ArrowTri[ARROW_CONE].push_back(math::vec3(x1, 0, 0));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y0, nn * z0));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y0, nn * z0));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y1, nn * z1));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y0, nn * z0));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y1, nn * z1));
+		s_ArrowNorm[ARROW_CONE].push_back(math::vec3(nn * nx, nn * y1, nn * z1));
+		s_ArrowTri[ARROW_CONE_CAP].push_back(math::vec3(x0, 0, 0));
+		s_ArrowTri[ARROW_CONE_CAP].push_back(math::vec3(x0, CONE_RADIUS * y1, CONE_RADIUS * z1));
+		s_ArrowTri[ARROW_CONE_CAP].push_back(math::vec3(x0, CONE_RADIUS * y0, CONE_RADIUS * z0));
+		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::vec3(-1, 0, 0));
+		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::vec3(-1, 0, 0));
+		s_ArrowNorm[ARROW_CONE_CAP].push_back(math::vec3(-1, 0, 0));
 	}
 
 	for (int i = 0; i < 4; ++i)
@@ -172,7 +172,7 @@ void drawTriangles(ImDrawList* drawList, const ImVec2& offset, const ImVector<Im
 	}
 }
 
-bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t color)
+bool drawArrowWidget(math::vec3& direction, float widgetSize, std::uint32_t color)
 {
 	auto& style = ImGui::GetStyle();
 	auto* drawList = ImGui::GetWindowDrawList();
@@ -191,8 +191,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 
 	// We want to generate quaternion rotations relative to the quaternion in the down press state.
 	// This gives us cleaner control over rotation (it feels better)
-	static math::quatf origQuat;
-	static math::float3 coordOld;
+	static math::quat origQuat;
+	static math::vec3 coordOld;
 	bool highlighted = false;
 	ImGui::InvisibleButton("widget", ImVec2(sv_orient_size, sv_orient_size));
 	if (ImGui::IsItemActive())
@@ -202,21 +202,21 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 		if (ImGui::IsMouseClicked(0))
 		{
 			origQuat = directionQuaternion;
-			coordOld = math::float3(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
+			coordOld = math::vec3(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
 		}
 		else if (ImGui::IsMouseDragging(0))
 		{
-			math::float3 coord(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
-			math::float3 pVec = coord;
-			math::float3 oVec = coordOld;
+			math::vec3 coord(quatIX(mouse.x, w, h), quatIY(mouse.y, w, h), 1.0f);
+			math::vec3 pVec = coord;
+			math::vec3 oVec = coordOld;
 			coord.z = 0.0f;
 			float n0 = length(oVec);
 			float n1 = length(pVec);
 			if (n0 > math::epsilon && n1 > math::epsilon)
 			{
-				math::float3 v0 = oVec / n0;
-				math::float3 v1 = pVec / n1;
-				math::float3 axis = cross(v0, v1);
+				math::vec3 v0 = oVec / n0;
+				math::vec3 v1 = pVec / n1;
+				math::vec3 axis = cross(v0, v1);
 				float sa = length(axis);
 				float ca = dot(v0, v1);
 				float angle = atan2(sa, ca);
@@ -225,8 +225,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 					angle *= 1.0f + 1.5f * (length(coord) - 1.0f);
 				}
 
-				math::quatf qrot, qres, qorig;
-				qrot = math::quatf::fromAxisAngle(axis, angle);
+				math::quat qrot, qres, qorig;
+				qrot = math::angleAxis(angle, axis);
 				float nqorig = sqrt(origQuat.x * origQuat.x + origQuat.y * origQuat.y + origQuat.z * origQuat.z
 									+ origQuat.w * origQuat.w);
 				if (abs(nqorig) > math::epsilon * math::epsilon)
@@ -269,8 +269,8 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 		auto ntri = s_ArrowTri[j].size();
 		for (int i = 0; i < ntri; ++i)
 		{
-			math::float3 coord = s_ArrowTri[j][i];
-			math::float3 norm = s_ArrowNorm[j][i];
+			math::vec3 coord = s_ArrowTri[j][i];
+			math::vec3 norm = s_ArrowNorm[j][i];
 			if (coord.x > 0)
 			{
 				coord.x = 2.5f * coord.x - 2.0f;
@@ -293,7 +293,7 @@ bool drawArrowWidget(math::float3& direction, float widgetSize, std::uint32_t co
 	return value_changed;
 }
 
-bool directionInput(const std::string_view label, math::float3& dir, float size, std::uint32_t color)
+bool directionInput(const std::string_view label, math::vec3& dir, float size, std::uint32_t color)
 {
 	ImGui::PushID(label.data());
 	ImGui::BeginGroup();

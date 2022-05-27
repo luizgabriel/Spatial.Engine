@@ -41,9 +41,9 @@ class Window
 		return mWindowHandle;
 	}
 
-	math::int2 getFrameBufferSize() const;
-	math::int2 getSize() const;
-	math::double2 getMousePosition() const;
+	math::uvec2 getFrameBufferSize() const;
+	math::uvec2 getSize() const;
+	math::dvec2 getMousePosition() const;
 
 	bool hasFocus() const;
 
@@ -53,7 +53,7 @@ class Window
 	Window& operator=(Window&& other) noexcept;
 	Window& operator=(const Window& w) = delete;
 
-	void warpMouse(const math::float2& position) const;
+	void warpMouse(const math::vec2& position) const;
 };
 
 class PlatformContext

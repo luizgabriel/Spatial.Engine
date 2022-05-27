@@ -73,7 +73,7 @@ void PlatformContext::setupCallbacks(GLFWwindow* window)
 	glfwSetWindowSizeCallback(window, [](auto* win, int width, int height) {
 		int fbw, fbh;
 		glfwGetFramebufferSize(win, &fbw, &fbh);
-		sEventQueue.enqueue<WindowResizedEvent>(math::int2{width, height}, math::int2{fbw, fbh});
+		sEventQueue.enqueue<WindowResizedEvent>(math::uvec2{width, height}, math::uvec2{fbw, fbh});
 	});
 
 	glfwSetCursorPosCallback(

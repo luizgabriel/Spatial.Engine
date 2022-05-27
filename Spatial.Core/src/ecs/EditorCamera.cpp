@@ -3,32 +3,32 @@
 namespace spatial::ecs
 {
 
-math::mat4f Transform::getTranslationMatrix() const noexcept
+math::mat4 Transform::getTranslationMatrix() const noexcept
 {
-	return math::mat4f::translation(position);
+	return math::translate(position);
 }
 
-math::mat4f Transform::getScaleMatrix() const noexcept
+math::mat4 Transform::getScaleMatrix() const noexcept
 {
-	return math::mat4f::scaling(scale);
+	return math::scale(scale);
 }
 
-math::mat4f Transform::getRotationMatrix() const noexcept
+math::mat4 Transform::getRotationMatrix() const noexcept
 {
-	return math::mat4f::eulerZYX(rotation.z, rotation.y, rotation.x);
+	return math::rotate(rotation.z, math::axisZ) * math::rotate(rotation.y, math::axisY) * math::rotate(rotation.x, math::axisX);
 }
 
-math::mat4f Transform::getMatrix() const noexcept
+math::mat4 Transform::getMatrix() const noexcept
 {
 	return getTranslationMatrix() * getRotationMatrix() * getScaleMatrix();
 }
 
-math::float3 Transform::getForwardVector() const noexcept
+math::vec3 Transform::getForwardVector() const noexcept
 {
 	return math::forwardVector(getMatrix());
 }
 
-math::float3 Transform::getEulerAnglesRotation() const noexcept
+math::vec3 Transform::getEulerAnglesRotation() const noexcept
 {
 	return rotation * math::rad2deg;
 }

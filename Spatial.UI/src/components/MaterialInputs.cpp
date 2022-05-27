@@ -1,6 +1,6 @@
 #include <imgui.h>
 #include <spatial/ecs/Texture.h>
-#include <spatial/render/TextureUtils.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
@@ -10,7 +10,7 @@
 namespace spatial::ui
 {
 
-bool albedoInput(std::string_view label, math::float3& color, ecs::Registry& registry, ecs::Entity& resource,
+bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& registry, ecs::Entity& resource,
 				 const filament::Texture* icons)
 {
 	ImGui::PushID(label.data());
@@ -18,7 +18,7 @@ bool albedoInput(std::string_view label, math::float3& color, ecs::Registry& reg
 
 	bool changed = false;
 
-	constexpr auto size = math::float2{20.0f};
+	constexpr auto size = math::vec2{20.0f};
 
 	ui::previewTexture(registry, resource, icons, Icons::picture.uv());
 
@@ -37,8 +37,7 @@ bool albedoInput(std::string_view label, math::float3& color, ecs::Registry& reg
 	return changed;
 }
 
-bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons,
-			  const math::float4& uv)
+bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons, math::vec4 uv)
 {
 	bool changed = false;
 
@@ -52,7 +51,7 @@ bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& reso
 }
 
 bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs::Entity& resource,
-			  const filament::Texture* icons, const math::float4& uv)
+			  const filament::Texture* icons, math::vec4 uv)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -75,9 +74,9 @@ bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs
 	return changed;
 }
 
-bool colorPicker(std::string_view label, math::float4& color, const filament::Texture* icons)
+bool colorPicker(std::string_view label, math::vec4& color, const filament::Texture* icons)
 {
-	static constexpr auto size = math::float2{20.0f};
+	static constexpr auto size = math::vec2{20.0f};
 
 	bool changed = false;
 
@@ -90,9 +89,9 @@ bool colorPicker(std::string_view label, math::float4& color, const filament::Te
 	return changed;
 }
 
-bool colorPicker(std::string_view label, math::float3& color, const filament::Texture* icons)
+bool colorPicker(std::string_view label, math::vec3& color, const filament::Texture* icons)
 {
-	static constexpr auto size = math::float2{20.0f};
+	static constexpr auto size = math::vec2{20.0f};
 
 	bool changed = false;
 
@@ -106,7 +105,7 @@ bool colorPicker(std::string_view label, math::float3& color, const filament::Te
 bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource,
 				  const filament::Texture* icons)
 {
-	static constexpr auto size = math::float2{20.0f};
+	static constexpr auto size = math::vec2{20.0f};
 
 	bool changed = false;
 

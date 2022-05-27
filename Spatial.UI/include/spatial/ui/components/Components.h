@@ -32,11 +32,11 @@ void spacing(std::uint32_t times = 1);
 
 void separator(std::uint32_t spacing = 0);
 
-void image(const filament::Texture* texture, math::float2 size = math::float2{0, 0},
-		   math::float4 uv = math::float4{0, 0, 1, 1});
+void image(const filament::Texture* texture, math::vec2 size = math::vec2{0, 0},
+		   math::vec4 uv = math::vec4{0, 0, 1, 1});
 
-bool imageButton(const filament::Texture* texture, math::float2 size = math::float2{0, 0},
-				 math::float4 uv = math::float4{0, 0, 1, 1});
+bool imageButton(const filament::Texture* texture, math::vec2 size = math::vec2{0, 0},
+				 math::vec4 uv = math::vec4{0, 0, 1, 1});
 
 template <typename Component, typename... Args>
 struct ComponentInputImpl

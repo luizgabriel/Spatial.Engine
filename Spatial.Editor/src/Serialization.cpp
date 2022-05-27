@@ -30,8 +30,6 @@ ecs::Registry parseRegistry(std::istream& istream)
 		serializeEditorComponents(archive, snapshot);
 	}
 
-	registry.destroyOrphans();
-
 	return registry;
 }
 
