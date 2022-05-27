@@ -11,8 +11,7 @@
       "hidden": true,
       "generator": "Visual Studio 17 2022",
       "environment": {
-        "CONAN_REVISIONS_ENABLED": "1",
-        "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
+        "CONAN_REVISIONS_ENABLED": "1"
       },
       "architecture": {
         "value": "x64",
