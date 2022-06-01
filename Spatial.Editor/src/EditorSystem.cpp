@@ -7,14 +7,11 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <spatial/render/Resources.h>
-
 #include <spatial/ui/components/FilesExplorer.h>
 #include <spatial/ui/components/Window.h>
 
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
-#include <spatial/core/Clock.h>
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
@@ -23,16 +20,9 @@
 #include <spatial/render/MaterialController.h>
 #include <spatial/render/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
-#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
-
-namespace fl = filament;
-namespace fs = std::filesystem;
-
-using namespace spatial::math;
-using namespace entt::literals;
 
 namespace spatial::editor
 {
