@@ -7,15 +7,34 @@
   },
   "configurePresets": [
     {
-      "name": "Windows-Base",
+      "name": "Default",
       "hidden": true,
-      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "environment": {
         "CONAN_REVISIONS_ENABLED": "1"
+      },
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+      }
+    },
+    {
+      "name": "Windows-Base",
+      "hidden": true,
+      "inherits": [
+        "Default"
+      ],
+      "generator": "Visual Studio 17 2022",
+      "environment": {
+        "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
       },
       "architecture": {
         "value": "x64",
         "strategy": "external"
+      },
+      "cacheVariables": {
+        "WARNINGS_AS_ERRORS": "OFF",
+        "CPACK_GENERATOR": "ZIP;WIX"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -27,70 +46,48 @@
     },
     {
       "name": "Windows-Debug",
-      "displayName": "Windows Debug",
-      "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "displayName": "Windows Debug (Visual Studio 2022)",
       "inherits": [
         "Windows-Base"
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "/MTd",
-        "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;WIX",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_CXX_FLAGS": "/MTd"
       }
     },
     {
       "name": "Windows-Release",
-      "displayName": "Windows Release",
-      "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "displayName": "Windows Release (Visual Studio 2022)",
       "inherits": [
         "Windows-Base"
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "/MT",
-        "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;WIX",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_CXX_FLAGS": "/MT"
       }
     },
     {
       "name": "Windows-2019-Debug",
       "displayName": "Windows Debug (Visual Studio 2019)",
       "generator": "Visual Studio 16 2019",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "inherits": [
         "Windows-Base"
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "/MTd",
-        "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;WIX",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_CXX_FLAGS": "/MTd"
       }
     },
     {
       "name": "Windows-2019-Release",
       "displayName": "Windows Release (Visual Studio 2019)",
       "generator": "Visual Studio 16 2019",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "inherits": [
         "Windows-Base"
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "/MT",
-        "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;WIX",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_CXX_FLAGS": "/MT"
       }
     },
     {
@@ -118,12 +115,9 @@
       "inherits": [
         "Linux-Base"
       ],
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CPACK_GENERATOR": "TGZ;DEB",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DEB"
       }
     },
     {
@@ -132,20 +126,20 @@
       "inherits": [
         "Linux-Base"
       ],
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CPACK_GENERATOR": "TGZ;DEB",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CPACK_GENERATOR": "TGZ;DEB"
       }
     },
     {
       "name": "MacOS-Base",
       "hidden": true,
       "generator": "CodeBlocks - Unix Makefiles",
-      "environment": {
-        "CONAN_REVISIONS_ENABLED": "1"
+      "inherits": [
+        "Default"
+      ],
+      "cacheVariables": {
+        "CPACK_GENERATOR": "TGZ;DragNDrop"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -161,23 +155,18 @@
       "inherits": [
         "MacOS-Base"
       ],
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CPACK_GENERATOR": "TGZ;DragNDrop",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "MacOS-Release",
       "displayName": "MacOS Release",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "inherits": [
+        "MacOS-Base"
+      ],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CPACK_GENERATOR": "TGZ;DragNDrop",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],
