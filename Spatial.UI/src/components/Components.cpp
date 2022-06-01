@@ -404,7 +404,7 @@ bool ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Enti
 		changed |= vec3Input("Rotation", eulerAnglesRotation);
 		transform.rotation = math::deg2rad * eulerAnglesRotation;
 
-		changed |= vec3Input("Scale", transform.scale);
+		changed |= vec3Input("Scale", transform.scale, 1.0f);
 	}
 
 	return changed;
