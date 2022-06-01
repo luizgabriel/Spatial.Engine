@@ -64,9 +64,9 @@ math::vec3 Light::getDirection() const noexcept
 	return fromFilament(mManager.getDirection(getInstance()));
 }
 
-void Light::setColor(const filament::LinearColor& color) noexcept
+void Light::setColor(const math::vec3& color) noexcept
 {
-	mManager.setColor(getInstance(), filament::Color::toLinear<filament::ColorConversion::ACCURATE>(color));
+	mManager.setColor(getInstance(), filament::Color::toLinear<filament::ColorConversion::ACCURATE>(toFilament(color)));
 }
 
 math::vec3 Light::getColor() const noexcept
@@ -180,6 +180,16 @@ void Light::reset() noexcept
 		mManager.destroy(mEntity);
 
 	mEntity = utils::Entity{};
+}
+
+math::vec3 Light::getPosition() const noexcept
+{
+	return fromFilament(mManager.getPosition(getInstance()));
+}
+
+void Light::setPosition(const math::vec3& position) noexcept
+{
+	return mManager.setPosition(getInstance(), toFilament(position));
 }
 
 } // namespace spatial::graphics
