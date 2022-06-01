@@ -2,7 +2,6 @@
 #include <spatial/graphics/Entity.h>
 #include <spatial/graphics/Light.h>
 #include <spatial/graphics/LightController.h>
-#include <spatial/graphics/MathConversionUtils.h>
 #include <spatial/graphics/Resources.h>
 #include <spatial/graphics/SkyboxResources.h>
 #include <spatial/graphics/Transform.h>
@@ -14,14 +13,14 @@ void update(const ecs::PointLight& data, Light& light)
 {
 	light.setFalloff(data.falloff);
 	light.setIntensity(data.intensity);
-	light.setColor(toFilament(data.color));
+	light.setColor(data.color);
 }
 
 void update(const ecs::DirectionalLight& data, Light& light)
 {
 	light.setIntensity(data.intensity);
 	light.setDirection(data.direction);
-	light.setColor(toFilament(data.color));
+	light.setColor(data.color);
 	light.setShadowCaster(data.castShadows);
 }
 
@@ -31,7 +30,7 @@ void update(const ecs::SunLight& data, Light& light)
 	light.setSunHaloSize(data.haloSize);
 	light.setSunAngularRadius(data.angularRadius);
 	light.setIntensity(data.intensity);
-	light.setColor(toFilament(data.color));
+	light.setColor(data.color);
 }
 
 void update(const ecs::SpotLight& data, Light& light)
@@ -39,7 +38,7 @@ void update(const ecs::SpotLight& data, Light& light)
 	light.setFalloff(data.falloff);
 	light.setDirection(data.direction);
 	light.setIntensity(data.intensity);
-	light.setColor(toFilament(data.color));
+	light.setColor(data.color);
 	light.setSpotLightCone(data.innerAngle, data.outerAngle);
 }
 
@@ -58,14 +57,7 @@ void createComponentLights(ecs::Registry& registry, filament::Engine& engine)
 template <typename Component>
 void updateComponentLights(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<Component, Light>();
-
-	for (auto entity : view)
-	{
-		const auto& data = registry.getComponent<const Component>(entity);
-		auto& light = registry.getComponent<Light>(entity);
-		update(data, light);
-	}
+	registry.getEntities<Component, Light>().each([](const auto& data, auto& light) { update(data, light); });
 }
 
 template <typename... Component>
@@ -114,6 +106,9 @@ void LightController::updateLights(ecs::Registry& registry)
 	updateComponentLights<ecs::PointLight>(registry);
 	updateComponentLights<ecs::SunLight>(registry);
 	updateComponentLights<ecs::SpotLight>(registry);
+
+	registry.getEntities<ecs::Transform, Light>(ecs::ExcludeComponents<ecs::DirectionalLight>)
+		.each([](const auto& transform, auto& light) { light.setPosition(transform.position); });
 }
 
 void LightController::deleteLights(ecs::Registry& registry)

@@ -103,7 +103,7 @@ bool ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ec
 
 	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
 	changed |= directionInput("Direction", light.direction);
 
 	return changed;
@@ -115,7 +115,7 @@ bool ComponentInputImpl<ecs::PointLight>::draw(ecs::Registry& registry, ecs::Ent
 	bool changed = false;
 
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
 	changed |= ImGui::InputFloat("Falloff", &light.falloff);
 
 	return changed;
@@ -128,7 +128,7 @@ bool ComponentInputImpl<ecs::SpotLight>::draw(ecs::Registry& registry, ecs::Enti
 
 	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
 	changed |= ImGui::InputFloat("Falloff", &light.falloff);
 	changed |= ImGui::DragFloat("Inner Angle", &light.innerAngle, math::pi / 180.0f, 0, math::pi / 2.0f);
 	changed |= ImGui::DragFloat("Outer Angle", &light.outerAngle, math::pi / 180.0f, light.innerAngle, math::pi / 2.0f);
@@ -144,7 +144,7 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 
 	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
 	changed |= ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
 	changed |= ImGui::InputFloat("Halo size", &light.haloSize);
 
@@ -157,7 +157,7 @@ bool ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>::draw(ecs:
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 	bool changed = false;
 
-	changed |= ImGui::DragFloat("Intensity", &light.intensity, 1.0f, .0f, 100000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
 	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>("Reflections Texture", icons, registry,
 																	   light.reflectionsTexture);
 	changed |= ui::Search::searchResource<ecs::tags::IsIrradianceValues>("Irradiance Values", icons, registry,
@@ -398,11 +398,14 @@ bool ComponentInputImpl<ecs::Transform>::draw(ecs::Registry& registry, ecs::Enti
 
 	changed |= vec3Input("Position", transform.position);
 
-	auto eulerAnglesRotation = transform.getEulerAnglesRotation();
-	changed |= vec3Input("Rotation", eulerAnglesRotation);
-	transform.rotation = math::deg2rad * eulerAnglesRotation;
+	if (!registry.hasAllComponents<ecs::tags::IsLight>(entity))
+	{
+		auto eulerAnglesRotation = transform.getEulerAnglesRotation();
+		changed |= vec3Input("Rotation", eulerAnglesRotation);
+		transform.rotation = math::deg2rad * eulerAnglesRotation;
 
-	changed |= vec3Input("Scale", transform.scale);
+		changed |= vec3Input("Scale", transform.scale);
+	}
 
 	return changed;
 }

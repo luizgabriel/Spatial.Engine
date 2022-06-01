@@ -41,7 +41,7 @@ class Light
 
 	[[nodiscard]] math::vec3 getDirection() const noexcept;
 
-	void setColor(const filament::LinearColor& color) noexcept;
+	void setColor(const math::vec3& color) noexcept;
 
 	[[nodiscard]] math::vec3 getColor() const noexcept;
 
@@ -80,6 +80,10 @@ class Light
 	void setShadowCaster(bool shadowCaster) noexcept;
 
 	[[nodiscard]] bool isShadowCaster() const noexcept;
+
+	void setPosition(const math::vec3& position) noexcept;
+
+	math::vec3 getPosition() const noexcept;
 
   private:
 	Manager& mManager;
