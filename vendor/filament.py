@@ -76,10 +76,9 @@ conan_basic_setup()
         self.cpp_info.libdirs = ["lib/x86_64", "lib/arm64"]
 
         libs = tools.collect_libs(self)
-        if not self.options.get_safe("supports_vulkan", False):
-            vulkan_libs = ["MoltenVK", "vulkan.1"]
-            for vulkan_lib in vulkan_libs:
-                libs = [lib for lib in libs if vulkan_lib not in lib]
+        libs = [lib for lib in libs if ".dylib" not in lib]
+        libs = [lib for lib in libs if ".dll" not in lib]
+        libs = [lib for lib in libs if ".so" not in lib]
 
         self.cpp_info.libs = libs
 
