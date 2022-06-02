@@ -103,7 +103,7 @@ bool ComponentInputImpl<ecs::DirectionalLight>::draw(ecs::Registry& registry, ec
 
 	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
 	changed |= directionInput("Direction", light.direction);
 
 	return changed;
@@ -144,7 +144,7 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 
 	changed |= ImGui::Checkbox("Cast Shadows", &light.castShadows);
 	changed |= ImGui::ColorEdit3("Color", &light.color.r);
-	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 1000000.0f);
+	changed |= ImGui::SliderFloat("Intensity", &light.intensity, .0f, 100000.0f);
 	changed |= ImGui::InputFloat("Halo Falloff", &light.haloFalloff);
 	changed |= ImGui::InputFloat("Halo size", &light.haloSize);
 
