@@ -19,22 +19,22 @@ class FilamentConan(ConanFile):
     ]
 
     options = {
+        "enable_lto": [True, False],
         "skip_samples": [True, False],
         "skip_sdl2": [True, False],
-        "enable_lto": [True, False],
-        "use_swiftshader": [True, False],
         "build_filamat": [True, False],
+        "use_swiftshader": [True, False],
         "supports_opengl": [True, False],
         "supports_metal": [True, False],
         "supports_vulkan": [True, False],
     }
 
     default_options = {
+        "enable_lto": True,
         "skip_samples": True,
         "skip_sdl2": True,
-        "enable_lto": True,
-        "use_swiftshader": False,
         "build_filamat": True,
+        "use_swiftshader": False,
         "supports_opengl": True,
         "supports_metal": False,
         "supports_vulkan": False,
@@ -52,13 +52,13 @@ conan_basic_setup()
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["FILAMENT_SKIP_SAMPLES"] = self.options.get_safe("skip_samples", False)
-        cmake.definitions["FILAMENT_ENABLE_LTO"] = self.options.get_safe("enable_lto", False)
-        cmake.definitions["FILAMENT_SKIP_SDL2"] = self.options.get_safe("skip_sdl2", False)
-        cmake.definitions["FILAMENT_SUPPORTS_OPENGL"] = self.options.get_safe("supports_opengl", False)
-        cmake.definitions["FILAMENT_SUPPORTS_METAL"] = self.options.get_safe("supports_metal", False)
-        cmake.definitions["FILAMENT_SUPPORTS_VULKAN"] = self.options.get_safe("supports_vulkan", False)
-        cmake.definitions["FILAMENT_BUILD_FILAMAT"] = self.options.get_safe("build_filamat", False)
+        cmake.definitions["FILAMENT_ENABLE_LTO"] = self.options["enable_lto"]
+        cmake.definitions["FILAMENT_SKIP_SAMPLES"] = self.options["skip_samples"]
+        cmake.definitions["FILAMENT_SKIP_SDL2"] = self.options["skip_sdl2"]
+        cmake.definitions["FILAMENT_SUPPORTS_OPENGL"] = self.options["supports_opengl"]
+        cmake.definitions["FILAMENT_SUPPORTS_METAL"] = self.options["supports_metal"]
+        cmake.definitions["FILAMENT_SUPPORTS_VULKAN"] = self.options["supports_vulkan"]
+        cmake.definitions["FILAMENT_BUILD_FILAMAT"] = self.options["build_filamat"]
 
         cmake.configure(source_dir="filament")
 
@@ -74,15 +74,4 @@ conan_basic_setup()
 
     def package_info(self):
         self.cpp_info.libdirs = ["lib/x86_64", "lib/arm64"]
-
-        libs = tools.collect_libs(self)
-        if not self.options.get_safe("supports_vulkan", False):
-            vulkan_libs = ["MoltenVK", "vulkan.1"]
-            for vulkan_lib in vulkan_libs:
-                libs = [lib for lib in libs if vulkan_lib not in lib]
-
-        # Remove benchmark libs
-        libs = [lib for lib in libs if "benchmark" not in lib]
-
-        self.cpp_info.libs = libs
-
+        self.cpp_info.libs = tools.collect_libs(self)
