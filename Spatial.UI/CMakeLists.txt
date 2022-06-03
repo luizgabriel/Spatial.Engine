@@ -70,9 +70,12 @@ target_include_directories(Spatial.UI
 
 # LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.UI
-        PUBLIC
+        PRIVATE
         Spatial.Core
-        Spatial.Graphics
+        Spatial.Graphics)
+
+target_link_libraries(Spatial.UI
+        PUBLIC
         CONAN_PKG::imgui)
 
 install(

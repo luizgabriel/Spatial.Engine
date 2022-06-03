@@ -64,7 +64,6 @@ target_include_directories(Spatial.Graphics
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
         PRIVATE src)
 
-# LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.Graphics
         PUBLIC
         Spatial.Core
