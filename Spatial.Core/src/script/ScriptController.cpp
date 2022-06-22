@@ -13,38 +13,40 @@ using namespace boost::algorithm;
 namespace spatial::script
 {
 
-ScriptController::ScriptController(FileSystem& fileSystem, Isolate&& isolate)
-	: mFileSystem{fileSystem}, mIsolate{std::move(isolate)}, mScope{mIsolate.get()}
+void ScriptController::loadScripts(ecs::Registry& registry, FileSystem& fileSystem, Isolate& isolate)
 {
-}
+	auto handle = v8::HandleScope{isolate.get()};
+	const auto context = v8::Context::New(isolate.get());
 
-void ScriptController::onUpdateFrame(ecs::Registry& registry, float delta)
-{
-	assert(mScope.NumberOfHandles(mIsolate.get()) == 0);
-
-	registry.getEntities<const ecs::Resource, ecs::tags::IsScript>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource) {
-			if (resource.relativePath.empty() || !ends_with(resource.relativePath.c_str(), ".js"))
-				return;
-
+	registry
+		.getEntities<const ecs::Resource, const ecs::ResourceData, ecs::tags::IsScript>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::Resource& resource, const ecs::ResourceData& data) {
 			const auto scriptDefaultName = registry.hasAllComponents<ecs::Name>(entity)
-				                               ? registry.getComponent<ecs::Name>(entity).name
-				                               : resource.stem();
+											   ? registry.getComponent<ecs::Name>(entity).name
+											   : resource.stem();
 
-			auto scope = v8::HandleScope{mIsolate.get()};
-			const auto context = v8::Context::New(mIsolate.get());
-			const auto module = compileModule(context, mFileSystem, resource.relativePath);
+			auto module = compileModule(isolate.get(), data.data, resource.relativePath);
+			if (auto instantiateError = instantiateModule(context, module)) {
+				auto errorMessage = fmt::format("Could not instantiate module: {}. \nException: {}",
+												resource.relativePath, instantiateError.value());
+				registry.addComponent<ecs::ResourceError>(entity, std::move(errorMessage));
+			}
+
 			auto result = parseModule(context, module, scriptDefaultName);
+			if (std::holds_alternative<std::string>(result)) {
+				auto errorMessage = fmt::format("Could not parse module: {}. \nException: {}", resource.relativePath,
+												std::get<std::string>(result));
+				registry.addComponent<ecs::ResourceError>(entity, std::move(errorMessage));
+			}
 
-			std::visit(
-				[&registry, entity]<typename T>(T&& c) {
-					registry.addOrReplaceComponent<T>(entity, std::forward<T>(c));
-				},
-				std::move(result));
+			if (std::holds_alternative<ecs::ScriptModule>(result)) {
+				auto moduleComponent = std::get<ecs::ScriptModule>(std::move(result));
+				registry.addComponent<ecs::ScriptModule>(entity, std::move(moduleComponent));
+			}
 
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
-
 
 } // namespace spatial::script

@@ -7,17 +7,8 @@
 namespace spatial::script
 {
 
-class ScriptController
-{
-  public:
-	explicit ScriptController(FileSystem& mFileSystem, Isolate&& isolate);
-
-	void onUpdateFrame(ecs::Registry& registry, float delta);
-
-  private:
-	FileSystem& mFileSystem;
-	Isolate mIsolate;
-	v8::HandleScope mScope;
+struct ScriptController {
+	static void loadScripts(ecs::Registry& registry, FileSystem& fileSystem, Isolate& isolate);
 };
 
 } // namespace spatial::script

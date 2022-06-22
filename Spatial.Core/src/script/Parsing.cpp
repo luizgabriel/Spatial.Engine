@@ -12,35 +12,7 @@
 namespace spatial::script
 {
 
-v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, FileSystem& fileSystem, std::string_view modulePath)
-{
-	auto resourceStream = fileSystem.openReadStream(modulePath);
-	if (resourceStream->fail())
-		throw std::invalid_argument{fmt::format("Script not found: {}", modulePath)};
-
-	auto module = script::compileModule(context, std::move(resourceStream), modulePath);
-	auto result =
-		module
-			->InstantiateModule(context,
-								[](v8::Local<v8::Context> context, v8::Local<v8::String> specifier,
-								   v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer) {
-									context->GetIsolate()->ThrowException(
-										createString(context->GetIsolate(), "Module importing is not implemented yet"));
-									return v8::MaybeLocal<v8::Module>();
-								})
-			.ToChecked();
-
-	if (!result || module.IsEmpty())
-	{
-		auto exception = module->GetException().As<v8::String>();
-		throw std::invalid_argument{fmt::format("Could not instantiate module: {}, Exception: {}", modulePath,
-												getValue(context->GetIsolate(), exception))};
-	}
-
-	return module;
-}
-
-ecs::ScriptComponent::Property::NumberRangeType parseNumberRangeProperty(v8::Local<v8::Object> object)
+ecs::ScriptModule::Property::NumberRangeType parseNumberRangeProperty(v8::Local<v8::Object> object)
 {
 	return {
 		getAttribute<v8::Number>(object, "default")->Value(),
@@ -49,21 +21,21 @@ ecs::ScriptComponent::Property::NumberRangeType parseNumberRangeProperty(v8::Loc
 	};
 }
 
-ecs::ScriptComponent::Property::StringType parseStringProperty(v8::Local<v8::Object> object)
+ecs::ScriptModule::Property::StringType parseStringProperty(v8::Local<v8::Object> object)
 {
 	return {
 		getValue(object->GetIsolate(), getAttribute<v8::String>(object, "default")),
 	};
 }
 
-ecs::ScriptComponent::Property parseProperty(v8::Local<v8::Object> object, const ParserMap& parserMap)
+ecs::ScriptModule::Property parseProperty(v8::Local<v8::Object> object, const ParserMap& parserMap)
 {
 	auto isolate = object->GetIsolate();
 	auto emptyName = createString(isolate, "");
 	auto propertyName = getValue(isolate, getAttributeOrDefault(object, "name", emptyName));
 	auto propertyType = getValue(isolate, getAttribute<v8::String>(object, "type"));
 
-	return ecs::ScriptComponent::Property{propertyName, std::apply(parserMap.at(propertyType), std::make_tuple(object))};
+	return ecs::ScriptModule::Property{propertyName, std::apply(parserMap.at(propertyType), std::make_tuple(object))};
 }
 
 ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module, std::string_view moduleName, const ParserMap& parserMap)
@@ -84,11 +56,11 @@ ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Modu
 			logger.info("{} -> {}", getValue(isolate, key), getValue(isolate, type));
 		}
 
-		return ecs::ScriptComponent{};
+		return ecs::ScriptModule{};
 	}
 	catch (const std::invalid_argument& e)
 	{
-		return ecs::ResourceError{e.what()};
+		return e.what();
 	}
 }
 

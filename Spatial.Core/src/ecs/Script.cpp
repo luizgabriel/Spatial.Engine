@@ -2,14 +2,12 @@
 
 namespace spatial::ecs {
 
-const char* ScriptComponent::Property::getTypeName() const
+const char* ScriptModule::Property::getTypeName() const
 {
-	return std::visit([](const auto& t){
-		return std::decay_t<decltype(t)>::typeName;
-	}, type);
+	return std::visit([](const auto& t) { return std::decay_t<decltype(t)>::typeName; }, type);
 }
 
-bool ScriptComponent::Property::operator<(const ScriptComponent::Property& rhs) const
+bool ScriptModule::Property::operator<(const ScriptModule::Property& rhs) const
 {
 	return name < rhs.name;
 }

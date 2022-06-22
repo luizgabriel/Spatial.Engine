@@ -19,20 +19,16 @@ struct IsScript
 
 } // namespace tags
 
-struct ScriptComponent
-{
-	struct Property
-	{
-		struct StringType
-		{
+struct ScriptModule {
+	struct Property {
+		struct StringType {
 			static constexpr auto typeName = "String";
 
 			// std::string regexValidation;
 			std::string defaultValue{};
 		};
 
-		struct NumberRangeType
-		{
+		struct NumberRangeType {
 			static constexpr auto typeName = "NumberRange";
 
 			double defaultValue{.0};
@@ -53,22 +49,22 @@ struct ScriptComponent
 	std::string name;
 	std::unordered_map<std::string, Property> properties;
 
-	bool operator<(const ScriptComponent& rhs) const
+	bool operator<(const ScriptModule& rhs) const
 	{
 		return name < rhs.name;
 	}
 
-	bool operator>(const ScriptComponent& rhs) const
+	bool operator>(const ScriptModule& rhs) const
 	{
 		return rhs < *this;
 	}
 
-	bool operator<=(const ScriptComponent& rhs) const
+	bool operator<=(const ScriptModule& rhs) const
 	{
 		return !(rhs < *this);
 	}
 
-	bool operator>=(const ScriptComponent& rhs) const
+	bool operator>=(const ScriptModule& rhs) const
 	{
 		return !(*this < rhs);
 	}
@@ -103,7 +99,7 @@ struct ScriptSystem
 
 struct ScriptInfo
 {
-	std::set<ScriptComponent> components;
+	std::set<ScriptModule> components;
 	std::set<ScriptSystem> systems;
 
 	bool operator<(const ScriptInfo& rhs) const

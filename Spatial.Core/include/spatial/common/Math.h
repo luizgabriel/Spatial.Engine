@@ -15,8 +15,12 @@ constexpr auto epsilon_v = std::numeric_limits<T>::epsilon();
 constexpr auto epsilon = epsilon_v<float>;
 
 template <typename T>
-constexpr auto pi_v = static_cast<T>(3.14159265358979323846264338327950);
+constexpr auto pi_v = glm::pi<T>();
 constexpr auto pi = pi_v<float>;
+
+template <typename T>
+constexpr auto halfPi_v = glm::half_pi<T>();
+constexpr auto halfPi = halfPi_v<float>;
 
 constexpr auto axisX = vec3{1.0, .0, .0};
 constexpr auto axisY = vec3{.0, 1.0, .0};
@@ -33,23 +37,20 @@ constexpr auto deg2rad = deg2rad_v<float>;
 template <typename T, precision P>
 qua<T, P> directionToQuaternion(const vec<3, T, P>& dir)
 {
-	auto dn = length(dir);
+	auto directionLength = length(dir);
 	auto out = quat{};
 
-	if (dn < epsilon_v<T> * epsilon_v<T>)
-	{
+	if (directionLength < epsilon_v<T> * epsilon_v<T>) {
 		out.x = out.y = out.z = 0;
 		out.w = 1;
 	}
-	else
-	{
+	else {
 		auto rotAxis = decltype(dir){0, -dir.z, dir.y};
-		if (dot(rotAxis, rotAxis) < epsilon * epsilon)
-		{
+		if (dot(rotAxis, rotAxis) < epsilon * epsilon) {
 			rotAxis.x = rotAxis.y = 0;
 			rotAxis.z = 1;
 		}
-		auto rotAngle = acos(clamp(dir.x / dn, -1.0f, 1.0f));
+		auto rotAngle = acos(clamp(dir.x / directionLength, -1.0f, 1.0f));
 		out = angleAxis(rotAngle, rotAxis);
 	}
 

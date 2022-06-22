@@ -1,6 +1,6 @@
 #include "EditorSystem.h"
-#include "CustomComponents.h"
-#include "EditorCamera.h"
+#include "Components.h"
+#include "CustomUserInterface.h"
 #include "Materials.h"
 #include "Serialization.h"
 #include "Tags.h"
@@ -24,8 +24,7 @@
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 
-namespace spatial::editor
-{
+namespace spatial::editor {
 
 static auto gLogger = createDefaultLogger();
 
@@ -36,14 +35,12 @@ EditorSystem::EditorSystem(FileSystem& fileSystem)
 	  mRegistry{},
 	  mEditorRegistry{},
 
-	  mEditorCameraController{},
-	  mScriptController{mFileSystem, mPlatformContext.createIsolate()},
+	  mIsolate{mPlatformContext.createIsolate()},
 
 	  mJobQueue{},
 
 	  mScenePath{},
 	  mCurrentPath{PROJECT_DIR}
-
 {
 }
 
@@ -66,10 +63,10 @@ void EditorSystem::onStartFrame(float)
 
 void EditorSystem::onUpdateFrame(float delta)
 {
-	mScriptController.onUpdateFrame(mRegistry, delta);
+	script::ScriptController::loadScripts(mRegistry, mFileSystem, mIsolate);
 
 	if (mIsCameraViewWindowHovered && mIsCameraControlEnabled)
-		mEditorCameraController.onUpdateFrame(mRegistry, delta);
+		EditorCameraController::updateCameraTransforms(mRegistry, delta);
 
 	graphics::MaterialController::updateMaterial<GridMaterial>(mRegistry);
 	graphics::MaterialController::updateMaterial<ColorMaterial>(mRegistry);
@@ -99,8 +96,7 @@ void EditorSystem::onDrawGui()
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 	});
 
-	if (mMenuAction != ui::EditorMainMenu::Action::None)
-	{
+	if (mMenuAction != ui::EditorMainMenu::Action::None) {
 		if (mMenuAction == ui::EditorMainMenu::Action::NewScene)
 			ui::PopupModal::open("New Scene");
 
@@ -141,8 +137,10 @@ void EditorSystem::onDrawGui()
 		auto window = ui::Window{"Scene View", ui::WindowFlags::NoScrollbar};
 		mIsCameraViewWindowHovered = ImGui::IsWindowHovered();
 
-		if (!mRegistry.isValid(selectedView))
+		if (!mRegistry.isValid(selectedView)) {
 			selectedView = mRegistry.getFirstEntity<ecs::SceneView, tags::IsEditorView>();
+			EditorCamera::replaceView(mRegistry, selectedView);
+		}
 
 		const auto imageSize = window.getSize() - math::vec2{0, 24};
 		ui::SceneView::image(mRegistry, selectedView, imageSize);
@@ -151,7 +149,8 @@ void EditorSystem::onDrawGui()
 			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
 
 		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, selectedEntity, createEntityPosition);
-		ui::SceneView::selector(mRegistry, selectedView);
+		if (ui::SceneView::selector(mRegistry, selectedView))
+			EditorCamera::replaceView(mRegistry, selectedView);
 	}
 
 	ui::Window::show("Scene Tree", [&]() {
@@ -195,7 +194,7 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Assets Explorer", [&]() {
 		ui::FilesExplorer::displayFiles(mFileSystem, mCurrentPath, icons);
-		if (mFileSystem.list(PROJECT_DIR).size() == 0) {
+		if (mFileSystem.list(PROJECT_DIR).empty()) {
 			ImGui::Text("No files inside this project.");
 			if (ImGui::Button("Open Project"))
 				mMenuAction = ui::EditorMainMenu::Action::OpenProject;
@@ -212,19 +211,23 @@ void EditorSystem::onPublishRegistry(ecs::RegistryCollection& publisher)
 void EditorSystem::onUpdateInput(const desktop::InputState& input)
 {
 	mIsCameraControlEnabled = input.pressed(Key::MouseRight);
-	mEditorCameraController.onUpdateInput(input);
+	EditorCameraController::readCameraInputs(mRegistry, input);
 
-	if (input.combined(Key::LControl, Key::N))
+	if (input.combined(Key::LControl, Key::N)) {
 		mMenuAction = ui::EditorMainMenu::Action::NewScene;
+	}
 
-	if (input.combined(Key::LControl, Key::S))
+	if (input.combined(Key::LControl, Key::S)) {
 		mMenuAction = ui::EditorMainMenu::Action::SaveScene;
+	}
 
-	if (input.combined(Key::LControl, Key::LShift, Key::O))
+	if (input.combined(Key::LControl, Key::LShift, Key::O)) {
 		mMenuAction = ui::EditorMainMenu::Action::OpenProject;
+	}
 
-	if (input.combined(Key::LControl, Key::O))
+	if (input.combined(Key::LControl, Key::O)) {
 		mMenuAction = ui::EditorMainMenu::Action::OpenScene;
+	}
 }
 
 void EditorSystem::setScenePath(const std::string& path)
@@ -243,19 +246,15 @@ void EditorSystem::loadScene()
 	auto path = getScenePath();
 
 	auto stream = mFileSystem.openReadStream(path);
-	if (stream->fail())
-	{
+	if (stream->fail()) {
 		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
-	try
-	{
-
+	try {
 		mRegistry = parseRegistry(*stream);
 	}
-	catch (const std::exception& e)
-	{
+	catch (const std::exception& e) {
 		gLogger.warn("Could not load scene: {}", e.what());
 	}
 }
@@ -265,18 +264,15 @@ void EditorSystem::saveScene()
 	auto path = getScenePath();
 
 	auto stream = mFileSystem.openWriteStream(path);
-	if (stream->fail())
-	{
+	if (stream->fail()) {
 		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
-	try
-	{
+	try {
 		writeRegistry(mRegistry, *stream);
 	}
-	catch (const std::exception& e)
-	{
+	catch (const std::exception& e) {
 		gLogger.warn("Could not save scene: {}", e.what());
 	}
 }
@@ -285,19 +281,22 @@ std::string EditorSystem::getScenePath() const
 {
 	auto path = mScenePath;
 	auto projectPath = std::string{"project"} + FileSystem::SEPARATOR;
-	if (!boost::starts_with(mScenePath, projectPath))
+	if (!boost::starts_with(mScenePath, projectPath)) {
 		path = projectPath + path;
+	}
 
-	if (!boost::ends_with(mScenePath, ".spatial.json"))
+	if (!boost::ends_with(mScenePath, ".spatial.json")) {
 		path = path + ".spatial.json";
+	}
 
 	return path;
 }
 
 void EditorSystem::setRootPath(const std::filesystem::path& path)
 {
-	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
+	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
 		return;
+	}
 
 	mCurrentPath = PROJECT_DIR;
 	auto result = mFileSystem.resolve(PROJECT_DIR);
@@ -381,8 +380,8 @@ void EditorSystem::createDefaultEditorEntities()
 		.withName("Grid Plane")
 		.with<tags::IsEditorEntity>()
 		.asTransform()
-		.withScale({100.0f, 1.0f, 100.0f})
-		.withPosition({.0f, -0.01f, .0f})
+		.withScale({100.0F, 1.0f, 100.0F})
+		.withPosition({.0f, -math::epsilon, .0f})
 		.asMeshInstance()
 		.withMesh("editor/meshes/plane.filamesh")
 		.withDefaultMaterialInstance(mRegistry.getFirstEntity<GridMaterial>());
@@ -401,7 +400,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.with<tags::IsEditorEntity>()
 		.with<tags::IsEditorView>()
 		.asSceneView()
-		.withDimensions(math::uvec2{19.0, 6.0} * 240u)
+		.withDimensions(math::uvec2{19.0F, 6.0F} * 240U)
 		.withIndirectLight(ecs::Builder::create(mRegistry)
 							   .withName("Indirect Light")
 							   .with<tags::IsEditorEntity>()
@@ -410,10 +409,10 @@ void EditorSystem::createDefaultEditorEntities()
 							   .withIrradianceValues("editor/textures/skybox/sh.txt"))
 		.withCamera(ecs::Builder::create(mRegistry)
 						.withName("Editor Camera")
-						.with(EditorCamera{.5f, 10.0f})
+						.with(EditorCamera{})
 						.with<tags::IsEditorEntity>()
 						.asTransform()
-						.withPosition({3.0f, 3.0f, 20.0f})
+						.withPosition({3.0F, 3.0F, 20.0F})
 						.asPerspectiveCamera()
 						.withFieldOfView(60.0)
 						.withAspectRatio(19.0 / 6.0));

@@ -8,4 +8,5 @@ AlwaysBreakTemplateDeclarations: Yes
 AlignAfterOpenBracket: Align
 AlignOperands: Align
 BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Stroustrup
 ...
