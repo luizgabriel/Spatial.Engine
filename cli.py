@@ -192,7 +192,7 @@ def setup_cli(args: Arguments) -> CommandResult:
     #                            "https://luizgabriel.jfrog.io/artifactory/api/conan/spatial-conan")))
 
     packages = [
-        Package("filament", "1.22.2"),
+        Package("filament", "1.23.2"),
         Package("v8", "10.4.66"),
     ]
 

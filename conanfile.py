@@ -31,7 +31,7 @@ class SpatialEngineConan(ConanFile):
         # "assimp/5.1.0",
 
         # Remember to run 'setup.py' to make these dependencies available
-        "filament/1.22.2@spatial/stable",  # Installed with vendor/filament.py
+        "filament/1.23.2@spatial/stable",  # Installed with vendor/filament.py
         "v8/10.4.66@spatial/stable",       # Installed with vendor/v8.py
     ]
 
