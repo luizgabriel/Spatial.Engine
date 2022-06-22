@@ -23,6 +23,34 @@ std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string)
 	return std::string{*value, static_cast<size_t>(value.length())};
 }
 
+v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint8_t>& data, std::string_view moduleName)
+{
+	auto handle = v8::EscapableHandleScope{isolate};
+
+	auto moduleId = static_cast<int>(entt::hashed_string{moduleName.data()}.value());
+
+	// For some reason, V8 Caches the script source by the module name. By generating a custom module name, we avoid it.
+	// TODO: How to enable/disable this module caching when appropriate?
+	auto uniqueModuleName =
+		fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
+
+	auto resourceName = createString(isolate, uniqueModuleName);
+	auto fullSource = createString(isolate, "");
+
+	auto origin =
+		v8::ScriptOrigin{isolate, resourceName,			0, 0, false, moduleId, v8::Local<v8::Value>(), false, false,
+						 true,	  v8::Local<v8::Data>()};
+
+	auto sourceString = createString(isolate, std::string{data.begin(), data.end()});
+	auto source = v8::ScriptCompiler::Source{sourceString, origin};
+
+	auto module = v8::Local<v8::Module>{};
+	if (!v8::ScriptCompiler::CompileModule(isolate, &source).ToLocal(&module))
+		throw std::invalid_argument{"Could not parse module"};
+
+	return handle.Escape(module);
+}
+
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
 									std::string_view moduleName)
 {
@@ -32,7 +60,8 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 
 	// For some reason, V8 Caches the script source by the module name. By generating a custom module name, we avoid it.
 	// TODO: How to enable/disable this module caching when appropriate?
-	auto uniqueModuleName = fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
+	auto uniqueModuleName =
+		fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
 
 	auto resourceName = createString(context->GetIsolate(), uniqueModuleName);
 	auto fullSource = createString(context->GetIsolate(), "");
@@ -53,6 +82,27 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 		throw std::invalid_argument{"Could not parse module"};
 
 	return handle.Escape(module);
+}
+
+std::optional<std::string> instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
+{
+	auto result =
+		module
+			->InstantiateModule(context,
+								[](v8::Local<v8::Context> context, v8::Local<v8::String> specifier,
+								   v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer) {
+									context->GetIsolate()->ThrowException(
+										createString(context->GetIsolate(), "Module importing is not implemented yet"));
+									return v8::MaybeLocal<v8::Module>();
+								})
+			.ToChecked();
+
+	if (!result || module.IsEmpty()) {
+		auto exception = module->GetException().As<v8::String>();
+		return getValue(context->GetIsolate(), exception);
+	}
+
+	return std::nullopt;
 }
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)

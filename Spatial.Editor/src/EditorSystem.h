@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CustomComponents.h"
-#include "EditorCamera.h"
+#include "Components.h"
+#include "CustomUserInterface.h"
 #include "EditorCameraController.h"
 #include "Jobs.h"
 #include "Settings.h"
@@ -60,8 +60,7 @@ class EditorSystem
 	ecs::Registry mEditorRegistry;
 	ecs::Entity mIconTexture{ecs::NullEntity};
 
-	EditorCameraController mEditorCameraController;
-	script::ScriptController mScriptController;
+	script::Isolate mIsolate;
 
 	EventQueue mJobQueue;
 	ui::EditorMainMenu::Action mMenuAction{ui::EditorMainMenu::Action::None};

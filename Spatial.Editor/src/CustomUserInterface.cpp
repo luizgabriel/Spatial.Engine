@@ -1,8 +1,7 @@
-#include "CustomComponents.h"
-#include "EditorCamera.h"
+#include "CustomUserInterface.h"
+#include "Components.h"
 #include "Materials.h"
 #include "Tags.h"
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <magic_enum.hpp>
 #include <spatial/ecs/Builder.h>

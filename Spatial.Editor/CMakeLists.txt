@@ -11,14 +11,14 @@ add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/EditorSystem.cpp
         src/EditorCameraController.h
         src/EditorCameraController.cpp
-        src/EditorCamera.h
+        src/Components.h
         src/Jobs.h
         src/Materials.h
         src/Materials.cpp
         src/Serialization.h
         src/Serialization.cpp
-        src/CustomComponents.h
-        src/CustomComponents.cpp
+        src/CustomUserInterface.h
+        src/CustomUserInterface.cpp
         src/EditorSettings.cpp
         src/Settings.h
         src/FileSystem.h

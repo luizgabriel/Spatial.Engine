@@ -8,11 +8,12 @@ Checks: "*,
         -llvm*,
         -modernize-use-trailing-return-type,
         -zircon-*,
-        -readability-else-after-return,
         -readability-static-accessed-through-instance,
         -readability-avoid-const-params-in-decls,
         -cppcoreguidelines-non-private-member-variables-in-classes,
+        -cppcoreguidelines-pro-type-union-access,
         -misc-non-private-member-variables-in-classes,
+        -hicpp-braces-around-statements,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''

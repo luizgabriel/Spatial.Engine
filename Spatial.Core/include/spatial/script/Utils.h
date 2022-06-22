@@ -27,7 +27,13 @@ const char* getTypeName(v8::Local<v8::Value> value);
 
 std::string getValue(v8::Isolate* isolate, v8::Local<v8::String> string);
 
-v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream, std::string_view moduleName);
+v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint8_t>& data,
+									std::string_view moduleName);
+
+v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
+									std::string_view moduleName);
+
+std::optional<std::string> instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
 
@@ -35,7 +41,8 @@ v8::Local<v8::Value> getAttributeValue(v8::Local<v8::Object> object, size_t key)
 
 v8::Local<v8::Value> getAttributeValue(v8::Local<v8::Object> object, std::string_view key);
 
-v8::Local<v8::Value> getAttributeValueOrDefault(v8::Local<v8::Object> object, std::string_view key, v8::Local<v8::Value> defaultValue);
+v8::Local<v8::Value> getAttributeValueOrDefault(v8::Local<v8::Object> object, std::string_view key,
+												v8::Local<v8::Value> defaultValue);
 
 template <typename T, typename K>
 v8::Local<T> getAttribute(v8::Local<v8::Object> object, const K& key)
