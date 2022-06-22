@@ -13,7 +13,7 @@ Checks: "*,
         -cppcoreguidelines-non-private-member-variables-in-classes,
         -cppcoreguidelines-pro-type-union-access,
         -misc-non-private-member-variables-in-classes,
-        -hicpp-braces-around-statements,
+        -*-braces-around-statements,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
