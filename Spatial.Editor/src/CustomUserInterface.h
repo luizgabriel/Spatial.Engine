@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EditorCamera.h"
+#include "Components.h"
 #include "Materials.h"
 #include <filesystem>
 #include <imgui.h>

@@ -27,7 +27,6 @@ add_library(Spatial.Core
         include/spatial/ecs/Mesh.h
         include/spatial/ecs/Builder.h
         include/spatial/ecs/Relation.h
-        include/spatial/ecs/UpdateController.h
         include/spatial/ecs/SceneView.h
         include/spatial/ecs/Script.h
         include/spatial/ecs/Material.h
