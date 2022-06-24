@@ -5,10 +5,10 @@
 namespace spatial::math
 {
 
-template <typename T, precision P>
+template <typename T>
 struct BaseAxisAlignedBoundingBox
 {
-	using PointType = vec<3, T, P>;
+	using PointType = vec<3, T>;
 
 	PointType minimumPoint{std::numeric_limits<T>::max()};
 	PointType maximumPoint{std::numeric_limits<T>::lowest()};
@@ -28,7 +28,7 @@ struct BaseAxisAlignedBoundingBox
 		return minimumPoint.x >= maximumPoint.x && minimumPoint.y >= maximumPoint.y && minimumPoint.z >= maximumPoint.z;
 	}
 
-	[[nodiscard]] BaseAxisAlignedBoundingBox<T, P> extend(const PointType& point) const noexcept
+	[[nodiscard]] BaseAxisAlignedBoundingBox<T> extend(const PointType& point) const noexcept
 	{
 		return {
 			(point.x > maximumPoint.x) && (point.y > maximumPoint.y) && (point.z > maximumPoint.z) ? point
@@ -50,6 +50,6 @@ struct BaseAxisAlignedBoundingBox
 	}
 };
 
-using AxisAlignedBoundingBox = BaseAxisAlignedBoundingBox<float, precision::packed_highp>;
+using AxisAlignedBoundingBox = BaseAxisAlignedBoundingBox<float>;
 
 } // namespace spatial::math

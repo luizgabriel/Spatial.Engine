@@ -400,7 +400,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.with<tags::IsEditorEntity>()
 		.with<tags::IsEditorView>()
 		.asSceneView()
-		.withDimensions(math::uvec2{19.0F, 6.0F} * 240U)
+		.withDimensions(ultraWideScreenAspectRatio.toVector() * 240.0)
 		.withIndirectLight(ecs::Builder::create(mRegistry)
 							   .withName("Indirect Light")
 							   .with<tags::IsEditorEntity>()
@@ -414,8 +414,7 @@ void EditorSystem::createDefaultEditorEntities()
 						.asTransform()
 						.withPosition({3.0F, 3.0F, 20.0F})
 						.asPerspectiveCamera()
-						.withFieldOfView(60.0)
-						.withAspectRatio(19.0 / 6.0));
+						.withAspectRatio(ultraWideScreenAspectRatio));
 }
 
 } // namespace spatial::editor

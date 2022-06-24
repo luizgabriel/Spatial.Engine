@@ -14,10 +14,12 @@ Checks: "*,
         -cppcoreguidelines-pro-type-union-access,
         -misc-non-private-member-variables-in-classes,
         -*-braces-around-statements,
+        -hicpp-explicit-conversions,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle:     none
+IgnoredFloatingPointValues: {1.0, 2.0, 90.0, 100.0, 0.0}
 
 
 

@@ -73,7 +73,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: python ./cli.py build --preset=${{ matrix.config.preset }}
+        run: python ./cli.py build
 
       - name: Run Tests
         shell: bash

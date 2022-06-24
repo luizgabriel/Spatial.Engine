@@ -130,9 +130,9 @@ PerspectiveCameraBuilder& PerspectiveCameraBuilder::withFieldOfView(double field
 	return *this;
 }
 
-PerspectiveCameraBuilder& PerspectiveCameraBuilder::withAspectRatio(double aspectRatio)
+PerspectiveCameraBuilder& PerspectiveCameraBuilder::withAspectRatio(const AspectRatio& aspectRatio)
 {
-	getComponent().aspectRatio = aspectRatio;
+	getComponent().aspectRatio = aspectRatio.get();
 	return *this;
 }
 
