@@ -99,8 +99,8 @@ inline math::mat<4, 4, T, math::precision::packed_highp> fromFilament(const fila
 
 /** ---- Bounding Box ---- **/
 
-template <typename T, math::precision P>
-inline filament::Box toFilament(const math::BaseAxisAlignedBoundingBox<T, P>& aabb)
+template <typename T>
+inline filament::Box toFilament(const math::BaseAxisAlignedBoundingBox<T>& aabb)
 {
 	return {toFilament(aabb.getCenter()), toFilament(aabb.getExtent())};
 }

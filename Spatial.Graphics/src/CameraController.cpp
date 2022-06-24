@@ -22,7 +22,8 @@ void updateCamera(const ecs::OrthographicCamera& component, SharedCamera& camera
 
 void updateCamera(const ecs::PerspectiveCamera& component, SharedCamera& camera)
 {
-	camera->setPerspectiveProjection(component.fieldOfView, component.aspectRatio, component.near, component.far);
+	camera->setPerspectiveProjection(component.fieldOfView, component.aspectRatio, component.near,
+									 component.far);
 }
 
 void updateCamera(const ecs::CustomCamera& component, SharedCamera& camera)

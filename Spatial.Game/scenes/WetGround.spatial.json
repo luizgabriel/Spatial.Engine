@@ -34,141 +34,141 @@
         31
     ],
     "name": [
-        31,
+        0,
         {
-            "name": "color.filamat"
-        },
-        30,
-        {
-            "name": "Color Material (Sphere)"
-        },
-        29,
-        {
-            "name": "sphere.filamesh"
-        },
-        28,
-        {
-            "name": "Sphere"
-        },
-        27,
-        {
-            "name": "Directional Light"
-        },
-        26,
-        {
-            "name": "Ground_Wet_Rocks_basecolor.jpg"
-        },
-        25,
-        {
-            "name": "Ground_Wet_Rocks_height.png"
-        },
-        24,
-        {
-            "name": "Ground_Wet_Rocks_roughness.jpg"
-        },
-        23,
-        {
-            "name": "Ground_Wet_Rocks_normal.jpg"
-        },
-        22,
-        {
-            "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
-        },
-        21,
-        {
-            "name": "standard_lit.filamat"
-        },
-        20,
-        {
-            "name": "Standard Opaque (WetGround)"
-        },
-        18,
-        {
-            "name": "WetGround"
-        },
-        19,
-        {
-            "name": "plane_hd.filamesh"
-        },
-        17,
-        {
-            "name": "Editor Camera"
-        },
-        16,
-        {
-            "name": "sh.txt"
-        },
-        15,
-        {
-            "name": "ibl.ktx"
-        },
-        14,
-        {
-            "name": "Indirect Light"
-        },
-        13,
-        {
-            "name": "Editor View"
-        },
-        12,
-        {
-            "name": "SkyBox"
-        },
-        11,
-        {
-            "name": "plane.filamesh"
-        },
-        10,
-        {
-            "name": "Grid Plane"
-        },
-        9,
-        {
-            "name": "grid.filamat"
-        },
-        8,
-        {
-            "name": "Grid Material"
-        },
-        7,
-        {
-            "name": "texture.ktx"
-        },
-        6,
-        {
-            "name": "skybox.filamat"
-        },
-        5,
-        {
-            "name": "SkyBox Material"
-        },
-        4,
-        {
-            "name": "black"
-        },
-        3,
-        {
-            "name": "gray"
-        },
-        2,
-        {
-            "name": "white"
+            "name": "skybox"
         },
         1,
         {
             "name": "dummy_cubemap"
         },
-        0,
+        2,
         {
-            "name": "skybox"
+            "name": "white"
+        },
+        3,
+        {
+            "name": "gray"
+        },
+        4,
+        {
+            "name": "black"
+        },
+        5,
+        {
+            "name": "SkyBox Material"
+        },
+        6,
+        {
+            "name": "skybox.filamat"
+        },
+        7,
+        {
+            "name": "texture.ktx"
+        },
+        8,
+        {
+            "name": "Grid Material"
+        },
+        9,
+        {
+            "name": "grid.filamat"
+        },
+        10,
+        {
+            "name": "Grid Plane"
+        },
+        11,
+        {
+            "name": "plane.filamesh"
+        },
+        12,
+        {
+            "name": "SkyBox"
+        },
+        13,
+        {
+            "name": "Editor View"
+        },
+        14,
+        {
+            "name": "Indirect Light"
+        },
+        15,
+        {
+            "name": "ibl.ktx"
+        },
+        16,
+        {
+            "name": "sh.txt"
+        },
+        17,
+        {
+            "name": "Editor Camera"
+        },
+        19,
+        {
+            "name": "plane_hd.filamesh"
+        },
+        18,
+        {
+            "name": "WetGround"
+        },
+        20,
+        {
+            "name": "Standard Opaque (WetGround)"
+        },
+        21,
+        {
+            "name": "standard_lit.filamat"
+        },
+        22,
+        {
+            "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
+        },
+        23,
+        {
+            "name": "Ground_Wet_Rocks_normal.jpg"
+        },
+        24,
+        {
+            "name": "Ground_Wet_Rocks_roughness.jpg"
+        },
+        25,
+        {
+            "name": "Ground_Wet_Rocks_height.png"
+        },
+        26,
+        {
+            "name": "Ground_Wet_Rocks_basecolor.jpg"
+        },
+        27,
+        {
+            "name": "Directional Light"
+        },
+        28,
+        {
+            "name": "Sphere"
+        },
+        29,
+        {
+            "name": "sphere.filamesh"
+        },
+        30,
+        {
+            "name": "Color Material (Sphere)"
+        },
+        31,
+        {
+            "name": "color.filamat"
         }
     ],
     "transform": [
-        28,
+        10,
         {
             "position": {
                 "x": 0.0,
-                "y": 2.0,
+                "y": -0.009999999776482582,
                 "z": 0.0
             },
             "rotation": {
@@ -177,9 +177,27 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 2.0,
-                "y": 2.0,
-                "z": 2.0
+                "x": 100.0,
+                "y": 1.0,
+                "z": 100.0
+            }
+        },
+        17,
+        {
+            "position": {
+                "x": -8.233415603637696,
+                "y": 3.837390422821045,
+                "z": 7.321011543273926
+            },
+            "rotation": {
+                "x": -0.17310014367103578,
+                "y": 11.636565208435059,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             }
         },
         18,
@@ -200,29 +218,11 @@
                 "z": 10.0
             }
         },
-        17,
-        {
-            "position": {
-                "x": -9.3278226852417,
-                "y": 3.6086044311523439,
-                "z": -4.073774337768555
-            },
-            "rotation": {
-                "x": -0.2114465832710266,
-                "y": 10.57314682006836,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        10,
+        28,
         {
             "position": {
                 "x": 0.0,
-                "y": -0.009999999776482582,
+                "y": 2.0,
                 "z": 0.0
             },
             "rotation": {
@@ -231,16 +231,16 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 100.0,
-                "y": 1.0,
-                "z": 100.0
+                "x": 2.0,
+                "y": 2.0,
+                "z": 2.0
             }
         }
     ],
     "perspective_camera": [
         17,
         {
-            "fieldOfView": 60.0,
+            "fieldOfView": 0.7853981633974483,
             "aspectRatio": 3.1666666666666667,
             "near": 0.1,
             "far": 10000.0
@@ -277,22 +277,11 @@
         }
     ],
     "mesh_instance": [
-        28,
+        10,
         {
-            "meshSource": 29,
-            "defaultMaterial": 30,
-            "receiveShadows": true,
-            "castShadows": true,
-            "culling": true,
-            "priority": 0,
-            "partsCount": 1,
-            "partsOffset": 0
-        },
-        18,
-        {
-            "meshSource": 19,
-            "defaultMaterial": 20,
-            "receiveShadows": true,
+            "meshSource": 11,
+            "defaultMaterial": 8,
+            "receiveShadows": false,
             "castShadows": false,
             "culling": true,
             "priority": 0,
@@ -310,31 +299,36 @@
             "partsCount": 0,
             "partsOffset": 0
         },
-        10,
+        18,
         {
-            "meshSource": 11,
-            "defaultMaterial": 8,
-            "receiveShadows": false,
+            "meshSource": 19,
+            "defaultMaterial": 20,
+            "receiveShadows": true,
             "castShadows": false,
             "culling": true,
             "priority": 0,
             "partsCount": 0,
             "partsOffset": 0
+        },
+        28,
+        {
+            "meshSource": 29,
+            "defaultMaterial": 30,
+            "receiveShadows": true,
+            "castShadows": true,
+            "culling": true,
+            "priority": 0,
+            "partsCount": 1,
+            "partsOffset": 0
         }
     ],
     "mesh_material": [],
     "parent": [
-        31,
+        6,
         {
             "childrenCount": 1,
-            "first": 30,
-            "last": 30
-        },
-        21,
-        {
-            "childrenCount": 1,
-            "first": 20,
-            "last": 20
+            "first": 5,
+            "last": 5
         },
         9,
         {
@@ -342,23 +336,23 @@
             "first": 8,
             "last": 8
         },
-        6,
+        21,
         {
             "childrenCount": 1,
-            "first": 5,
-            "last": 5
+            "first": 20,
+            "last": 20
+        },
+        31,
+        {
+            "childrenCount": 1,
+            "first": 30,
+            "last": 30
         }
     ],
     "child": [
-        30,
+        5,
         {
-            "parent": 31,
-            "next": 4294967295,
-            "previous": 4294967295
-        },
-        20,
-        {
-            "parent": 21,
+            "parent": 6,
             "next": 4294967295,
             "previous": 4294967295
         },
@@ -368,93 +362,99 @@
             "next": 4294967295,
             "previous": 4294967295
         },
-        5,
+        20,
         {
-            "parent": 6,
+            "parent": 21,
+            "next": 4294967295,
+            "previous": 4294967295
+        },
+        30,
+        {
+            "parent": 31,
             "next": 4294967295,
             "previous": 4294967295
         }
     ],
     "resource": [
-        31,
+        0,
         {
-            "relativePath": "editor/materials/color.filamat"
-        },
-        29,
-        {
-            "relativePath": "editor/meshes/sphere.filamesh"
-        },
-        26,
-        {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_basecolor.jpg"
-        },
-        25,
-        {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
-        },
-        24,
-        {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_roughness.jpg"
-        },
-        23,
-        {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
-        },
-        22,
-        {
-            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
-        },
-        21,
-        {
-            "relativePath": "editor/materials/standard_lit.filamat"
-        },
-        19,
-        {
-            "relativePath": "project/meshes/plane_hd.filamesh"
-        },
-        16,
-        {
-            "relativePath": "editor/textures/skybox/sh.txt"
-        },
-        15,
-        {
-            "relativePath": "editor/textures/skybox/ibl.ktx"
-        },
-        11,
-        {
-            "relativePath": "editor/meshes/plane.filamesh"
-        },
-        9,
-        {
-            "relativePath": "editor/materials/grid.filamat"
-        },
-        7,
-        {
-            "relativePath": "editor/textures/skybox/texture.ktx"
-        },
-        6,
-        {
-            "relativePath": "editor/materials/skybox.filamat"
-        },
-        4,
-        {
-            "relativePath": "engine/black"
-        },
-        3,
-        {
-            "relativePath": "engine/gray"
-        },
-        2,
-        {
-            "relativePath": "engine/white"
+            "relativePath": "engine/skybox"
         },
         1,
         {
             "relativePath": "engine/dummy_cubemap"
         },
-        0,
+        2,
         {
-            "relativePath": "engine/skybox"
+            "relativePath": "engine/white"
+        },
+        3,
+        {
+            "relativePath": "engine/gray"
+        },
+        4,
+        {
+            "relativePath": "engine/black"
+        },
+        6,
+        {
+            "relativePath": "editor/materials/skybox.filamat"
+        },
+        7,
+        {
+            "relativePath": "editor/textures/skybox/texture.ktx"
+        },
+        9,
+        {
+            "relativePath": "editor/materials/grid.filamat"
+        },
+        11,
+        {
+            "relativePath": "editor/meshes/plane.filamesh"
+        },
+        15,
+        {
+            "relativePath": "editor/textures/skybox/ibl.ktx"
+        },
+        16,
+        {
+            "relativePath": "editor/textures/skybox/sh.txt"
+        },
+        19,
+        {
+            "relativePath": "project/meshes/plane_hd.filamesh"
+        },
+        21,
+        {
+            "relativePath": "editor/materials/standard_lit.filamat"
+        },
+        22,
+        {
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
+        },
+        23,
+        {
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
+        },
+        24,
+        {
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_roughness.jpg"
+        },
+        25,
+        {
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
+        },
+        26,
+        {
+            "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_basecolor.jpg"
+        },
+        29,
+        {
+            "relativePath": "editor/meshes/sphere.filamesh"
+        },
+        31,
+        {
+            "relativePath": "editor/materials/color.filamat"
         }
     ],
     "scene_view": [
@@ -472,10 +472,10 @@
         1
     ],
     "runtime_texture": [
-        4,
+        2,
         {
             "pixels": [
-                4278190080
+                4294967295
             ],
             "width": 1
         },
@@ -486,10 +486,10 @@
             ],
             "width": 1
         },
-        2,
+        4,
         {
             "pixels": [
-                4294967295
+                4278190080
             ],
             "width": 1
         }
@@ -522,54 +522,54 @@
         }
     ],
     "tag_is_material": [
-        31,
-        21,
+        6,
         9,
-        6
+        21,
+        31
     ],
     "tag_is_mesh": [
-        29,
-        19,
+        0,
         11,
-        0
+        19,
+        29
     ],
     "is_renderable": [
-        28,
-        27,
-        18,
-        17,
-        14,
+        10,
         12,
-        10
+        14,
+        17,
+        18,
+        27,
+        28
     ],
     "tag_is_camera": [
         17
     ],
     "tag_light": [
-        27,
-        14
+        14,
+        27
     ],
     "tag_is_main_view": [],
     "tag_is_material_instance": [
-        30,
-        20,
+        5,
         8,
-        5
+        20,
+        30
     ],
     "tag_is_image_texture": [
-        26,
-        25,
-        24,
-        23,
-        22,
-        4,
+        2,
         3,
-        2
+        4,
+        22,
+        23,
+        24,
+        25,
+        26
     ],
     "tag_is_cubemap_texture": [
-        15,
+        1,
         7,
-        1
+        15
     ],
     "tag_is_irradiance_values": [
         16
@@ -658,11 +658,11 @@
         }
     ],
     "tag_is_editor_entity": [
-        17,
-        14,
-        13,
+        8,
         10,
-        8
+        13,
+        14,
+        17
     ],
     "tag_is_editor_view": [
         13

@@ -23,7 +23,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 	const auto& sceneView = registry.getComponent<const ecs::SceneView>(sceneViewEntity);
 	const auto& textureView = registry.getComponent<const graphics::TextureView>(sceneViewEntity);
 
-	double aspectRatio = 1.0;
+	auto aspectRatio = 1.0;
 	const auto* perspectiveCamera = registry.tryGetComponent<const ecs::PerspectiveCamera>(sceneView.camera);
 	if (perspectiveCamera)
 		aspectRatio = perspectiveCamera->aspectRatio;

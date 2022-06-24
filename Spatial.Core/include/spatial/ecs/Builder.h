@@ -148,7 +148,7 @@ class PerspectiveCameraBuilder : public BasicBuilder<PerspectiveCamera>
 
 	PerspectiveCameraBuilder& withClippingPlanes(double near, double far);
 	PerspectiveCameraBuilder& withFieldOfView(double fieldOfView);
-	PerspectiveCameraBuilder& withAspectRatio(double aspectRatio);
+	PerspectiveCameraBuilder& withAspectRatio(const AspectRatio& aspectRatio);
 };
 
 class OrthographicCameraBuilder : public BasicBuilder<OrthographicCamera>

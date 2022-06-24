@@ -7,10 +7,10 @@
 namespace spatial
 {
 
-template <typename T, math::precision P>
-std::istream& operator>>(std::istream& stream, math::BaseAxisAlignedBoundingBox<T, P>& box)
+template <typename T>
+std::istream& operator>>(std::istream& stream, math::BaseAxisAlignedBoundingBox<T>& box)
 {
-	using PointType = typename math::BaseAxisAlignedBoundingBox<T, P>::PointType;
+	using PointType = typename math::BaseAxisAlignedBoundingBox<T>::PointType;
 
 	PointType center;
 	PointType halfExtent;
