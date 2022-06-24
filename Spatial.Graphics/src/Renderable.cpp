@@ -101,12 +101,6 @@ void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType 
 	getManager().setGeometryAt(getInstance(), primitiveIndex, type, vertices.get(), indices.get(), offset, count);
 }
 
-void Renderable::setGeometryAt(size_t primitiveIndex, Renderable::PrimitiveType type, size_t offset,
-							   size_t count) noexcept
-{
-	getManager().setGeometryAt(getInstance(), primitiveIndex, type, offset, count);
-}
-
 uint8_t Renderable::getLayerMask() const noexcept
 {
 	return getManager().getLayerMask(getInstance());

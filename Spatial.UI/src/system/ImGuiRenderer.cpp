@@ -60,8 +60,10 @@ void ImGuiRenderer::setViewport(const math::vec2& windowSize, const math::vec2& 
 	const auto dpiScaleY = frameBufferSize.y / windowSize.y;
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
-	mCamera.setOrthographicProjection(0.0, static_cast<double>(frameBufferSize.x / dpiScaleX),
-									  static_cast<double>(frameBufferSize.y / dpiScaleY), 0.0, 0.0, 1.0);
+
+	const auto right = static_cast<double>(frameBufferSize.x) / static_cast<double>(dpiScaleX);
+	const auto bottom = static_cast<double>(frameBufferSize.y) / static_cast<double>(dpiScaleY);
+	mCamera.setOrthographicProjection(0.0, right, bottom, 0.0, 0.0, 1.0);
 
 	const auto scaleX = windowSize.x > 0 ? dpiScaleX : 0;
 	const auto scaleY = windowSize.y > 0 ? dpiScaleY : 0;

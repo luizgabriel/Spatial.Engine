@@ -418,9 +418,14 @@ bool ComponentInputImpl<ecs::PerspectiveCamera>::draw(ecs::Registry& registry, e
 	changed |= ImGui::InputDouble("Near", &camera.near, 0.1, 1.0, "%.2f");
 	changed |= ImGui::InputDouble("Far", &camera.far, 0.1, 1.0, "%.2f");
 
-	double min = 15.0, max = 120.0;
-	changed |= ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &camera.fieldOfView, 1.0f, &min, &max, "%.1f");
+	double min = 15.0, max = 180.0, fov = camera.fieldOfView * math::rad2deg_v<double>;
+	changed |= ImGui::DragScalar("Field Of View", ImGuiDataType_Double, &fov, 1.0f, &min, &max, "%.1f");
+	camera.fieldOfView = fov * math::deg2rad_v<double>;
+
 	changed |= ImGui::InputDouble("Aspect Ratio", &camera.aspectRatio);
+
+	if (camera.near > camera.far)
+		camera.near = camera.far - 1.0;
 
 	return changed;
 }

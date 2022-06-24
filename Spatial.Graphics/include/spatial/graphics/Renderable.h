@@ -59,8 +59,6 @@ class Renderable
 	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, const SharedVertexBuffer& vertices,
 					   const SharedIndexBuffer& indices, size_t offset, size_t count) noexcept;
 
-	void setGeometryAt(size_t primitiveIndex, PrimitiveType type, size_t offset, size_t count) noexcept;
-
 	[[nodiscard]] math::AxisAlignedBoundingBox getAxisAlignedBoundingBox() const noexcept;
 
 	[[nodiscard]] std::uint8_t getLayerMask() const noexcept;

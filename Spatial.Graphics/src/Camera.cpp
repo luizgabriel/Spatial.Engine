@@ -55,9 +55,9 @@ void Camera::lookAt(const math::vec3& eye, const math::vec3& center, const math:
 	getInstance()->lookAt(toFilament(eye), toFilament(center), toFilament(up));
 }
 
-void Camera::setPerspectiveProjection(double fovInDegrees, double aspect, double near, double far) noexcept
+void Camera::setPerspectiveProjection(double fov, double aspect, double near, double far) noexcept
 {
-	getInstance()->setProjection(fovInDegrees, aspect, near, far);
+	getInstance()->setProjection(fov * math::rad2deg_v<double>, aspect, near, far);
 }
 
 void Camera::setOrthographicProjection(double left, double right, double bottom, double top, double near,
@@ -68,7 +68,8 @@ void Camera::setOrthographicProjection(double left, double right, double bottom,
 
 void Camera::setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept
 {
-	getInstance()->setLensProjection(focalLengthInMillimeters, aspect, near, far);
+	getInstance()->setLensProjection(focalLengthInMillimeters, aspect,
+									 near, far);
 }
 
 void Camera::setCustomProjection(const math::dmat4& projection, double near, double far) noexcept

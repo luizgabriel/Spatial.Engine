@@ -34,8 +34,8 @@ template <typename T>
 constexpr T deg2rad_v = pi_v<T> / static_cast<T>(180.0);
 constexpr auto deg2rad = deg2rad_v<float>;
 
-template <typename T, precision P>
-qua<T, P> directionToQuaternion(const vec<3, T, P>& dir)
+template <typename T>
+qua<T> directionToQuaternion(const vec<3, T>& dir)
 {
 	auto directionLength = length(dir);
 	auto out = quat{};
@@ -57,16 +57,16 @@ qua<T, P> directionToQuaternion(const vec<3, T, P>& dir)
 	return out;
 }
 
-template <typename T, precision P>
-vec<3, T, P> quaternionToDirection(const qua<T, P>& dir)
+template <typename T>
+vec<3, T> quaternionToDirection(const qua<T>& dir)
 {
 	auto d = dir * axisX;
 	return d / length(d);
 }
 
-template <typename T, precision P>
-vec<3, T, P> forwardVector(const mat<4, 4, T, P>& mat)
+template <typename T>
+vec<3, T> forwardVector(const mat<4, 4, T>& mat)
 {
-	return normalize(-math::vec3{mat[2]});
+	return normalize(-math::vec<3, T>{mat[2]});
 }
 } // namespace spatial::math

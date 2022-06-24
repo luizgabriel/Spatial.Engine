@@ -130,8 +130,8 @@ def cmake_configure(options: Arguments) -> Command:
     return Command(f"cmake -S {options.source_path} --preset {options.preset}")
 
 
-def cmake_build(options: Arguments) -> Command:
-    return Command(f"cmake --build --preset {options.preset} --target Spatial.Editor Spatial.Core.Tests")
+def cmake_build() -> Command:
+    return Command(f"cmake --build --target Spatial.Editor Spatial.Core.Tests")
 
 
 def cmake_install(options: Arguments) -> Command:

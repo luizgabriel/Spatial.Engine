@@ -1,5 +1,6 @@
 #pragma once
 
+#include "spatial/common/AspectRatio.h"
 #include <spatial/common/Math.h>
 
 namespace spatial::ecs
@@ -15,42 +16,35 @@ struct IsCamera
 
 } // namespace tags
 
-struct CustomCamera
-{
+struct CustomCamera {
 	constexpr static auto typeName = "custom_camera";
+	constexpr static auto defaultNear = .1;
+	constexpr static auto defaultFar = 10000.0;
 
-	math::mat4 projectionMatrix{};
-	double near{0.1};
-	double far{10000.0};
+	math::dmat4 projectionMatrix{};
+	double near{defaultNear};
+	double far{defaultFar};
 
-	constexpr explicit CustomCamera(math::mat4 projection = math::perspective(60.0, 19.0 / 6.0, 0.1, 10000.0),
-									double near = 0.1, double far = 10000.0)
-		: projectionMatrix{projection}, near{near}, far{far}
+	constexpr CustomCamera()
+		: projectionMatrix{
+			math::perspective(defaultVerticalFieldOfView, wideScreenAspectRatio.get(), defaultNear, defaultFar)}
 	{
 	}
 };
 
-struct OrthographicCamera
-{
+struct OrthographicCamera {
 	constexpr static auto typeName = "orthographic_camera";
 
-	double left{-10.0};
-	double right{10.0};
-	double bottom{-10.0};
-	double top{10.0};
+	constexpr static auto defaultNear = .1;
+	constexpr static auto defaultFar = 10000.0;
 
-	double near{-10.0};
-	double far{1000.0};
+	double left{-wideScreenAspectRatio.get()};
+	double right{wideScreenAspectRatio.get()};
+	double bottom{-1};
+	double top{1};
 
-	constexpr OrthographicCamera(double left, double right, double bottom, double top, double near, double far)
-		: left{left}, right{right}, bottom{bottom}, top{top}, near{near}, far{far}
-	{
-	}
-
-	constexpr OrthographicCamera(double aspectRatio, double near, double far)
-		: OrthographicCamera(-aspectRatio, aspectRatio, -1, 1, near, far)
-	{
-	}
+	double near{defaultNear};
+	double far{defaultFar};
 
 	constexpr OrthographicCamera() = default;
 
@@ -61,22 +55,18 @@ struct OrthographicCamera
 	}
 };
 
-struct PerspectiveCamera
-{
+struct PerspectiveCamera {
 	constexpr static auto typeName = "perspective_camera";
 
-	double fieldOfView{60.0};
-	double aspectRatio{19.0 / 6.0};
+	constexpr static auto defaultNear = .1;
+	constexpr static auto defaultFar = 10000.0;
 
-	double near{0.1};
-	double far{10000.0};
+	double fieldOfView{defaultVerticalFieldOfView};
+	double aspectRatio{wideScreenAspectRatio.get()};
+	double near{defaultNear};
+	double far{defaultFar};
 
 	constexpr PerspectiveCamera() = default;
-
-	constexpr PerspectiveCamera(double fieldOfView, double aspectRatio, double near, double far)
-		: fieldOfView{fieldOfView}, aspectRatio{aspectRatio}, near{near}, far{far}
-	{
-	}
 };
 
 } // namespace spatial::ecs
