@@ -5,6 +5,7 @@ add_library(Spatial.Core
         include/spatial/common/Key.h
         include/spatial/common/Signal.h
         include/spatial/common/AxisAlignedBoundingBox.h
+        include/spatial/common/AspectRatio.h
 
         include/spatial/core/Application.h
         include/spatial/core/ApplicationUtils.h
@@ -98,7 +99,7 @@ add_library(Spatial.Core
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
         src/resources/MemoryFileSystem.cpp
-        src/resources/ResourceController.cpp include/spatial/common/AspectRatio.h)
+        src/resources/ResourceController.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
