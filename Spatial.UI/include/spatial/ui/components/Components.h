@@ -167,9 +167,9 @@ struct ComponentInputImpl<ecs::CustomCamera>
 };
 
 template <>
-struct ComponentInputImpl<ecs::ScriptInfo>
+struct ComponentInputImpl<ecs::ScriptModule>
 {
-	static constexpr auto sName = "Script Information";
+	static constexpr auto sName = "Script Module";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 

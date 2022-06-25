@@ -193,7 +193,7 @@ def setup_cli(args: Arguments) -> CommandResult:
 
     packages = [
         Package("filament", "1.23.2"),
-        Package("v8", "10.4.66"),
+        Package("v8", "10.1.69"),
     ]
 
     to_export = to_package_export(args.source_path)

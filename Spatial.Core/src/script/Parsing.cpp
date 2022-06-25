@@ -12,7 +12,7 @@
 namespace spatial::script
 {
 
-ecs::ScriptModule::Property::NumberRangeType parseNumberRangeProperty(v8::Local<v8::Object> object)
+ecs::ScriptComponent::NumberProperty parseNumberRangeProperty(v8::Local<v8::Object> object)
 {
 	return {
 		getAttribute<v8::Number>(object, "default")->Value(),
@@ -21,47 +21,55 @@ ecs::ScriptModule::Property::NumberRangeType parseNumberRangeProperty(v8::Local<
 	};
 }
 
-ecs::ScriptModule::Property::StringType parseStringProperty(v8::Local<v8::Object> object)
+ecs::ScriptComponent::StringProperty parseStringProperty(v8::Local<v8::Object> object)
 {
 	return {
 		getValue(object->GetIsolate(), getAttribute<v8::String>(object, "default")),
 	};
 }
 
-ecs::ScriptModule::Property parseProperty(v8::Local<v8::Object> object, const ParserMap& parserMap)
+ecs::ScriptComponent::Property parseProperty(v8::Local<v8::Object> object)
 {
-	auto isolate = object->GetIsolate();
-	auto emptyName = createString(isolate, "");
-	auto propertyName = getValue(isolate, getAttributeOrDefault(object, "name", emptyName));
-	auto propertyType = getValue(isolate, getAttribute<v8::String>(object, "type"));
+	static const ParserMap sDefaultPropertyParserMap{
+		{ecs::ScriptComponent::StringProperty::typeName, parseStringProperty},
+		{ecs::ScriptComponent::NumberProperty::typeName, parseNumberRangeProperty},
+	};
 
-	return ecs::ScriptModule::Property{propertyName, std::apply(parserMap.at(propertyType), std::make_tuple(object))};
+	auto propertyType = getValue(object->GetIsolate(), getAttribute<v8::String>(object, "type"));
+
+	return std::apply(sDefaultPropertyParserMap.at(propertyType), std::make_tuple(object));
 }
 
-ScriptParseResult parseModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module, std::string_view moduleName, const ParserMap& parserMap)
+ecs::ScriptComponent parseComponent(v8::Local<v8::Object> object)
 {
-	auto isolate = context->GetIsolate();
+	auto component = ecs::ScriptComponent{};
+
+	auto properties = getAttribute<v8::Object>(object, "Properties");
+	for (auto [key, value] : toEntries<v8::String, v8::Object>(properties)) {
+		auto name = getValue(object->GetIsolate(), key);
+		component.properties.emplace(name, parseProperty(value));
+	}
+
+	return component;
+}
+
+ecs::ScriptModule parseModule(v8::Local<v8::Object> object)
+{
+	auto isolate = object->GetIsolate();
 	auto handle = v8::HandleScope{isolate};
-	static auto logger = createDefaultLogger();
 
-	try
-	{
-		auto moduleNamespace = evaluateModule(context, module);
-		auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
+	auto parseModule = ecs::ScriptModule{};
 
-		logger.info("----- Loading Script ------- {}", moduleName);
+	for (auto [key, value] : toEntries<v8::String, v8::Object>(object)) {
+		const auto type = getValue(isolate, getAttribute<v8::String>(value, "Type"));
+		const auto name = getValue(isolate, key);
 
-		for (auto [key, value] : toEntries<v8::String, v8::Object>(defaultExport)) {
-			const auto type = getAttribute<v8::String>(value, "Type");
-			logger.info("{} -> {}", getValue(isolate, key), getValue(isolate, type));
+		if (type == "Component") {
+			parseModule.components.emplace(std::move(name), parseComponent(value));
 		}
+	}
 
-		return ecs::ScriptModule{};
-	}
-	catch (const std::invalid_argument& e)
-	{
-		return e.what();
-	}
+	return parseModule;
 }
 
 } // namespace spatial::script
