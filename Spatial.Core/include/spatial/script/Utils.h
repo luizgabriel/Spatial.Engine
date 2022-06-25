@@ -33,7 +33,7 @@ v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint
 v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
 									std::string_view moduleName);
 
-std::optional<std::string> instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
+void instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module);
 

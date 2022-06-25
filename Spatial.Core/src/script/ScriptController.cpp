@@ -15,9 +15,6 @@ namespace spatial::script
 
 void ScriptController::loadScripts(ecs::Registry& registry, FileSystem& fileSystem, Isolate& isolate)
 {
-	auto handle = v8::HandleScope{isolate.get()};
-	const auto context = v8::Context::New(isolate.get());
-
 	registry
 		.getEntities<const ecs::Resource, const ecs::ResourceData, ecs::tags::IsScript>(
 			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
@@ -26,23 +23,22 @@ void ScriptController::loadScripts(ecs::Registry& registry, FileSystem& fileSyst
 											   ? registry.getComponent<ecs::Name>(entity).name
 											   : resource.stem();
 
-			auto module = compileModule(isolate.get(), data.data, resource.relativePath);
-			if (auto instantiateError = instantiateModule(context, module)) {
-				auto errorMessage = fmt::format("Could not instantiate module: {}. \nException: {}",
-												resource.relativePath, instantiateError.value());
-				registry.addComponent<ecs::ResourceError>(entity, std::move(errorMessage));
-			}
+			try {
+				auto handle = v8::HandleScope{isolate.get()};
+				auto context = v8::Context::New(isolate.get());
+				auto module = compileModule(isolate.get(), data.data, resource.relativePath);
+				instantiateModule(context, module);
 
-			auto result = parseModule(context, module, scriptDefaultName);
-			if (std::holds_alternative<std::string>(result)) {
-				auto errorMessage = fmt::format("Could not parse module: {}. \nException: {}", resource.relativePath,
-												std::get<std::string>(result));
-				registry.addComponent<ecs::ResourceError>(entity, std::move(errorMessage));
-			}
+				auto moduleNamespace = evaluateModule(context, module);
+				auto defaultExport = getAttribute<v8::Object>(moduleNamespace, "default");
 
-			if (std::holds_alternative<ecs::ScriptModule>(result)) {
-				auto moduleComponent = std::get<ecs::ScriptModule>(std::move(result));
-				registry.addComponent<ecs::ScriptModule>(entity, std::move(moduleComponent));
+                auto parsedModule = parseModule(defaultExport);
+                registry.addComponent(entity, std::move(module));
+			}
+			catch (const std::invalid_argument& e) {
+				auto errorMessage =
+					fmt::format("Could not load module: {}. \nException: {}", resource.relativePath, e.what());
+				registry.addComponent<ecs::ResourceError>(entity, std::move(errorMessage));
 			}
 
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);

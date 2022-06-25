@@ -171,6 +171,7 @@ void EditorSystem::onDrawGui()
 
 		ui::ResourceManager::header(search, type, icons);
 		ui::ResourceManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
+		ui::EditorDragAndDrop::loadScriptResource(mRegistry, selectedEntity, type);
 
 		ui::Popup::show("AssetManagerPopup", [&]() { ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity); });
 	});

@@ -166,9 +166,9 @@ bool ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>::draw(ecs:
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::ScriptInfo>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::ScriptModule>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
-	auto& script = registry.getComponent<ecs::ScriptInfo>(entity);
+	auto& script = registry.getComponent<ecs::ScriptModule>(entity);
 	bool changed = false;
 
 	ui::spacing(3);
@@ -180,11 +180,11 @@ bool ComponentInputImpl<ecs::ScriptInfo>::draw(ecs::Registry& registry, ecs::Ent
 		ImGui::TableSetupColumn("Excluded Components", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableHeadersRow();
 
-		for (const auto& system : script.systems)
+		for (const auto& [name, system] : script.systems)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::Text("%s", system.name.c_str());
+			ImGui::Text("%s", name.c_str());
 
 			ImGui::TableNextColumn();
 			ImGui::Text("%s", boost::algorithm::join(system.requiredComponents, ", ").c_str());
@@ -204,11 +204,11 @@ bool ComponentInputImpl<ecs::ScriptInfo>::draw(ecs::Registry& registry, ecs::Ent
 		ImGui::TableSetupColumn("Properties", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableHeadersRow();
 
-		for (const auto& component : script.components)
+		for (const auto& [name, component] : script.components)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::Text("%s", component.name.c_str());
+			ImGui::Text("%s", name.c_str());
 
 			ImGui::TableNextColumn();
 			auto props = std::vector<std::string>{};
