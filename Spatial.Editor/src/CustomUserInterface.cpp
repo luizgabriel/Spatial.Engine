@@ -674,14 +674,32 @@ bool EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, ecs::Entity& s
 	return false;
 }
 
+bool EditorDragAndDrop::loadScriptResource(ecs::Registry& registry, ecs::Entity& selectedEntity, ResourceManager::ResourceType& type)
+{
+	auto dnd = DragAndDropTarget{};
+	auto result = dnd.getPayload();
+
+	if (result && boost::algorithm::ends_with(result->c_str(), ".js")) {
+		selectedEntity =
+			ecs::Builder::create(registry).asResource().withPath(result.value()).with<ecs::tags::IsScript>();
+
+		if (type != ResourceManager::ResourceType::All) {
+			type = ResourceManager::ResourceType::Script;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 										  math::vec3 createEntitiesPosition, bool addAsChild)
 {
 	bool changed = false;
 	ecs::Entity newEntity = ecs::NullEntity;
 
-	if (Menu::itemButton("Empty"))
-	{
+	if (Menu::itemButton("Empty")) {
 		newEntity = ecs::Builder::create(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
 		changed = true;
 	}

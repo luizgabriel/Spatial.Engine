@@ -10,7 +10,7 @@ from conans.errors import ConanInvalidConfiguration
 
 class V8Conan(ConanFile):
     name = "v8"
-    version = "10.4.66"
+    version = "10.1.69"
     license = "BSD"
     homepage = "https://v8.dev"
     url = "https://github.com/v8/v8"

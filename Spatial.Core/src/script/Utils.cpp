@@ -46,7 +46,7 @@ v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint
 
 	auto module = v8::Local<v8::Module>{};
 	if (!v8::ScriptCompiler::CompileModule(isolate, &source).ToLocal(&module))
-		throw std::invalid_argument{"Could not parse module"};
+		throw std::invalid_argument{"Could not compile module"};
 
 	return handle.Escape(module);
 }
@@ -84,7 +84,7 @@ v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_
 	return handle.Escape(module);
 }
 
-std::optional<std::string> instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
+void instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
 {
 	auto result =
 		module
@@ -99,10 +99,8 @@ std::optional<std::string> instantiateModule(v8::Local<v8::Context> context, v8:
 
 	if (!result || module.IsEmpty()) {
 		auto exception = module->GetException().As<v8::String>();
-		return getValue(context->GetIsolate(), exception);
+		throw std::invalid_argument(getValue(context->GetIsolate(), exception));
 	}
-
-	return std::nullopt;
 }
 
 v8::Local<v8::Object> evaluateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> module)
