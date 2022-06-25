@@ -35,7 +35,6 @@ v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint
 		fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
 
 	auto resourceName = createString(isolate, uniqueModuleName);
-	auto fullSource = createString(isolate, "");
 
 	auto origin =
 		v8::ScriptOrigin{isolate, resourceName,			0, 0, false, moduleId, v8::Local<v8::Value>(), false, false,
@@ -45,41 +44,8 @@ v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint
 	auto source = v8::ScriptCompiler::Source{sourceString, origin};
 
 	auto module = v8::Local<v8::Module>{};
-	if (!v8::ScriptCompiler::CompileModule(isolate, &source).ToLocal(&module))
+	if (!v8::ScriptCompiler::CompileModule(isolate, &source, v8::ScriptCompiler::kNoCompileOptions, v8::ScriptCompiler::kNoCacheBecauseCachingDisabled).ToLocal(&module))
 		throw std::invalid_argument{"Could not compile module"};
-
-	return handle.Escape(module);
-}
-
-v8::Local<v8::Module> compileModule(v8::Local<v8::Context> context, std::unique_ptr<std::istream>&& stream,
-									std::string_view moduleName)
-{
-	auto handle = v8::EscapableHandleScope{context->GetIsolate()};
-
-	auto moduleId = static_cast<int>(entt::hashed_string{moduleName.data()}.value());
-
-	// For some reason, V8 Caches the script source by the module name. By generating a custom module name, we avoid it.
-	// TODO: How to enable/disable this module caching when appropriate?
-	auto uniqueModuleName =
-		fmt::format("{}-{}", moduleName, std::chrono::steady_clock::now().time_since_epoch().count());
-
-	auto resourceName = createString(context->GetIsolate(), uniqueModuleName);
-	auto fullSource = createString(context->GetIsolate(), "");
-
-	auto origin = v8::ScriptOrigin{
-		context->GetIsolate(), resourceName, 0, 0, false, moduleId, v8::Local<v8::Value>(), false, false, true,
-		v8::Local<v8::Data>()};
-
-	auto streamedSource = v8::ScriptCompiler::StreamedSource{std::make_unique<ScriptSourceStream>(std::move(stream)),
-															 v8::ScriptCompiler::StreamedSource::Encoding::UTF8};
-
-	auto task = v8::ScriptCompiler::StartStreaming(context->GetIsolate(), &streamedSource, v8::ScriptType::kModule);
-	auto thread = std::thread{[task]() { task->Run(); }};
-	thread.join();
-
-	auto module = v8::Local<v8::Module>{};
-	if (!v8::ScriptCompiler::CompileModule(context, &streamedSource, fullSource, origin).ToLocal(&module))
-		throw std::invalid_argument{"Could not parse module"};
 
 	return handle.Escape(module);
 }
@@ -162,9 +128,7 @@ std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array)
 	values.reserve(array->Length());
 
 	for (auto i = 0; i < array->Length(); i++)
-	{
 		values.emplace_back(getAttributeValue(array, i));
-	}
 
 	return values;
 }

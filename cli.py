@@ -249,7 +249,10 @@ def main():
         print(USAGE)
         return
 
-    action = CLI_COMMANDS[sys_args[0]]
+    action = CLI_COMMANDS.get(sys_args[0], None)
+    if action is None:
+        print(f"ERROR: Command not found\n---------\n\n{USAGE}")
+        return
 
     args = parse_args(sys_args[1:])
     args.source_path = args.source_path if args.source_path else DEFAULT_SOURCE_DIR
