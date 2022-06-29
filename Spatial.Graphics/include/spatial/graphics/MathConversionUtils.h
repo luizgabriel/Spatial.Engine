@@ -15,84 +15,84 @@ namespace spatial
 
 /** ---- Vector 2 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::vec2<T> toFilament(const math::vec<2, T, P>& vec)
+template <typename T>
+inline filament::math::vec2<T> toFilament(const math::vec<2, T>& vec)
 {
 	return {vec.x, vec.y};
 }
 
 template <typename T>
-inline math::vec<2, T, math::precision::packed_highp> fromFilament(const filament::math::vec2<T>& vec)
+inline math::vec<2, T> fromFilament(const filament::math::vec2<T>& vec)
 {
 	return {vec.x, vec.y};
 }
 
 /** ---- Vector 3 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::vec3<T> toFilament(const math::vec<3, T, P>& vec)
+template <typename T>
+inline filament::math::vec3<T> toFilament(const math::vec<3, T>& vec)
 {
 	return {vec.x, vec.y, vec.z};
 }
 
 template <typename T>
-inline math::vec<3, T, math::precision::packed_highp> fromFilament(const filament::math::vec3<T>& vec)
+inline math::vec<3, T> fromFilament(const filament::math::vec3<T>& vec)
 {
 	return {vec.x, vec.y, vec.z};
 }
 
 /** ---- Vector 4 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::vec4<T> toFilament(const math::vec<4, T, P>& vec)
+template <typename T>
+inline filament::math::vec4<T> toFilament(const math::vec<4, T>& vec)
 {
 	return {vec.x, vec.y, vec.z, vec.w};
 }
 
 template <typename T>
-inline math::vec<4, T, math::precision::packed_highp> fromFilament(const filament::math::vec4<T>& vec)
+inline math::vec<4, T> fromFilament(const filament::math::vec4<T>& vec)
 {
 	return {vec.x, vec.y, vec.z, vec.w};
 }
 
 /** ---- Matrix 2x2 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::details::TMat22<T> toFilament(const math::mat<2, 2, T, P>& mat)
+template <typename T>
+inline filament::math::details::TMat22<T> toFilament(const math::mat<2, 2, T>& mat)
 {
 	return {toFilament(mat[0]), toFilament(mat[1])};
 }
 
 template <typename T>
-inline math::mat<2, 2, T, math::precision::packed_highp> fromFilament(const filament::math::details::TMat22<T>& mat)
+inline math::mat<2, 2, T> fromFilament(const filament::math::details::TMat22<T>& mat)
 {
 	return {fromFilament(mat[0]), fromFilament(mat[1])};
 }
 
 /** ---- Matrix 3x3 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::details::TMat33<T> toFilament(const math::mat<3, 3, T, P>& mat)
+template <typename T>
+inline filament::math::details::TMat33<T> toFilament(const math::mat<3, 3, T>& mat)
 {
 	return {toFilament(mat[0]), toFilament(mat[1]), toFilament(mat[2])};
 }
 
 template <typename T>
-inline math::mat<3, 3, T, math::precision::packed_highp> fromFilament(const filament::math::details::TMat33<T>& mat)
+inline math::mat<3, 3, T> fromFilament(const filament::math::details::TMat33<T>& mat)
 {
 	return {fromFilament(mat[0]), fromFilament(mat[1]), fromFilament(mat[2])};
 }
 
 /** ---- Matrix 4x4 ---- **/
 
-template <typename T, math::precision P>
-inline filament::math::details::TMat44<T> toFilament(const math::mat<4, 4, T, P>& mat)
+template <typename T>
+inline filament::math::details::TMat44<T> toFilament(const math::mat<4, 4, T>& mat)
 {
 	return {toFilament(mat[0]), toFilament(mat[1]), toFilament(mat[2]), toFilament(mat[3])};
 }
 
 template <typename T>
-inline math::mat<4, 4, T, math::precision::packed_highp> fromFilament(const filament::math::details::TMat44<T>& mat)
+inline math::mat<4, 4, T> fromFilament(const filament::math::details::TMat44<T>& mat)
 {
 	return {fromFilament(mat[0]), fromFilament(mat[1]), fromFilament(mat[2]), fromFilament(mat[3])};
 }
