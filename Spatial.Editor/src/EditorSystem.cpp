@@ -214,21 +214,17 @@ void EditorSystem::onUpdateInput(const desktop::InputState& input)
 	mIsCameraControlEnabled = input.pressed(Key::MouseRight);
 	EditorCameraController::readCameraInputs(mRegistry, input);
 
-	if (input.combined(Key::LControl, Key::N)) {
+	if (input.combined(Key::LControl, Key::N))
 		mMenuAction = ui::EditorMainMenu::Action::NewScene;
-	}
 
-	if (input.combined(Key::LControl, Key::S)) {
+	if (input.combined(Key::LControl, Key::S))
 		mMenuAction = ui::EditorMainMenu::Action::SaveScene;
-	}
 
-	if (input.combined(Key::LControl, Key::LShift, Key::O)) {
+	if (input.combined(Key::LControl, Key::LShift, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenProject;
-	}
 
-	if (input.combined(Key::LControl, Key::O)) {
+	if (input.combined(Key::LControl, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenScene;
-	}
 }
 
 void EditorSystem::setScenePath(const std::string& path)
@@ -282,22 +278,19 @@ std::string EditorSystem::getScenePath() const
 {
 	auto path = mScenePath;
 	auto projectPath = std::string{"project"} + FileSystem::SEPARATOR;
-	if (!boost::starts_with(mScenePath, projectPath)) {
+	if (!boost::starts_with(mScenePath, projectPath))
 		path = projectPath + path;
-	}
 
-	if (!boost::ends_with(mScenePath, ".spatial.json")) {
+	if (!boost::ends_with(mScenePath, ".spatial.json"))
 		path = path + ".spatial.json";
-	}
 
 	return path;
 }
 
 void EditorSystem::setRootPath(const std::filesystem::path& path)
 {
-	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
+	if (!std::filesystem::exists(path) && !std::filesystem::is_directory(path))
 		return;
-	}
 
 	mCurrentPath = PROJECT_DIR;
 	auto result = mFileSystem.resolve(PROJECT_DIR);

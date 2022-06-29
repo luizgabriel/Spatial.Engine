@@ -177,6 +177,56 @@
       }
     }
   ],
+  "buildPresets": [
+    {
+      "name": "Windows-Debug",
+      "displayName": "Windows Debug - Build",
+      "configurePreset": "Windows-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Windows-Release",
+      "displayName": "Windows Release - Build",
+      "configurePreset": "Windows-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "Windows-2019-Debug",
+      "displayName": "Windows Debug (Visual Studio 2019) - Build",
+      "configurePreset": "Windows-2019-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Windows-2019-Release",
+      "displayName": "Windows Release (Visual Studio 2019) - Build",
+      "configurePreset": "Windows-2019-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "Linux-Debug",
+      "displayName": "Linux Debug - Build",
+      "configurePreset": "Linux-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Linux-Release",
+      "displayName": "Linux Release - Build",
+      "configurePreset": "Linux-Release",
+      "configuration": "Release"
+    },
+    {
+      "name": "MacOS-Debug",
+      "displayName": "MacOS Debug - Build",
+      "configurePreset": "MacOS-Debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "MacOS-Release",
+      "displayName": "MacOS Release - Build",
+      "configurePreset": "MacOS-Release",
+      "configuration": "Release"
+    }
+  ],
   "testPresets": [
     {
       "name": "Test-Base",
