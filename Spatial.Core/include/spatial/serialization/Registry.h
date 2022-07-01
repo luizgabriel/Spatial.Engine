@@ -2,7 +2,7 @@
 
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Tags.h>
-#include <spatial/ecs/Texture.h>
+#include <spatial/serialization/BoundingBox.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Light.h>
@@ -10,9 +10,8 @@
 #include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
 #include <spatial/serialization/SceneView.h>
-#include <spatial/serialization/Script.h>
-#include <spatial/serialization/Transform.h>
 #include <spatial/serialization/Texture.h>
+#include <spatial/serialization/Transform.h>
 
 namespace spatial::ecs
 {
