@@ -4,7 +4,6 @@
 #include <spatial/ecs/Tags.h>
 #include <spatial/serialization/BoundingBox.h>
 #include <spatial/serialization/Camera.h>
-#include <spatial/serialization/FileSystem.h>
 #include <spatial/serialization/Light.h>
 #include <spatial/serialization/Mesh.h>
 #include <spatial/serialization/Name.h>
