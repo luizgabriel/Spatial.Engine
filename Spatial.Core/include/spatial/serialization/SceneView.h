@@ -1,10 +1,7 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <fmt/format.h>
 #include <spatial/ecs/SceneView.h>
-#include <spatial/serialization/BoundingBox.h>
-#include <spatial/serialization/FileSystem.h>
 
 namespace cereal
 {
