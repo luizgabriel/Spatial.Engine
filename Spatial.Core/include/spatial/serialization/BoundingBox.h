@@ -1,17 +1,17 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <filament/Box.h>
+#include <spatial/common/AxisAlignedBoundingBox.h>
 #include <spatial/serialization/Math.h>
 
 namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, filament::Box& box)
+void serialize(Archive& ar, spatial::math::AxisAlignedBoundingBox& box)
 {
-	ar(cereal::make_nvp("center", box.center));
-	ar(cereal::make_nvp("halfExtent", box.halfExtent));
+	ar(cereal::make_nvp("maximumPoint", box.maximumPoint));
+	ar(cereal::make_nvp("minimumPoint", box.minimumPoint));
 }
 
 } // namespace cereal
