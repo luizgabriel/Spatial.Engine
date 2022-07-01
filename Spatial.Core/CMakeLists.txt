@@ -45,12 +45,9 @@ add_library(Spatial.Core
         include/spatial/serialization/Name.h
         include/spatial/serialization/BoundingBox.h
         include/spatial/serialization/Registry.h
-        include/spatial/serialization/FileSystem.h
         include/spatial/serialization/Relation.h
-        include/spatial/serialization/SkyBox.h
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
-        include/spatial/serialization/Script.h
         include/spatial/serialization/Texture.h
 
         include/spatial/resources/Math.h
