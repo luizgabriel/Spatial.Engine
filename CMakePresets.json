@@ -240,7 +240,7 @@
       },
       "filter": {
         "exclude": {
-          "name": "(Application)|(DesktopWindow)"
+          "name": "(Application)"
         }
       }
     },
@@ -296,7 +296,7 @@
       "configuration": "Release",
       "filter": {
         "exclude": {
-          "name": "(Application)|(DesktopWindow)"
+          "name": "(Application)"
         }
       }
     },
