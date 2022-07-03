@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <spatial/render/RenderingSystem.h>
-#include <spatial/render/RenderingSystemUtils.h>
+#include <spatial/graphics/RenderingSystem.h>
+#include <spatial/graphics/RenderingSystemUtils.h>
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -17,7 +17,7 @@ struct RenderingSystemMockListener
 
 TEST(RenderingSystem, TestOnRenderSignal)
 {
-	auto renderingSystem = render::RenderingSystem{nullptr};
+	auto renderingSystem = graphics::RenderingSystem{nullptr};
 	auto listener = RenderingSystemMockListener{};
 
 	EXPECT_CALL(listener, onRender(_)).Times(1);
