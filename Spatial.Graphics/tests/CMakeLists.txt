@@ -8,7 +8,7 @@ set_property(
 
 target_link_libraries(Spatial.Graphics.Tests
         PUBLIC
-            Spatial.Core
+            Spatial.Graphics
             CONAN_PKG::gtest)
 
 gtest_discover_tests(Spatial.Graphics.Tests)

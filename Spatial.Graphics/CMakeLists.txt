@@ -67,8 +67,7 @@ target_include_directories(Spatial.Graphics
 target_link_libraries(Spatial.Graphics
         PUBLIC
         Spatial.Core
-        CONAN_PKG::filament
-        CONAN_PKG::stb)
+        CONAN_PKG::filament)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(Spatial.Graphics PRIVATE OpenGL::GL)
