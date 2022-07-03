@@ -13,7 +13,6 @@ add_executable(Spatial.Core.Tests
         RegistryRelation.test.cpp
         RegistryResource.test.cpp
         DesktopWindowContext.test.cpp
-        RenderingSystem.test.cpp
         FileSystem.test.cpp
         main.cpp)
 
