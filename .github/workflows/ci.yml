@@ -79,11 +79,11 @@ jobs:
 
       - name: Upload artifacts
         if: contains(github.ref, 'tags/v')
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
-          path: out/package/${{ matrix.config.preset }}/SpatialEngine-${{ steps.get_version.outputs.VERSION }}-*
+          path: ${{ github.workspace }}/out/package/${{ matrix.config.preset }}/SpatialEngine-${{ steps.get_version.outputs.VERSION }}-*
 
   release:
     if: contains(github.ref, 'tags/v')

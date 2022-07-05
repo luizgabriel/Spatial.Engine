@@ -33,10 +33,10 @@ const ExportType = Object.freeze({
 //</editor-fold>
 
 const RotateSystem = {
-    Type: ExportType.System,
-    Query: {
-        Required: ["Transform", "RotateVelocity"],
-        Excluded: ["StopRotatingFlag"]
+    type: ExportType.System,
+    query: {
+        required: ["Transform", "RotateVelocity"],
+        excluded: ["StopRotatingFlag"]
     },
     onUpdateEntity: ({entity, delta, components}) => {
         const { velocity } = components["RotateVelocity"][entity];
@@ -53,19 +53,19 @@ const RotateSystem = {
 };
 
 const RotateVelocity = {
-    Type: ExportType.Component,
-    Properties: {
-        Velocity: {
-            Type: PropertyType.NumberRange,
-            Default: 5.0,
-            Min: .0,
-            Max: 100.0,
+    type: ExportType.Component,
+    properties: {
+        velocity: {
+            type: PropertyType.NumberRange,
+            default: 5.0,
+            min: .0,
+            max: 100.0,
         },
     },
 };
 
 const StopRotatingFlag = {
-    Type: ExportType.ComponentFlag,
+    type: ExportType.ComponentFlag,
 };
 
 export default {RotateVelocity, StopRotatingFlag, RotateSystem};
