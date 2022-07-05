@@ -26,6 +26,8 @@ void ScriptController::loadScripts(ecs::Registry& registry, FileSystem& fileSyst
 			try {
 				auto handle = v8::HandleScope{isolate.get()};
 				auto context = v8::Context::New(isolate.get());
+				auto contextScope = v8::Context::Scope{context};
+
 				auto module = compileModule(isolate.get(), data.data, resource.relativePath);
 				instantiateModule(context, module);
 

@@ -44,7 +44,7 @@ v8::Local<v8::Module> compileModule(v8::Isolate* isolate, const std::vector<uint
 	auto source = v8::ScriptCompiler::Source{sourceString, origin};
 
 	auto module = v8::Local<v8::Module>{};
-	if (!v8::ScriptCompiler::CompileModule(isolate, &source, v8::ScriptCompiler::kNoCompileOptions, v8::ScriptCompiler::kNoCacheBecauseCachingDisabled).ToLocal(&module))
+	if (!v8::ScriptCompiler::CompileModule(isolate, &source).ToLocal(&module))
 		throw std::invalid_argument{"Could not compile module"};
 
 	return handle.Escape(module);

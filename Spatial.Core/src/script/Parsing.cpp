@@ -12,19 +12,25 @@
 namespace spatial::script
 {
 
+constexpr auto typeKeyword = "type";
+constexpr auto defaultKeyword = "default";
+constexpr auto minKeyword = "min";
+constexpr auto maxKeyword = "max";
+constexpr auto propertiesKeyword = "properties";
+
 ecs::ScriptComponent::NumberProperty parseNumberRangeProperty(v8::Local<v8::Object> object)
 {
 	return {
-		getAttribute<v8::Number>(object, "default")->Value(),
-		getAttribute<v8::Number>(object, "min")->Value(),
-		getAttribute<v8::Number>(object, "max")->Value(),
+		getAttribute<v8::Number>(object, defaultKeyword)->Value(),
+		getAttribute<v8::Number>(object, minKeyword)->Value(),
+		getAttribute<v8::Number>(object, maxKeyword)->Value(),
 	};
 }
 
 ecs::ScriptComponent::StringProperty parseStringProperty(v8::Local<v8::Object> object)
 {
 	return {
-		getValue(object->GetIsolate(), getAttribute<v8::String>(object, "default")),
+		getValue(object->GetIsolate(), getAttribute<v8::String>(object, defaultKeyword)),
 	};
 }
 
@@ -35,7 +41,7 @@ ecs::ScriptComponent::Property parseProperty(v8::Local<v8::Object> object)
 		{ecs::ScriptComponent::NumberProperty::typeName, parseNumberRangeProperty},
 	};
 
-	auto propertyType = getValue(object->GetIsolate(), getAttribute<v8::String>(object, "type"));
+	auto propertyType = getValue(object->GetIsolate(), getAttribute<v8::String>(object, typeKeyword));
 
 	return std::apply(sDefaultPropertyParserMap.at(propertyType), std::make_tuple(object));
 }
@@ -44,7 +50,7 @@ ecs::ScriptComponent parseComponent(v8::Local<v8::Object> object)
 {
 	auto component = ecs::ScriptComponent{};
 
-	auto properties = getAttribute<v8::Object>(object, "Properties");
+	auto properties = getAttribute<v8::Object>(object, propertiesKeyword);
 	for (auto [key, value] : toEntries<v8::String, v8::Object>(properties)) {
 		auto name = getValue(object->GetIsolate(), key);
 		component.properties.emplace(name, parseProperty(value));
@@ -61,7 +67,7 @@ ecs::ScriptModule parseModule(v8::Local<v8::Object> object)
 	auto parseModule = ecs::ScriptModule{};
 
 	for (auto [key, value] : toEntries<v8::String, v8::Object>(object)) {
-		const auto type = getValue(isolate, getAttribute<v8::String>(value, "Type"));
+		const auto type = getValue(isolate, getAttribute<v8::String>(value, typeKeyword));
 		const auto name = getValue(isolate, key);
 
 		if (type == "Component") {
