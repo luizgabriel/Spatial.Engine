@@ -83,7 +83,8 @@ jobs:
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
-          path: ${{ github.workspace }}/out/package/${{ matrix.config.preset }}/SpatialEngine-${{ steps.get_version.outputs.VERSION }}-*
+          path: |
+            ${{ github.workspace }}/out/package/${{ matrix.config.preset }}/*.dmg
 
   release:
     if: contains(github.ref, 'tags/v')
