@@ -36,19 +36,19 @@ struct BaseAspectRatio
 using AspectRatio = BaseAspectRatio<double>;
 
 template <typename T>
-constexpr auto ultraWideScreenAspectRatio_v = BaseAspectRatio<T>{21, 9};
-constexpr auto ultraWideScreenAspectRatio = ultraWideScreenAspectRatio_v<double>;
+constexpr auto gUltraWideScreenAspectRatio_v = BaseAspectRatio<T>{21, 9};
+constexpr auto gUltraWideScreenAspectRatio = gUltraWideScreenAspectRatio_v<double>;
 
 template <typename T>
-constexpr auto wideScreenAspectRatio_v = BaseAspectRatio<T>{16, 9};
-constexpr auto wideScreenAspectRatio = wideScreenAspectRatio_v<double>;
+constexpr auto gWideScreenAspectRatio_v = BaseAspectRatio<T>{16, 9};
+constexpr auto gWideScreenAspectRatio = gWideScreenAspectRatio_v<double>;
 
 template <typename T>
-constexpr auto standardAspectRatio_v = BaseAspectRatio<T>{4, 3};
-constexpr auto standardAspectRatio = standardAspectRatio_v<double>;
+constexpr auto gStandardAspectRatio_v = BaseAspectRatio<T>{4, 3};
+constexpr auto gStandardAspectRatio = gStandardAspectRatio_v<double>;
 
 template <typename T>
-constexpr auto defaultVerticalFieldOfView_v = static_cast<T>(45) * math::deg2rad_v<T>;
-constexpr auto defaultVerticalFieldOfView = defaultVerticalFieldOfView_v<double>;
+constexpr auto gDefaultVerticalFieldOfView_v = static_cast<T>(45) * math::deg2rad_v<T>;
+constexpr auto gDefaultVerticalFieldOfView = gDefaultVerticalFieldOfView_v<double>;
 
 } // namespace spatial

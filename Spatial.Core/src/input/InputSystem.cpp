@@ -26,7 +26,7 @@ void InputSystem::onEvent(const KeyEvent& event)
 
 void InputSystem::onEvent(const MouseMovedEvent& event)
 {
-	mInputState.setMousePosition({event.x, event.y});
+	mInputState.setMousePosition(event.position);
 }
 
 } // namespace spatial::desktop

@@ -22,15 +22,10 @@ struct CustomCamera
 	constexpr static auto defaultNear = .1;
 	constexpr static auto defaultFar = 10000.0;
 
-	math::dmat4 projectionMatrix{};
+	math::dmat4 projectionMatrix{
+		math::perspective(gDefaultVerticalFieldOfView, gWideScreenAspectRatio.get(), defaultNear, defaultFar)};
 	double near{defaultNear};
 	double far{defaultFar};
-
-	constexpr CustomCamera()
-		: projectionMatrix{
-			math::perspective(defaultVerticalFieldOfView, wideScreenAspectRatio.get(), defaultNear, defaultFar)}
-	{
-	}
 };
 
 struct OrthographicCamera
@@ -40,20 +35,18 @@ struct OrthographicCamera
 	constexpr static auto defaultNear = .1;
 	constexpr static auto defaultFar = 10000.0;
 
-	double left{-wideScreenAspectRatio.get()};
-	double right{wideScreenAspectRatio.get()};
+	double left{-gWideScreenAspectRatio.get()};
+	double right{gWideScreenAspectRatio.get()};
 	double bottom{-1};
 	double top{1};
 
 	double near{defaultNear};
 	double far{defaultFar};
 
-	constexpr OrthographicCamera() = default;
-
-	constexpr void setAspectRatio(double aspectRatio) noexcept
+	constexpr void setAspectRatio(AspectRatio aspectRatio) noexcept
 	{
-		left = -aspectRatio;
-		right = aspectRatio;
+		left = -aspectRatio.get();
+		right = aspectRatio.get();
 	}
 };
 
@@ -64,12 +57,10 @@ struct PerspectiveCamera
 	constexpr static auto defaultNear = .1;
 	constexpr static auto defaultFar = 10000.0;
 
-	double fieldOfView{defaultVerticalFieldOfView};
-	double aspectRatio{wideScreenAspectRatio.get()};
+	double fieldOfView{gDefaultVerticalFieldOfView};
+	double aspectRatio{gWideScreenAspectRatio.get()};
 	double near{defaultNear};
 	double far{defaultFar};
-
-	constexpr PerspectiveCamera() = default;
 };
 
 } // namespace spatial::ecs

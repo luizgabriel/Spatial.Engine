@@ -63,21 +63,19 @@ void PlatformContext::setupCallbacks(GLFWwindow* window)
 	});
 
 	glfwSetScrollCallback(window, [](auto* win, double xOffset, double yOffset) {
-		sEventQueue.enqueue<MouseScrolledEvent>(xOffset, yOffset);
-	});
-
-	glfwSetScrollCallback(window, [](auto* win, double xOffset, double yOffset) {
-		sEventQueue.enqueue<MouseScrolledEvent>(xOffset, yOffset);
+		sEventQueue.enqueue<MouseScrolledEvent>(math::dvec2{xOffset, yOffset});
 	});
 
 	glfwSetWindowSizeCallback(window, [](auto* win, int width, int height) {
-		int fbw, fbh;
-		glfwGetFramebufferSize(win, &fbw, &fbh);
-		sEventQueue.enqueue<WindowResizedEvent>(math::uvec2{width, height}, math::uvec2{fbw, fbh});
+		int frameBufferWidth, frameBufferHeight;
+		glfwGetFramebufferSize(win, &frameBufferWidth, &frameBufferHeight);
+		sEventQueue.enqueue<WindowResizedEvent>(math::uvec2{width, height},
+												math::uvec2{frameBufferWidth, frameBufferHeight});
 	});
 
-	glfwSetCursorPosCallback(
-		window, [](auto* win, double xPos, double yPos) { sEventQueue.enqueue<MouseMovedEvent>(xPos, yPos); });
+	glfwSetCursorPosCallback(window, [](auto* win, double xPos, double yPos) {
+		sEventQueue.enqueue<MouseMovedEvent>(math::dvec2{xPos, yPos});
+	});
 }
 
 void PlatformContext::onStartFrame(float)
@@ -92,9 +90,14 @@ void PlatformContext::onStartFrame(float)
 	sEventQueue.update();
 }
 
-Window PlatformContext::createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept
+Window PlatformContext::createWindow(math::uvec2 dimensions, std::string_view title) const noexcept
 {
-	auto window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+	auto window = glfwCreateWindow(dimensions.x, dimensions.y, title.data(), nullptr, nullptr);
+
+	int frameBufferWidth, frameBufferHeight;
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+	sEventQueue.enqueue<WindowResizedEvent>(dimensions, math::uvec2{frameBufferWidth, frameBufferHeight});
+
 	setupCallbacks(window);
 	return Window{window};
 }
