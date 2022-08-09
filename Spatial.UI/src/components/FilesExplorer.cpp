@@ -1,15 +1,14 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
-#include <spatial/ui/components/FilesExplorer.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
+#include <spatial/ui/components/FilesExplorer.h>
 #include <spatial/ui/components/Icons.h>
 
 namespace spatial::ui
 {
 
-bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPath,
-								  const filament::Texture* icon)
+bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPath, const filament::Texture* icon)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
@@ -90,14 +89,15 @@ bool FilesExplorer::displayPathHeader(std::string& selectedPath, const filament:
 
 	ImGui::PushID("BackButton");
 	changed = imageButton(icon, math::vec2{20}, Icons::back.uv());
-	if (changed) {
+	if (changed)
+	{
 		auto lastSeparator = selectedPath.find_last_of(FileSystem::SEPARATOR);
 		if (lastSeparator == std::string::npos)
 			selectedPath = "";
 		else
 			selectedPath = selectedPath.substr(0, lastSeparator);
 	}
-		
+
 	ImGui::PopID();
 
 	ImGui::SameLine();

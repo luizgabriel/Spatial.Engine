@@ -1,5 +1,5 @@
-#include <spatial/graphics/MeshResources.h>
 #include <filament/Fence.h>
+#include <spatial/graphics/MeshResources.h>
 
 namespace spatial::graphics
 {
@@ -24,8 +24,8 @@ filament::VertexBuffer::Builder createVertexBufferBuilder(const FilameshFileHead
 									header.offsetPosition, static_cast<uint8_t>(header.stridePosition))
 						 .attribute(filament::TANGENTS, 0, filament::VertexBuffer::AttributeType::SHORT4,
 									header.offsetTangents, static_cast<uint8_t>(header.strideTangents))
-						 .attribute(filament::COLOR, 0, filament::VertexBuffer::AttributeType::UBYTE4, header.offsetColor,
-									static_cast<uint8_t>(header.strideColor))
+						 .attribute(filament::COLOR, 0, filament::VertexBuffer::AttributeType::UBYTE4,
+									header.offsetColor, static_cast<uint8_t>(header.strideColor))
 						 .attribute(filament::UV0, 0, uvType, header.offsetUV0, static_cast<uint8_t>(header.strideUV0))
 						 .normalized(filament::UV0, uvNormalized);
 
@@ -58,7 +58,8 @@ filament::IndexBuffer::Builder createIndexBufferBuilder(const FilameshFileHeader
 {
 	return filament::IndexBuffer::Builder()
 		.indexCount(header.indexCount)
-		.bufferType(header.indexType ? filament::IndexBuffer::IndexType::USHORT : filament::IndexBuffer::IndexType::UINT);
+		.bufferType(header.indexType ? filament::IndexBuffer::IndexType::USHORT
+									 : filament::IndexBuffer::IndexType::UINT);
 }
 
 filament::IndexBuffer::BufferDescriptor createIndexBufferDescriptor(const FilameshFile& filamesh)
@@ -76,7 +77,6 @@ IndexBuffer createIndexBuffer(filament::Engine& engine, const FilameshFile& fila
 	return ib;
 }
 
-
 MeshGeometries createMeshGeometries(const FilameshFile& filamesh)
 {
 	auto geometries = MeshGeometries(filamesh.parts.size());
@@ -90,4 +90,4 @@ MeshGeometries createMeshGeometries(const FilameshFile& filamesh)
 	return geometries;
 }
 
-}
+} // namespace spatial::graphics

@@ -39,7 +39,7 @@ const RotateSystem = {
         excluded: ["StopRotatingFlag"]
     },
     onUpdateEntity: ({entity, delta, components}) => {
-        const { velocity } = components["RotateVelocity"][entity];
+        const {velocity} = components["RotateVelocity"][entity];
         const transform = components["Transform"][entity];
         transform.rotation.x += velocity * delta;
 

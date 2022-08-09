@@ -25,4 +25,4 @@ void RenderingSystem::onEndFrame()
 	}
 }
 
-} // namespace spatial
+} // namespace spatial::graphics

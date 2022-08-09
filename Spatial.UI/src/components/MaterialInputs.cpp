@@ -37,7 +37,8 @@ bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& regis
 	return changed;
 }
 
-bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons, math::vec4 uv)
+bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons,
+			  math::vec4 uv)
 {
 	bool changed = false;
 

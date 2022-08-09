@@ -16,7 +16,8 @@ namespace spatial::ui
 class EntityProperties
 {
   public:
-	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons, bool showDebugComponents = false);
+	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons,
+								  bool showDebugComponents = false);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
 
@@ -45,10 +46,10 @@ struct EditorMainMenu
 
 struct EditorModals
 {
-  static bool newScene();
-  static bool openScene(std::string& openPath);
-  static bool saveScene(std::string& savePath);
-  static bool openProject(std::string& openPath);
+	static bool newScene();
+	static bool openScene(std::string& openPath);
+	static bool saveScene(std::string& savePath);
+	static bool openProject(std::string& openPath);
 };
 
 class OpenSceneModal
@@ -80,10 +81,10 @@ class SceneOptionsMenu
 	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
 
   private:
-	static bool createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-							   math::vec3 createEntitiesPosition, bool addAsChild = false);
-	static bool createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								math::vec3 createEntitiesPosition, bool addAsChild = false);
+	static bool createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition,
+							   bool addAsChild = false);
+	static bool createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition,
+								bool addAsChild = false);
 	static bool createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								 math::vec3 createEntitiesPosition, bool addAsChild = false);
 };
@@ -129,7 +130,8 @@ class EditorDragAndDrop
 	static bool loadScene(std::string& scenePath, ecs::Entity& selectedEntity);
 	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
 								 math::vec3 createEntityPosition = {});
-	static bool loadScriptResource(ecs::Registry& registry, ecs::Entity& selectedEntity, ResourceManager::ResourceType& type);
+	static bool loadScriptResource(ecs::Registry& registry, ecs::Entity& selectedEntity,
+								   ResourceManager::ResourceType& type);
 };
 
 template <>

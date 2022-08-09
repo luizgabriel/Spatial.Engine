@@ -1,9 +1,9 @@
 #pragma once
 
+#include <filament/Box.h>
 #include <filament/Camera.h>
 #include <filament/Engine.h>
 #include <filament/Frustum.h>
-#include <filament/Box.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Transform.h>
 #include <utils/Entity.h>

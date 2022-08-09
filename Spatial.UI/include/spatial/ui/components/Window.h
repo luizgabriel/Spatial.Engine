@@ -27,10 +27,10 @@ enum class WindowFlags
 								   // SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify
 								   // width. Read code in imgui_demo in the "Horizontal Scrolling" section.
 	NoFocusOnAppearing = 1 << 12,  // Disable taking focus when transitioning from hidden to visible state
-	NoBringToFrontOnFocus = 1 << 13,	 // Disable bringing window to front when taking focus (e.g. clicking on it or
+	NoBringToFrontOnFocus = 1 << 13, // Disable bringing window to front when taking focus (e.g. clicking on it or
 
-	NoNavInputs = 1 << 18,				 // No gamepad/keyboard navigation within the window
-	NoNavFocus = 1 << 19, // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
+	NoNavInputs = 1 << 18, // No gamepad/keyboard navigation within the window
+	NoNavFocus = 1 << 19,  // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
 
 	NoNav = NoNavInputs | NoNavFocus,
 	NoDecoration = NoTitleBar | NoResize | NoScrollbar | NoCollapse,

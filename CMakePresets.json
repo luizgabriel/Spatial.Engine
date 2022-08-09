@@ -10,6 +10,7 @@
       "name": "Default",
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "generator": "Ninja",
       "environment": {
         "CONAN_REVISIONS_ENABLED": "1"
       },
@@ -19,22 +20,33 @@
       }
     },
     {
+      "name": "Debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "Windows-Base",
       "hidden": true,
       "inherits": [
         "Default"
       ],
-      "generator": "Visual Studio 17 2022",
       "environment": {
         "CONAN_USE_ALWAYS_SHORT_PATHS": "1"
       },
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
       "cacheVariables": {
         "WARNINGS_AS_ERRORS": "OFF",
-        "CPACK_GENERATOR": "ZIP;WIX"
+        "CPACK_GENERATOR": "ZIP;WIX",
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "condition": {
         "type": "equals",
@@ -43,6 +55,7 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64",
           "hostOS": [
             "Windows"
           ]
@@ -51,46 +64,29 @@
     },
     {
       "name": "Windows-Debug",
-      "displayName": "Windows Debug (Visual Studio 2022)",
+      "displayName": "Windows Debug",
       "inherits": [
-        "Windows-Base"
+        "Windows-Base",
+        "Debug"
       ],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "/MTd"
       }
     },
     {
       "name": "Windows-Release",
-      "displayName": "Windows Release (Visual Studio 2022)",
+      "displayName": "Windows Release",
       "inherits": [
-        "Windows-Base"
+        "Windows-Base",
+        "Release"
       ],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_FLAGS": "/MT"
       }
     },
     {
-      "name": "Windows-2019-Debug",
-      "displayName": "Windows Debug (Visual Studio 2019)",
-      "generator": "Visual Studio 16 2019",
-      "inherits": [
-        "Windows-Debug"
-      ]
-    },
-    {
-      "name": "Windows-2019-Release",
-      "displayName": "Windows Release (Visual Studio 2019)",
-      "generator": "Visual Studio 16 2019",
-      "inherits": [
-        "Windows-Release"
-      ]
-    },
-    {
       "name": "Linux-Base",
       "hidden": true,
-      "generator": "Ninja",
       "environment": {
         "CONAN_REVISIONS_ENABLED": "1",
         "CONAN_SYSREQUIRES_MODE": "enabled",
@@ -115,10 +111,10 @@
       "name": "Linux-Debug",
       "displayName": "Linux Debug",
       "inherits": [
-        "Linux-Base"
+        "Linux-Base",
+        "Debug"
       ],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CPACK_GENERATOR": "TGZ;DEB"
       }
     },
@@ -126,17 +122,16 @@
       "name": "Linux-Release",
       "displayName": "Linux Release",
       "inherits": [
-        "Linux-Base"
+        "Linux-Base",
+        "Release"
       ],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "CPACK_GENERATOR": "TGZ;DEB"
       }
     },
     {
       "name": "MacOS-Base",
       "hidden": true,
-      "generator": "CodeBlocks - Unix Makefiles",
       "inherits": [
         "Default"
       ],
@@ -160,21 +155,17 @@
       "name": "MacOS-Debug",
       "displayName": "MacOS Debug",
       "inherits": [
-        "MacOS-Base"
-      ],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+        "MacOS-Base",
+        "Debug"
+      ]
     },
     {
       "name": "MacOS-Release",
       "displayName": "MacOS Release",
       "inherits": [
-        "MacOS-Base"
-      ],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+        "MacOS-Base",
+        "Release"
+      ]
     }
   ],
   "buildPresets": [
@@ -188,18 +179,6 @@
       "name": "Windows-Release",
       "displayName": "Windows Release - Build",
       "configurePreset": "Windows-Release",
-      "configuration": "Release"
-    },
-    {
-      "name": "Windows-2019-Debug",
-      "displayName": "Windows Debug (Visual Studio 2019) - Build",
-      "configurePreset": "Windows-2019-Debug",
-      "configuration": "Debug"
-    },
-    {
-      "name": "Windows-2019-Release",
-      "displayName": "Windows Release (Visual Studio 2019) - Build",
-      "configurePreset": "Windows-2019-Release",
       "configuration": "Release"
     },
     {
@@ -257,24 +236,6 @@
       "name": "Windows-Release",
       "displayName": "Windows Release - Test",
       "configurePreset": "Windows-Release",
-      "configuration": "Release",
-      "inherits": [
-        "Test-Base"
-      ]
-    },
-    {
-      "name": "Windows-2019-Debug",
-      "displayName": "Windows 2019 Debug - Test",
-      "configurePreset": "Windows-2019-Debug",
-      "configuration": "Debug",
-      "inherits": [
-        "Test-Base"
-      ]
-    },
-    {
-      "name": "Windows-2019-Release",
-      "displayName": "Windows 2019 Release - Test",
-      "configurePreset": "Windows-2019-Release",
       "configuration": "Release",
       "inherits": [
         "Test-Base"

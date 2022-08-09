@@ -1,6 +1,5 @@
 #pragma once
 
-#include <spatial/ecs/Resource.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/Light.h>
@@ -8,6 +7,7 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/ecs/Resource.h>
 #include <spatial/ecs/SceneView.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
@@ -91,7 +91,7 @@ class Builder
 	template <typename MaterialComponent>
 	MaterialInstanceBuilder<MaterialComponent> asMaterialInstance()
 	{
-		return MaterialInstanceBuilder<MaterialComponent>{ mRegistry, mEntity };
+		return MaterialInstanceBuilder<MaterialComponent>{mRegistry, mEntity};
 	}
 
 	[[nodiscard]] Entity get() const
@@ -247,8 +247,7 @@ template <typename MaterialProps>
 class MaterialInstanceBuilder : public Builder
 {
   public:
-	MaterialInstanceBuilder(Registry& registry, Entity entity)
-		: Builder(registry, entity)
+	MaterialInstanceBuilder(Registry& registry, Entity entity) : Builder(registry, entity)
 	{
 		with<tags::IsMaterialInstance>();
 		with<MaterialProps>({});

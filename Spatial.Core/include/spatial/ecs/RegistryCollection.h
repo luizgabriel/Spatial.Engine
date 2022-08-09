@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <algorithm>
 #include <spatial/ecs/Registry.h>
+#include <vector>
 
 namespace spatial::ecs
 {
@@ -19,9 +19,7 @@ class RegistryCollection
 	template <typename Func>
 	void each(Func func) const
 	{
-		std::for_each(mRegistries.begin(), mRegistries.end(), [&](ecs::Registry* r) {
-			func(*r);
-		});
+		std::for_each(mRegistries.begin(), mRegistries.end(), [&](ecs::Registry* r) { func(*r); });
 	}
 
   private:

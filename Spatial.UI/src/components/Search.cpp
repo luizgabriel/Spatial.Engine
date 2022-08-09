@@ -8,7 +8,7 @@ namespace spatial::ui
 
 bool Search::text(std::string& search, const filament::Texture* texture)
 {
-	auto color = ImVec4(0.27f, 0.27f, 0.27f,1.0f);
+	auto color = ImVec4(0.27f, 0.27f, 0.27f, 1.0f);
 	ImGui::PushStyleColor(ImGuiCol_Button, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);

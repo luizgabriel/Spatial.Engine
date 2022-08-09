@@ -107,5 +107,4 @@ void Window::setIcon(FileSystem& fileSystem, std::string_view resourcePath)
 	setIcon(iconData.data(), iconData.size());
 }
 
-
 } // namespace spatial::desktop

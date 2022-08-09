@@ -1,9 +1,9 @@
-#include <spatial/graphics/MeshResources.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Tags.h>
 #include <spatial/graphics/MeshController.h>
+#include <spatial/graphics/MeshResources.h>
 #include <spatial/graphics/Renderable.h>
 #include <spatial/graphics/Resources.h>
 
@@ -143,7 +143,8 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
-	registry.getEntities<const ecs::ResourceData, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+	registry
+		.getEntities<const ecs::ResourceData, ecs::tags::IsMesh>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
 			auto filamesh = loadFilameshFromMemory(resource.data.data(), resource.data.size());
 			registry.removeComponent<ecs::ResourceData>(entity);

@@ -16,7 +16,8 @@ struct IsCamera
 
 } // namespace tags
 
-struct CustomCamera {
+struct CustomCamera
+{
 	constexpr static auto typeName = "custom_camera";
 	constexpr static auto defaultNear = .1;
 	constexpr static auto defaultFar = 10000.0;
@@ -32,7 +33,8 @@ struct CustomCamera {
 	}
 };
 
-struct OrthographicCamera {
+struct OrthographicCamera
+{
 	constexpr static auto typeName = "orthographic_camera";
 
 	constexpr static auto defaultNear = .1;
@@ -55,7 +57,8 @@ struct OrthographicCamera {
 	}
 };
 
-struct PerspectiveCamera {
+struct PerspectiveCamera
+{
 	constexpr static auto typeName = "perspective_camera";
 
 	constexpr static auto defaultNear = .1;
