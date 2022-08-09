@@ -31,6 +31,9 @@ jobs:
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
 
+      - name: Setup Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+
       - name: (Windows) Setup MSBuild
         if: contains(matrix.config.os, 'windows')
         uses: microsoft/setup-msbuild@v1.1
@@ -45,9 +48,9 @@ jobs:
       - name: (Linux) Setup Linux Dependencies
         if: contains(matrix.config.os, 'ubuntu')
         shell: bash
-        run: sudo apt-get install ninja-build mesa-common-dev libxi-dev libxxf86vm-dev
+        run: sudo apt-get install mesa-common-dev libxi-dev libxxf86vm-dev
 
-      - name: (Ubuntu) Set up Clang
+      - name: (Linux) Set up Clang
         if: contains(matrix.config.os, 'ubuntu')
         uses: egor-tensin/setup-clang@v1
         with:
