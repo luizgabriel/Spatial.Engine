@@ -136,5 +136,4 @@ void Parent::destroyChildren(Registry& registry, Entity parentEntity)
 	registry.removeComponent<Parent>(parentEntity);
 }
 
-
 } // namespace spatial::ecs

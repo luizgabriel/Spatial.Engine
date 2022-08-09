@@ -59,7 +59,7 @@ class InputState
 
 	float axis(Key positive, Key negative) const;
 
-private:
+  private:
 	BitSet mKeyPressed;
 	BitSet mKeyReleased;
 

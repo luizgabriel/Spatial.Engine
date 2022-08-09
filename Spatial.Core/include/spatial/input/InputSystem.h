@@ -1,8 +1,8 @@
 #pragma once
 
+#include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/input/InputState.h>
-#include <spatial/common/Signal.h>
 
 namespace spatial::desktop
 {

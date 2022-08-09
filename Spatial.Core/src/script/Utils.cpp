@@ -63,7 +63,8 @@ void instantiateModule(v8::Local<v8::Context> context, v8::Local<v8::Module> mod
 								})
 			.ToChecked();
 
-	if (!result || module.IsEmpty()) {
+	if (!result || module.IsEmpty())
+	{
 		auto exception = module->GetException().As<v8::String>();
 		throw std::invalid_argument(getValue(context->GetIsolate(), exception));
 	}

@@ -24,11 +24,7 @@ TEST(Registry, EmptySerialization)
 TEST(Registry, SimpleSerialization)
 {
 	auto registry = ecs::Registry{};
-	ecs::Builder::create(registry)
-		.withName("Entity 1")
-		.asTransform()
-		.withPosition(math::vec3{5.0f})
-		.asPointLight();
+	ecs::Builder::create(registry).withName("Entity 1").asTransform().withPosition(math::vec3{5.0f}).asPointLight();
 
 	auto ss = std::stringstream{};
 
@@ -55,11 +51,11 @@ TEST(Registry, CustomComponentSerialization)
 {
 	auto registry = ecs::Registry{};
 	ecs::Builder::create(registry)
-				  .withName("Entity 1")
-				  .asTransform()
-				  .withPosition(math::vec3{5.0f})
-				  .asPointLight()
-				  .with<CustomComponent>();
+		.withName("Entity 1")
+		.asTransform()
+		.withPosition(math::vec3{5.0f})
+		.asPointLight()
+		.with<CustomComponent>();
 
 	auto ss = std::stringstream{};
 

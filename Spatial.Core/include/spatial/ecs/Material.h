@@ -13,4 +13,4 @@ struct IsMaterialInstance
 	constexpr static auto typeName = "tag_is_material_instance";
 };
 
-} // namespace spatial::ecs
+} // namespace spatial::ecs::tags

@@ -96,9 +96,7 @@ void SceneController::createScenes(filament::Engine& engine, ecs::Registry& regi
 void SceneController::updateScenes(ecs::Registry& registry)
 {
 	registry.getEntities<const ecs::SceneView, TextureView>().each(
-		[&](const auto& sceneView, auto& textureView) {
-			updateScene(registry, sceneView, textureView);
-		});
+		[&](const auto& sceneView, auto& textureView) { updateScene(registry, sceneView, textureView); });
 }
 
 } // namespace spatial::graphics

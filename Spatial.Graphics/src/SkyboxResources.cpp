@@ -1,8 +1,8 @@
 #include <spatial/graphics/SkyboxResources.h>
 
-#include <sstream>
 #include <image/Ktx1Bundle.h>
 #include <ktxreader/Ktx1Reader.h>
+#include <sstream>
 
 namespace spatial::graphics
 {

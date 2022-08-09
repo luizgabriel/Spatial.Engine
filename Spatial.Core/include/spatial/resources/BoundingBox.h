@@ -21,4 +21,4 @@ std::istream& operator>>(std::istream& stream, math::BaseAxisAlignedBoundingBox<
 	return stream;
 }
 
-}
+} // namespace spatial

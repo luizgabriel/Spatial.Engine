@@ -66,7 +66,8 @@ bool componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args... args
 			spacing(3);
 		}
 
-		if (collapse.onClose()) {
+		if (collapse.onClose())
+		{
 			registry.removeComponent<Component>(entity);
 			changed = true;
 		}

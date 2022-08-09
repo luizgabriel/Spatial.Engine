@@ -46,4 +46,4 @@ class RenderingSystem
 	Signal<filament::Renderer&> mOnRenderSignal;
 };
 
-} // namespace spatial
+} // namespace spatial::graphics

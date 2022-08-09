@@ -15,7 +15,8 @@ math::mat4 Transform::getScaleMatrix() const noexcept
 
 math::mat4 Transform::getRotationMatrix() const noexcept
 {
-	return math::rotate(rotation.z, math::axisZ) * math::rotate(rotation.y, math::axisY) * math::rotate(rotation.x, math::axisX);
+	return math::rotate(rotation.z, math::axisZ) * math::rotate(rotation.y, math::axisY)
+		   * math::rotate(rotation.x, math::axisX);
 }
 
 math::mat4 Transform::getMatrix() const noexcept

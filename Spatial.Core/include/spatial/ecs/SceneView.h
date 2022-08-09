@@ -14,7 +14,6 @@ struct IsMainView
 	constexpr static auto typeName = "tag_is_main_view";
 };
 
-
 } // namespace tags
 
 struct SceneView

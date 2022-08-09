@@ -241,4 +241,4 @@ void ImGuiRenderer::createFontTextureAtlas()
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }
 
-} // namespace spatial
+} // namespace spatial::ui

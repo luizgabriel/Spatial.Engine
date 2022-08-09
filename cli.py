@@ -1,8 +1,8 @@
 import os
 import os.path
 import platform
-from dataclasses import dataclass
 import sys
+from dataclasses import dataclass
 from typing import Optional
 
 USAGE = "Usage:" \
@@ -131,7 +131,8 @@ def cmake_configure(options: Arguments) -> Command:
 
 
 def cmake_build(options: Arguments) -> Command:
-    return Command(f"cmake --build --preset {options.preset} --target Spatial.Editor Spatial.Core.Tests Spatial.Graphics.Tests")
+    return Command(
+        f"cmake --build --preset {options.preset} --target Spatial.Editor Spatial.Core.Tests Spatial.Graphics.Tests")
 
 
 def cmake_install(options: Arguments) -> Command:

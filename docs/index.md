@@ -18,18 +18,22 @@ layout: default
 
 ## Why do we need another game engine?
 
-Maybe you're asking yourself: "Wait a minute. Why do we need another game engine?" - and you're right. 
-There are plenty of well known game engines like Unity, Unreal Engine, some open-source like Panda 3D, Xenko and Lumberyard Engine, etc. 
-So, if you REALLY want to make a game, go straight away with those engines. 
-But, if you need a simple visualization tool with game engine like tools and functions, I think that the Spatial Engine is a nice solution to consider.
+Maybe you're asking yourself: "Wait a minute. Why do we need another game engine?" - and you're right.
+There are plenty of well known game engines like Unity, Unreal Engine, some open-source like Panda 3D, Xenko and
+Lumberyard Engine, etc.
+So, if you REALLY want to make a game, go straight away with those engines.
+But, if you need a simple visualization tool with game engine like tools and functions, I think that the Spatial Engine
+is a nice solution to consider.
 
-Programming a game engine is hard and the necessary skill are completely different from creating a game. 
+Programming a game engine is hard and the necessary skill are completely different from creating a game.
 The Spatial Engine is still pretty simple and also really far from complete, but it already do some neat things.
 
 ## The Project Structure
+
 Now, let's dive into the usage details of the Spatial Engine.
 
 The project is organized by grouping some bigger modules:
+
 ```
 Spatial.Engine
 │   README.md
@@ -44,15 +48,16 @@ You can take a look at the `Spatial.Core` folder to understand how the darker de
 
 ## First time here, buddy?
 
-So, the first step to get used to this engine is to build it from source. 
+So, the first step to get used to this engine is to build it from source.
 We'll need to install the correct compiler, the package manager, run some installation scripts, wait for all required
-dependencies to build and finally you'll be able see something on your screen. 
+dependencies to build and finally you'll be able see something on your screen.
 You might take some time in this step if you're not used to all complexities of a C++ project.
 
 When you get used with the engine, we can bootstrap a simple game project using the engine's core library.
 
 ## Let us known if you're having any trouble
-As a reminder, this engine is improving constantly and changes may happen which could deprecate this tutorial steps. 
+
+As a reminder, this engine is improving constantly and changes may happen which could deprecate this tutorial steps.
 So, if you have any problems, feel free to leave an issue on Github.
 
 [Create a Github Issue](https://github.com/luizgabriel/Spatial.Engine/issues/new){: .btn }

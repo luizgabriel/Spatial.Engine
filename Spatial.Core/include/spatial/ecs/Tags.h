@@ -1,6 +1,7 @@
 #pragma once
 
-namespace spatial::ecs::tags {
+namespace spatial::ecs::tags
+{
 
 struct IsRenderable
 {
@@ -19,4 +20,4 @@ struct CanDestroy
 {
 };
 
-}
+} // namespace spatial::ecs::tags

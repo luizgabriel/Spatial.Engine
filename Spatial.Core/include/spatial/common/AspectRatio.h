@@ -2,10 +2,12 @@
 
 #include <spatial/common/Math.h>
 
-namespace spatial {
+namespace spatial
+{
 
 template <typename T>
-struct BaseAspectRatio {
+struct BaseAspectRatio
+{
 	T width{1.0};
 	T height{1.0};
 

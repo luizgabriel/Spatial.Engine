@@ -1,6 +1,5 @@
 #include "Settings.h"
 
-#include <fstream>
 #include <argh.h>
 
 namespace fs = std::filesystem;

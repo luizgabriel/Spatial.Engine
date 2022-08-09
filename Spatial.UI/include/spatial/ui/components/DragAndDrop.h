@@ -2,7 +2,6 @@
 
 #include <optional>
 #include <string_view>
-#include <fmt/format.h>
 
 namespace spatial::ui
 {

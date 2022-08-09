@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string_view>
 #include <functional>
+#include <string_view>
 
 namespace spatial::ui
 {

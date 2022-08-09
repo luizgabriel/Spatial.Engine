@@ -28,7 +28,7 @@ struct Icons
 	constexpr static Icon pngFile = Icon{{3, 0}};
 	constexpr static Icon jpgFile = Icon{{4, 0}};
 	constexpr static Icon exrFile = Icon{{5, 0}};
-	constexpr static Icon ktxFile= Icon{{5, 1}};
+	constexpr static Icon ktxFile = Icon{{5, 1}};
 	constexpr static Icon sceneFile = Icon{{6, 0}};
 	constexpr static Icon jsFile = Icon{{7, 0}};
 	constexpr static Icon logo = Icon{{0, 2}};

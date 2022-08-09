@@ -71,4 +71,4 @@ void UserInterfaceSystem::addFont(FileSystem& fileSystem, std::string_view fontP
 	mRenderer.addFont(fontData.data(), fontData.size());
 }
 
-} // namespace spatial
+} // namespace spatial::ui
