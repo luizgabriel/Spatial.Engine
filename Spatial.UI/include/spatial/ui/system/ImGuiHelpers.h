@@ -48,13 +48,13 @@ filament::backend::BufferDescriptor imguiCreateDescriptor(const ImVector<ImGuiTy
 
 void imguiSetupInput();
 
-void imguiSetMousePosition(filament::math::float2 position);
+void imguiSetMousePosition(math::vec2 position);
 
 void imguiSetKey(Key key, KeyAction action);
 
 void imguiSetText(std::string_view text);
 
-void imguiSetScrollOffset(double xOffset, double yOffset);
+void imguiSetScrollOffset(math::vec2 offset);
 
 void imguiSetupTheme();
 

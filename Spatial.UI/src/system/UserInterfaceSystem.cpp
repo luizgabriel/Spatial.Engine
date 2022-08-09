@@ -22,7 +22,7 @@ void UserInterfaceSystem::onEvent(const WindowResizedEvent& event)
 
 void UserInterfaceSystem::onEvent(const MouseMovedEvent& event)
 {
-	imguiSetMousePosition({event.x, event.y});
+	imguiSetMousePosition(event.position);
 }
 
 void UserInterfaceSystem::onEvent(const KeyEvent& event)
@@ -37,7 +37,7 @@ void UserInterfaceSystem::onEvent(const TextEvent& event)
 
 void UserInterfaceSystem::onEvent(const MouseScrolledEvent& event)
 {
-	imguiSetScrollOffset(event.xOffset, event.yOffset);
+	imguiSetScrollOffset(event.offset);
 }
 
 void UserInterfaceSystem::onUpdateFrame(float delta)

@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	auto app = Application{};
 	auto desktopContext = desktop::PlatformContext{};
 
-	auto window = desktopContext.createWindow(config.windowWidth, config.windowHeight, config.windowTitle);
+	auto window = desktopContext.createWindow(config.windowDimensions, config.windowTitle);
 #if defined(SPATIAL_PLATFORM_WINDOWS)
 	window.setIcon(*fileSystem, "editor/AppIcon.png");
 #endif

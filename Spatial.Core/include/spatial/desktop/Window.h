@@ -64,7 +64,7 @@ class PlatformContext
 
 	void onStartFrame(float);
 
-	[[nodiscard]] Window createWindow(std::uint16_t width, std::uint16_t height, std::string_view title) const noexcept;
+	[[nodiscard]] Window createWindow(math::uvec2 dimensions, std::string_view title) const noexcept;
 
 	PlatformContext(const PlatformContext& c) = delete;
 	PlatformContext& operator=(const PlatformContext& w) = delete;

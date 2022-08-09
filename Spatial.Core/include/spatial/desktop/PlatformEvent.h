@@ -9,13 +9,8 @@ namespace spatial
 
 struct WindowResizedEvent
 {
-	math::uvec2 windowSize;
-	math::uvec2 frameBufferSize;
-
-	WindowResizedEvent(math::uvec2 windowSize, math::uvec2 frameBufferSize)
-		: windowSize{windowSize}, frameBufferSize{frameBufferSize}
-	{
-	}
+	math::uvec2 windowSize{};
+	math::uvec2 frameBufferSize{};
 };
 
 struct WindowClosedEvent
@@ -24,38 +19,23 @@ struct WindowClosedEvent
 
 struct KeyEvent
 {
-	Key key;
-	KeyAction action;
-
-	explicit KeyEvent(const Key key, const KeyAction action = KeyAction::UnknownAction) : key{key}, action{action}
-	{
-	}
+	Key key{Key::UnknownKey};
+	KeyAction action{KeyAction::UnknownAction};
 };
 
 struct TextEvent
 {
-	std::string text;
-
-	explicit TextEvent(std::string&& text) : text{text}
-	{
-	}
+	std::string text{};
 };
 
 struct MouseMovedEvent
 {
-	double x, y;
-	MouseMovedEvent(double x, double y) : x{x}, y{y}
-	{
-	}
+	math::dvec2 position{};
 };
 
 struct MouseScrolledEvent
 {
-	double xOffset, yOffset;
-
-	MouseScrolledEvent(double x, double y) : xOffset{x}, yOffset{y}
-	{
-	}
+	math::dvec2 offset{};
 };
 
 } // namespace spatial

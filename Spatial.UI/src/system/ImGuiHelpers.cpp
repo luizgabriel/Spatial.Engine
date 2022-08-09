@@ -123,7 +123,7 @@ void imguiSetupInput()
 	io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
 }
 
-void imguiSetMousePosition(filament::math::float2 position)
+void imguiSetMousePosition(math::vec2 position)
 {
 	auto& io = ImGui::GetIO();
 	io.MousePos = ImVec2(position.x, position.y);
@@ -153,11 +153,11 @@ void imguiSetText(std::string_view text)
 	io.AddInputCharactersUTF8(text.data());
 }
 
-void imguiSetScrollOffset(double xOffset, double yOffset)
+void imguiSetScrollOffset(math::vec2 offset)
 {
 	auto& io = ImGui::GetIO();
-	io.MouseWheel = static_cast<float>(yOffset);
-	io.MouseWheelH = static_cast<float>(xOffset);
+	io.MouseWheel = offset.x;
+	io.MouseWheelH = offset.y;
 }
 
 void imguiSetupTheme()
