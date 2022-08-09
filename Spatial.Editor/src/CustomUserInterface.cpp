@@ -4,6 +4,7 @@
 #include "Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <magic_enum.hpp>
+#include <fmt/format.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
