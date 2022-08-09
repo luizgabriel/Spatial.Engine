@@ -4,11 +4,11 @@
 #include <filament/MaterialInstance.h>
 #include <filament/RenderableManager.h>
 #include <filament/VertexBuffer.h>
-#include <spatial/common/Math.h>
+#include <set>
 #include <spatial/common/AxisAlignedBoundingBox.h>
+#include <spatial/common/Math.h>
 #include <spatial/graphics/Resources.h>
 #include <utils/Entity.h>
-#include <set>
 
 namespace spatial::graphics
 {
@@ -103,7 +103,7 @@ class Renderable
 	std::set<PrimitiveIndex<SharedVertexBuffer>> mVertexBuffers;
 	std::set<PrimitiveIndex<SharedIndexBuffer>> mIndexBuffers;
 
-    [[nodiscard]] Instance getInstance() const noexcept;
+	[[nodiscard]] Instance getInstance() const noexcept;
 
 	[[nodiscard]] const Manager& getManager() const noexcept;
 

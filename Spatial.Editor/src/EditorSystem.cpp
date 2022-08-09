@@ -24,7 +24,8 @@
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
 
-namespace spatial::editor {
+namespace spatial::editor
+{
 
 static auto gLogger = createDefaultLogger();
 
@@ -96,7 +97,8 @@ void EditorSystem::onDrawGui()
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 	});
 
-	if (mMenuAction != ui::EditorMainMenu::Action::None) {
+	if (mMenuAction != ui::EditorMainMenu::Action::None)
+	{
 		if (mMenuAction == ui::EditorMainMenu::Action::NewScene)
 			ui::PopupModal::open("New Scene");
 
@@ -137,7 +139,8 @@ void EditorSystem::onDrawGui()
 		auto window = ui::Window{"Scene View", ui::WindowFlags::NoScrollbar};
 		mIsCameraViewWindowHovered = ImGui::IsWindowHovered();
 
-		if (!mRegistry.isValid(selectedView)) {
+		if (!mRegistry.isValid(selectedView))
+		{
 			selectedView = mRegistry.getFirstEntity<ecs::SceneView, tags::IsEditorView>();
 			EditorCamera::replaceView(mRegistry, selectedView);
 		}
@@ -195,7 +198,8 @@ void EditorSystem::onDrawGui()
 
 	ui::Window::show("Assets Explorer", [&]() {
 		ui::FilesExplorer::displayFiles(mFileSystem, mCurrentPath, icons);
-		if (mFileSystem.list(PROJECT_DIR).empty()) {
+		if (mFileSystem.list(PROJECT_DIR).empty())
+		{
 			ImGui::Text("No files inside this project.");
 			if (ImGui::Button("Open Project"))
 				mMenuAction = ui::EditorMainMenu::Action::OpenProject;
@@ -243,15 +247,18 @@ void EditorSystem::loadScene()
 	auto path = getScenePath();
 
 	auto stream = mFileSystem.openReadStream(path);
-	if (stream->fail()) {
+	if (stream->fail())
+	{
 		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
-	try {
+	try
+	{
 		mRegistry = parseRegistry(*stream);
 	}
-	catch (const std::exception& e) {
+	catch (const std::exception& e)
+	{
 		gLogger.warn("Could not load scene: {}", e.what());
 	}
 }
@@ -261,15 +268,18 @@ void EditorSystem::saveScene()
 	auto path = getScenePath();
 
 	auto stream = mFileSystem.openWriteStream(path);
-	if (stream->fail()) {
+	if (stream->fail())
+	{
 		gLogger.error("Could not open scene file: {}", path);
 		return;
 	}
 
-	try {
+	try
+	{
 		writeRegistry(mRegistry, *stream);
 	}
-	catch (const std::exception& e) {
+	catch (const std::exception& e)
+	{
 		gLogger.warn("Could not save scene: {}", e.what());
 	}
 }

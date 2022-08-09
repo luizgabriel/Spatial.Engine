@@ -1,4 +1,3 @@
-#include <spatial/resources/ResourceController.h>
 #include <spatial/graphics/CameraController.h>
 #include <spatial/graphics/LightController.h>
 #include <spatial/graphics/MaterialController.h>
@@ -8,6 +7,7 @@
 #include <spatial/graphics/TextureController.h>
 #include <spatial/graphics/TextureView.h>
 #include <spatial/graphics/TransformController.h>
+#include <spatial/resources/ResourceController.h>
 
 namespace spatial::graphics
 {

@@ -68,8 +68,7 @@ void Camera::setOrthographicProjection(double left, double right, double bottom,
 
 void Camera::setLensProjection(double focalLengthInMillimeters, double aspect, double near, double far) noexcept
 {
-	getInstance()->setLensProjection(focalLengthInMillimeters, aspect,
-									 near, far);
+	getInstance()->setLensProjection(focalLengthInMillimeters, aspect, near, far);
 }
 
 void Camera::setCustomProjection(const math::dmat4& projection, double near, double far) noexcept

@@ -13,7 +13,8 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 	using FutureData = std::future<std::vector<uint8_t>>;
 
 	registry
-		.getEntities<const ecs::Resource>(ecs::ExcludeComponents<FutureData, ecs::ResourceData, ecs::tags::IsResourceLoaded>)
+		.getEntities<const ecs::Resource>(
+			ecs::ExcludeComponents<FutureData, ecs::ResourceData, ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const auto& resource) {
 			if (resource.relativePath.empty())
 				return;

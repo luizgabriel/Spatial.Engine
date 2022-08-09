@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/ecs/Registry.h>
 #include <spatial/common/Math.h>
+#include <spatial/ecs/Registry.h>
 #include <vector>
 
 namespace spatial::ecs

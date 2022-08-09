@@ -19,15 +19,18 @@ struct IsScript
 
 } // namespace tags
 
-struct ScriptComponent {
-	struct StringProperty {
+struct ScriptComponent
+{
+	struct StringProperty
+	{
 		static constexpr auto typeName = "String";
 
 		// std::string regexValidation;
 		std::string defaultValue{};
 	};
 
-	struct NumberProperty {
+	struct NumberProperty
+	{
 		static constexpr auto typeName = "NumberRange";
 
 		double defaultValue{.0};

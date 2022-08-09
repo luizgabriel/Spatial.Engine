@@ -35,7 +35,6 @@ class Isolate
 
 	~Isolate();
 
-
   private:
 	v8::Isolate* mIsolate;
 };

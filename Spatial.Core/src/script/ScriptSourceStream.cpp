@@ -22,4 +22,4 @@ size_t ScriptSourceStream::GetMoreData(const uint8_t** src)
 	return size;
 }
 
-}
+} // namespace spatial::script

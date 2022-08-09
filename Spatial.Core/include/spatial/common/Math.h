@@ -40,13 +40,16 @@ qua<T> directionToQuaternion(const vec<3, T>& dir)
 	auto directionLength = length(dir);
 	auto out = quat{};
 
-	if (directionLength < epsilon_v<T> * epsilon_v<T>) {
+	if (directionLength < epsilon_v<T> * epsilon_v<T>)
+	{
 		out.x = out.y = out.z = 0;
 		out.w = 1;
 	}
-	else {
+	else
+	{
 		auto rotAxis = decltype(dir){0, -dir.z, dir.y};
-		if (dot(rotAxis, rotAxis) < epsilon * epsilon) {
+		if (dot(rotAxis, rotAxis) < epsilon * epsilon)
+		{
 			rotAxis.x = rotAxis.y = 0;
 			rotAxis.z = 1;
 		}

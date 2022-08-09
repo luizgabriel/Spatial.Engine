@@ -7,8 +7,8 @@
 namespace spatial::editor
 {
 
-const static auto gDefaultSampler = filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR,
-													 filament::TextureSampler::WrapMode::REPEAT};
+const static auto gDefaultSampler =
+	filament::TextureSampler{filament::TextureSampler::MagFilter::LINEAR, filament::TextureSampler::WrapMode::REPEAT};
 
 void ColorMaterial::apply(filament::MaterialInstance& instance, const ecs::Registry&) const
 {
@@ -57,7 +57,7 @@ void StandardOpaqueMaterial::apply(filament::MaterialInstance& instance, const e
 						  ambientOcclusionMapTexture != nullptr ? ambientOcclusionMapTexture : dummyWhite,
 						  gDefaultSampler);
 
-	const auto* normalMapTexture = graphics::getTexture(registry,normalMap);
+	const auto* normalMapTexture = graphics::getTexture(registry, normalMap);
 	instance.setParameter("normalMap", normalMapTexture != nullptr ? normalMapTexture : dummyWhite, gDefaultSampler);
 
 	auto fixedEmissive = math::vec4{math::vec3{emissive}, 1.0f - emissive.w};

@@ -11,4 +11,4 @@ const filament::Texture* getTexture(const ecs::Registry& registry, ecs::Entity e
 
 const filament::Texture* getTexture(const ecs::Registry& registry, std::string_view resourcePath);
 
-}
+} // namespace spatial::graphics

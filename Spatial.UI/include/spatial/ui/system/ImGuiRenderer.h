@@ -73,4 +73,4 @@ class ImGuiRenderer
 	// endregion
 };
 
-} // namespace spatial
+} // namespace spatial::ui

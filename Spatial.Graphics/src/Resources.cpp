@@ -57,8 +57,4 @@ Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t si
 	return Material{engine, material};
 }
 
-
-
-
-
 } // namespace spatial::graphics

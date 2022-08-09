@@ -245,14 +245,14 @@ bool drawArrowWidget(math::vec3& direction, float widgetSize, std::uint32_t colo
 			}
 		}
 		drawList->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size),
-								 ImColor(style.Colors[ImGuiCol_FrameBgActive]), style.FrameRounding);
+								ImColor(style.Colors[ImGuiCol_FrameBgActive]), style.FrameRounding);
 	}
 	else
 	{
 		auto imcolor =
 			ImColor{ImGui::IsItemHovered() ? style.Colors[ImGuiCol_FrameBgHovered] : style.Colors[ImGuiCol_FrameBg]};
 		drawList->AddRectFilled(orient_pos, orient_pos + ImVec2(sv_orient_size, sv_orient_size), imcolor,
-								 style.FrameRounding);
+								style.FrameRounding);
 	}
 
 	auto innerPos = orient_pos;

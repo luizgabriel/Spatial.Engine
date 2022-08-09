@@ -9,7 +9,8 @@
 namespace spatial::editor
 {
 
-struct EditorCameraController {
+struct EditorCameraController
+{
 	static void readCameraInputs(ecs::Registry& registry, const desktop::InputState& state);
 	static void updateCameraTransforms(ecs::Registry& registry, float delta);
 };
