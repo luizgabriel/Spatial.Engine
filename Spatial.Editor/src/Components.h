@@ -3,9 +3,11 @@
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Registry.h>
 
-namespace spatial::editor {
+namespace spatial::editor
+{
 
-struct EditorCamera {
+struct EditorCamera
+{
 	constexpr static auto typeName = "editor_camera";
 
 	float sensitivity{.5F};

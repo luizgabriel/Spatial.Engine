@@ -17,4 +17,4 @@ class ScriptSourceStream : public v8::ScriptCompiler::ExternalSourceStream
 	std::unique_ptr<std::istream> mStream;
 };
 
-}
+} // namespace spatial::script

@@ -3,7 +3,8 @@
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/SceneView.h>
 
-namespace spatial::editor {
+namespace spatial::editor
+{
 
 void EditorCameraController::readCameraInputs(ecs::Registry& registry, const desktop::InputState& state)
 {

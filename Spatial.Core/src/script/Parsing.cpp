@@ -51,7 +51,8 @@ ecs::ScriptComponent parseComponent(v8::Local<v8::Object> object)
 	auto component = ecs::ScriptComponent{};
 
 	auto properties = getAttribute<v8::Object>(object, propertiesKeyword);
-	for (auto [key, value] : toEntries<v8::String, v8::Object>(properties)) {
+	for (auto [key, value] : toEntries<v8::String, v8::Object>(properties))
+	{
 		auto name = getValue(object->GetIsolate(), key);
 		component.properties.emplace(name, parseProperty(value));
 	}
@@ -66,11 +67,13 @@ ecs::ScriptModule parseModule(v8::Local<v8::Object> object)
 
 	auto parseModule = ecs::ScriptModule{};
 
-	for (auto [key, value] : toEntries<v8::String, v8::Object>(object)) {
+	for (auto [key, value] : toEntries<v8::String, v8::Object>(object))
+	{
 		const auto type = getValue(isolate, getAttribute<v8::String>(value, typeKeyword));
 		const auto name = getValue(isolate, key);
 
-		if (type == "Component") {
+		if (type == "Component")
+		{
 			parseModule.components.emplace(std::move(name), parseComponent(value));
 		}
 	}

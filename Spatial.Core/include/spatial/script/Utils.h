@@ -1,8 +1,8 @@
 #pragma once
 
-#include <v8-local-handle.h>
-#include <v8-isolate.h>
 #include <fmt/format.h>
+#include <v8-isolate.h>
+#include <v8-local-handle.h>
 
 namespace spatial::script
 {
@@ -49,7 +49,8 @@ v8::Local<T> getAttribute(v8::Local<v8::Object> object, const K& key)
 {
 	auto scope = v8::EscapableHandleScope{object->GetIsolate()};
 	static auto typeName = getTypeName<T>();
-	return scope.Escape(cast<T>(getAttributeValue(object, key), fmt::format("Could not cast property '{}' to '{}'", key, typeName)));
+	return scope.Escape(
+		cast<T>(getAttributeValue(object, key), fmt::format("Could not cast property '{}' to '{}'", key, typeName)));
 }
 
 template <typename T, typename K>
@@ -57,7 +58,8 @@ v8::Local<T> getAttributeOrDefault(v8::Local<v8::Object> object, const K& key, v
 {
 	auto scope = v8::EscapableHandleScope{object->GetIsolate()};
 	auto typeName = getTypeName(defaultValue);
-	return scope.Escape(cast<T>(getAttributeValueOrDefault(object, key, defaultValue), fmt::format("Could not cast property '{}' to '{}'", key, typeName)));
+	return scope.Escape(cast<T>(getAttributeValueOrDefault(object, key, defaultValue),
+								fmt::format("Could not cast property '{}' to '{}'", key, typeName)));
 }
 
 std::vector<v8::Local<v8::Value>> toVector(v8::Local<v8::Array> array);
@@ -74,11 +76,10 @@ std::vector<std::pair<v8::Local<K>, v8::Local<V>>> toEntries(v8::Local<v8::Objec
 	auto newEntries = std::vector<std::pair<v8::Local<K>, v8::Local<V>>>{};
 	newEntries.reserve(valueEntries.size());
 
-	for (auto [key, value] : valueEntries) {
-		newEntries.emplace_back(
-			cast<K>(key, fmt::format("Could not cast Object key to '{}'", keyType)),
-			cast<V>(value, fmt::format("Could not cast Object value to '{}'", valueType))
-		);
+	for (auto [key, value] : valueEntries)
+	{
+		newEntries.emplace_back(cast<K>(key, fmt::format("Could not cast Object key to '{}'", keyType)),
+								cast<V>(value, fmt::format("Could not cast Object value to '{}'", valueType)));
 	}
 
 	return newEntries;
@@ -92,5 +93,4 @@ v8::Local<T> unwrap(v8::MaybeLocal<T> value, std::string_view errorMessage)
 	return value.ToLocalChecked();
 }
 
-
-}
+} // namespace spatial::script

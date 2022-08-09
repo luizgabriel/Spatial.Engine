@@ -13,7 +13,7 @@ std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_v
 
 std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path) noexcept
 {
-	//TODO: Use span-stream on C++23
+	// TODO: Use span-stream on C++23
 	auto stream = std::make_unique<std::stringstream>();
 	stream->setstate(std::ios::failbit);
 	return stream;
@@ -65,10 +65,13 @@ void MemoryFileSystem::define(const std::string& fileName, const std::pair<const
 
 std::stringstream MemoryFileSystem::openStream(std::string_view path) const
 {
-	try {
+	try
+	{
 		auto& data = mMemoryMap.at(std::string{path});
 		return std::stringstream{data};
-	} catch (const std::out_of_range& e) {
+	}
+	catch (const std::out_of_range& e)
+	{
 		auto value = std::stringstream{};
 		value.setstate(std::ios::badbit);
 		return value;

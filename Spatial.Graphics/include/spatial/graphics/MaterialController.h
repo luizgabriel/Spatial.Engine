@@ -18,7 +18,9 @@ struct MaterialController
 	static void updateMaterial(ecs::Registry& registry)
 	{
 		registry.getEntities<const MaterialComponent, SharedMaterialInstance>().each(
-			[&](const auto& data, auto& materialInstance) { data.apply(*materialInstance->get(), std::as_const(registry)); });
+			[&](const auto& data, auto& materialInstance) {
+				data.apply(*materialInstance->get(), std::as_const(registry));
+			});
 	}
 };
 

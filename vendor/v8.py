@@ -1,10 +1,7 @@
 import os
-import sys
-import shutil
-import subprocess
 import re
-
-from conans import ConanFile, CMake, tools
+import shutil
+from conans import ConanFile, tools
 from conans.errors import ConanInvalidConfiguration
 
 

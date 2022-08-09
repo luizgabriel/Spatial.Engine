@@ -18,5 +18,4 @@ Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pix
 
 Texture createDummyCubemap(filament::Engine& engine);
 
-
-}
+} // namespace spatial::graphics

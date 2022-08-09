@@ -7,7 +7,8 @@
 namespace spatial::script
 {
 
-struct ScriptController {
+struct ScriptController
+{
 	static void loadScripts(ecs::Registry& registry, FileSystem& fileSystem, Isolate& isolate);
 };
 

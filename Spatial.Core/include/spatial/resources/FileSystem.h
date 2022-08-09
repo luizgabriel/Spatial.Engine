@@ -1,10 +1,10 @@
 #pragma once
 
+#include <future>
 #include <map>
 #include <memory>
 #include <set>
 #include <string_view>
-#include <future>
 
 namespace spatial
 {

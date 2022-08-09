@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/ecs/Registry.h>
 #include <set>
+#include <spatial/ecs/Registry.h>
 
 namespace spatial::ecs
 {
@@ -65,7 +65,7 @@ struct Parent
 	 * @descriptions Collects a vector of child entities
 	 */
 	static std::set<Entity> getChildren(const Registry& registry, Entity parentEntity);
-	
+
 	/**
 	 * @descriptions Collects a vector of child entities recursively
 	 */

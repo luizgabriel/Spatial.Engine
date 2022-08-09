@@ -8,7 +8,8 @@ namespace spatial::ecs
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity)
 {
 	auto& mesh = registry.getOrAddComponent<ecs::MeshInstance>(meshEntity);
-	if (!registry.isValid(mesh.defaultMaterial)) {
+	if (!registry.isValid(mesh.defaultMaterial))
+	{
 		mesh.defaultMaterial = materialEntity;
 		return ecs::NullEntity;
 	}
@@ -18,7 +19,8 @@ Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity m
 
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex)
 {
-	auto child = ecs::Builder::create(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
+	auto child =
+		ecs::Builder::create(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
 	ecs::Parent::addChild(registry, meshEntity, child);
 
 	return child;
