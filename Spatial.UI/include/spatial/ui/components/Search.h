@@ -18,10 +18,10 @@ namespace spatial::ui
 class Search
 {
   public:
-	static bool text(std::string& search, const filament::Texture* icons);
+	static bool text(std::string& search, graphics::OptionalTexture icons);
 
 	template <typename FilterComponent>
-	static bool searchEntity(const std::string_view name, const filament::Texture* icons, const ecs::Registry& registry,
+	static bool searchEntity(const std::string_view name, graphics::OptionalTexture icons, const ecs::Registry& registry,
 							 ecs::Entity& selectedEntity)
 	{
 		bool changed = false;
@@ -77,10 +77,10 @@ class Search
 	}
 
 	template <typename ResourceTypeTag>
-	static bool searchResource(const std::string_view name, const filament::Texture* icons, ecs::Registry& registry,
+	static bool searchResource(const std::string_view name, graphics::OptionalTexture icons, ecs::Registry& registry,
 							   ecs::Entity& selectedEntity)
 	{
-		bool changed = searchEntity<ResourceTypeTag>(name, icons, registry, selectedEntity);
+		bool changed = searchEntity<ResourceTypeTag>(name, std::move(icons), registry, selectedEntity);
 
 		{
 			auto dnd = ui::DragAndDropTarget{};

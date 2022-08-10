@@ -11,7 +11,7 @@ namespace spatial::ui
 {
 
 bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& registry, ecs::Entity& resource,
-				 const filament::Texture* icons)
+				 graphics::OptionalTexture icons)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -37,7 +37,7 @@ bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& regis
 	return changed;
 }
 
-bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, const filament::Texture* icons,
+bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, graphics::OptionalTexture icons,
 			  math::vec4 uv)
 {
 	bool changed = false;
@@ -52,7 +52,7 @@ bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& reso
 }
 
 bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs::Entity& resource,
-			  const filament::Texture* icons, math::vec4 uv)
+			  graphics::OptionalTexture icons, math::vec4 uv)
 {
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
@@ -75,7 +75,7 @@ bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs
 	return changed;
 }
 
-bool colorPicker(std::string_view label, math::vec4& color, const filament::Texture* icons)
+bool colorPicker(std::string_view label, math::vec4& color, graphics::OptionalTexture icons)
 {
 	static constexpr auto size = math::vec2{20.0f};
 
@@ -90,7 +90,7 @@ bool colorPicker(std::string_view label, math::vec4& color, const filament::Text
 	return changed;
 }
 
-bool colorPicker(std::string_view label, math::vec3& color, const filament::Texture* icons)
+bool colorPicker(std::string_view label, math::vec3& color, graphics::OptionalTexture icons)
 {
 	static constexpr auto size = math::vec2{20.0f};
 
@@ -104,7 +104,7 @@ bool colorPicker(std::string_view label, math::vec3& color, const filament::Text
 }
 
 bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource,
-				  const filament::Texture* icons)
+				  graphics::OptionalTexture icons)
 {
 	static constexpr auto size = math::vec2{20.0f};
 

@@ -62,13 +62,15 @@ set_property(
         TARGET Spatial.UI
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
+target_compile_definitions(Spatial.UI PUBLIC "ImTextureID=std::shared_ptr<void>")
+target_compile_definitions(Spatial.UI PUBLIC "IMGUI_USER_CONFIG=<memory>")
+
 target_include_directories(Spatial.UI
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
         PRIVATE src)
 
-# LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.UI
         PRIVATE
         Spatial.Core

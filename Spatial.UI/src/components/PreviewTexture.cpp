@@ -6,17 +6,17 @@
 namespace spatial::ui
 {
 
-void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, const filament::Texture* icons,
+void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, graphics::OptionalTexture icons,
 					const math::vec4 uv)
 {
 	constexpr auto size = math::vec2{20.0f};
-	const auto* texture = graphics::getTexture(registry, resourceEntity);
-	auto isDepthTexture = texture != nullptr && isDepthFormat(texture->getFormat());
+	auto texture = graphics::getTexture(registry, resourceEntity);
+	auto isDepthTexture = texture && isDepthFormat(texture.value()->getFormat());
 
-	if (texture == nullptr || isDepthTexture)
+	if (!texture || isDepthTexture)
 		ui::image(icons, size, uv);
 
-	if (texture != nullptr && !isDepthTexture)
+	if (!isDepthTexture)
 		ui::image(texture, size);
 
 	const auto& colors = ImGui::GetStyle().Colors;
@@ -29,7 +29,7 @@ void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, c
 		{
 			ImGui::Text("Preview");
 			ui::separator();
-			if (isDepthFormat(texture->getFormat()))
+			if (isDepthTexture)
 				ImGui::Text("Depth Textures cannot be previewed");
 			else
 				ui::image(texture, math::vec2{300.0f});
@@ -42,7 +42,6 @@ void previewTexture(const ecs::Registry& registry, ecs::Entity resourceEntity, c
 
 		ImGui::EndTooltip();
 	}
-
 }
 
 } // namespace spatial::ui

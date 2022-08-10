@@ -8,12 +8,12 @@
 namespace spatial::ui
 {
 
-bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPath, const filament::Texture* icon)
+bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPath, graphics::OptionalTexture icons)
 {
 	using namespace boost::algorithm;
 	using namespace std::filesystem;
 
-	displayPathHeader(selectedPath, icon);
+	displayPathHeader(selectedPath, icons);
 
 	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "FilesExplorer", false);
 
@@ -27,7 +27,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 		if (entry.isDirectory())
 		{
 			ImGui::PushID(entry.path.c_str());
-			if (imageButton(icon, size, Icons::folder.uv()))
+			if (imageButton(icons, size, Icons::folder.uv()))
 			{
 				selectedPath = newPath;
 				selected = true;
@@ -42,7 +42,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 
 			const auto fileButton = [&](const math::vec4& uv) {
 				ImGui::PushID(entry.path.c_str());
-				if (imageButton(icon, size, uv))
+				if (imageButton(icons, size, uv))
 					selected = true;
 				ImGui::PopID();
 			};
@@ -81,14 +81,14 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 	return selected;
 }
 
-bool FilesExplorer::displayPathHeader(std::string& selectedPath, const filament::Texture* icon)
+bool FilesExplorer::displayPathHeader(std::string& selectedPath, graphics::OptionalTexture icons)
 {
 	bool changed = false;
 	if (selectedPath.empty())
 		return false;
 
 	ImGui::PushID("BackButton");
-	changed = imageButton(icon, math::vec2{20}, Icons::back.uv());
+	changed = imageButton(icons, math::vec2{20}, Icons::back.uv());
 	if (changed)
 	{
 		auto lastSeparator = selectedPath.find_last_of(FileSystem::SEPARATOR);

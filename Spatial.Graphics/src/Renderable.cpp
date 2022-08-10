@@ -84,7 +84,7 @@ math::AxisAlignedBoundingBox Renderable::getAxisAlignedBoundingBox() const noexc
 void Renderable::setMaterialInstanceAt(size_t primitiveIndex, const SharedMaterialInstance& materialInstance) noexcept
 {
 	mMaterialInstances.emplace(primitiveIndex, materialInstance);
-	return getManager().setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance->get());
+	return getManager().setMaterialInstanceAt(getInstance(), primitiveIndex, materialInstance->getInstance());
 }
 
 filament::MaterialInstance* Renderable::getMaterialInstanceAt(size_t primitiveIndex) const noexcept

@@ -69,26 +69,21 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 	return false;
 }
 
-void image(const filament::Texture* texture, math::vec2 size, math::vec4 uv)
+
+void image(graphics::OptionalTexture texture, math::vec2 size, math::vec4 uv)
 {
-	if (texture == nullptr)
+	if (!texture)
 		return;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
-	ImGui::Image((ImTextureID)texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
-#pragma clang diagnostic pop
+	ImGui::Image(*texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 }
 
-bool imageButton(const filament::Texture* texture, math::vec2 size, math::vec4 uv)
+bool imageButton(graphics::OptionalTexture texture, math::vec2 size, math::vec4 uv)
 {
-	if (texture == nullptr)
+	if (!texture)
 		return false;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
-	return ImGui::ImageButton((ImTextureID)texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
-#pragma clang diagnostic pop
+	return ImGui::ImageButton(*texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 }
 
 void spanToAvailWidth(float weight)
@@ -151,8 +146,8 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																			const filament::Texture* icons)
+bool ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																			graphics::OptionalTexture icons)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 	bool changed = false;
@@ -230,8 +225,9 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 	auto& resource = registry.getComponent<ecs::Resource>(entity);
 	bool changed = false;
 
-	if (registry.hasComponent<ecs::tags::IsImageTexture>(entity)) {
-		ui::previewTexture(registry, entity, nullptr);
+	if (registry.hasComponent<ecs::tags::IsImageTexture>(entity))
+	{
+		ui::previewTexture(registry, entity, std::nullopt);
 		ImGui::SameLine();
 	}
 
@@ -260,8 +256,8 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::MeshInstance, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																		   const filament::Texture* icons)
+bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																		   graphics::OptionalTexture icons)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 	bool changed = false;
@@ -384,8 +380,8 @@ bool ComponentInputImpl<ecs::MeshInstance, const filament::Texture*>::draw(ecs::
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::MeshMaterial, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																		   const filament::Texture* icons)
+bool ComponentInputImpl<ecs::MeshMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																		   graphics::OptionalTexture icons)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
 	const size_t smallStep = 1, largeStep = 1;
@@ -470,8 +466,8 @@ bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Scene, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	const filament::Texture* icons)
+bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	graphics::OptionalTexture icons)
 {
 	auto& sceneView = registry.getComponent<ecs::Scene>(entity);
 	auto changed = false;
@@ -507,8 +503,8 @@ bool ComponentInputImpl<ecs::Scene, const filament::Texture*>::draw(ecs::Registr
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Parent, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	 const filament::Texture* icons)
+bool ComponentInputImpl<ecs::Parent, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	 graphics::OptionalTexture icons)
 {
 	auto& parent = registry.getComponent<ecs::Parent>(entity);
 	bool changed = false;
@@ -523,8 +519,8 @@ bool ComponentInputImpl<ecs::Parent, const filament::Texture*>::draw(ecs::Regist
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Child, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	const filament::Texture* icons)
+bool ComponentInputImpl<ecs::Child, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	graphics::OptionalTexture icons)
 {
 	auto& child = registry.getComponent<ecs::Child>(entity);
 	bool changed = false;
@@ -548,11 +544,11 @@ bool ComponentInputImpl<ecs::AttachmentTexture>::draw(ecs::Registry& registry, e
 
 	ui::spacing(2);
 
-	const auto* texture = registry.tryGetComponent<graphics::SharedTexture>(entity);
-	if (texture != nullptr && attachment.type == ecs::AttachmentTexture::Type::Color)
+	auto texture = graphics::getTexture(registry, entity);
+	if (texture && attachment.type == ecs::AttachmentTexture::Type::Color)
 	{
 		auto width = ImGui::GetContentRegionAvail().x * 0.8f;
-		ui::image(texture->get(), {width, width * aspectRatio.inv()}, math::vec4{0, 1, 1, 0});
+		ui::image(*texture, {width, width * aspectRatio.inv()}, math::vec4{0, 1, 1, 0});
 	}
 	else
 	{
