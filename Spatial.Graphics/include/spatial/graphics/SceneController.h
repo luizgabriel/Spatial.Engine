@@ -18,7 +18,7 @@ class SceneController
 
 	static void organizeSceneRenderables(ecs::Registry& registry);
 
-	static void updateScenes(const ecs::Registry& registry);
+	static void updateScenes(const ecs::Registry& scene);
 
 	static void renderViews(filament::Renderer& renderer, const ecs::Registry& registry);
 };
