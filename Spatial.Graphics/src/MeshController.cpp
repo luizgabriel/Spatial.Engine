@@ -1,7 +1,6 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/graphics/MeshController.h>
 #include <spatial/graphics/MeshResources.h>
 #include <spatial/graphics/Renderable.h>
@@ -22,14 +21,10 @@ void MeshController::createMeshInstances(filament::Engine& engine, ecs::Registry
 		.each([&](ecs::Entity e, const auto& entity, const auto& meshInstance) {
 			size_t meshPartsCount = 0;
 			if (registry.hasAllComponents<MeshGeometries>(meshInstance.meshSource))
-			{
 				meshPartsCount = registry.getComponent<const MeshGeometries>(meshInstance.meshSource).size();
-			}
 
 			if (meshPartsCount <= 0)
-			{
 				return;
-			}
 
 			auto partsCount = meshInstance.slice.count == 0 ? meshPartsCount : meshInstance.slice.count;
 			registry.addComponent<Renderable>(e, engine, entity.get(), partsCount);
@@ -61,9 +56,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 
 		const auto* boundingBox = registry.tryGetComponent<const math::AxisAlignedBoundingBox>(meshInstance.meshSource);
 		if (boundingBox != nullptr)
-		{
 			renderable.setAxisAlignedBoundingBox(*boundingBox);
-		}
 
 		const auto numParts = std::min(partsCount, parts.size());
 		for (size_t i = 0; i < numParts; i++)
@@ -79,9 +72,7 @@ void MeshController::updateMeshGeometries(ecs::Registry& registry)
 				registry.getComponent<const SharedMaterialInstance>(meshInstance.defaultMaterial);
 
 			for (size_t i = 0; i < numParts; i++)
-			{
 				renderable.setMaterialInstanceAt(i, materialInstance);
-			}
 		}
 	});
 

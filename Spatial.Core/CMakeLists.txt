@@ -28,11 +28,10 @@ add_library(Spatial.Core
         include/spatial/ecs/Mesh.h
         include/spatial/ecs/Builder.h
         include/spatial/ecs/Relation.h
-        include/spatial/ecs/SceneView.h
+        include/spatial/ecs/Scene.h
         include/spatial/ecs/Script.h
         include/spatial/ecs/Material.h
         include/spatial/ecs/RegistryCollection.h
-        include/spatial/ecs/Tags.h
         include/spatial/ecs/Resource.h
         include/spatial/ecs/Texture.h
 
@@ -57,7 +56,6 @@ add_library(Spatial.Core
         include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
         include/spatial/resources/ResourceController.h
-        include/spatial/resources/FilameshFile.h
 
         include/spatial/script/Isolate.h
         include/spatial/script/PlatformContext.h
@@ -84,6 +82,7 @@ add_library(Spatial.Core
         src/ecs/RegistryPublisher.cpp
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
+        src/ecs/Scene.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp

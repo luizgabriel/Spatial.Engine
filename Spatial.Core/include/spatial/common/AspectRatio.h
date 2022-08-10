@@ -13,6 +13,10 @@ struct BaseAspectRatio
 
 	constexpr BaseAspectRatio() = default;
 
+	constexpr BaseAspectRatio(math::vec<2, T> dimensions) : width{dimensions.x}, height{dimensions.y}
+	{
+	}
+
 	constexpr BaseAspectRatio(T width, T height) : width{width}, height{height}
 	{
 	}

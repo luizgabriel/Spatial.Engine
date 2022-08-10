@@ -11,10 +11,38 @@ namespace spatial::graphics
 
 void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::DummyCubeMapTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+	registry
+		.getEntities<ecs::tags::IsColorBufferTexture, const ecs::AttachmentTexture>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const auto& data) {
+			auto texture = toShared(createTexture(
+				engine, filament::Texture::Builder()
+							.width(data.size.x)
+							.height(data.size.y)
+							.format(filament::backend::TextureFormat::RGBA16F)
+							.usage(filament::Texture::Usage::COLOR_ATTACHMENT | filament::Texture::Usage::SAMPLEABLE)));
+
+			registry.addOrReplaceComponent(entity, std::move(texture));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		});
+
+	registry
+		.getEntities<ecs::tags::IsDepthBufferTexture, const ecs::AttachmentTexture>(
+			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const auto& data) {
+			auto texture = toShared(createTexture(engine, filament::Texture::Builder()
+															  .width(data.size.x)
+															  .height(data.size.y)
+															  .format(filament::backend::TextureFormat::DEPTH16)
+															  .usage(filament::Texture::Usage::DEPTH_ATTACHMENT)));
+
+			registry.addOrReplaceComponent(entity, std::move(texture));
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
+		});
+
+	registry.getEntities<const ecs::tags::IsDummyCubeMapTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity) {
 			auto texture = toShared(createDummyCubemap(engine));
-
 			registry.addOrReplaceComponent(entity, std::move(texture));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
@@ -23,7 +51,6 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 		.each([&](ecs::Entity entity, const ecs::RuntimeTexture& runtimeTexture) {
 			auto texture = toShared(createTexture(engine, runtimeTexture.pixels, runtimeTexture.width));
 			registry.addOrReplaceComponent(entity, std::move(texture));
-			registry.removeComponent<ecs::ResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 

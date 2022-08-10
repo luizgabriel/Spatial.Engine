@@ -13,6 +13,7 @@
 #include <filament/TextureSampler.h>
 #include <filament/VertexBuffer.h>
 #include <filament/View.h>
+#include <filament/Viewport.h>
 
 #include <spatial/graphics/Camera.h>
 #include <spatial/graphics/EngineResource.h>
@@ -47,6 +48,7 @@ using SharedView = SharedEngineResource<filament::View>;
 using SharedTexture = SharedEngineResource<filament::Texture>;
 using SharedCamera = SharedEngineResource<Camera>;
 using SharedIndirectLight = SharedEngineResource<filament::IndirectLight>;
+using SharedRenderTarget = SharedEngineResource<filament::RenderTarget>;
 
 struct MeshGeometry
 {
@@ -56,41 +58,29 @@ struct MeshGeometry
 
 using MeshGeometries = std::vector<MeshGeometry>;
 
-/**
- * \brief Creates a scoped pointer of the filament::SwapChain
- */
 SwapChain createSwapChain(filament::Engine& engine, void* nativeWindowHandle) noexcept;
 
-/**
- * \brief Creates a scoped pointer of the filament::Renderer
- */
 Renderer createRenderer(filament::Engine& engine) noexcept;
 
-/**
- * \brief Creates a scoped pointer of the filament::Scene
- */
 Scene createScene(filament::Engine& engine) noexcept;
 
-/**
- * \brief Creates a scoped pointer of the filament::View
- */
 View createView(filament::Engine& engine) noexcept;
 
-/**
- * \brief Creates a scoped pointer of the filament::Camera
- */
 Camera createCamera(filament::Engine& engine, utils::Entity entity) noexcept;
 
-/**
- * \brief Creates a scoped pointer of the utils::Entity
- */
 Entity createEntity(filament::Engine& engine) noexcept;
+
+VertexBuffer createVertexBuffer(filament::Engine& engine, filament::VertexBuffer::Builder builder);
+
+IndexBuffer createIndexBuffer(filament::Engine& engine, filament::IndexBuffer::Builder builder);
 
 MaterialInstance createMaterialInstance(filament::Engine& engine, const SharedMaterial& material,
 										std::string_view = {}) noexcept;
 
-RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth);
+RenderTarget createRenderTarget(filament::Engine& engine, filament::RenderTarget::Builder builder);
 
 Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size);
+
+Texture createTexture(filament::Engine& engine, filament::Texture::Builder builder);
 
 } // namespace spatial::graphics

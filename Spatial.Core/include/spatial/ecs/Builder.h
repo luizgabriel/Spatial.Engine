@@ -8,7 +8,7 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Resource.h>
-#include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
 
@@ -27,8 +27,6 @@ class DirectionalLightBuilder;
 class SunLightBuilder;
 class IndirectLightBuilder;
 
-class PrecompiledMaterialBuilder;
-
 class ResourceBuilder;
 
 template <typename MaterialComponent>
@@ -38,7 +36,7 @@ class MeshInstanceBuilder;
 
 class MeshMaterialBuilder;
 
-class SceneViewBuilder;
+class SceneBuilder;
 
 class Builder
 {
@@ -81,7 +79,7 @@ class Builder
 	DirectionalLightBuilder asDirectionalLight();
 	SunLightBuilder asSunLight();
 	IndirectLightBuilder asIndirectLight();
-	SceneViewBuilder asSceneView();
+	SceneBuilder asScene();
 
 	ResourceBuilder asResource();
 
@@ -237,10 +235,10 @@ class IndirectLightBuilder : public BasicBuilder<IndirectLight>
 
 	IndirectLightBuilder& withIntensity(float intensity);
 	IndirectLightBuilder& withReflectionsTexture(std::string_view path);
-	IndirectLightBuilder& withReflectionsTexture(ecs::Entity resource);
+	IndirectLightBuilder& withReflectionsTexture(Entity resource);
 
 	IndirectLightBuilder& withIrradianceValues(std::string_view path);
-	IndirectLightBuilder& withIrradianceValues(ecs::Entity resource);
+	IndirectLightBuilder& withIrradianceValues(Entity resource);
 };
 
 template <typename MaterialProps>
@@ -314,15 +312,20 @@ class MeshMaterialBuilder : public BasicBuilder<MeshMaterial>
 	MeshMaterialBuilder& withMaterial(Entity materialInstance);
 };
 
-class SceneViewBuilder : public BasicBuilder<SceneView>
+class SceneBuilder : public BasicBuilder<Scene>
 {
   public:
-	using Base = BasicBuilder<SceneView>;
+	using Base = BasicBuilder<Scene>;
 
-	SceneViewBuilder(Registry& registry, Entity entity);
-	SceneViewBuilder& withDimensions(math::uvec2 dimensions);
-	SceneViewBuilder& withCamera(ecs::Entity cameraEntity);
-	SceneViewBuilder& withIndirectLight(ecs::Entity indirectLightEntity);
+	SceneBuilder(Registry& registry, Entity entity);
+	SceneBuilder& withDimensions(math::uvec2 dimensions);
+	SceneBuilder& withCamera(Entity cameraEntity);
+	SceneBuilder& withIndirectLight(Entity indirectLightEntity);
+	SceneBuilder& withBlendMode(Scene::BlendMode blendMode);
+	SceneBuilder& withShadowingDisabled();
+	SceneBuilder& withPostProcessingDisabled();
+	SceneBuilder& withDefaultAttachments();
+	SceneBuilder& withAttachment(Entity attachmentTexture);
 };
 
 } // namespace spatial::ecs

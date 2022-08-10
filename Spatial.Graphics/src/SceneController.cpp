@@ -1,14 +1,35 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/SceneView.h>
-#include <spatial/ecs/Tags.h>
+#include <spatial/ecs/Scene.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/graphics/Entity.h>
 #include <spatial/graphics/Resources.h>
 #include <spatial/graphics/SceneController.h>
-#include <spatial/graphics/TextureView.h>
 
 namespace spatial::graphics
 {
+
+inline filament::View::BlendMode toFilament(ecs::Scene::BlendMode blendMode)
+{
+	switch (blendMode)
+	{
+	case ecs::Scene::BlendMode::Opaque:
+		return filament::BlendMode::OPAQUE;
+	case ecs::Scene::BlendMode::Translucent:
+		return filament::BlendMode::TRANSLUCENT;
+	}
+}
+
+inline filament::RenderTarget::AttachmentPoint toFilament(ecs::AttachmentTexture::Type attachmentType)
+{
+	switch (attachmentType)
+	{
+	case ecs::AttachmentTexture::Type::Color:
+		return filament::RenderTarget::AttachmentPoint::COLOR;
+	case ecs::AttachmentTexture::Type::Depth:
+		return filament::RenderTarget::AttachmentPoint::DEPTH;
+	}
+}
 
 void SceneController::createRenderables(filament::Engine& engine, ecs::Registry& registry)
 {
@@ -39,7 +60,7 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 	auto view = registry.getEntities<Entity>(ecs::ExcludeComponents<ecs::tags::AddedToScene>);
 
 	view.each([&](auto& renderEntity) {
-		registry.getEntities<SharedScene>().each([&](auto& scene) {
+		registry.getEntities<const SharedScene>().each([&](const auto& scene) {
 			auto contains = scene->hasEntity(renderEntity.get());
 			if (!contains)
 			{
@@ -51,52 +72,72 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 	registry.insertComponent<ecs::tags::AddedToScene>(view.begin(), view.end());
 }
 
-void SceneController::renderViews(filament::Renderer& renderer, ecs::Registry& registry)
+void SceneController::renderViews(filament::Renderer& renderer, const ecs::Registry& registry)
 {
-	registry.getEntities<const TextureView>().each([&](const TextureView& textureView) {
-		const auto& view = textureView.getView();
-		renderer.render(view.get());
-	});
-}
-
-void updateScene(const ecs::Registry& registry, const ecs::SceneView& component, TextureView& textureView)
-{
-	auto* indirectLight = registry.tryGetComponent<const SharedIndirectLight>(component.indirectLight);
-	if (indirectLight)
-		textureView.getScene()->setIndirectLight(indirectLight->get());
-
-	if (registry.hasAllComponents<SharedCamera>(component.camera))
-	{
-		const auto& camera = registry.getComponent<const SharedCamera>(component.camera);
-		textureView.setCamera(camera);
-	}
+	registry
+		.getEntities<const SharedView>()	//
+		.each([&](const SharedView& view) { //
+			renderer.render(view.get());
+		});
 }
 
 void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
 {
-	auto sceneViews = registry.getEntities<const ecs::SceneView>(ecs::ExcludeComponents<SharedScene>);
+	auto sceneViews = registry.getEntities<const ecs::Scene>(ecs::ExcludeComponents<SharedScene>);
 	if (sceneViews.size_hint() > 0)
 		registry.removeComponentFromEntities<ecs::tags::AddedToScene>();
 
-	sceneViews.each(
-		[&](ecs::Entity entity, const auto&) { registry.addComponent(entity, toShared(createScene(engine))); });
+	sceneViews.each([&](ecs::Entity entity, const auto&) {
+		auto scene = toShared(createScene(engine));
+		auto view = toShared(createView(engine));
+		view->setScene(scene.get());
 
-	registry.getEntities<const ecs::SceneView, const SharedScene>(ecs::ExcludeComponents<TextureView>)
-		.each([&](ecs::Entity entity, const auto& sceneView, const auto& scene) {
-			if (!registry.hasAllComponents<SharedCamera>(sceneView.camera))
+		registry.addComponent(entity, std::move(scene));
+		registry.addComponent(entity, std::move(view));
+	});
+
+	registry
+		.getEntities<ecs::tags::IsRenderedToTarget, const ecs::Scene, const SharedView>(
+			ecs::ExcludeComponents<SharedRenderTarget>)
+		.each([&](ecs::Entity entity, const auto&, const auto& view) {
+			auto builder = filament::RenderTarget::Builder();
+			auto attachments = ecs::Scene::getAttachments(registry, entity);
+			if (attachments.size() < 2)
 				return;
 
-			auto& textureView = registry.addComponent<TextureView>(entity, engine, sceneView.size);
-			textureView.setScene(scene);
+			for (auto attachmentEntity : attachments)
+			{
+				const auto& attachment = registry.getComponent<const ecs::AttachmentTexture>(attachmentEntity);
+				const auto* texture = registry.tryGetComponent<const SharedTexture>(attachmentEntity);
+				auto flAttachmentType = toFilament(attachment.type);
 
-			updateScene(registry, sceneView, textureView);
+				builder = builder.texture(flAttachmentType, texture != nullptr ? texture->get() : nullptr);
+			}
+
+			auto renderTarget = toShared(createRenderTarget(engine, builder));
+			view->setRenderTarget(renderTarget.get());
+
+			registry.addComponent(entity, std::move(renderTarget));
 		});
 }
 
-void SceneController::updateScenes(ecs::Registry& registry)
+void SceneController::updateScenes(const ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::SceneView, TextureView>().each(
-		[&](const auto& sceneView, auto& textureView) { updateScene(registry, sceneView, textureView); });
+	registry.getEntities<const ecs::Scene, const SharedScene>().each([&](const auto& sceneView, const auto& scene) {
+		auto* indirectLight = registry.tryGetComponent<const SharedIndirectLight>(sceneView.indirectLight);
+		scene->setIndirectLight(indirectLight != nullptr ? indirectLight->get() : nullptr);
+	});
+
+	registry.getEntities<const ecs::Scene, const SharedView>().each([&](const auto& sceneView, const auto& view) {
+		const auto* camera = registry.tryGetComponent<const SharedCamera>(sceneView.camera);
+		auto blendMode = toFilament(sceneView.blendMode);
+
+		view->setViewport({0, 0, sceneView.size.x, sceneView.size.y});
+		view->setCamera(camera != nullptr ? camera->get()->getInstance() : nullptr);
+		view->setBlendMode(blendMode);
+		view->setShadowingEnabled(sceneView.isShadowingEnabled);
+		view->setPostProcessingEnabled(sceneView.isPostProcessingEnabled);
+	});
 }
 
 } // namespace spatial::graphics

@@ -18,9 +18,9 @@ class SceneController
 
 	static void organizeSceneRenderables(ecs::Registry& registry);
 
-	static void updateScenes(ecs::Registry& registry);
+	static void updateScenes(const ecs::Registry& registry);
 
-	static void renderViews(filament::Renderer& renderer, ecs::Registry& registry);
+	static void renderViews(filament::Renderer& renderer, const ecs::Registry& registry);
 };
 
 } // namespace spatial::graphics

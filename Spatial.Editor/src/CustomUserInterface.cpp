@@ -3,14 +3,12 @@
 #include "Materials.h"
 #include "Tags.h"
 #include <boost/algorithm/string/predicate.hpp>
-#include <magic_enum.hpp>
 #include <fmt/format.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/graphics/TextureUtils.h>
-#include <spatial/graphics/TextureView.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <spatial/ui/components/Icons.h>
@@ -142,7 +140,8 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::Resource>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity, icons);
 	componentCollapse<ecs::MeshMaterial>(registry, entity, icons);
-	componentCollapse<ecs::SceneView>(registry, entity, icons);
+	componentCollapse<ecs::Scene>(registry, entity, icons);
+	componentCollapse<ecs::AttachmentTexture>(registry, entity);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
 	componentCollapse<editor::ColorMaterial>(registry, entity);
@@ -155,6 +154,24 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 		componentCollapse<ecs::Parent>(registry, entity, icons);
 		componentCollapse<ecs::Child>(registry, entity, icons);
 	}
+
+	ui::separator(2);
+
+	ImGui::Text("Tags: ");
+
+	componentTag<ecs::tags::IsRenderedToTarget>(registry, entity);
+	componentTag<ecs::tags::IsMaterialInstance>(registry, entity);
+	componentTag<ecs::tags::IsCubeMapTexture>(registry, entity);
+	componentTag<ecs::tags::IsColorBufferTexture>(registry, entity);
+	componentTag<ecs::tags::IsDepthBufferTexture>(registry, entity);
+	componentTag<ecs::tags::IsRenderable>(registry, entity);
+	componentTag<ecs::tags::IsMesh>(registry, entity);
+	componentTag<ecs::tags::IsMainView>(registry, entity);
+	componentTag<ecs::tags::IsIrradianceValues>(registry, entity);
+	componentTag<ecs::tags::IsDummyCubeMapTexture>(registry, entity);
+	componentTag<ecs::tags::IsMaterial>(registry, entity);
+	componentTag<ecs::tags::IsImageTexture>(registry, entity);
+	componentTag<ecs::tags::IsScript>(registry, entity);
 
 	return changed;
 }
@@ -218,8 +235,8 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::SceneView>(entity) && menu.item("Scene View"))
-		registry.addComponent<ecs::SceneView>(entity);
+	if (!registry.hasAnyComponent<ecs::Scene>(entity) && menu.item("Scene View"))
+		registry.addComponent<ecs::Scene>(entity);
 }
 
 void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
@@ -419,28 +436,14 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 
 bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter, const filament::Texture* icons)
 {
-	static const auto filterToName = std::unordered_map<ResourceType, const char*>{
-		{ResourceType::All, "All"},		{ResourceType::Material, "Materials"}, {ResourceType::Script, "Scripts"},
-		{ResourceType::Mesh, "Meshes"}, {ResourceType::Texture, "Textures"},
-	};
-
 	bool changed = false;
 
 	ImGui::Columns(2);
 	ImGui::SetColumnWidth(0, 100.0f);
 	ui::spanToAvailWidth();
-	if (ImGui::BeginCombo("##ResourceTypeFilter", filterToName.at(filter)))
-	{
-		for (auto value : magic_enum::enum_values<ResourceType>())
-		{
-			if (ImGui::Selectable(filterToName.at(value), filter == value))
-			{
-				filter = value;
-				changed = true;
-			}
-		}
-		ImGui::EndCombo();
-	}
+
+	changed |= ui::Combo::fromEnum("##ResourceTypeFilter", filter);
+
 	ImGui::NextColumn();
 	changed |= ui::Search::text(search, icons);
 
@@ -711,7 +714,7 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (Menu::itemButton("Scene View"))
 	{
-		newEntity = ecs::Builder::create(registry).withName("Scene View").asSceneView();
+		newEntity = ecs::Builder::create(registry).withName("Scene View").asScene().withDefaultAttachments();
 		changed = true;
 	}
 
