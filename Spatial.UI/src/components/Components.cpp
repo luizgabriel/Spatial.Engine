@@ -3,7 +3,7 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
-#include <spatial/graphics/TextureView.h>
+#include <spatial/graphics/Resources.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
@@ -462,16 +462,13 @@ bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::SceneView, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
-																		const filament::Texture* icons)
+bool ComponentInputImpl<ecs::Scene, const filament::Texture*>::draw(ecs::Registry& registry, ecs::Entity entity,
+																	const filament::Texture* icons)
 {
-	auto& sceneView = registry.getComponent<ecs::SceneView>(entity);
+	auto& sceneView = registry.getComponent<ecs::Scene>(entity);
 	auto changed = false;
 
-	auto size = std::array<int, 2>{static_cast<int>(sceneView.size.x), static_cast<int>(sceneView.size.y)};
-	changed |= ImGui::DragInt2("Size", size.data());
-	sceneView.size = math::uvec2{size[0], size[1]};
-
+	changed |= vec2Input("Size", sceneView.size);
 	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", icons, registry, sceneView.indirectLight);
 	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", icons, registry, sceneView.camera);
 
@@ -489,8 +486,7 @@ bool ComponentInputImpl<ecs::SceneView, const filament::Texture*>::draw(ecs::Reg
 		ImGui::TreePop();
 	}
 
-	if (registry.hasAllComponents<graphics::TextureView>(entity)
-		&& ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
 		ImGui::TreePop();
@@ -524,6 +520,32 @@ bool ComponentInputImpl<ecs::Child, const filament::Texture*>::draw(ecs::Registr
 	changed |= ui::Search::searchEntity<ecs::Name>("Parent", icons, registry, child.parent);
 	changed |= ui::Search::searchEntity<ecs::Name>("Previous Sibling", icons, registry, child.previous);
 	changed |= ui::Search::searchEntity<ecs::Name>("Next Sibling", icons, registry, child.next);
+
+	return changed;
+}
+
+bool ComponentInputImpl<ecs::AttachmentTexture>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& attachment = registry.getComponent<ecs::AttachmentTexture>(entity);
+	bool changed = false;
+
+	changed |= ui::vec2Input("Size", attachment.size);
+	changed |= ui::Combo::fromEnum("Type", attachment.type);
+
+	auto aspectRatio = BaseAspectRatio<float>{attachment.size};
+
+	ui::spacing(2);
+
+	const auto* texture = registry.tryGetComponent<graphics::SharedTexture>(entity);
+	if (texture != nullptr && attachment.type == ecs::AttachmentTexture::Type::Color)
+	{
+		auto width = ImGui::GetContentRegionAvail().x * 0.8f;
+		ui::image(texture->get(), {width, width * aspectRatio.inv()}, math::vec4{0, 1, 1, 0});
+	}
+	else
+	{
+		ImGui::Text("This \"%s\" attachment cannot be previewed", magic_enum::enum_name(attachment.type).data());
+	}
 
 	return changed;
 }

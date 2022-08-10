@@ -1,7 +1,5 @@
 #include <spatial/graphics/Resources.h>
 
-#include <filament/Fence.h>
-
 namespace spatial::graphics
 {
 
@@ -41,20 +39,30 @@ MaterialInstance createMaterialInstance(filament::Engine& engine, const SharedMa
 	return MaterialInstance{engine, material, material->createInstance(name.data())};
 }
 
-RenderTarget createRenderTarget(filament::Engine& engine, filament::Texture& color, filament::Texture& depth)
-{
-	auto target = filament::RenderTarget::Builder()
-					  .texture(filament::RenderTarget::AttachmentPoint::COLOR, &color)
-					  .texture(filament::RenderTarget::AttachmentPoint::DEPTH, &depth)
-					  .build(engine);
-
-	return RenderTarget{engine, target};
-}
-
 Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size)
 {
 	auto material = filament::Material::Builder().package(data, size).build(engine);
 	return Material{engine, material};
+}
+
+VertexBuffer createVertexBuffer(filament::Engine& engine, filament::VertexBuffer::Builder builder)
+{
+	return VertexBuffer{engine, builder.build(engine)};
+}
+
+IndexBuffer createIndexBuffer(filament::Engine& engine, filament::IndexBuffer::Builder builder)
+{
+	return IndexBuffer{engine, builder.build(engine)};
+}
+
+RenderTarget createRenderTarget(filament::Engine& engine, filament::RenderTarget::Builder builder)
+{
+	return RenderTarget{engine, builder.build(engine)};
+}
+
+Texture createTexture(filament::Engine& engine, filament::Texture::Builder builder)
+{
+	return Texture{engine, builder.build(engine)};
 }
 
 } // namespace spatial::graphics

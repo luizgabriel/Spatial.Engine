@@ -100,17 +100,17 @@ class Registry : private entt::registry
 	}
 
 	template <typename... Component>
-	void removeComponentFromEntities()
+	size_t removeComponentFromEntities()
 	{
 		auto view = getEntities<Component...>();
-		remove<Component...>(view.begin(), view.end());
+		return remove<Component...>(view.begin(), view.end());
 	}
 
 	template <typename Component>
-	void removeComponent(Entity entity)
+	size_t removeComponent(Entity entity)
 	{
 		assert(isValid(entity));
-		remove<Component>(entity);
+		return remove<Component>(entity);
 	}
 
 	template <typename Component>
@@ -121,9 +121,9 @@ class Registry : private entt::registry
 	}
 
 	template <typename Component, typename It>
-	void removeComponent(It begin, It end)
+	size_t removeComponent(It begin, It end)
 	{
-		remove<Component>(begin, end);
+		return remove<Component>(begin, end);
 	}
 
 	template <typename Component, typename It>
@@ -174,6 +174,26 @@ class Registry : private entt::registry
 		return get_or_emplace<Component>(entity, std::forward<Component>(component));
 	}
 
+	template <typename Component, typename... Args>
+	decltype(auto) replaceComponent(entt::entity entity, Args&&... args)
+	{
+		assert(isValid(entity));
+		return this->replace<Component>(entity, std::forward<Args>(args)...);
+	}
+
+	template <typename Component>
+	decltype(auto) replaceComponent(entt::entity entity, Component&& component)
+	{
+		assert(isValid(entity));
+		return this->replace<Component>(entity, std::forward<Component>(component));
+	}
+
+	template <typename Component>
+	[[nodiscard]] bool hasComponent(Entity entity) const
+	{
+		return isValid(entity) && all_of<Component>(entity);
+	}
+
 	template <typename... Component>
 	[[nodiscard]] bool hasAllComponents(Entity entity) const
 	{
@@ -217,6 +237,19 @@ class Registry : private entt::registry
 	[[nodiscard]] bool existsAny() const
 	{
 		return isValid(getFirstEntity<Component...>());
+	}
+
+	template <typename... Component, typename... Exclude>
+	void destroyEntitiesWith(ExcludeComponentsType<Exclude...> excludes = {})
+	{
+		auto view = getEntities<const Component...>(excludes);
+		destroy(view.begin(), view.end());
+	}
+
+	template <typename Component, typename Compare, typename Sort = entt::std_sort, typename... Args>
+	void sortComponent(Compare compare, Sort algo = Sort{}, Args&&... args)
+	{
+		sort<Component>(std::forward<Compare>(compare), std::forward<Sort>(algo), std::forward<Args>(args)...);
 	}
 
 	friend class SnapshotLoader;

@@ -1,7 +1,7 @@
+#include "spatial/graphics/Resources.h"
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <spatial/ecs/SceneView.h>
-#include <spatial/graphics/TextureView.h>
+#include <spatial/ecs/Scene.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/SceneView.h>
 
@@ -17,12 +17,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
 	}
 
-	if (!registry.hasAllComponents<ecs::SceneView, graphics::TextureView>(sceneViewEntity))
-		return;
-
-	const auto& sceneView = registry.getComponent<const ecs::SceneView>(sceneViewEntity);
-	const auto& textureView = registry.getComponent<const graphics::TextureView>(sceneViewEntity);
-
+	const auto& sceneView = registry.getComponent<const ecs::Scene>(sceneViewEntity);
 	auto aspectRatio = 1.0;
 	const auto* perspectiveCamera = registry.tryGetComponent<const ecs::PerspectiveCamera>(sceneView.camera);
 	if (perspectiveCamera)
@@ -33,7 +28,16 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
 									 ImGui::GetCursorScreenPos().y));
-	ui::image(textureView.getColorTexture().get(), imageSize, math::vec4{0, 1, 1, 0});
+
+	auto attachments = ecs::Scene::getAttachments(registry, sceneViewEntity);
+	auto colorAttachmentEntityIt =
+		std::find_if(attachments.begin(), attachments.end(), [&](const auto attachmentEntity) {
+			auto& attachment = registry.getComponent<ecs::AttachmentTexture>(attachmentEntity);
+			return attachment.type == ecs::AttachmentTexture::Type::Color;
+		});
+
+	const auto* colorAttachment = registry.tryGetComponent<const graphics::SharedTexture>(*colorAttachmentEntityIt);
+	ui::image(colorAttachment != nullptr ? colorAttachment->get() : nullptr, imageSize, math::vec4{0, 1, 1, 0});
 }
 
 bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity)
@@ -45,7 +49,7 @@ bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEn
 	auto cursorPosition = ImGui::GetCursorPos();
 	constexpr auto comboWidth = 200;
 
-	auto view = registry.getEntities<const ecs::Name, const ecs::SceneView>();
+	auto view = registry.getEntities<const ecs::Name, const ecs::Scene>();
 
 	ImGui::SetCursorPos(ImVec2(windowWidth - comboWidth - 10, 30));
 
@@ -57,7 +61,7 @@ bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEn
 		auto combo = ui::Combo{"##SceneViewSelector", sceneViewName ? sceneViewName->name : "No View Selected"};
 		if (combo.isOpen())
 		{
-			registry.getEntities<const ecs::Name, const ecs::SceneView>().each(
+			registry.getEntities<const ecs::Name, const ecs::Scene>().each(
 				[&](ecs::Entity entity, const ecs::Name& name, const auto&) {
 					if (combo.item(name.name, entity == sceneViewEntity))
 					{

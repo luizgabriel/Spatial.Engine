@@ -15,7 +15,7 @@
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/graphics/MaterialController.h>
 #include <spatial/graphics/TextureUtils.h>
@@ -141,7 +141,7 @@ void EditorSystem::onDrawGui()
 
 		if (!mRegistry.isValid(selectedView))
 		{
-			selectedView = mRegistry.getFirstEntity<ecs::SceneView, tags::IsEditorView>();
+			selectedView = mRegistry.getFirstEntity<ecs::Scene, tags::IsEditorView>();
 			EditorCamera::replaceView(mRegistry, selectedView);
 		}
 
@@ -343,7 +343,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.asResource()
 		.withPath("engine/dummy_cubemap")
 		.with<ecs::tags::IsCubeMapTexture>()
-		.with<ecs::DummyCubeMapTexture>();
+		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
 		.asResource()
@@ -385,7 +385,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.with<tags::IsEditorEntity>()
 		.asTransform()
 		.withScale({100.0F, 1.0f, 100.0F})
-		.withPosition({.0f, -math::epsilon, .0f})
+		.withPosition({.0f, -0.01f, .0f})
 		.asMeshInstance()
 		.withMesh("editor/meshes/plane.filamesh")
 		.withDefaultMaterialInstance(mRegistry.getFirstEntity<GridMaterial>());
@@ -403,8 +403,10 @@ void EditorSystem::createDefaultEditorEntities()
 		.withName("Editor View")
 		.with<tags::IsEditorEntity>()
 		.with<tags::IsEditorView>()
-		.asSceneView()
+		.with<ecs::tags::IsRenderedToTarget>()
+		.asScene()
 		.withDimensions(gUltraWideScreenAspectRatio.toVector() * 240.0)
+		.withDefaultAttachments()
 		.withIndirectLight(ecs::Builder::create(mRegistry)
 							   .withName("Indirect Light")
 							   .with<tags::IsEditorEntity>()

@@ -15,6 +15,10 @@ struct IsMesh
 	constexpr static auto typeName = "tag_is_mesh";
 };
 
+struct ShouldRecreateRenderable
+{
+};
+
 } // namespace tags
 
 struct RuntimeMesh

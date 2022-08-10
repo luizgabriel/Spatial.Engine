@@ -5,7 +5,6 @@
 #include <spatial/graphics/RegistryRenderingSystem.h>
 #include <spatial/graphics/SceneController.h>
 #include <spatial/graphics/TextureController.h>
-#include <spatial/graphics/TextureView.h>
 #include <spatial/graphics/TransformController.h>
 #include <spatial/resources/ResourceController.h>
 
