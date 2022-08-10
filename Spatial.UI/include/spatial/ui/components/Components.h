@@ -50,9 +50,12 @@ struct ComponentTagImpl
 	static constexpr auto sName = Component::typeName;
 	static void draw(const ecs::Registry&, ecs::Entity)
 	{
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4(ImGuiCol_Button));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_Button));
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
 		ImGui::Button(sName);
 		ImGui::PopStyleVar();
+		ImGui::PopStyleColor(2);
 	}
 };
 

@@ -149,6 +149,7 @@ bool vec3Input(const std::string_view label, math::vec3& v, float resetValue, fl
 
 	ImGui::Columns(2);
 	ImGui::SetColumnWidth(0, 70.0f);
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("%s", label.data());
 	ImGui::NextColumn();
 
@@ -194,6 +195,7 @@ bool vec4Input(const std::string_view label, math::vec4& v, float resetValue, fl
 
 	ImGui::Columns(2);
 	ImGui::SetColumnWidth(0, 70.0f);
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("%s", label.data());
 	ImGui::NextColumn();
 
