@@ -472,6 +472,8 @@ bool ComponentInputImpl<ecs::Scene, const filament::Texture*>::draw(ecs::Registr
 	changed |= Search::searchEntity<ecs::IndirectLight>("Indirect Light", icons, registry, sceneView.indirectLight);
 	changed |= Search::searchEntity<ecs::tags::IsCamera>("Camera", icons, registry, sceneView.camera);
 
+	ui::spacing();
+
 	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
 		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -485,6 +487,8 @@ bool ComponentInputImpl<ecs::Scene, const filament::Texture*>::draw(ecs::Registr
 		spacing(3);
 		ImGui::TreePop();
 	}
+
+	ui::spacing();
 
 	if (ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
 	{

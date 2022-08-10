@@ -157,7 +157,6 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 
 	ui::separator(2);
 
-	ImGui::SetWindowFontScale(0.9f);
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Tags: ");
 
@@ -176,8 +175,6 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 
 	componentTag<editor::tags::IsEditorView>(registry, entity);
 	componentTag<editor::tags::IsEditorEntity>(registry, entity);
-
-	ImGui::SetWindowFontScale(1.0f);
 
 	return changed;
 }

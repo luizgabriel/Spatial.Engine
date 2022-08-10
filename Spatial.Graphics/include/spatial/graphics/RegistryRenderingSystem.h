@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <filament/Engine.h>
+#include <functional>
 #include <spatial/common/Signal.h>
-#include <spatial/ecs/RegistryCollection.h>
 #include <spatial/resources/FileSystem.h>
 #include <spatial/script/PlatformContext.h>
 
@@ -28,10 +28,7 @@ class RegistryRenderingSystem
 
   private:
 	FileSystem& mFileSystem;
-
-	Signal<ecs::RegistryCollection&> mOnPublishRegistry;
-
-	[[nodiscard]] ecs::RegistryCollection getPublishedRegistries() const;
+	Signal<std::function<void(ecs::Registry&)>> mOnPublishRegistry;
 };
 
 } // namespace spatial::graphics

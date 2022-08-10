@@ -17,9 +17,7 @@ RegistryRenderingSystem::RegistryRenderingSystem(FileSystem& fileSystem) : mFile
 
 void RegistryRenderingSystem::onStartFrame(float)
 {
-	auto registries = getPublishedRegistries();
-
-	registries.each([&](ecs::Registry& registry) {
+	mOnPublishRegistry([](ecs::Registry& registry) {
 		SceneController::cleanUpDestroyableEntities(registry);
 		LightController::deleteLights(registry);
 		CameraController::deleteCameras(registry);
@@ -28,9 +26,7 @@ void RegistryRenderingSystem::onStartFrame(float)
 
 void RegistryRenderingSystem::onUpdateFrame(float)
 {
-	auto registries = getPublishedRegistries();
-
-	registries.each([&](ecs::Registry& registry) {
+	mOnPublishRegistry([&](ecs::Registry& registry) {
 		ResourceController::loadResources(mFileSystem, registry);
 
 		SceneController::updateScenes(registry);
@@ -44,10 +40,9 @@ void RegistryRenderingSystem::onUpdateFrame(float)
 
 void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 {
-	auto registries = getPublishedRegistries();
 	auto& engine = *renderer.getEngine();
 
-	registries.each([&](ecs::Registry& registry) {
+	mOnPublishRegistry([&](ecs::Registry& registry) {
 		MeshController::loadMeshes(engine, registry);
 		MaterialController::loadMaterials(engine, registry);
 		TextureController::loadTextures(engine, registry);
@@ -62,15 +57,6 @@ void RegistryRenderingSystem::onRender(filament::Renderer& renderer)
 
 		SceneController::renderViews(renderer, registry);
 	});
-}
-
-ecs::RegistryCollection RegistryRenderingSystem::getPublishedRegistries() const
-{
-	auto registries = ecs::RegistryCollection{};
-	registries.reserve(mOnPublishRegistry.getSize());
-	mOnPublishRegistry.trigger(registries);
-
-	return registries;
 }
 
 } // namespace spatial::graphics

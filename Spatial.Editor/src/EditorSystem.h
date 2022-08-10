@@ -7,7 +7,6 @@
 #include "Settings.h"
 
 #include <filament/Viewport.h>
-#include <spatial/ecs/RegistryCollection.h>
 #include <spatial/input/InputState.h>
 #include <spatial/script/PlatformContext.h>
 #include <spatial/script/ScriptController.h>
@@ -34,7 +33,7 @@ class EditorSystem
 
 	void onDrawGui();
 
-	void onPublishRegistry(ecs::RegistryCollection& publisher);
+	void onPublishRegistry(std::function<void(ecs::Registry&)> publisher);
 
 	void setRootPath(const std::filesystem::path& path);
 	void setScenePath(const std::string& path);

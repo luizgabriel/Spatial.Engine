@@ -31,7 +31,6 @@ add_library(Spatial.Core
         include/spatial/ecs/Scene.h
         include/spatial/ecs/Script.h
         include/spatial/ecs/Material.h
-        include/spatial/ecs/RegistryCollection.h
         include/spatial/ecs/Resource.h
         include/spatial/ecs/Texture.h
 
@@ -79,7 +78,6 @@ add_library(Spatial.Core
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
         src/ecs/Mesh.cpp
-        src/ecs/RegistryPublisher.cpp
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
         src/ecs/Scene.cpp
