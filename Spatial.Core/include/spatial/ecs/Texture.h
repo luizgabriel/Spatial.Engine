@@ -30,16 +30,6 @@ struct IsDummyCubeMapTexture
 	constexpr static auto typeName = "tag_is_dummy_cubemap_texture";
 };
 
-struct IsColorBufferTexture
-{
-	constexpr static auto typeName = "tag_is_color_buffer_texture";
-};
-
-struct IsDepthBufferTexture
-{
-	constexpr static auto typeName = "tag_is_depth_buffer_texture";
-};
-
 } // namespace tags
 
 struct RuntimeTexture

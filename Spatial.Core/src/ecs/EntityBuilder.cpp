@@ -470,13 +470,11 @@ SceneBuilder& SceneBuilder::withDefaultAttachments()
 	auto colorAttachment = ecs::Builder::create(mRegistry)
 							   .withName("Color Texture")
 							   .with<ecs::tags::IsImageTexture>()
-							   .with<ecs::tags::IsColorBufferTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Color, size});
 
 	auto depthAttachment = ecs::Builder::create(mRegistry)
 							   .withName("Depth Texture")
 							   .with<ecs::tags::IsImageTexture>()
-							   .with<ecs::tags::IsDepthBufferTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Depth, size});
 
 	return withAttachment(colorAttachment) //

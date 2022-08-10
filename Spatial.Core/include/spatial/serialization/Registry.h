@@ -48,8 +48,6 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsCubeMapTexture>(ar);
 	snapshot.template component<ecs::tags::IsIrradianceValues>(ar);
 	snapshot.template component<ecs::tags::IsDummyCubeMapTexture>(ar);
-	snapshot.template component<ecs::tags::IsDepthBufferTexture>(ar);
-	snapshot.template component<ecs::tags::IsColorBufferTexture>(ar);
 	snapshot.template component<ecs::tags::IsRenderedToTarget>(ar);
 }
 

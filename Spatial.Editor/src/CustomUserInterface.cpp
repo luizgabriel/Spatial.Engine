@@ -157,21 +157,27 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 
 	ui::separator(2);
 
+	ImGui::SetWindowFontScale(0.9f);
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Tags: ");
 
 	componentTag<ecs::tags::IsRenderedToTarget>(registry, entity);
 	componentTag<ecs::tags::IsMaterialInstance>(registry, entity);
-	componentTag<ecs::tags::IsCubeMapTexture>(registry, entity);
-	componentTag<ecs::tags::IsColorBufferTexture>(registry, entity);
-	componentTag<ecs::tags::IsDepthBufferTexture>(registry, entity);
+	componentTag<ecs::tags::IsMainView>(registry, entity);
 	componentTag<ecs::tags::IsRenderable>(registry, entity);
 	componentTag<ecs::tags::IsMesh>(registry, entity);
-	componentTag<ecs::tags::IsMainView>(registry, entity);
 	componentTag<ecs::tags::IsIrradianceValues>(registry, entity);
 	componentTag<ecs::tags::IsDummyCubeMapTexture>(registry, entity);
 	componentTag<ecs::tags::IsMaterial>(registry, entity);
 	componentTag<ecs::tags::IsImageTexture>(registry, entity);
+	componentTag<ecs::tags::IsCubeMapTexture>(registry, entity);
 	componentTag<ecs::tags::IsScript>(registry, entity);
+	componentTag<ecs::tags::IsLight>(registry, entity);
+
+	componentTag<editor::tags::IsEditorView>(registry, entity);
+	componentTag<editor::tags::IsEditorEntity>(registry, entity);
+
+	ImGui::SetWindowFontScale(1.0f);
 
 	return changed;
 }

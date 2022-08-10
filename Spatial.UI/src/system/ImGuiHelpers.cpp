@@ -156,8 +156,8 @@ void imguiSetText(std::string_view text)
 void imguiSetScrollOffset(math::vec2 offset)
 {
 	auto& io = ImGui::GetIO();
-	io.MouseWheel = offset.x;
-	io.MouseWheelH = offset.y;
+	io.MouseWheel = offset.y;
+	io.MouseWheelH = offset.x;
 }
 
 void imguiSetupTheme()

@@ -9,32 +9,30 @@
 namespace spatial::graphics
 {
 
+filament::Texture::Builder makeAttachmentTexture(const ecs::AttachmentTexture& attachmentTexture)
+{
+	switch (attachmentTexture.type)
+	{
+	case ecs::AttachmentTexture::Type::Color:
+		return filament::Texture::Builder()
+			.width(attachmentTexture.size.x)
+			.height(attachmentTexture.size.y)
+			.format(filament::backend::TextureFormat::RGBA16F)
+			.usage(filament::Texture::Usage::COLOR_ATTACHMENT | filament::Texture::Usage::SAMPLEABLE);
+	case ecs::AttachmentTexture::Type::Depth:
+		return filament::Texture::Builder()
+			.width(attachmentTexture.size.x)
+			.height(attachmentTexture.size.y)
+			.format(filament::backend::TextureFormat::DEPTH16)
+			.usage(filament::Texture::Usage::DEPTH_ATTACHMENT);
+	}
+}
+
 void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry
-		.getEntities<ecs::tags::IsColorBufferTexture, const ecs::AttachmentTexture>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
+	registry.getEntities<const ecs::AttachmentTexture>(ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const auto& data) {
-			auto texture = toShared(createTexture(
-				engine, filament::Texture::Builder()
-							.width(data.size.x)
-							.height(data.size.y)
-							.format(filament::backend::TextureFormat::RGBA16F)
-							.usage(filament::Texture::Usage::COLOR_ATTACHMENT | filament::Texture::Usage::SAMPLEABLE)));
-
-			registry.addOrReplaceComponent(entity, std::move(texture));
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
-		});
-
-	registry
-		.getEntities<ecs::tags::IsDepthBufferTexture, const ecs::AttachmentTexture>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const auto& data) {
-			auto texture = toShared(createTexture(engine, filament::Texture::Builder()
-															  .width(data.size.x)
-															  .height(data.size.y)
-															  .format(filament::backend::TextureFormat::DEPTH16)
-															  .usage(filament::Texture::Usage::DEPTH_ATTACHMENT)));
+			auto texture = toShared(createTexture(engine, makeAttachmentTexture(data)));
 
 			registry.addOrReplaceComponent(entity, std::move(texture));
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
