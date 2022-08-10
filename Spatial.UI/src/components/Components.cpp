@@ -230,12 +230,18 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 	auto& resource = registry.getComponent<ecs::Resource>(entity);
 	bool changed = false;
 
+	if (registry.hasComponent<ecs::tags::IsImageTexture>(entity)) {
+		ui::previewTexture(registry, entity, nullptr);
+		ImGui::SameLine();
+	}
+
 	changed |= ui::inputPath("Resource", resource.relativePath, "project/assets/*");
 
+	ui::spacing(2);
+
 	auto loaded = registry.hasAllComponents<ecs::tags::IsResourceLoaded>(entity);
-
 	ImGui::Checkbox("Is Loaded", &loaded);
-
+	ImGui::SameLine();
 	if (loaded && ImGui::Button("Reload"))
 		registry.removeComponent<ecs::tags::IsResourceLoaded>(entity);
 
@@ -248,6 +254,8 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 		ImGui::Separator();
 		ImGui::TextColored(ImVec4(0.81f, 0.27f, 0.33f, 1.0), "Error: %s", error->errorMessage.c_str());
 	}
+
+	ui::spacing(2);
 
 	return changed;
 }

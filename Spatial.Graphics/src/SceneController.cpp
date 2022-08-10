@@ -63,9 +63,7 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 		registry.getEntities<const SharedScene>().each([&](const auto& scene) {
 			auto contains = scene->hasEntity(renderEntity.get());
 			if (!contains)
-			{
 				scene->addEntity(renderEntity.get());
-			}
 		});
 	});
 
@@ -128,15 +126,15 @@ void SceneController::updateScenes(const ecs::Registry& registry)
 		scene->setIndirectLight(indirectLight != nullptr ? indirectLight->get() : nullptr);
 	});
 
-	registry.getEntities<const ecs::Scene, const SharedView>().each([&](const auto& sceneView, const auto& view) {
-		const auto* camera = registry.tryGetComponent<const SharedCamera>(sceneView.camera);
-		auto blendMode = toFilament(sceneView.blendMode);
+	registry.getEntities<const ecs::Scene, const SharedView>().each([&](const auto& scene, const auto& view) {
+		const auto* camera = registry.tryGetComponent<const SharedCamera>(scene.camera);
+		auto blendMode = toFilament(scene.blendMode);
 
-		view->setViewport({0, 0, sceneView.size.x, sceneView.size.y});
+		view->setViewport({0, 0, scene.size.x, scene.size.y});
 		view->setCamera(camera != nullptr ? camera->get()->getInstance() : nullptr);
 		view->setBlendMode(blendMode);
-		view->setShadowingEnabled(sceneView.isShadowingEnabled);
-		view->setPostProcessingEnabled(sceneView.isPostProcessingEnabled);
+		view->setShadowingEnabled(scene.isShadowingEnabled);
+		view->setPostProcessingEnabled(scene.isPostProcessingEnabled);
 	});
 }
 
