@@ -83,7 +83,7 @@ void EditorSystem::onDrawGui()
 	static bool showDebugComponents{false};
 	static std::string rootPath = {};
 
-	const auto* icons = graphics::getTexture(mEditorRegistry, mIconTexture);
+	auto icons = graphics::getTexture(mEditorRegistry, mIconTexture);
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
 	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =

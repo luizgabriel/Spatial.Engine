@@ -1,14 +1,18 @@
 #pragma once
 
-#include <filament/Texture.h>
+#include <optional>
 #include <spatial/ecs/Registry.h>
+#include <spatial/graphics/Resources.h>
 #include <string_view>
+#include <memory>
 
 namespace spatial::graphics
 {
 
-const filament::Texture* getTexture(const ecs::Registry& registry, ecs::Entity entity);
+using OptionalTexture = std::optional<SharedTexture>;
 
-const filament::Texture* getTexture(const ecs::Registry& registry, std::string_view resourcePath);
+OptionalTexture getTexture(const ecs::Registry& registry, ecs::Entity entity);
+
+OptionalTexture getTexture(const ecs::Registry& registry, std::string_view resourcePath);
 
 } // namespace spatial::graphics

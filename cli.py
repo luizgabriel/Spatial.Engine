@@ -195,6 +195,7 @@ def setup_cli(args: Arguments) -> CommandResult:
     packages = [
         Package("filament", "1.23.2"),
         Package("v8", "10.1.69"),
+        Package("imgui", "docking"),
     ]
 
     to_export = to_package_export(args.source_path)

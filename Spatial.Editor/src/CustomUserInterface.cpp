@@ -55,9 +55,9 @@ bool ComponentInputImpl<editor::GridMaterial>::draw(ecs::Registry& registry, ecs
 	return changed;
 }
 
-bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture*>::draw(ecs::Registry& registry,
+bool ComponentInputImpl<editor::SkyBoxMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry,
 																				ecs::Entity entity,
-																				const filament::Texture* icons)
+																				graphics::OptionalTexture icons)
 {
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 	bool changed = false;
@@ -69,9 +69,9 @@ bool ComponentInputImpl<editor::SkyBoxMaterial, const filament::Texture*>::draw(
 	return changed;
 }
 
-bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*>::draw(ecs::Registry& registry,
+bool ComponentInputImpl<editor::StandardOpaqueMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry,
 																						ecs::Entity entity,
-																						const filament::Texture* icons)
+																						graphics::OptionalTexture icons)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
@@ -115,7 +115,7 @@ bool ComponentInputImpl<editor::StandardOpaqueMaterial, const filament::Texture*
 	return changed;
 }
 
-bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons,
+bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons,
 										 bool showDebugComponents)
 {
 	bool isValid = registry.isValid(entity);
@@ -437,7 +437,8 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	return open;
 }
 
-bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter, const filament::Texture* icons)
+bool ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter,
+							 graphics::OptionalTexture icons)
 {
 	bool changed = false;
 
@@ -448,7 +449,7 @@ bool ResourceManager::header(std::string& search, ResourceManager::ResourceType&
 	changed |= ui::Combo::fromEnum("##ResourceTypeFilter", filter);
 
 	ImGui::NextColumn();
-	changed |= ui::Search::text(search, icons);
+	changed |= ui::Search::text(search, std::move(icons));
 
 	ImGui::Columns(1);
 
@@ -965,13 +966,12 @@ bool SceneOptionsMenu::removeMenu(ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool EditorMainMenu::fileMenu(const filament::Texture* icons, EditorMainMenu::Action& action)
+bool EditorMainMenu::fileMenu(graphics::OptionalTexture icons, EditorMainMenu::Action& action)
 {
 	bool changed = false;
 
 	ImGui::SetCursorPosY(1.5f);
-	if (icons)
-		ui::image(icons, math::vec2{20.0f}, Icons::logo.uv());
+	ui::image(std::move(icons), math::vec2{20.0f}, Icons::logo.uv());
 	ImGui::SetCursorPosY(0.0f);
 
 	{

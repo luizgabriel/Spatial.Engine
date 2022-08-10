@@ -5,16 +5,15 @@
 namespace spatial::graphics
 {
 
-const filament::Texture* getTexture(const ecs::Registry& registry, ecs::Entity entity)
+OptionalTexture getTexture(const ecs::Registry& registry, ecs::Entity entity)
 {
-	const auto* texture = registry.tryGetComponent<SharedTexture>(entity);
-	if (texture)
-		return texture->get();
+	if (!registry.hasComponent<SharedTexture>(entity))
+		return std::nullopt;
 
-	return nullptr;
+	return registry.getComponent<const SharedTexture>(entity);
 }
 
-const filament::Texture* getTexture(const ecs::Registry& registry, std::string_view resourcePath)
+OptionalTexture getTexture(const ecs::Registry& registry, std::string_view resourcePath)
 {
 	return getTexture(registry, ecs::Resource::find(registry, resourcePath));
 }

@@ -36,8 +36,8 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 			return attachment.type == ecs::AttachmentTexture::Type::Color;
 		});
 
-	const auto* colorAttachment = registry.tryGetComponent<const graphics::SharedTexture>(*colorAttachmentEntityIt);
-	ui::image(colorAttachment != nullptr ? colorAttachment->get() : nullptr, imageSize, math::vec4{0, 1, 1, 0});
+	auto colorAttachment = colorAttachmentEntityIt != attachments.end() ? graphics::getTexture(registry, *colorAttachmentEntityIt) : std::nullopt;
+	ui::image(colorAttachment, imageSize, math::vec4{0, 1, 1, 0});
 }
 
 bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity)

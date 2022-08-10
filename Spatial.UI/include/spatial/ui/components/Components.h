@@ -12,6 +12,7 @@
 #include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/SceneView.h>
@@ -31,10 +32,10 @@ void spacing(std::uint32_t times = 1);
 
 void separator(std::uint32_t spacing = 0);
 
-void image(const filament::Texture* texture, math::vec2 size = math::vec2{0, 0},
+void image(graphics::OptionalTexture texture, math::vec2 size = math::vec2{0, 0},
 		   math::vec4 uv = math::vec4{0, 0, 1, 1});
 
-bool imageButton(const filament::Texture* texture, math::vec2 size = math::vec2{0, 0},
+bool imageButton(graphics::OptionalTexture texture, math::vec2 size = math::vec2{0, 0},
 				 math::vec4 uv = math::vec4{0, 0, 1, 1});
 
 template <typename Component, typename... Args>
@@ -128,10 +129,10 @@ struct ComponentInputImpl<ecs::SunLight>
 };
 
 template <>
-struct ComponentInputImpl<ecs::IndirectLight, const filament::Texture*>
+struct ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Indirect Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
@@ -142,17 +143,17 @@ struct ComponentInputImpl<ecs::Resource>
 };
 
 template <>
-struct ComponentInputImpl<ecs::MeshInstance, const filament::Texture*>
+struct ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Mesh Instance";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
-struct ComponentInputImpl<ecs::MeshMaterial, const filament::Texture*>
+struct ComponentInputImpl<ecs::MeshMaterial, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Mesh Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
@@ -177,10 +178,10 @@ struct ComponentInputImpl<ecs::OrthographicCamera>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Scene, const filament::Texture*>
+struct ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Scene";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
@@ -198,17 +199,17 @@ struct ComponentInputImpl<ecs::ScriptModule>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Parent, const filament::Texture*>
+struct ComponentInputImpl<ecs::Parent, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Parent";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
-struct ComponentInputImpl<ecs::Child, const filament::Texture*>
+struct ComponentInputImpl<ecs::Child, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Child";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>

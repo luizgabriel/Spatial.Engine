@@ -7,6 +7,7 @@
 #include <set>
 #include <spatial/common/AxisAlignedBoundingBox.h>
 #include <spatial/common/Math.h>
+#include <spatial/graphics/MaterialInstance.h>
 #include <spatial/graphics/Resources.h>
 #include <utils/Entity.h>
 

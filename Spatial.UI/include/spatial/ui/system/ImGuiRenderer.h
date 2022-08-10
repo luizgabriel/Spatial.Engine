@@ -2,11 +2,10 @@
 
 #include <imgui.h>
 #include <spatial/common/Math.h>
+#include <spatial/graphics/MaterialInstance.h>
 #include <spatial/graphics/Resources.h>
-#include <vector>
-
-#include <filesystem>
 #include <string_view>
+#include <vector>
 
 namespace spatial::ui
 {
@@ -23,7 +22,7 @@ class ImGuiRenderer
 	graphics::Entity mEntity;
 	graphics::Skybox mSkybox;
 	graphics::SharedMaterial mMaterial;
-	graphics::Texture mFontTexture;
+	graphics::SharedTexture mFontTexture;
 
 	std::vector<graphics::VertexBuffer> mVertexBuffers;
 	std::vector<graphics::IndexBuffer> mIndexBuffers;

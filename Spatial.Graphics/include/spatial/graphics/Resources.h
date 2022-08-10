@@ -18,7 +18,6 @@
 #include <spatial/graphics/Camera.h>
 #include <spatial/graphics/EngineResource.h>
 #include <spatial/graphics/Entity.h>
-#include <spatial/graphics/MaterialInstance.h>
 
 #include <string_view>
 
@@ -43,7 +42,6 @@ using SharedScene = SharedEngineResource<filament::Scene>;
 using SharedVertexBuffer = SharedEngineResource<filament::VertexBuffer>;
 using SharedIndexBuffer = SharedEngineResource<filament::IndexBuffer>;
 using SharedMaterial = SharedEngineResource<filament::Material>;
-using SharedMaterialInstance = std::shared_ptr<graphics::MaterialInstance>;
 using SharedView = SharedEngineResource<filament::View>;
 using SharedTexture = SharedEngineResource<filament::Texture>;
 using SharedCamera = SharedEngineResource<Camera>;
@@ -73,9 +71,6 @@ Entity createEntity(filament::Engine& engine) noexcept;
 VertexBuffer createVertexBuffer(filament::Engine& engine, filament::VertexBuffer::Builder builder);
 
 IndexBuffer createIndexBuffer(filament::Engine& engine, filament::IndexBuffer::Builder builder);
-
-MaterialInstance createMaterialInstance(filament::Engine& engine, const SharedMaterial& material,
-										std::string_view = {}) noexcept;
 
 RenderTarget createRenderTarget(filament::Engine& engine, filament::RenderTarget::Builder builder);
 

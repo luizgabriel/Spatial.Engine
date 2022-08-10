@@ -24,7 +24,7 @@ ImGuiRenderer::ImGuiRenderer(fl::Engine& engine)
 	  mEntity{graphics::createEntity(mEngine)},
 	  mSkybox{graphics::createSkybox(mEngine, fl::math::float4{.0f, .0f, .0f, .0f})},
 	  mMaterial{},
-	  mFontTexture{mEngine, nullptr}
+	  mFontTexture{}
 {
 	mView->setCamera(mCamera.getInstance());
 	mView->setScene(mScene.get());
@@ -143,23 +143,23 @@ void ImGuiRenderer::renderDrawData()
 			else
 			{
 				auto& mi = mMaterialInstances[primIndex];
-				mi->setScissor(static_cast<uint32_t>(command.ClipRect.x),
-							   static_cast<uint32_t>(fbSize.y - command.ClipRect.w),
-							   static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
-							   static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y));
+				mi.setScissor(static_cast<uint32_t>(command.ClipRect.x),
+							  static_cast<uint32_t>(fbSize.y - command.ClipRect.w),
+							  static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
+							  static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y));
 
-				const auto* albedoTexture =
-					command.TextureId ? reinterpret_cast<const fl::Texture*>(command.TextureId) : nullptr;
-
-				if (albedoTexture != nullptr)
+				if (command.TextureId)
 				{
-					mi->setParameter("albedo", albedoTexture,
-									 fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
-														fl::TextureSampler::MagFilter::LINEAR});
-				} else {
-					mi->setParameter("albedo", mFontTexture.get(),
-									 fl::TextureSampler{fl::TextureSampler::MinFilter::NEAREST,
-														fl::TextureSampler::MagFilter::NEAREST});
+					auto albedo = std::static_pointer_cast<filament::Texture>(command.TextureId);
+					mi.setParameter("albedo", std::move(albedo),
+									fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
+													   fl::TextureSampler::MagFilter::LINEAR});
+				}
+				else
+				{
+					mi.setParameter("albedo", mFontTexture,
+									fl::TextureSampler{fl::TextureSampler::MinFilter::NEAREST,
+													   fl::TextureSampler::MagFilter::NEAREST});
 				}
 
 				builder
@@ -167,7 +167,7 @@ void ImGuiRenderer::renderDrawData()
 							  mVertexBuffers[bufferIndex].get(), mIndexBuffers[bufferIndex].get(), command.IdxOffset,
 							  command.ElemCount)
 					.blendOrder(primIndex, static_cast<uint16_t>(primIndex))
-					.material(primIndex, mi.get());
+					.material(primIndex, mi.getInstance());
 
 				primIndex++;
 			}
@@ -245,7 +245,7 @@ void ImGuiRenderer::populateIndexData(size_t bufferIndex, const ImVector<ImDrawI
 void ImGuiRenderer::createFontTextureAtlas()
 {
 	assert(mMaterial);
-	mFontTexture = ui::imguiCreateTextureAtlas(mEngine);
+	mFontTexture = toShared(ui::imguiCreateTextureAtlas(mEngine));
 	mMaterial->setDefaultParameter("albedo", mFontTexture.get(),
 								   {fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
 }

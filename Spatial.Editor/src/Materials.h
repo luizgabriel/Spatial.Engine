@@ -4,6 +4,7 @@
 #include <filament/TextureSampler.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Registry.h>
+#include <spatial/graphics/MaterialInstance.h>
 #include <string_view>
 
 namespace spatial::editor
@@ -18,7 +19,7 @@ struct ColorMaterial
 	float roughness{0.8f};
 	float reflectance{.1f};
 
-	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
+	void apply(const graphics::SharedMaterialInstance&, const ecs::Registry& registry) const;
 };
 
 struct GridMaterial
@@ -29,7 +30,7 @@ struct GridMaterial
 	math::vec2 scale{10.0f};
 	float thickness{0.015f};
 
-	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
+	void apply(const graphics::SharedMaterialInstance&, const ecs::Registry& registry) const;
 };
 
 struct SkyBoxMaterial
@@ -40,7 +41,7 @@ struct SkyBoxMaterial
 	math::vec4 color{1.0f};
 	ecs::Entity skybox{ecs::NullEntity};
 
-	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
+	void apply(const graphics::SharedMaterialInstance&, const ecs::Registry& registry) const;
 };
 
 struct StandardOpaqueMaterial
@@ -71,7 +72,7 @@ struct StandardOpaqueMaterial
 	float height{1.0f};
 	ecs::Entity heightMap{ecs::NullEntity};
 
-	void apply(filament::MaterialInstance& instance, const ecs::Registry& registry) const;
+	void apply(const graphics::SharedMaterialInstance&, const ecs::Registry& registry) const;
 };
 
 } // namespace spatial::editor

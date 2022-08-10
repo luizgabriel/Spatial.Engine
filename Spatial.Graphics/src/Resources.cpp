@@ -33,11 +33,6 @@ Entity createEntity(filament::Engine& engine) noexcept
 	return Entity{engine, utils::EntityManager::get().create()};
 }
 
-MaterialInstance createMaterialInstance(filament::Engine& engine, const SharedMaterial& material,
-										const std::string_view name) noexcept
-{
-	return MaterialInstance{engine, material, material->createInstance(name.data())};
-}
 
 Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size)
 {
