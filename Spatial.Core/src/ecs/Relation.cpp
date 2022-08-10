@@ -29,19 +29,29 @@ void Parent::addChild(Registry& registry, Entity parentEntity, Entity childEntit
 	parent.last = childEntity;
 }
 
-std::set<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
+std::vector<Entity> Parent::getChildren(const Registry& registry, Entity parentEntity)
 {
-	const auto& parent = registry.getComponent<const Parent>(parentEntity);
-	auto children = std::set<Entity>{};
+	if (!registry.hasComponent<ecs::Parent>(parentEntity))
+		return {};
 
-	Parent::forEachChild(registry, parentEntity, [&](auto entity) { children.emplace(entity); });
+	const auto& parent = registry.getComponent<const Parent>(parentEntity);
+	auto children = std::vector<Entity>{};
+	children.reserve(parent.childrenCount);
+
+	Parent::forEachChild(registry, parentEntity, [&](auto entity) { children.emplace_back(entity); });
 
 	return children;
 }
 
-std::set<Entity> Parent::getChildrenDepth(const Registry& registry, Entity parentEntity)
+std::vector<Entity> Parent::getChildrenDepth(const Registry& registry, Entity parentEntity)
 {
-	auto children = std::set<Entity>{};
+	if (!registry.hasComponent<ecs::Parent>(parentEntity))
+		return {};
+
+	const auto& parent = registry.getComponent<const Parent>(parentEntity);
+	auto children = std::vector<Entity>{};
+	children.reserve(parent.childrenCount);
+
 	auto stack = std::deque<Entity>{parentEntity};
 
 	while (!stack.empty())
@@ -53,7 +63,7 @@ std::set<Entity> Parent::getChildrenDepth(const Registry& registry, Entity paren
 			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
 
 		if (currentEntity != parentEntity)
-			children.emplace(currentEntity);
+			children.emplace_back(currentEntity);
 	}
 
 	return children;
@@ -91,6 +101,12 @@ void Child::remove(Registry& registry, Entity childEntity)
 	registry.removeComponent<Child>(childEntity);
 }
 
+void Child::changeParent(Registry& registry, entt::entity childEntity, Entity newParentEntity)
+{
+	Child::remove(registry, childEntity);
+	Parent::addChild(registry, newParentEntity, childEntity);
+}
+
 void Parent::remove(Registry& registry, Entity parentEntity)
 {
 	Parent::forEachChild(registry, parentEntity, [&](auto child) { registry.removeComponent<Child>(child); });
@@ -117,8 +133,9 @@ bool Parent::isChild(const Registry& registry, Entity parentEntity, Entity targe
 	return false;
 }
 
-void Parent::destroyChildren(Registry& registry, Entity parentEntity)
+size_t Parent::destroyChildren(Registry& registry, Entity parentEntity)
 {
+	size_t destroyed = 0;
 	auto stack = std::deque<Entity>{parentEntity};
 
 	while (!stack.empty())
@@ -130,10 +147,23 @@ void Parent::destroyChildren(Registry& registry, Entity parentEntity)
 			Parent::forEachChild(registry, currentEntity, [&](auto child) { stack.push_front(child); });
 
 		if (currentEntity != parentEntity)
+		{
 			registry.destroyEntity(currentEntity);
+			destroyed++;
+		}
 	}
 
 	registry.removeComponent<Parent>(parentEntity);
+	return destroyed;
+}
+
+size_t Parent::getChildrenCount(const Registry& registry, ecs::Entity entity)
+{
+	if (!registry.hasComponent<Parent>(entity))
+		return 0;
+
+	const auto& parent = registry.getComponent<Parent>(entity);
+	return parent.childrenCount;
 }
 
 } // namespace spatial::ecs

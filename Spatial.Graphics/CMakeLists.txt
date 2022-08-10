@@ -15,7 +15,6 @@ add_library(Spatial.Graphics
         include/spatial/graphics/LightController.h
         include/spatial/graphics/CameraController.h
         include/spatial/graphics/MeshController.h
-        include/spatial/graphics/TextureView.h
         include/spatial/graphics/RegistryRenderingSystem.h
         include/spatial/graphics/MaterialInstance.h
         include/spatial/graphics/TextureController.h
@@ -39,7 +38,6 @@ add_library(Spatial.Graphics
         src/CameraController.cpp
         src/MeshController.cpp
         src/SceneController.cpp
-        src/TextureView.cpp
         src/MaterialController.cpp
         src/SceneRenderingSystem.cpp
         src/MaterialInstance.cpp

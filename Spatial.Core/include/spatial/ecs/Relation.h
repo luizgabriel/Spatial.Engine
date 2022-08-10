@@ -18,7 +18,15 @@ struct Child
 	{
 	}
 
+	/**
+	 * @description Detaches a childEntity from the parent
+	 */
 	static void remove(Registry& registry, Entity childEntity);
+
+	/**
+	 * @description Moves some entity from it current parent to a new one
+	 */
+	static void changeParent(Registry& registry, entt::entity childEntity, Entity newParentEntity);
 };
 
 struct Parent
@@ -57,29 +65,36 @@ struct Parent
 
 	/**
 	 * @description Removes the Parent component and Destroys every single child of the parentEntity even if any child
-	 * is also parent of other children
+	 * is also parent of other children.
+	 * Time Complexity: O(n), n is the total number of children
+	 * @returns The number of destroyed entities
 	 */
-	static void destroyChildren(Registry& registry, Entity parentEntity);
+	static size_t destroyChildren(Registry& registry, Entity parentEntity);
 
 	/**
-	 * @descriptions Collects a vector of child entities
+	 * @descriptions Collects a set of child entities
 	 */
-	static std::set<Entity> getChildren(const Registry& registry, Entity parentEntity);
+	static std::vector<Entity> getChildren(const Registry& registry, Entity parentEntity);
 
 	/**
 	 * @descriptions Collects a vector of child entities recursively
+	 * Time Complexity: O(n), n is the total number of children
 	 */
-	static std::set<Entity> getChildrenDepth(const Registry& registry, Entity parentEntity);
+	static std::vector<Entity> getChildrenDepth(const Registry& registry, Entity parentEntity);
 
 	/**
 	 * @description Visits every direct child of the parentEntity
+	 * Time Complexity: O(c), c is the direct number of children
 	 */
 	template <typename Function>
 	static void forEachChild(const Registry& registry, Entity parentEntity, Function visitor)
 	{
 		static_assert(
 			std::is_invocable_v<Function, Entity, const Child&> || std::is_invocable_v<Function, Entity>,
-			"The function argument needs to be invocable with `each(Entity)` or `each(Entity, const Child&)`");
+			"The visitor needs to be invocable with `visitor(Entity)` or `visitor(Entity, const Child&)`");
+
+		if (!registry.hasComponent<ecs::Parent>(parentEntity))
+			return;
 
 		const auto& parent = registry.getComponent<const Parent>(parentEntity);
 		const auto childrenCount = parent.childrenCount;
@@ -98,6 +113,12 @@ struct Parent
 			currentChildEntity = nextEntity;
 		}
 	}
+
+	/**
+	 * @description If returns the number of children for some Parent.
+	 * Time Complexity: O(1)
+	 */
+	static size_t getChildrenCount(const Registry& registry, ecs::Entity entity);
 };
 
 } // namespace spatial::ecs

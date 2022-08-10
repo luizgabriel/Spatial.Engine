@@ -7,10 +7,17 @@ namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::RuntimeTexture& mesh)
+void serialize(Archive& ar, spatial::ecs::RuntimeTexture& texture)
 {
-	ar(make_nvp("pixels", mesh.pixels));
-	ar(make_nvp("width", mesh.width));
+	ar(make_nvp("pixels", texture.pixels));
+	ar(make_nvp("width", texture.width));
+}
+
+template <typename Archive>
+void serialize(Archive& ar, spatial::ecs::AttachmentTexture& attachment)
+{
+	ar(make_nvp("type", attachment.type));
+	ar(make_nvp("size", attachment.size));
 }
 
 } // namespace cereal

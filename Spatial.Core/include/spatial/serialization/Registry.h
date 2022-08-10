@@ -1,14 +1,13 @@
 #pragma once
 
 #include <spatial/ecs/Material.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/serialization/BoundingBox.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/Light.h>
 #include <spatial/serialization/Mesh.h>
 #include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
-#include <spatial/serialization/SceneView.h>
+#include <spatial/serialization/Scene.h>
 #include <spatial/serialization/Texture.h>
 #include <spatial/serialization/Transform.h>
 
@@ -33,9 +32,9 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::Parent>(ar);
 	snapshot.template component<ecs::Child>(ar);
 	snapshot.template component<ecs::Resource>(ar);
-	snapshot.template component<ecs::SceneView>(ar);
-	snapshot.template component<ecs::DummyCubeMapTexture>(ar);
+	snapshot.template component<ecs::Scene>(ar);
 	snapshot.template component<ecs::RuntimeTexture>(ar);
+	snapshot.template component<ecs::AttachmentTexture>(ar);
 	snapshot.template component<ecs::RuntimeMesh>(ar);
 
 	snapshot.template component<ecs::tags::IsMaterial>(ar);
@@ -48,6 +47,10 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsImageTexture>(ar);
 	snapshot.template component<ecs::tags::IsCubeMapTexture>(ar);
 	snapshot.template component<ecs::tags::IsIrradianceValues>(ar);
+	snapshot.template component<ecs::tags::IsDummyCubeMapTexture>(ar);
+	snapshot.template component<ecs::tags::IsDepthBufferTexture>(ar);
+	snapshot.template component<ecs::tags::IsColorBufferTexture>(ar);
+	snapshot.template component<ecs::tags::IsRenderedToTarget>(ar);
 }
 
 } // namespace spatial::ecs

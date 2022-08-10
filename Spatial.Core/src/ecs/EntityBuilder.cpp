@@ -6,7 +6,6 @@
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Tags.h>
 
 namespace spatial::ecs
 {
@@ -71,7 +70,7 @@ IndirectLightBuilder Builder::asIndirectLight()
 	return {mRegistry, mEntity};
 }
 
-SceneViewBuilder Builder::asSceneView()
+SceneBuilder Builder::asScene()
 {
 	return {mRegistry, mEntity};
 }
@@ -417,26 +416,71 @@ MeshInstanceBuilder& MeshInstanceBuilder::withMaterialAt(uint32_t primitiveIndex
 	return *this;
 }
 
-SceneViewBuilder::SceneViewBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+SceneBuilder::SceneBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 }
 
-SceneViewBuilder& SceneViewBuilder::withCamera(ecs::Entity cameraEntity)
+SceneBuilder& SceneBuilder::withCamera(ecs::Entity cameraEntity)
 {
 	getComponent().camera = cameraEntity;
 	return *this;
 }
 
-SceneViewBuilder& SceneViewBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
+SceneBuilder& SceneBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
 	getComponent().indirectLight = indirectLightEntity;
 	return *this;
 }
 
-SceneViewBuilder& SceneViewBuilder::withDimensions(math::uvec2 dimensions)
+SceneBuilder& SceneBuilder::withDimensions(math::uvec2 dimensions)
 {
 	getComponent().size = dimensions;
 	return *this;
+}
+
+SceneBuilder& SceneBuilder::withBlendMode(Scene::BlendMode blendMode)
+{
+	getComponent().blendMode = blendMode;
+	return *this;
+}
+
+SceneBuilder& SceneBuilder::withShadowingDisabled()
+{
+	getComponent().isShadowingEnabled = false;
+	return *this;
+}
+
+SceneBuilder& SceneBuilder::withPostProcessingDisabled()
+{
+	getComponent().isPostProcessingEnabled = false;
+	return *this;
+}
+
+SceneBuilder& SceneBuilder::withAttachment(ecs::Entity attachmentTexture)
+{
+	ecs::Scene::addAttachment(mRegistry, mEntity, attachmentTexture);
+	return *this;
+}
+
+SceneBuilder& SceneBuilder::withDefaultAttachments()
+{
+	const auto& size = getComponent().size;
+	assert(size.x > 0 && size.y > 0);
+
+	auto colorAttachment = ecs::Builder::create(mRegistry)
+							   .withName("Color Texture")
+							   .with<ecs::tags::IsImageTexture>()
+							   .with<ecs::tags::IsColorBufferTexture>()
+							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Color, size});
+
+	auto depthAttachment = ecs::Builder::create(mRegistry)
+							   .withName("Depth Texture")
+							   .with<ecs::tags::IsImageTexture>()
+							   .with<ecs::tags::IsDepthBufferTexture>()
+							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Depth, size});
+
+	return withAttachment(colorAttachment) //
+		.withAttachment(depthAttachment);
 }
 
 MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)

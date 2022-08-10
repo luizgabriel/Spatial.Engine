@@ -9,9 +9,8 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
-#include <spatial/ecs/SceneView.h>
+#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Script.h>
-#include <spatial/ecs/Tags.h>
 #include <spatial/ecs/Transform.h>
 #include <spatial/ui/components/Collapse.h>
 #include <spatial/ui/components/DirectionInput.h>
@@ -41,9 +40,30 @@ bool imageButton(const filament::Texture* texture, math::vec2 size = math::vec2{
 template <typename Component, typename... Args>
 struct ComponentInputImpl
 {
-	static constexpr auto sName = "Unknown";
+	static constexpr auto sName = Component::typeName;
 	static bool draw(ecs::Registry&, ecs::Entity, Args...) = delete;
 };
+
+template <typename Component>
+struct ComponentTagImpl
+{
+	static constexpr auto sName = Component::typeName;
+	static void draw(const ecs::Registry&, ecs::Entity)
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
+		ImGui::Button(sName);
+		ImGui::PopStyleVar();
+	}
+};
+
+template <typename Component>
+void componentTag(const ecs::Registry& registry, ecs::Entity entity)
+{
+	if (registry.template hasComponent<Component>(entity)) {
+		ImGui::SameLine(.0, 2.0f);
+		ComponentTagImpl<Component>::draw(registry, entity);
+	}
+}
 
 template <typename Component, typename... Args>
 bool componentInput(ecs::Registry& registry, ecs::Entity entity, Args... args)
@@ -154,9 +174,9 @@ struct ComponentInputImpl<ecs::OrthographicCamera>
 };
 
 template <>
-struct ComponentInputImpl<ecs::SceneView, const filament::Texture*>
+struct ComponentInputImpl<ecs::Scene, const filament::Texture*>
 {
-	static constexpr auto sName = "Scene Camera";
+	static constexpr auto sName = "Scene";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
 };
 
@@ -186,6 +206,13 @@ struct ComponentInputImpl<ecs::Child, const filament::Texture*>
 {
 	static constexpr auto sName = "Child";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity, const filament::Texture* icons);
+};
+
+template <>
+struct ComponentInputImpl<ecs::AttachmentTexture>
+{
+	static constexpr auto sName = "Attachment Texture";
+	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 } // namespace spatial::ui

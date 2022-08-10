@@ -148,10 +148,19 @@ void ImGuiRenderer::renderDrawData()
 							   static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
 							   static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y));
 
-				mi->setParameter(
-					"albedo",
-					command.TextureId ? reinterpret_cast<const fl::Texture*>(command.TextureId) : mFontTexture.get(),
-					fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR, fl::TextureSampler::MagFilter::LINEAR});
+				const auto* albedoTexture =
+					command.TextureId ? reinterpret_cast<const fl::Texture*>(command.TextureId) : nullptr;
+
+				if (albedoTexture != nullptr)
+				{
+					mi->setParameter("albedo", albedoTexture,
+									 fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
+														fl::TextureSampler::MagFilter::LINEAR});
+				} else {
+					mi->setParameter("albedo", mFontTexture.get(),
+									 fl::TextureSampler{fl::TextureSampler::MinFilter::NEAREST,
+														fl::TextureSampler::MagFilter::NEAREST});
+				}
 
 				builder
 					.geometry(primIndex, fl::RenderableManager::PrimitiveType::TRIANGLES,
