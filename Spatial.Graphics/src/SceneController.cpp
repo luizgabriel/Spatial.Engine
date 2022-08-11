@@ -73,9 +73,10 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 void SceneController::renderViews(filament::Renderer& renderer, const ecs::Registry& registry)
 {
 	registry
-		.getEntities<const SharedView>()	//
-		.each([&](const SharedView& view) { //
-			renderer.render(view.get());
+		.getEntities<const ecs::Scene, const SharedView>()	//
+		.each([&](const auto& scene, const auto& view) { //
+			if (registry.hasComponent<SharedCamera>(scene.camera))
+				renderer.render(view.get());
 		});
 }
 
@@ -131,7 +132,7 @@ void SceneController::updateScenes(const ecs::Registry& registry)
 		auto blendMode = toFilament(scene.blendMode);
 
 		view->setViewport({0, 0, scene.size.x, scene.size.y});
-		view->setCamera(camera != nullptr ? camera->get()->getInstance() : nullptr);
+		view->setCamera(camera ? camera->get()->getInstance() : nullptr);
 		view->setBlendMode(blendMode);
 		view->setShadowingEnabled(scene.isShadowingEnabled);
 		view->setPostProcessingEnabled(scene.isPostProcessingEnabled);

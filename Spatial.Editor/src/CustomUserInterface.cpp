@@ -56,8 +56,8 @@ bool ComponentInputImpl<editor::GridMaterial>::draw(ecs::Registry& registry, ecs
 }
 
 bool ComponentInputImpl<editor::SkyBoxMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry,
-																				ecs::Entity entity,
-																				graphics::OptionalTexture icons)
+																				 ecs::Entity entity,
+																				 graphics::OptionalTexture icons)
 {
 	auto& data = registry.getComponent<editor::SkyBoxMaterial>(entity);
 	bool changed = false;
@@ -69,9 +69,8 @@ bool ComponentInputImpl<editor::SkyBoxMaterial, graphics::OptionalTexture>::draw
 	return changed;
 }
 
-bool ComponentInputImpl<editor::StandardOpaqueMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry,
-																						ecs::Entity entity,
-																						graphics::OptionalTexture icons)
+bool ComponentInputImpl<editor::StandardOpaqueMaterial, graphics::OptionalTexture>::draw(
+	ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons)
 
 {
 	auto& data = registry.getComponent<editor::StandardOpaqueMaterial>(entity);
@@ -718,7 +717,11 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 
 	if (Menu::itemButton("Scene View"))
 	{
-		newEntity = ecs::Builder::create(registry).withName("Scene View").asScene().withDefaultAttachments();
+		newEntity = ecs::Builder::create(registry)
+						.withName("Scene View")
+						.with<ecs::tags::IsRenderedToTarget>()
+						.asScene()
+						.withDefaultAttachments();
 		changed = true;
 	}
 
