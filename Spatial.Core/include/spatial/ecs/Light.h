@@ -11,7 +11,7 @@ namespace tags
 
 struct IsLight
 {
-	constexpr static auto typeName = "tag_light";
+	constexpr static auto typeName = "tag_is_light";
 };
 
 } // namespace tags
