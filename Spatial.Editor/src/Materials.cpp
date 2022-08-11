@@ -1,5 +1,7 @@
 #include "Materials.h"
+#include "Tags.h"
 #include <spatial/ecs/Resource.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/graphics/Resources.h>
 #include <spatial/graphics/TextureUtils.h>
 
@@ -27,9 +29,9 @@ void GridMaterial::apply(const graphics::SharedMaterialInstance& instance, const
 void StandardOpaqueMaterial::apply(const graphics::SharedMaterialInstance& instance,
 								   const ecs::Registry& registry) const
 {
-	auto dummyGray = graphics::getTexture(registry, "engine/gray");
-	auto dummyWhite = graphics::getTexture(registry, "engine/white");
-	auto dummyBlack = graphics::getTexture(registry, "engine/black");
+	auto dummyGray = graphics::getTexture<editor::tags::IsEditorGrayTexture>(registry);
+	auto dummyWhite = graphics::getTexture<editor::tags::IsEditorWhiteTexture>(registry);
+	auto dummyBlack = graphics::getTexture<editor::tags::IsEditorBlackTexture>(registry);
 	assert(dummyGray.has_value());
 	assert(dummyWhite.has_value());
 	assert(dummyBlack.has_value());
@@ -74,15 +76,16 @@ void SkyBoxMaterial::apply(const graphics::SharedMaterialInstance& instance, con
 	auto texture = graphics::getTexture(registry, skybox);
 	instance->setParameter("constantColor", !texture.has_value());
 
-	if (texture)
+	if (texture.has_value())
 	{
 		instance->setParameter("skybox", *texture, gDefaultSampler);
-		return;
 	}
-
-	auto dummy = graphics::getTexture(registry, "engine/dummy_cubemap");
-	assert(dummy.has_value());
-	instance->setParameter("skybox", *dummy, gDefaultSampler);
+	else
+	{
+		auto dummy = graphics::getTexture<ecs::tags::IsDummyCubeMapTexture>(registry);
+		if (dummy)
+			instance->setParameter("skybox", *dummy, gDefaultSampler);
+	}
 }
 
 } // namespace spatial::editor

@@ -13,6 +13,14 @@ using OptionalTexture = std::optional<SharedTexture>;
 
 OptionalTexture getTexture(const ecs::Registry& registry, ecs::Entity entity);
 
-OptionalTexture getTexture(const ecs::Registry& registry, std::string_view resourcePath);
+template <typename ResourceTag>
+OptionalTexture getTexture(const ecs::Registry& registry)
+{
+	auto entity = registry.getFirstEntity<ResourceTag>();
+	if (!registry.isValid(entity))
+		return std::nullopt;
+
+	return getTexture(registry, entity);
+}
 
 } // namespace spatial::graphics

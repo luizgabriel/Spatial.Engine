@@ -334,31 +334,34 @@ void EditorSystem::onEvent(const OpenProjectEvent& event)
 void EditorSystem::createDefaultEditorEntities()
 {
 	ecs::Builder::create(mRegistry)
-		.asResource()
-		.withPath("engine/dummy_cubemap")
+		.withName("editor::DummyCubemap")
+		.with<tags::IsEditorEntity>()
 		.with<ecs::tags::IsCubeMapTexture>()
 		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
-		.asResource()
-		.withPath("engine/white")
+		.withName("editor::WhiteTexture")
 		.with<ecs::tags::IsImageTexture>()
+		.with<tags::IsEditorWhiteTexture>()
+		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFFFFFFFF}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.asResource()
-		.withPath("engine/gray")
+		.withName("editor::GrayTexture")
 		.with<ecs::tags::IsImageTexture>()
+		.with<tags::IsEditorGrayTexture>()
+		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFF777777}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.asResource()
-		.withPath("engine/black")
+		.withName("editor::BlackTexture")
 		.with<ecs::tags::IsImageTexture>()
+		.with<tags::IsEditorBlackTexture>()
+		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFF000000}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.withName("Grid Plane")
+		.withName("editor::GridPlane")
 		.with<tags::IsEditorEntity>()
 		.asTransform()
 		.withScale({100.0F, 1.0f, 100.0F})
@@ -377,8 +380,8 @@ void EditorSystem::createDefaultEditorEntities()
 		.asMeshInstance()
 		.withMesh(
 			ecs::Builder::create(mRegistry) //
-				.asResource()
-				.withPath("engine/skybox")
+				.withName("editor::SkyboxMesh")
+				.with<tags::IsEditorEntity>()
 				.with<ecs::tags::IsMesh>()
 				.with(ecs::RuntimeMesh{{{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}}, {0, 1, 2}}))
 		.withDefaultMaterialInstance(ecs::Builder::create(mRegistry)
