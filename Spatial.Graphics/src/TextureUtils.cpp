@@ -13,9 +13,4 @@ OptionalTexture getTexture(const ecs::Registry& registry, ecs::Entity entity)
 	return registry.getComponent<const SharedTexture>(entity);
 }
 
-OptionalTexture getTexture(const ecs::Registry& registry, std::string_view resourcePath)
-{
-	return getTexture(registry, ecs::Resource::find(registry, resourcePath));
-}
-
 } // namespace spatial::graphics
