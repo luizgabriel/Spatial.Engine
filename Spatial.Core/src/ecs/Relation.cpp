@@ -79,6 +79,9 @@ Entity Parent::createChild(Registry& registry, Entity parentEntity)
 
 void Child::remove(Registry& registry, Entity childEntity)
 {
+	if (!registry.hasComponent<ecs::Child>(childEntity))
+		return;
+
 	const auto& child = registry.getComponent<const Child>(childEntity);
 	auto& parent = registry.getComponent<Parent>(child.parent);
 	parent.childrenCount--;
@@ -103,6 +106,7 @@ void Child::remove(Registry& registry, Entity childEntity)
 
 void Child::changeParent(Registry& registry, entt::entity childEntity, Entity newParentEntity)
 {
+	assert(childEntity != newParentEntity);
 	Child::remove(registry, childEntity);
 	Parent::addChild(registry, newParentEntity, childEntity);
 }

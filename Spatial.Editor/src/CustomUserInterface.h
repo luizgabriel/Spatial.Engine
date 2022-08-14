@@ -73,11 +73,11 @@ class SceneOptionsMenu
 class SceneTree
 {
   public:
-	static bool displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities = false,
+	static bool displayTree(ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities = false,
 							std::string_view search = "");
 
   private:
-	static bool displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
+	static bool displayNode(ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
 };
 
 class ResourceManager
