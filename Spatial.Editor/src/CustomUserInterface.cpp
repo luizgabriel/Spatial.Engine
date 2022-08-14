@@ -347,7 +347,7 @@ bool EditorModals::openProject(std::string& openPath)
 	return confirmed;
 }
 
-bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities,
+bool SceneTree::displayTree(ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities,
 							std::string_view search)
 {
 	using namespace boost::algorithm;
@@ -390,7 +390,7 @@ bool SceneTree::displayTree(const ecs::Registry& registry, ecs::Entity& selected
 	return changed;
 }
 
-bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity)
+bool SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity)
 {
 	const auto& name = registry.getComponent<ecs::Name>(entity);
 
@@ -410,6 +410,21 @@ bool SceneTree::displayNode(const ecs::Registry& registry, ecs::Entity entity, e
 	bool open = ImGui::TreeNodeEx(name.c_str(), childrenFlags | selectedFlags);
 	if (ImGui::IsItemClicked())
 		selectedEntity = entity;
+
+	if (auto dnd = ui::DragAndDropSource{}; dnd.isStarted())
+		dnd.setPayload(fmt::to_string(static_cast<uint32_t>(entity)));
+
+	if (auto dnd = ui::DragAndDropTarget{}; dnd.isStarted())
+	{
+		if (auto payload = dnd.getPayload(); payload)
+		{
+			auto draggedEntity = static_cast<ecs::Entity>(std::stoi(*payload));
+			assert(registry.isValid(draggedEntity));
+			if (draggedEntity != entity) {
+				ecs::Child::changeParent(registry, draggedEntity, entity);
+			}
+		}
+	}
 
 	ImGui::TableNextColumn();
 
@@ -1040,6 +1055,5 @@ bool EditorMainMenu::createMenu(ecs::Registry& registry, ecs::Entity& selectedEn
 
 	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition);
 }
-
 
 } // namespace spatial::ui
