@@ -219,4 +219,11 @@ struct ComponentInputImpl<ecs::AttachmentTexture>
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
+template <>
+struct ComponentInputImpl<ecs::tags::IsImageTexture>
+{
+	static constexpr auto sName = "Image Texture";
+	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
 } // namespace spatial::ui

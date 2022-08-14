@@ -69,7 +69,6 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 	return false;
 }
 
-
 void image(graphics::OptionalTexture texture, math::vec2 size, math::vec4 uv)
 {
 	if (!texture)
@@ -146,8 +145,9 @@ bool ComponentInputImpl<ecs::SunLight>::draw(ecs::Registry& registry, ecs::Entit
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																			graphics::OptionalTexture icons)
+bool ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>::draw(ecs::Registry& registry,
+																			 ecs::Entity entity,
+																			 graphics::OptionalTexture icons)
 {
 	auto& light = registry.getComponent<ecs::IndirectLight>(entity);
 	bool changed = false;
@@ -257,7 +257,7 @@ bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entit
 }
 
 bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																		   graphics::OptionalTexture icons)
+																			graphics::OptionalTexture icons)
 {
 	auto& mesh = registry.getComponent<ecs::MeshInstance>(entity);
 	bool changed = false;
@@ -381,7 +381,7 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 }
 
 bool ComponentInputImpl<ecs::MeshMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																		   graphics::OptionalTexture icons)
+																			graphics::OptionalTexture icons)
 {
 	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
 	const size_t smallStep = 1, largeStep = 1;
@@ -467,7 +467,7 @@ bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::E
 }
 
 bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	graphics::OptionalTexture icons)
+																	 graphics::OptionalTexture icons)
 {
 	auto& sceneView = registry.getComponent<ecs::Scene>(entity);
 	auto changed = false;
@@ -504,7 +504,7 @@ bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Regist
 }
 
 bool ComponentInputImpl<ecs::Parent, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	 graphics::OptionalTexture icons)
+																	  graphics::OptionalTexture icons)
 {
 	auto& parent = registry.getComponent<ecs::Parent>(entity);
 	bool changed = false;
@@ -520,7 +520,7 @@ bool ComponentInputImpl<ecs::Parent, graphics::OptionalTexture>::draw(ecs::Regis
 }
 
 bool ComponentInputImpl<ecs::Child, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																	graphics::OptionalTexture icons)
+																	 graphics::OptionalTexture icons)
 {
 	auto& child = registry.getComponent<ecs::Child>(entity);
 	bool changed = false;
@@ -540,22 +540,36 @@ bool ComponentInputImpl<ecs::AttachmentTexture>::draw(ecs::Registry& registry, e
 	changed |= ui::vec2Input("Size", attachment.size);
 	changed |= ui::Combo::fromEnum("Type", attachment.type);
 
-	auto aspectRatio = BaseAspectRatio<float>{attachment.size};
+	return changed;
+}
 
-	ui::spacing(2);
+bool ComponentInputImpl<ecs::tags::IsImageTexture>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
 
 	auto texture = graphics::getTexture(registry, entity);
-	if (texture && attachment.type == ecs::AttachmentTexture::Type::Color)
+	if (!texture || isDepthFormat(texture->get()->getFormat()))
+		return false;
+
+	auto size = math::vec2{ImGui::GetContentRegionAvail().x, 200.0f};
+
 	{
-		auto width = ImGui::GetContentRegionAvail().x * 0.8f;
-		ui::image(*texture, {width, width * aspectRatio.inv()}, math::vec4{0, 1, 1, 0});
-	}
-	else
-	{
-		ImGui::Text("This \"%s\" attachment cannot be previewed", magic_enum::enum_name(attachment.type).data());
+		const auto currentPosition = ImGui::GetCursorScreenPos();
+		const auto rectMax = ImVec2(currentPosition.x + size.x, currentPosition.y + size.y);
+
+		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
 	}
 
-	return changed;
+	auto textureAspectRatio = BaseAspectRatio<float>{static_cast<float>(texture->get()->getWidth()),
+													 static_cast<float>(texture->get()->getHeight())};
+	auto textureSize = math::vec2{textureAspectRatio.get() * size.y, size.y};
+
+	ImGui::SetCursorScreenPos(
+		ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(textureSize.x)) * 0.5f,
+			   ImGui::GetCursorScreenPos().y));
+
+	ui::image(std::move(texture), textureSize);
+
+	return false;
 }
 
 } // namespace spatial::ui

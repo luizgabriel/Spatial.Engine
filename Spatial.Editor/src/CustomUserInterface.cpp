@@ -141,6 +141,7 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::MeshMaterial>(registry, entity, icons);
 	componentCollapse<ecs::Scene>(registry, entity, icons);
 	componentCollapse<ecs::AttachmentTexture>(registry, entity);
+	componentCollapse<ecs::tags::IsImageTexture>(registry, entity);
 
 	componentCollapse<editor::EditorCamera>(registry, entity);
 	componentCollapse<editor::ColorMaterial>(registry, entity);
@@ -1039,5 +1040,6 @@ bool EditorMainMenu::createMenu(ecs::Registry& registry, ecs::Entity& selectedEn
 
 	return SceneOptionsMenu::createEntitiesMenu(registry, selectedEntity, createEntitiesPosition);
 }
+
 
 } // namespace spatial::ui

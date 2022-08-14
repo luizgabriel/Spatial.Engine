@@ -150,7 +150,7 @@ void ImGuiRenderer::renderDrawData()
 
 				if (command.TextureId)
 				{
-					auto albedo = std::static_pointer_cast<filament::Texture>(command.TextureId);
+					auto albedo = std::static_pointer_cast<filament::Texture>(std::move(command.TextureId));
 					mi.setParameter("albedo", std::move(albedo),
 									fl::TextureSampler{fl::TextureSampler::MinFilter::LINEAR,
 													   fl::TextureSampler::MagFilter::LINEAR});
