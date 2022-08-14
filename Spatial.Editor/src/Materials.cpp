@@ -29,16 +29,14 @@ void GridMaterial::apply(const graphics::SharedMaterialInstance& instance, const
 void StandardOpaqueMaterial::apply(const graphics::SharedMaterialInstance& instance,
 								   const ecs::Registry& registry) const
 {
-	auto dummyGray = graphics::getTexture<editor::tags::IsEditorGrayTexture>(registry);
 	auto dummyWhite = graphics::getTexture<editor::tags::IsEditorWhiteTexture>(registry);
 	auto dummyBlack = graphics::getTexture<editor::tags::IsEditorBlackTexture>(registry);
-	assert(dummyGray.has_value());
 	assert(dummyWhite.has_value());
 	assert(dummyBlack.has_value());
 
 	instance->setParameter("baseColor", baseColor);
 	auto albedoTexture = graphics::getTexture(registry, albedo);
-	instance->setParameter("albedo", albedoTexture ? *albedoTexture : *dummyGray, gDefaultSampler);
+	instance->setParameter("albedo", albedoTexture ? *albedoTexture : *dummyWhite, gDefaultSampler);
 	instance->setParameter("tilingOffset", math::vec4{tiling, offset});
 
 	instance->setParameter("metallic", metallic);

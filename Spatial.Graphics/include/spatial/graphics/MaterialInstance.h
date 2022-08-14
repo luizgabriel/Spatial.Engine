@@ -40,7 +40,7 @@ class MaterialInstance
 	void setParameter(std::string_view parameter, math::vec2 value);
 	void setParameter(std::string_view parameter, math::vec3 value);
 	void setParameter(std::string_view parameter, math::vec4 value);
-	void setParameter(std::string_view parameter, const SharedTexture& texture, filament::TextureSampler sampler);
+	void setParameter(std::string_view parameter, SharedTexture texture, filament::TextureSampler sampler);
 
   private:
 	filament::Engine& mEngine;

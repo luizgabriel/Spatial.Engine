@@ -23,9 +23,4 @@ struct IsEditorBlackTexture
 	constexpr static auto typeName = "tag_is_editor_black_texture";
 };
 
-struct IsEditorGrayTexture
-{
-	constexpr static auto typeName = "tag_is_editor_gray_texture";
-};
-
 } // namespace spatial::editor::tags

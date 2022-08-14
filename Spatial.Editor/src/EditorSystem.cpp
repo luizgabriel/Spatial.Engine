@@ -333,28 +333,28 @@ void EditorSystem::onEvent(const OpenProjectEvent& event)
 
 void EditorSystem::createDefaultEditorEntities()
 {
+	auto texturesGroup = ecs::Builder::create(mRegistry)
+		.withName("editor::Textures")
+		.with<tags::IsEditorEntity>();
+
 	ecs::Builder::create(mRegistry)
 		.withName("editor::DummyCubemap")
+		.withParent(texturesGroup)
 		.with<tags::IsEditorEntity>()
 		.with<ecs::tags::IsCubeMapTexture>()
 		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
 		.withName("editor::WhiteTexture")
+		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorWhiteTexture>()
 		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFFFFFFFF}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor::GrayTexture")
-		.with<ecs::tags::IsImageTexture>()
-		.with<tags::IsEditorGrayTexture>()
-		.with<tags::IsEditorEntity>()
-		.with(ecs::RuntimeTexture{{0xFF777777}, 1});
-
-	ecs::Builder::create(mRegistry)
 		.withName("editor::BlackTexture")
+		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorBlackTexture>()
 		.with<tags::IsEditorEntity>()
