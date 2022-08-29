@@ -5,25 +5,64 @@
 namespace spatial::ecs
 {
 
-Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity)
+Entity Mesh::addPart(Registry& registry, Entity meshEntity, MeshPart part)
 {
-	auto& mesh = registry.getOrAddComponent<ecs::MeshInstance>(meshEntity);
-	if (!registry.isValid(mesh.defaultMaterial))
+	auto partEntity = registry.createEntity();
+	registry.addComponent<ecs::MeshPart>(partEntity, std::move(part));
+	ecs::Parent::addChild(registry, meshEntity, partEntity);
+
+	return partEntity;
+}
+
+std::vector<Entity> Mesh::getParts(const Registry& registry, Entity meshEntity)
+{
+	return ecs::Parent::getChildren(registry, meshEntity);
+}
+
+size_t MeshInstance::getPrimitivesCount(const Registry& registry, Entity meshInstanceEntity)
+{
+	if (!registry.hasComponent<ecs::Parent>(meshInstanceEntity))
+		return 0;
+
+	return ecs::Parent::getChildrenCount(registry, meshInstanceEntity);
+}
+
+Entity MeshInstance::addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity)
+{
+	auto& mesh = registry.getOrAddComponent<ecs::MeshInstance>(meshInstanceEntity);
+	if (!registry.isValid(mesh.defaultMaterialInstance))
 	{
-		mesh.defaultMaterial = materialEntity;
+		mesh.defaultMaterialInstance = materialInstanceEntity;
 		return ecs::NullEntity;
 	}
 
-	return addMaterial(registry, meshEntity, materialEntity, mesh.slice.count++);
+	return addMaterial(registry, meshInstanceEntity, materialInstanceEntity,
+					   getPrimitivesCount(registry, meshInstanceEntity));
 }
 
-Entity MeshInstance::addMaterial(Registry& registry, Entity meshEntity, Entity materialEntity, size_t primitiveIndex)
+Entity MeshInstance::addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity,
+								 size_t primitiveIndex)
 {
-	auto child =
-		ecs::Builder::create(registry).asMeshMaterial().withPrimitiveIndex(primitiveIndex).withMaterial(materialEntity);
-	ecs::Parent::addChild(registry, meshEntity, child);
+	return ecs::Builder::create(registry)
+		.asMeshPrimitive()
+		.withMeshInstance(meshInstanceEntity)
+		.withPrimitiveIndex(primitiveIndex)
+		.withMaterial(materialInstanceEntity);
+}
 
-	return child;
+std::vector<Entity> MeshInstance::getPrimitives(const Registry& registry, Entity meshInstance)
+{
+	return ecs::Parent::getChildren(registry, meshInstance);
+}
+
+size_t MeshInstance::destroyPrimitives(Registry& registry, Entity meshInstanceEntity)
+{
+	return ecs::Parent::destroyChildren(registry, meshInstanceEntity);
+}
+
+void MeshPrimitive::changeMeshInstance(Registry& registry, Entity meshPrimitiveEntity, Entity meshInstanceEntity)
+{
+	ecs::Child::changeParent(registry, meshPrimitiveEntity, meshInstanceEntity);
 }
 
 } // namespace spatial::ecs

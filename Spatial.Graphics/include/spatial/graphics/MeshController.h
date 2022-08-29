@@ -6,7 +6,7 @@
 namespace spatial::graphics
 {
 
-class MeshController
+struct MeshController
 {
   public:
 	static void loadMeshes(filament::Engine& engine, ecs::Registry& registry);
@@ -15,8 +15,6 @@ class MeshController
 
 	static void updateMeshInstances(ecs::Registry& registry);
 
-  private:
-	static void updateMeshGeometries(ecs::Registry& registry);
 	static void clearDirtyRenderables(ecs::Registry& registry);
 };
 

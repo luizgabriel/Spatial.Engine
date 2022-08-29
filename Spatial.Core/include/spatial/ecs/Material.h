@@ -1,16 +1,31 @@
 #pragma once
 
-namespace spatial::ecs::tags
-{
+#include <spatial/ecs/Registry.h>
 
-struct IsMaterial
-{
+namespace spatial::ecs {
+
+namespace tags {
+
+struct IsMaterial {
 	constexpr static auto typeName = "tag_is_material";
 };
 
-struct IsMaterialInstance
-{
-	constexpr static auto typeName = "tag_is_material_instance";
+} // namespace tags
+
+struct MaterialInstance {
+	constexpr static auto typeName = "material_instance";
+
+	struct Scissor {
+		uint32_t left{};
+		uint32_t bottom{};
+		uint32_t width{};
+		uint32_t height{};
+	};
+
+	Scissor scissor{};
+
+	static void changeMaterialSource(Registry& registry, entt::entity materialInstance, Entity newMaterialSource);
 };
 
-} // namespace spatial::ecs::tags
+
+} // namespace spatial::ecs

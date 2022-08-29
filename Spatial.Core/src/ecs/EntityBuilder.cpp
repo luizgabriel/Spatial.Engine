@@ -60,7 +60,17 @@ SunLightBuilder Builder::asSunLight()
 	return {mRegistry, mEntity};
 }
 
+MaterialInstanceBuilder Builder::asMaterialInstance()
+{
+	return {mRegistry, mEntity};
+}
+
 MeshInstanceBuilder Builder::asMeshInstance()
+{
+	return {mRegistry, mEntity};
+}
+
+MeshPrimitiveBuilder Builder::asMeshPrimitive()
 {
 	return {mRegistry, mEntity};
 }
@@ -75,12 +85,12 @@ SceneBuilder Builder::asScene()
 	return {mRegistry, mEntity};
 }
 
-MeshMaterialBuilder Builder::asMeshMaterial()
+ResourceBuilder Builder::asResource()
 {
 	return {mRegistry, mEntity};
 }
 
-ResourceBuilder Builder::asResource()
+MeshBuilder Builder::asMesh()
 {
 	return {mRegistry, mEntity};
 }
@@ -378,7 +388,7 @@ MeshInstanceBuilder& MeshInstanceBuilder::withMesh(Entity resource)
 
 MeshInstanceBuilder& MeshInstanceBuilder::withDefaultMaterialInstance(Entity materialEntity)
 {
-	getComponent().defaultMaterial = materialEntity;
+	getComponent().defaultMaterialInstance = materialEntity;
 	return *this;
 }
 
@@ -393,8 +403,8 @@ MeshInstanceBuilder& MeshInstanceBuilder::withShadowOptions(bool castShadows, bo
 MeshInstanceBuilder& MeshInstanceBuilder::withSubMesh(std::uint8_t offset, std::uint8_t count)
 {
 	auto& component = getComponent();
-	component.slice.count = count;
-	component.slice.offset = offset;
+	component.partsCount = count;
+	component.partsOffset = offset;
 	return *this;
 }
 
@@ -481,11 +491,11 @@ SceneBuilder& SceneBuilder::withDefaultAttachments()
 		.withAttachment(depthAttachment);
 }
 
-MeshMaterialBuilder::MeshMaterialBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
+MeshPrimitiveBuilder::MeshPrimitiveBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
 }
 
-MeshMaterialBuilder& MeshMaterialBuilder::withPrimitiveIndex(uint32_t primitiveIndex)
+MeshPrimitiveBuilder& MeshPrimitiveBuilder::withPrimitiveIndex(uint32_t primitiveIndex)
 {
 	if (!mRegistry.hasAllComponents<Name>(mEntity))
 		withName(fmt::format("Primitive {}", primitiveIndex));
@@ -494,9 +504,21 @@ MeshMaterialBuilder& MeshMaterialBuilder::withPrimitiveIndex(uint32_t primitiveI
 	return *this;
 }
 
-MeshMaterialBuilder& MeshMaterialBuilder::withMaterial(Entity materialInstance)
+MeshPrimitiveBuilder& MeshPrimitiveBuilder::withMaterial(Entity materialInstance)
 {
-	getComponent().materialInstanceEntity = materialInstance;
+	getComponent().materialInstance = materialInstance;
+	return *this;
+}
+
+MeshPrimitiveBuilder& MeshPrimitiveBuilder::withMeshInstance(Entity meshInstanceEntity)
+{
+	ecs::MeshPrimitive::changeMeshInstance(mRegistry, mEntity, meshInstanceEntity);
+	return *this;
+}
+
+MeshPrimitiveBuilder& MeshPrimitiveBuilder::withBlendOrder(uint16_t blendOrder)
+{
+	getComponent().blendOrder = blendOrder;
 	return *this;
 }
 
@@ -513,6 +535,54 @@ ResourceBuilder& ResourceBuilder::withPath(std::string_view relativePath)
 	if (!relativePath.empty() && !mRegistry.hasAllComponents<ecs::Name>(mEntity))
 		withName(fileName);
 
+	return *this;
+}
+
+MaterialInstanceBuilder::MaterialInstanceBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+}
+
+MaterialInstanceBuilder& MaterialInstanceBuilder::withMaterial(std::string_view relativeResourcePath)
+{
+	withMaterial(ecs::Resource::findOrCreate<ecs::tags::IsMaterial>(mRegistry, relativeResourcePath));
+	return *this;
+}
+
+MaterialInstanceBuilder& MaterialInstanceBuilder::withMaterial(Entity resource)
+{
+	if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
+		withName(mRegistry.getComponent<Resource>(resource).stem());
+
+	ecs::MaterialInstance::changeMaterialSource(mRegistry, mEntity, resource);
+	return *this;
+}
+
+MaterialInstanceBuilder& MaterialInstanceBuilder::withScissor(MaterialInstance::Scissor scissor)
+{
+	getComponent().scissor = std::move(scissor);
+	return *this;
+}
+
+MeshBuilder::MeshBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+	with<ecs::tags::IsMesh>();
+}
+
+MeshBuilder& MeshBuilder::withVertexData(ecs::VertexData vertexData)
+{
+	getComponent().vertexData = std::move(vertexData);
+	return *this;
+}
+
+MeshBuilder& MeshBuilder::withIndexData(ecs::IndexData indexData)
+{
+	getComponent().indexData = std::move(indexData);
+	return *this;
+}
+
+MeshBuilder& MeshBuilder::withBoundingBox(math::AxisAlignedBoundingBox boundingBox)
+{
+	getComponent().boundingBox = std::move(boundingBox);
 	return *this;
 }
 

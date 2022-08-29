@@ -22,10 +22,8 @@ void MaterialController::loadMaterials(filament::Engine& engine, ecs::Registry& 
 
 void MaterialController::createMaterialInstances(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry
-		.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Child>(
-			ecs::ExcludeComponents<SharedMaterialInstance>)
-		.each([&](ecs::Entity entity, const ecs::Child& child) {
+	registry.getEntities<const ecs::MaterialInstance, const ecs::Child>(ecs::ExcludeComponents<SharedMaterialInstance>)
+		.each([&](ecs::Entity entity, const auto&, const ecs::Child& child) {
 			const auto materialEntity = child.parent;
 
 			if (!registry.hasAllComponents<SharedMaterial>(materialEntity))
@@ -34,6 +32,15 @@ void MaterialController::createMaterialInstances(filament::Engine& engine, ecs::
 			auto& material = registry.getComponent<const SharedMaterial>(materialEntity);
 			auto materialInstance = toShared(createMaterialInstance(engine, material));
 			registry.addComponent<SharedMaterialInstance>(entity, std::move(materialInstance));
+		});
+}
+
+void MaterialController::updateMaterialInstances(const ecs::Registry& registry)
+{
+	registry.getEntities<const ecs::MaterialInstance, const SharedMaterialInstance>().each(
+		[&](const auto& data, const SharedMaterialInstance& materialInstance) {
+			materialInstance->setScissor(data.scissor.left, data.scissor.bottom, data.scissor.width,
+										 data.scissor.height);
 		});
 }
 

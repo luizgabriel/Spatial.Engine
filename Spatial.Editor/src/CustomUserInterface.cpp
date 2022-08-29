@@ -138,7 +138,8 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::SunLight>(registry, entity);
 	componentCollapse<ecs::Resource>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity, icons);
-	componentCollapse<ecs::MeshMaterial>(registry, entity, icons);
+	componentCollapse<ecs::MeshPrimitive>(registry, entity, icons);
+	componentCollapse<ecs::MaterialInstance>(registry, entity, icons);
 	componentCollapse<ecs::Scene>(registry, entity, icons);
 	componentCollapse<ecs::AttachmentTexture>(registry, entity);
 	componentCollapse<ecs::tags::IsImageTexture>(registry, entity);
@@ -161,7 +162,6 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	ImGui::Text("Tags: ");
 
 	componentTag<ecs::tags::IsRenderedToTarget>(registry, entity);
-	componentTag<ecs::tags::IsMaterialInstance>(registry, entity);
 	componentTag<ecs::tags::IsMainView>(registry, entity);
 	componentTag<ecs::tags::IsRenderable>(registry, entity);
 	componentTag<ecs::tags::IsMesh>(registry, entity);
@@ -247,7 +247,7 @@ void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
 	if (!registry.isValid(entity))
 		return;
 
-	if (registry.hasAnyComponent<ecs::tags::IsMaterialInstance>(entity))
+	if (registry.hasAnyComponent<ecs::MaterialInstance>(entity))
 		return;
 
 	{
@@ -420,7 +420,8 @@ bool SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity, ecs::En
 		{
 			auto draggedEntity = static_cast<ecs::Entity>(std::stoi(*payload));
 			assert(registry.isValid(draggedEntity));
-			if (draggedEntity != entity) {
+			if (draggedEntity != entity)
+			{
 				ecs::Child::changeParent(registry, draggedEntity, entity);
 			}
 		}
@@ -582,8 +583,9 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 		{
 			createdEntity = ecs::Builder::create(registry)
 								.withName(mergeMaterialName("Standard Opaque"))
-								.asMaterialInstance<editor::StandardOpaqueMaterial>()
-								.withMaterial("editor/materials/standard_lit.filamat");
+								.asMaterialInstance()
+								.withMaterial("editor/materials/standard_lit.filamat")
+								.with(editor::StandardOpaqueMaterial{});
 			changed = true;
 		}
 
@@ -591,8 +593,9 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 		{
 			createdEntity = ecs::Builder::create(registry)
 								.withName(mergeMaterialName("Color Material"))
-								.asMaterialInstance<editor::ColorMaterial>()
-								.withMaterial("editor/materials/color.filamat");
+								.asMaterialInstance()
+								.withMaterial("editor/materials/color.filamat")
+								.with(editor::ColorMaterial{});
 			changed = true;
 		}
 	}
@@ -601,12 +604,13 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 	{
 		createdEntity = ecs::Builder::create(registry)
 							.withName("Default SkyBox")
-							.asMaterialInstance<editor::SkyBoxMaterial>()
-							.withMaterial("editor/materials/skybox.filamat");
+							.asMaterialInstance()
+							.withMaterial("editor/materials/skybox.filamat")
+							.with(editor::SkyBoxMaterial{});
 		changed = true;
 	}
 
-	if (isMeshInstanceSelected && registry.hasAnyComponent<ecs::tags::IsMaterialInstance>(createdEntity))
+	if (isMeshInstanceSelected && registry.hasAnyComponent<ecs::MaterialInstance>(createdEntity))
 		ecs::MeshInstance::addMaterial(registry, selectedEntity, createdEntity);
 
 	if (changed)
@@ -632,7 +636,7 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableHeadersRow();
 
-		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
+		const auto eachFn = [&](ecs::Entity entity, const auto&, const auto& name) {
 			if (!icontains(name.name, search))
 				return;
 
@@ -650,10 +654,10 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 		};
 
 		if (showEditorEntities)
-			registry.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>().each(eachFn);
+			registry.getEntities<const ecs::MaterialInstance, const ecs::Name>().each(eachFn);
 		else
 			registry
-				.getEntities<const ecs::tags::IsMaterialInstance, const ecs::Name>(
+				.getEntities<const ecs::MaterialInstance, const ecs::Name>(
 					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
 				.each(eachFn);
 
@@ -826,9 +830,9 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withMesh("engine/skybox")
 						.withDefaultMaterialInstance(ecs::Builder::create(registry)
 														 .withName("Skybox Material")
-														 .asMaterialInstance<editor::SkyBoxMaterial>()
+														 .asMaterialInstance()
 														 .withMaterial("editor/materials/skybox.filamat")
-														 .withProps({
+														 .with(editor::SkyBoxMaterial{
 															 false,
 															 {math::vec3{.0f}, 1.0f},
 															 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(

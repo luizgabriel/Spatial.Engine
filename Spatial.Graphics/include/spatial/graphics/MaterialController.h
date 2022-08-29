@@ -15,6 +15,8 @@ struct MaterialController
 
 	static void createMaterialInstances(filament::Engine& engine, ecs::Registry& registry);
 
+	static void updateMaterialInstances(const ecs::Registry& registry);
+
 	template <typename MaterialComponent>
 	static void updateMaterial(ecs::Registry& registry)
 	{

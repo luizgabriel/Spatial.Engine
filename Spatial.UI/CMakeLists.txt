@@ -6,7 +6,7 @@ add_library(Spatial.UI
         include/spatial/ui/system/ImGuiRenderer.h
 
         include/spatial/ui/components/Window.h
-        include/spatial/ui/components/Collapse.h
+        include/spatial/ui/components/CollapsingHeader.h
         include/spatial/ui/components/DockSpace.h
         include/spatial/ui/components/Components.h
         include/spatial/ui/components/MenuBar.h
@@ -22,6 +22,7 @@ add_library(Spatial.UI
         include/spatial/ui/components/SceneView.h
         include/spatial/ui/components/MaterialInputs.h
         include/spatial/ui/components/PreviewTexture.h
+        include/spatial/ui/components/TreeNode.h
 
         include/spatial/ui/components/Icons.h
 
@@ -34,7 +35,7 @@ add_library(Spatial.UI
         src/system/ImGuiRenderer.cpp
 
         src/components/Window.cpp
-        src/components/Collapse.cpp
+        src/components/CollapsingHeader.cpp
         src/components/DockSpace.cpp
         src/components/Components.cpp
         src/components/MenuBar.cpp
@@ -50,6 +51,7 @@ add_library(Spatial.UI
         src/components/Search.cpp
         src/components/MaterialInputs.cpp
         src/components/PreviewTexture.cpp
+        src/components/TreeNode.cpp
 
         src/components/styles/BorderlessWindowStyle.cpp
         src/components/styles/WindowPaddingStyle.cpp)

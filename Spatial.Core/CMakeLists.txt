@@ -47,6 +47,7 @@ add_library(Spatial.Core
         include/spatial/serialization/Resource.h
         include/spatial/serialization/Snapshot.h
         include/spatial/serialization/Texture.h
+        include/spatial/serialization/Material.h
 
         include/spatial/resources/Math.h
         include/spatial/resources/BoundingBox.h
@@ -55,6 +56,7 @@ add_library(Spatial.Core
         include/spatial/resources/FileSystem.h
         include/spatial/resources/PhysicalFileSystem.h
         include/spatial/resources/ResourceController.h
+        include/spatial/resources/MeshComponents.h
 
         include/spatial/script/Isolate.h
         include/spatial/script/PlatformContext.h
@@ -81,6 +83,7 @@ add_library(Spatial.Core
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
         src/ecs/Scene.cpp
+        src/ecs/Material.cpp
 
         src/script/PlatformContext.cpp
         src/script/Isolate.cpp
@@ -93,7 +96,8 @@ add_library(Spatial.Core
         src/resources/FileSystem.cpp
         src/resources/PhysicalFileSystem.cpp
         src/resources/MemoryFileSystem.cpp
-        src/resources/ResourceController.cpp)
+        src/resources/ResourceController.cpp
+        src/resources/MeshComponents.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

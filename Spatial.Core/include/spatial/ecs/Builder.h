@@ -29,12 +29,13 @@ class IndirectLightBuilder;
 
 class ResourceBuilder;
 
-template <typename MaterialComponent>
 class MaterialInstanceBuilder;
+
+class MeshBuilder;
 
 class MeshInstanceBuilder;
 
-class MeshMaterialBuilder;
+class MeshPrimitiveBuilder;
 
 class SceneBuilder;
 
@@ -83,14 +84,11 @@ class Builder
 
 	ResourceBuilder asResource();
 
+	MeshBuilder asMesh();
 	MeshInstanceBuilder asMeshInstance();
-	MeshMaterialBuilder asMeshMaterial();
+	MeshPrimitiveBuilder asMeshPrimitive();
 
-	template <typename MaterialComponent>
-	MaterialInstanceBuilder<MaterialComponent> asMaterialInstance()
-	{
-		return MaterialInstanceBuilder<MaterialComponent>{mRegistry, mEntity};
-	}
+	MaterialInstanceBuilder asMaterialInstance();
 
 	[[nodiscard]] Entity get() const
 	{
@@ -241,36 +239,16 @@ class IndirectLightBuilder : public BasicBuilder<IndirectLight>
 	IndirectLightBuilder& withIrradianceValues(Entity resource);
 };
 
-template <typename MaterialProps>
-class MaterialInstanceBuilder : public Builder
+class MaterialInstanceBuilder : public BasicBuilder<MaterialInstance>
 {
   public:
-	MaterialInstanceBuilder(Registry& registry, Entity entity) : Builder(registry, entity)
-	{
-		with<tags::IsMaterialInstance>();
-		with<MaterialProps>({});
-	}
+	using Base = BasicBuilder<MaterialInstance>;
 
-	MaterialInstanceBuilder& withMaterial(std::string_view relativeResourcePath)
-	{
-		withMaterial(ecs::Resource::findOrCreate<ecs::tags::IsMaterial>(mRegistry, relativeResourcePath));
-		return *this;
-	}
+	MaterialInstanceBuilder(Registry& registry, Entity entity);
 
-	MaterialInstanceBuilder& withMaterial(Entity resource)
-	{
-		if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
-			withName(mRegistry.getComponent<Resource>(resource).stem());
-
-		withParent(resource);
-		return *this;
-	}
-
-	MaterialInstanceBuilder& withProps(MaterialProps&& params)
-	{
-		mRegistry.addOrReplaceComponent<MaterialProps>(mEntity, std::move(params));
-		return *this;
-	}
+	MaterialInstanceBuilder& withMaterial(std::string_view relativeResourcePath);
+	MaterialInstanceBuilder& withMaterial(Entity resource);
+	MaterialInstanceBuilder& withScissor(MaterialInstance::Scissor scissor);
 };
 
 class ResourceBuilder : public BasicBuilder<Resource>
@@ -301,15 +279,28 @@ class MeshInstanceBuilder : public BasicBuilder<MeshInstance>
 	MeshInstanceBuilder& withPriority(uint8_t priority);
 };
 
-class MeshMaterialBuilder : public BasicBuilder<MeshMaterial>
+class MeshPrimitiveBuilder : public BasicBuilder<MeshPrimitive>
 {
   public:
-	using Base = BasicBuilder<MeshMaterial>;
+	using Base = BasicBuilder<MeshPrimitive>;
 
-	MeshMaterialBuilder(Registry& registry, Entity entity);
+	MeshPrimitiveBuilder(Registry& registry, Entity entity);
 
-	MeshMaterialBuilder& withPrimitiveIndex(uint32_t primitiveIndex);
-	MeshMaterialBuilder& withMaterial(Entity materialInstance);
+	MeshPrimitiveBuilder& withMeshInstance(Entity meshInstanceEntity);
+	MeshPrimitiveBuilder& withPrimitiveIndex(uint32_t primitiveIndex);
+	MeshPrimitiveBuilder& withMaterial(Entity materialInstance);
+	MeshPrimitiveBuilder& withBlendOrder(uint16_t blendOrder);
+};
+
+class MeshBuilder : public BasicBuilder<Mesh>
+{
+  public:
+	using Base = BasicBuilder<Mesh>;
+
+	MeshBuilder(Registry& registry, Entity entity);
+	MeshBuilder& withVertexData(ecs::VertexData vertexData);
+	MeshBuilder& withIndexData(ecs::IndexData indexData);
+	MeshBuilder& withBoundingBox(math::AxisAlignedBoundingBox boundingBox);
 };
 
 class SceneBuilder : public BasicBuilder<Scene>
@@ -327,5 +318,6 @@ class SceneBuilder : public BasicBuilder<Scene>
 	SceneBuilder& withDefaultAttachments();
 	SceneBuilder& withAttachment(Entity attachmentTexture);
 };
+
 
 } // namespace spatial::ecs
