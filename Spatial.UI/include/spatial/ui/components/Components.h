@@ -13,7 +13,7 @@
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
 #include <spatial/graphics/TextureUtils.h>
-#include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/CollapsingHeader.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
@@ -82,7 +82,7 @@ bool componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args... args
 
 	if (registry.hasAllComponents<Component>(entity))
 	{
-		auto collapse = Collapse{ComponentInputImpl<Component, Args...>::sName};
+		auto collapse = CollapsingHeader{ComponentInputImpl<Component, Args...>::sName};
 		if (collapse.isOpen())
 		{
 			spacing(3);
@@ -150,9 +150,9 @@ struct ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>
 };
 
 template <>
-struct ComponentInputImpl<ecs::MeshMaterial, graphics::OptionalTexture>
+struct ComponentInputImpl<ecs::MeshPrimitive, graphics::OptionalTexture>
 {
-	static constexpr auto sName = "Mesh Material";
+	static constexpr auto sName = "Mesh Primitive";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
@@ -175,6 +175,13 @@ struct ComponentInputImpl<ecs::OrthographicCamera>
 {
 	static constexpr auto sName = "Orthographic Camera";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::MaterialInstance, graphics::OptionalTexture>
+{
+	static constexpr auto sName = "Material Instance";
+	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>

@@ -334,18 +334,18 @@ void EditorSystem::onEvent(const OpenProjectEvent& event)
 void EditorSystem::createDefaultEditorEntities()
 {
 	auto texturesGroup = ecs::Builder::create(mRegistry)
-		.withName("editor::Textures")
+		.withName("editor/textures")
 		.with<tags::IsEditorEntity>();
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor::DummyCubemap")
+		.withName("editor/dummy_cubemap")
 		.withParent(texturesGroup)
 		.with<tags::IsEditorEntity>()
 		.with<ecs::tags::IsCubeMapTexture>()
 		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor::WhiteTexture")
+		.withName("editor/white_texture")
 		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorWhiteTexture>()
@@ -353,7 +353,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.with(ecs::RuntimeTexture{{0xFFFFFFFF}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor::BlackTexture")
+		.withName("editor/black_texture")
 		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorBlackTexture>()
@@ -361,7 +361,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.with(ecs::RuntimeTexture{{0xFF000000}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor::GridPlane")
+		.withName("editor/grid_plane")
 		.with<tags::IsEditorEntity>()
 		.asTransform()
 		.withScale({100.0F, 1.0f, 100.0F})
@@ -371,24 +371,25 @@ void EditorSystem::createDefaultEditorEntities()
 		.withDefaultMaterialInstance(ecs::Builder::create(mRegistry)
 										 .withName("Grid Material")
 										 .with<tags::IsEditorEntity>()
-										 .asMaterialInstance<GridMaterial>()
+										 .asMaterialInstance()
 										 .withMaterial("editor/materials/grid.filamat")
-										 .withProps({}));
+										 .with(GridMaterial{}));
 
 	ecs::Builder::create(mRegistry)
 		.withName("SkyBox")
 		.asMeshInstance()
 		.withMesh(
 			ecs::Builder::create(mRegistry) //
-				.withName("editor::SkyboxMesh")
+				.withName("editor/skybox_mesh")
 				.with<tags::IsEditorEntity>()
-				.with<ecs::tags::IsMesh>()
-				.with(ecs::RuntimeMesh{{{-1.0f, -1.0f, 1.0f}, {3.0f, -1.0f, 1.0f}, {-1.0f, 3.0f, 1.0f}}, {0, 1, 2}}))
+				.asMesh()
+				.withVertexData(gSkyboxVertexData)
+				.withIndexData(gSkyboxIndexData))
 		.withDefaultMaterialInstance(ecs::Builder::create(mRegistry)
 										 .withName("SkyBox Material")
-										 .asMaterialInstance<SkyBoxMaterial>()
+										 .asMaterialInstance()
 										 .withMaterial("editor/materials/skybox.filamat")
-										 .withProps({
+										 .with(SkyBoxMaterial{
 											 false,
 											 math::vec4{math::vec3{0.3f}, 1.0f},
 											 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(

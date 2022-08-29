@@ -21,6 +21,7 @@ void RegistryRenderingSystem::onStartFrame(float)
 		SceneController::cleanUpDestroyableEntities(registry);
 		LightController::deleteLights(registry);
 		CameraController::deleteCameras(registry);
+		MeshController::clearDirtyRenderables(registry);
 	});
 }
 

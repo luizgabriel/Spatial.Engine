@@ -1,10 +1,11 @@
+#include "spatial/ui/components/TreeNode.h"
 #include <boost/algorithm/string/join.hpp>
 #include <imgui.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/graphics/Resources.h>
-#include <spatial/ui/components/Collapse.h>
+#include <spatial/ui/components/CollapsingHeader.h>
 #include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/DragAndDrop.h>
@@ -279,7 +280,7 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 	spacing(3);
 
 	changed |=
-		Search::searchEntity<ecs::tags::IsMaterialInstance>("Default Material", icons, registry, mesh.defaultMaterial);
+		Search::searchEntity<ecs::MaterialInstance>("Default Material", icons, registry, mesh.defaultMaterialInstance);
 
 	spacing(3);
 
@@ -306,10 +307,10 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 				ecs::Entity childToDestroy = ecs::NullEntity;
 
 				ecs::Parent::forEachChild(registry, entity, [&](ecs::Entity child) {
-					if (!registry.hasAllComponents<ecs::MeshMaterial>(child))
+					if (!registry.hasAllComponents<ecs::MeshPrimitive>(child))
 						return;
 
-					auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(child);
+					auto& meshPrimitive = registry.getComponent<ecs::MeshPrimitive>(child);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
@@ -320,14 +321,14 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep,
+					ImGui::InputScalar("##PrimitiveIndex", ImGuiDataType_U64, &meshPrimitive.primitiveIndex, &smallStep,
 									   &largeStep, "%lu");
 
 					ImGui::TableNextColumn();
 
 					ui::spanToAvailWidth();
-					ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("##Material", icons, registry,
-																			meshMaterial.materialInstanceEntity);
+					ui::Search::searchEntity<ecs::MaterialInstance>("##Material", icons, registry,
+																 meshPrimitive.materialInstance);
 
 					ImGui::TableNextColumn();
 
@@ -362,10 +363,10 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 		spacing(3);
 
 		shouldRecreateMesh =
-			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.slice.count, &smallStep, &largeStep, "%lu");
+			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
 		changed |= shouldRecreateMesh;
 		changed |=
-			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.slice.offset, &smallStep, &largeStep, "%lu");
+			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
 		ImGui::TreePop();
 
 		spacing(3);
@@ -380,17 +381,20 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::MeshMaterial, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
-																			graphics::OptionalTexture icons)
+bool ComponentInputImpl<ecs::MeshPrimitive, graphics::OptionalTexture>::draw(ecs::Registry& registry,
+																			 ecs::Entity entity,
+																			 graphics::OptionalTexture icons)
 {
-	auto& meshMaterial = registry.getComponent<ecs::MeshMaterial>(entity);
+	auto& meshPrimitive = registry.getComponent<ecs::MeshPrimitive>(entity);
 	const size_t smallStep = 1, largeStep = 1;
 	bool changed = false;
 
-	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshMaterial.primitiveIndex, &smallStep,
+	changed |= ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshPrimitive.primitiveIndex, &smallStep,
 								  &largeStep, "%lu");
-	changed |= ui::Search::searchEntity<ecs::tags::IsMaterialInstance>("Material", icons, registry,
-																	   meshMaterial.materialInstanceEntity);
+	changed |= ui::Search::searchEntity<ecs::MaterialInstance>("Material Instance", std::move(icons), registry,
+															   meshPrimitive.materialInstance);
+	changed |=
+		ImGui::InputScalar("Blend Order", ImGuiDataType_U16, &meshPrimitive.blendOrder, &smallStep, &largeStep, "%u");
 
 	return changed;
 }
@@ -478,8 +482,7 @@ bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Regist
 
 	ui::spacing();
 
-	if (registry.hasAnyComponent<ecs::tags::IsCamera>(sceneView.camera)
-		&& ImGui::TreeNodeEx("Camera Properties", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+	if (auto node = ui::TreeNode{"Camera Properties"}; node.isOpen())
 	{
 		spacing(3);
 		if (registry.hasAllComponents<ecs::PerspectiveCamera>(sceneView.camera))
@@ -489,16 +492,12 @@ bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Regist
 		else if (registry.hasAllComponents<ecs::CustomCamera>(sceneView.camera))
 			ui::componentInput<ecs::CustomCamera>(registry, sceneView.camera);
 		spacing(3);
-		ImGui::TreePop();
 	}
 
 	ui::spacing();
 
-	if (ImGui::TreeNodeEx("Camera Preview", ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
-	{
+	if (auto node = ui::TreeNode{"Camera Preview"}; node.isOpen())
 		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
-		ImGui::TreePop();
-	}
 
 	return changed;
 }
@@ -570,6 +569,34 @@ bool ComponentInputImpl<ecs::tags::IsImageTexture>::draw(ecs::Registry& registry
 	ui::image(std::move(texture), textureSize);
 
 	return false;
+}
+
+bool ComponentInputImpl<ecs::MaterialInstance, graphics::OptionalTexture>::draw(ecs::Registry& registry,
+																				ecs::Entity entity,
+																				graphics::OptionalTexture icons)
+{
+	auto& materialInstance = registry.getComponent<ecs::MaterialInstance>(entity);
+	auto& child = registry.getComponent<ecs::Child>(entity);
+
+	auto parent = child.parent;
+	bool changed = ui::Search::searchResource<ecs::tags::IsMaterial>("Material", icons, registry, parent);
+	if (changed)
+		ecs::MaterialInstance::changeMaterialSource(registry, entity, parent);
+
+	if (auto collapse = ui::TreeNode{"Scissor", false}; collapse.isOpen())
+	{
+		ImGui::Columns(2);
+		changed |= ImGui::InputScalar("Left", ImGuiDataType_U32, &materialInstance.scissor.left);
+		ImGui::NextColumn();
+		changed |= ImGui::InputScalar("Bottom", ImGuiDataType_U32, &materialInstance.scissor.bottom);
+		ImGui::NextColumn();
+		changed |= ImGui::InputScalar("Width", ImGuiDataType_U32, &materialInstance.scissor.width);
+		ImGui::NextColumn();
+		changed |= ImGui::InputScalar("Height", ImGuiDataType_U32, &materialInstance.scissor.height);
+		ImGui::Columns(1);
+	}
+
+	return changed;
 }
 
 } // namespace spatial::ui
