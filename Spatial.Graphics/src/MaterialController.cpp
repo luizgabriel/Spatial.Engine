@@ -9,20 +9,20 @@ namespace spatial::graphics
 void MaterialController::loadMaterials(filament::Engine& engine, ecs::Registry& registry)
 {
 	registry
-		.getEntities<const ecs::ResourceData, ecs::tags::IsMaterial>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::ResourceData& resource) {
+		.getEntities<const ecs::FileSystemResourceData, ecs::tags::IsMaterial>(
+			ecs::Exclude<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::FileSystemResourceData& resource) {
 			auto material = toShared(createMaterial(engine, resource.data.data(), resource.data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, std::move(material));
-			registry.removeComponent<ecs::ResourceData>(entity);
+			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }
 
 void MaterialController::createMaterialInstances(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::MaterialInstance, const ecs::Child>(ecs::ExcludeComponents<SharedMaterialInstance>)
+	registry.getEntities<const ecs::MaterialInstance, const ecs::Child>(ecs::Exclude<SharedMaterialInstance>)
 		.each([&](ecs::Entity entity, const auto&, const ecs::Child& child) {
 			const auto materialEntity = child.parent;
 

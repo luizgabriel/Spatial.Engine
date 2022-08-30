@@ -1,7 +1,7 @@
 #include "EditorCameraController.h"
 #include "Components.h"
 #include <spatial/ecs/Camera.h>
-#include <spatial/ecs/Scene.h>
+#include <spatial/ecs/View.h>
 
 namespace spatial::editor
 {
@@ -48,10 +48,10 @@ void EditorCamera::replaceCamera(ecs::Registry& registry, ecs::Entity newControl
 
 void EditorCamera::replaceView(ecs::Registry& registry, ecs::Entity newControlledView)
 {
-	if (!registry.hasAllComponents<ecs::Scene>(newControlledView))
+	if (!registry.hasAllComponents<ecs::View>(newControlledView))
 		return;
 
-	auto& sceneView = registry.getComponent<ecs::Scene>(newControlledView);
+	auto& sceneView = registry.getComponent<ecs::View>(newControlledView);
 	replaceCamera(registry, sceneView.camera);
 }
 

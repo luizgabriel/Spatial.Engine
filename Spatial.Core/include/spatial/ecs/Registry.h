@@ -7,7 +7,7 @@ namespace spatial::ecs
 {
 
 template <typename... Component>
-constexpr auto ExcludeComponents = entt::exclude<Component...>;
+constexpr auto Exclude = entt::exclude<Component...>;
 
 template <typename... Component>
 using ExcludeComponentsType = entt::exclude_t<Component...>;

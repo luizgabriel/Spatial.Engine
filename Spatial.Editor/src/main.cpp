@@ -26,7 +26,8 @@ int main(int argc, char* argv[])
 	auto app = Application{};
 	auto desktopContext = desktop::PlatformContext{};
 
-	auto window = desktopContext.createWindow(config.windowDimensions, config.windowTitle);
+	auto window = desktopContext.createWindow(config.windowDimensions.value_or(desktopContext.getMonitorSize()),
+											  config.windowTitle);
 #if defined(SPATIAL_PLATFORM_WINDOWS)
 	window.setIcon(*fileSystem, "editor/AppIcon.png");
 #endif
@@ -36,7 +37,7 @@ int main(int argc, char* argv[])
 
 	auto scene = graphics::RegistryRenderingSystem{*fileSystem};
 
-	auto ui = ui::UserInterfaceSystem{rendering.getEngine(), window};
+	auto ui = ui::UserInterfaceSystem{rendering.getEngine()};
 	ui.setMaterial(*fileSystem, "editor/materials/ui_blit.filamat");
 	ui.addFont(*fileSystem, "editor/fonts/roboto_medium.ttf");
 	ui.getRenderer().createFontTextureAtlas();

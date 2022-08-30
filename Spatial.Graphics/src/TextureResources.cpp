@@ -51,8 +51,8 @@ Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pix
 
 	auto size = dimensions.x * dimensions.y * sizeof(uint32_t);
 
-	auto buffer = filament::Texture::PixelBufferDescriptor(pixels.data(), size, filament::Texture::Format::RGBA,
-														   filament::Texture::Type::UBYTE);
+	auto buffer = filament::Texture::PixelBufferDescriptor{pixels.data(), size, filament::Texture::Format::RGBA,
+														   filament::Texture::Type::UBYTE};
 
 	texture->setImage(engine, 0, std::move(buffer));
 
@@ -67,10 +67,9 @@ Texture createDummyCubemap(filament::Engine& engine)
 								 filament::Texture::Usage::DEFAULT, filament::Texture::Sampler::SAMPLER_CUBEMAP);
 
 	static const uint32_t pixel = 0xFF888888;
-	auto buffer = filament::Texture::PixelBufferDescriptor(&pixel, 4, filament::Texture::Format::RGBA,
-														   filament::Texture::Type::UBYTE);
-	const auto offsets = filament::Texture::FaceOffsets{};
-	texture->setImage(engine, 0, std::move(buffer), offsets);
+	auto buffer = filament::Texture::PixelBufferDescriptor{&pixel, 4, filament::Texture::Format::RGBA,
+														   filament::Texture::Type::UBYTE};
+	texture->setImage(engine, 0, 0, 0, 1, 1, std::move(buffer));
 
 	filament::Fence::waitAndDestroy(engine.createFence());
 

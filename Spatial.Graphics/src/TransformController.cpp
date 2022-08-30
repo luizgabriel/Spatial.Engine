@@ -13,7 +13,7 @@ void updateTransform(const ecs::Transform& component, graphics::Transform& trans
 
 void TransformController::createTransforms(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<const Entity, ecs::Transform>(ecs::ExcludeComponents<Transform>)
+	registry.getEntities<const Entity, ecs::Transform>(ecs::Exclude<Transform>)
 		.each([&](const auto entity, const auto& renderable, const auto& component) {
 			auto& transform = registry.addComponent<Transform>(entity, engine, renderable.get());
 			updateTransform(component, transform);

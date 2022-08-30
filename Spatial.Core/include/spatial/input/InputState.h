@@ -1,19 +1,14 @@
 #pragma once
 
-#include <bitset>
 #include <spatial/common/Key.h>
 #include <spatial/common/Math.h>
 
 namespace spatial::desktop
 {
 
-constexpr int keysCount = static_cast<size_t>(Key::Count);
-
 class InputState
 {
   public:
-	using BitSet = std::bitset<keysCount>;
-
 	InputState();
 
 	void set(Key key, KeyAction action);
@@ -30,38 +25,51 @@ class InputState
 
 	void setMousePosition(math::vec2 position);
 
-	const auto& getMousePosition() const
+	constexpr auto getMousePosition() const
 	{
 		return mCurrentMousePosition;
 	}
 
-	const auto& getMouseLastPosition() const
+	constexpr auto getMouseLastPosition() const
 	{
 		return mLastMousePosition;
 	}
 
-	auto getMouseOffset() const
+	constexpr auto getMouseOffset() const
 	{
 		return getMouseLastPosition() - getMousePosition();
 	}
 
-	bool released(Key key) const;
+	constexpr bool released(Key key) const
+	{
+		return mKeyReleased.test(static_cast<size_t>(key));
+	}
 
-	bool pressed(Key key) const;
+	constexpr bool pressed(Key key) const
+	{
+		return mKeyPressed.test(static_cast<size_t>(key));
+	}
 
-	bool combined(Key alt1, Key key) const;
+	template <typename... K>
+	constexpr bool combined(K... keys) const
+	{
+		auto combination = KeyCombination{std::forward<K>(keys)...};
+		return (mKeyPressed == combination.getPressedBitset()) && (mKeyReleased == combination.getReleasedBitset());
+	}
 
-	bool combined(Key alt1, Key alt2, Key key) const;
-
-	bool combined(Key alt1, Key alt2, Key alt3, Key key) const;
-
-	bool combined(Key alt1, Key alt2, Key alt3, Key alt4, Key key) const;
-
-	float axis(Key positive, Key negative) const;
+	constexpr float axis(Key positive, Key negative) const
+	{
+		if (pressed(positive))
+			return 1.0f;
+		else if (pressed(negative))
+			return -1.0f;
+		else
+			return .0f;
+	}
 
   private:
-	BitSet mKeyPressed;
-	BitSet mKeyReleased;
+	KeyBitSet mKeyPressed;
+	KeyBitSet mKeyReleased;
 
 	math::vec2 mLastMousePosition;
 	math::vec2 mCurrentMousePosition;

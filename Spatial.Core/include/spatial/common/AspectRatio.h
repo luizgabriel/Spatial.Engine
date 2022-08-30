@@ -40,8 +40,8 @@ struct BaseAspectRatio
 using AspectRatio = BaseAspectRatio<double>;
 
 template <typename T>
-constexpr auto gUltraWideScreenAspectRatio_v = BaseAspectRatio<T>{21, 9};
-constexpr auto gUltraWideScreenAspectRatio = gUltraWideScreenAspectRatio_v<double>;
+constexpr auto gUltraWideAspectRatio_v = BaseAspectRatio<T>{21, 9};
+constexpr auto gUltraWideAspectRatio = gUltraWideAspectRatio_v<double>;
 
 template <typename T>
 constexpr auto gWideScreenAspectRatio_v = BaseAspectRatio<T>{16, 9};

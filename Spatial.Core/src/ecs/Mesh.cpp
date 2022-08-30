@@ -19,6 +19,11 @@ std::vector<Entity> Mesh::getParts(const Registry& registry, Entity meshEntity)
 	return ecs::Parent::getChildren(registry, meshEntity);
 }
 
+size_t Mesh::getPartsCount(const Registry& registry, Entity meshEntity)
+{
+	return ecs::Parent::getChildrenCount(registry, meshEntity);
+}
+
 size_t MeshInstance::getPrimitivesCount(const Registry& registry, Entity meshInstanceEntity)
 {
 	if (!registry.hasComponent<ecs::Parent>(meshInstanceEntity))

@@ -87,7 +87,7 @@ class Search
 			auto result = dnd.getPayload();
 			if (result)
 			{
-				selectedEntity = ecs::Resource::findOrCreate<ResourceTypeTag>(registry, *result);
+				selectedEntity = ecs::FileSystemResource::findOrCreate<ResourceTypeTag>(registry, *result);
 				changed = true;
 			}
 		}

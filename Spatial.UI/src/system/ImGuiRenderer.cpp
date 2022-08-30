@@ -54,10 +54,10 @@ ImGuiRenderer::~ImGuiRenderer()
 	ImGui::DestroyContext(mImguiContext);
 }
 
-void ImGuiRenderer::setViewport(const math::vec2& windowSize, const math::vec2& frameBufferSize)
+void ImGuiRenderer::setViewport(const math::uvec2& windowSize, const math::uvec2& frameBufferSize)
 {
-	const auto dpiScaleX = frameBufferSize.x / windowSize.x;
-	const auto dpiScaleY = frameBufferSize.y / windowSize.y;
+	const auto dpiScaleX = windowSize.x > 0 ? static_cast<float>(frameBufferSize.x) / static_cast<float>(windowSize.x) : 1.0f;
+	const auto dpiScaleY = windowSize.y > 0 ? static_cast<float>(frameBufferSize.y) / static_cast<float>(windowSize.y) : 1.0f;
 
 	mView->setViewport({0, 0, static_cast<uint32_t>(frameBufferSize.x), static_cast<uint32_t>(frameBufferSize.y)});
 
@@ -65,11 +65,8 @@ void ImGuiRenderer::setViewport(const math::vec2& windowSize, const math::vec2& 
 	const auto bottom = static_cast<double>(frameBufferSize.y) / static_cast<double>(dpiScaleY);
 	mCamera.setOrthographicProjection(0.0, right, bottom, 0.0, 0.0, 1.0);
 
-	const auto scaleX = windowSize.x > 0 ? dpiScaleX : 0;
-	const auto scaleY = windowSize.y > 0 ? dpiScaleY : 0;
-
 	ImGui::SetCurrentContext(mImguiContext);
-	ui::imguiRefreshViewport(windowSize.x, windowSize.y, scaleX, scaleY);
+	ui::imguiRefreshViewport(static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), dpiScaleX, dpiScaleY);
 }
 
 void ImGuiRenderer::initNewFrame(float delta)

@@ -31,6 +31,7 @@ enum class VertexAttribute
 	Position,
 	Color,
 	UV0,
+	UV1,
 	Tangents
 };
 
@@ -45,8 +46,8 @@ enum class VertexAttributeType : uint16_t
 	Half2 			= (5 << 8) | (2 * 2),
 	Half4 			= (6 << 8) | (4 * 2),
 	Short2 			= (7 << 8) | (2 * 2),
-	Short3 			= (7 << 8) | (3 * 2),
-	Short4 			= (7 << 8) | (4 * 2),
+	Short3 			= (8 << 8) | (3 * 2),
+	Short4 			= (9 << 8) | (4 * 2),
 };
 
 constexpr uint8_t getVertexAttributeSize(VertexAttributeType type)
@@ -83,7 +84,7 @@ enum class VertexLayoutMode
 struct VertexLayout
 {
 	VertexLayoutMode mode{VertexLayoutMode::Interleaved};
-	std::array<VertexDescription, 4> description{};
+	std::array<VertexDescription, 5> description{};
 };
 
 constexpr uint8_t calculateInterleavedBytesStride(const VertexLayout& layout)
@@ -182,6 +183,7 @@ struct Mesh
 
 	static Entity addPart(Registry& registry, Entity meshEntity, MeshPart part);
 	static std::vector<Entity> getParts(const Registry& registry, Entity meshEntity);
+	static size_t getPartsCount(const Registry& registry, Entity meshEntity);
 };
 
 struct MeshInstance
@@ -197,7 +199,7 @@ struct MeshInstance
 	uint8_t priority{0};
 
 	size_t partsOffset{0};
-	size_t partsCount{1};
+	size_t partsCount{0};
 
 	static size_t getPrimitivesCount(const Registry& registry, Entity meshInstanceEntity);
 

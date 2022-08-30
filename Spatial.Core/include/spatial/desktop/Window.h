@@ -77,11 +77,13 @@ class PlatformContext
 		return sEventQueue;
 	}
 
+	math::uvec2 getMonitorSize();
+
   private:
 	static bool sValid;
 	static EventQueue sEventQueue;
 
-	static void setupCallbacks(GLFWwindow* window);
+	static void setupCallbacks(const Window& window);
 };
 
 } // namespace spatial::desktop

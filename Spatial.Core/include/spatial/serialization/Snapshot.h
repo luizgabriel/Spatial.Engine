@@ -4,6 +4,8 @@
 #include <cereal/types/vector.hpp>
 #include <entt/entity/snapshot.hpp>
 #include <spatial/ecs/Registry.h>
+#include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Resource.h>
 
 namespace cereal
 {
@@ -25,28 +27,34 @@ struct ConstComponentRegistry
 template <typename Archive, typename Component>
 void save(Archive& ar, const ConstComponentRegistry<Component>& registry)
 {
-	auto view = registry.reg.template getEntities<const Component>();
+	if constexpr (std::is_same_v<Component, spatial::ecs::Mesh>) {
+		// ecs::Mesh is a huge component, there is no need to storage in the scene file if there is a FileSystemResource attached
+		auto view = registry.reg.template getEntities<const Component>(spatial::ecs::Exclude<spatial::ecs::FileSystemResource>);
+		ar(cereal::make_size_tag(view.size_hint()));
 
-	if constexpr (std::is_empty_v<Component>)
-	{
-		ar(cereal::make_size_tag(static_cast<cereal::size_type>(view.size())));
-		view.each([&](spatial::ecs::Entity entity) { ar(entity); });
+		view.each([&](spatial::ecs::Entity entity, const Component& component) {
+			ar(cereal::make_map_item(entity, component));
+		});
+	} else {
+		auto view = registry.reg.template getEntities<const Component>();
+		ar(cereal::make_size_tag(view.size()));
+
+		if constexpr (std::is_empty_v<Component>)
+			view.each([&](spatial::ecs::Entity entity) { ar(entity); });
+		else
+			view.each([&](spatial::ecs::Entity entity, const Component& component) {
+				ar(cereal::make_map_item(entity, component));
+			});
 	}
-	else
-	{
-		ar(cereal::make_size_tag(static_cast<cereal::size_type>(view.size() * 2)));
-		view.each([&](spatial::ecs::Entity entity, const Component& component) { ar(entity, component); });
-	}
+
+
 }
 
 template <typename Archive, typename Component>
 void load(Archive& ar, ComponentRegistry<Component>& registry)
 {
 	auto entitiesCount = cereal::size_type{};
-	ar(cereal::make_size_tag(entitiesCount));
-
-	if constexpr (!std::is_empty_v<Component>)
-		entitiesCount /= 2;
+    ar(cereal::make_size_tag(entitiesCount));
 
 	for (size_t i = 0; i < entitiesCount; i++)
 	{
@@ -60,7 +68,7 @@ void load(Archive& ar, ComponentRegistry<Component>& registry)
 		else
 		{
 			auto component = Component{};
-			ar(entity, component);
+			ar(cereal::make_map_item(entity, component));
 			registry.reg.template addComponent<Component>(entity, std::move(component));
 		}
 	}

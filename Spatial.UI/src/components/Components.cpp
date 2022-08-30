@@ -221,9 +221,9 @@ bool ComponentInputImpl<ecs::ScriptModule>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Resource>::draw(ecs::Registry& registry, ecs::Entity entity)
+bool ComponentInputImpl<ecs::FileSystemResource>::draw(ecs::Registry& registry, ecs::Entity entity)
 {
-	auto& resource = registry.getComponent<ecs::Resource>(entity);
+	auto& resource = registry.getComponent<ecs::FileSystemResource>(entity);
 	bool changed = false;
 
 	if (registry.hasComponent<ecs::tags::IsImageTexture>(entity))
@@ -291,7 +291,6 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 		if (ImGui::Button("Add Slot"))
 		{
 			ecs::MeshInstance::addMaterial(registry, entity, ecs::NullEntity);
-			shouldRecreateMesh = true;
 			changed = true;
 		}
 
@@ -343,7 +342,6 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 				if (registry.isValid(childToDestroy))
 				{
 					registry.addComponent<ecs::tags::CanDestroy>(childToDestroy);
-					shouldRecreateMesh = true;
 					changed = true;
 				}
 			}
@@ -362,11 +360,11 @@ bool ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 	{
 		spacing(3);
 
-		shouldRecreateMesh =
+		shouldRecreateMesh |=
 			ImGui::InputScalar("Parts Count", ImGuiDataType_U64, &mesh.partsCount, &smallStep, &largeStep, "%lu");
-		changed |= shouldRecreateMesh;
-		changed |=
+		shouldRecreateMesh |=
 			ImGui::InputScalar("Parts Offset", ImGuiDataType_U64, &mesh.partsOffset, &smallStep, &largeStep, "%lu");
+
 		ImGui::TreePop();
 
 		spacing(3);
@@ -470,10 +468,10 @@ bool ComponentInputImpl<ecs::CustomCamera>::draw(ecs::Registry& registry, ecs::E
 	return changed;
 }
 
-bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
+bool ComponentInputImpl<ecs::View, graphics::OptionalTexture>::draw(ecs::Registry& registry, ecs::Entity entity,
 																	 graphics::OptionalTexture icons)
 {
-	auto& sceneView = registry.getComponent<ecs::Scene>(entity);
+	auto& sceneView = registry.getComponent<ecs::View>(entity);
 	auto changed = false;
 
 	changed |= vec2Input("Size", sceneView.size);
@@ -497,7 +495,7 @@ bool ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>::draw(ecs::Regist
 	ui::spacing();
 
 	if (auto node = ui::TreeNode{"Camera Preview"}; node.isOpen())
-		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 100});
+		SceneView::image(registry, entity, {ImGui::GetContentRegionAvail().x, 200});
 
 	return changed;
 }

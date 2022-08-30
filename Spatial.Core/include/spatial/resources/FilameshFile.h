@@ -7,6 +7,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include <future>
 
 namespace spatial
 {
@@ -59,6 +60,8 @@ std::istream& operator>>(std::istream& stream, spatial::FilameshFileHeader& head
 
 std::istream& operator>>(std::istream& stream, spatial::FilameshFile& filamesh);
 
-FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size);
+FilameshFile loadFilameshFromMemory(const std::vector<uint8_t>& data);
+
+std::future<FilameshFile> loadFilameshFromMemoryAsync(std::vector<uint8_t>&& data);
 
 } // namespace spatial

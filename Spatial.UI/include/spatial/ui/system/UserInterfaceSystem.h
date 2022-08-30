@@ -46,12 +46,6 @@ class UserInterfaceSystem
 		return mRenderGuiSignal;
 	}
 
-	template <typename WindowImpl>
-	UserInterfaceSystem(filament::Engine& engine, const WindowImpl& window) : UserInterfaceSystem(engine)
-	{
-		getRenderer().setViewport(window.getSize(), window.getFrameBufferSize());
-	}
-
 	void setMaterial(FileSystem& fileSystem, std::string_view materialResourcePath);
 
 	void addFont(FileSystem& fileSystem, std::string_view fontPath);

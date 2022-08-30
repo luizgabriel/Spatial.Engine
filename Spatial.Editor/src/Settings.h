@@ -11,8 +11,8 @@ namespace spatial::editor
 struct Settings
 {
 	std::string windowTitle{"Spatial Engine | Editor"};
-	math::uvec2 windowDimensions{gWideScreenAspectRatio.toVector() * 80.0};
-	std::filesystem::path projectFolder{};
+	std::optional<math::uvec2> windowDimensions{std::nullopt};
+	std::optional<std::filesystem::path> projectFolder{std::nullopt};
 
 	static Settings load(int argc, char* argv[]);
 };

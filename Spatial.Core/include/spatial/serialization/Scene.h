@@ -1,13 +1,13 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <spatial/ecs/Scene.h>
+#include <spatial/ecs/View.h>
 
 namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::Scene& sceneView)
+void serialize(Archive& ar, spatial::ecs::View& sceneView)
 {
 	ar(make_nvp("size", sceneView.size));
 	ar(make_nvp("blendMode", sceneView.blendMode));

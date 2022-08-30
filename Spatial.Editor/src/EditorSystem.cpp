@@ -15,8 +15,8 @@
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Texture.h>
+#include <spatial/ecs/View.h>
 #include <spatial/graphics/MaterialController.h>
 #include <spatial/graphics/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
@@ -54,7 +54,8 @@ void EditorSystem::onStart()
 
 	createDefaultEditorEntities();
 
-	mIconTexture = ecs::Resource::create<ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons.png");
+	mIconTexture =
+		ecs::FileSystemResource::create<ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons.png");
 }
 
 void EditorSystem::onStartFrame(float)
@@ -141,7 +142,7 @@ void EditorSystem::onDrawGui()
 
 		if (!mRegistry.isValid(selectedView))
 		{
-			selectedView = mRegistry.getFirstEntity<ecs::Scene, tags::IsEditorView>();
+			selectedView = mRegistry.getFirstEntity<ecs::View, tags::IsEditorView>();
 			EditorCamera::replaceView(mRegistry, selectedView);
 		}
 
@@ -152,7 +153,7 @@ void EditorSystem::onDrawGui()
 			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
 
 		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, selectedEntity, createEntityPosition);
-		if (ui::SceneView::selector(mRegistry, selectedView))
+		if (auto style2 = ui::WindowPaddingStyle{math::vec2{10.0f}}; ui::SceneView::selector(mRegistry, selectedView))
 			EditorCamera::replaceView(mRegistry, selectedView);
 	}
 
@@ -168,9 +169,9 @@ void EditorSystem::onDrawGui()
 		});
 	});
 
-	ui::Window::show("Resources Manager", [&]() {
+	ui::Window::show("Resources", [&]() {
 		static std::string search;
-		static ui::ResourceManager::ResourceType type = ui::ResourceManager::ResourceType::All;
+		static auto type = ui::ResourceManager::ResourceType::All;
 
 		ui::ResourceManager::header(search, type, icons);
 		ui::ResourceManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
@@ -179,7 +180,19 @@ void EditorSystem::onDrawGui()
 		ui::Popup::show("AssetManagerPopup", [&]() { ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity); });
 	});
 
-	ui::Window::show("Materials Manager", [&]() {
+	ui::Window::show("Views", [&]() {
+		static std::string search;
+
+		ui::Search::text(search, icons);
+		ui::ViewsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+
+		ui::Popup::show("Asset Manager Popup", [&]() {
+			ui::ViewsManager::createMenu(mRegistry, selectedEntity);
+			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+		});
+	});
+
+	ui::Window::show("Materials", [&]() {
 		static std::string search;
 
 		ui::Search::text(search, icons);
@@ -218,16 +231,16 @@ void EditorSystem::onUpdateInput(const desktop::InputState& input)
 	mIsCameraControlEnabled = input.pressed(Key::MouseRight);
 	EditorCameraController::readCameraInputs(mRegistry, input);
 
-	if (input.combined(Key::LControl, Key::N))
+	if (input.combined(gControlKey, Key::N))
 		mMenuAction = ui::EditorMainMenu::Action::NewScene;
 
-	if (input.combined(Key::LControl, Key::S))
+	if (input.combined(gControlKey, Key::S))
 		mMenuAction = ui::EditorMainMenu::Action::SaveScene;
 
-	if (input.combined(Key::LControl, Key::LShift, Key::O))
+	if (input.combined(gControlKey, Key::LShift, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenProject;
 
-	if (input.combined(Key::LControl, Key::O))
+	if (input.combined(gControlKey, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenScene;
 }
 
@@ -255,7 +268,7 @@ void EditorSystem::loadScene()
 
 	try
 	{
-		mRegistry = parseRegistry(*stream);
+		mRegistry = parseRegistry(std::move(*stream));
 	}
 	catch (const std::exception& e)
 	{
@@ -333,35 +346,31 @@ void EditorSystem::onEvent(const OpenProjectEvent& event)
 
 void EditorSystem::createDefaultEditorEntities()
 {
-	auto texturesGroup = ecs::Builder::create(mRegistry)
-		.withName("editor/textures")
-		.with<tags::IsEditorEntity>();
-
 	ecs::Builder::create(mRegistry)
 		.withName("editor/dummy_cubemap")
-		.withParent(texturesGroup)
 		.with<tags::IsEditorEntity>()
 		.with<ecs::tags::IsCubeMapTexture>()
+		.with<ecs::tags::IsResource>()
 		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
 		.withName("editor/white_texture")
-		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorWhiteTexture>()
+		.with<ecs::tags::IsResource>()
 		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFFFFFFFF}, 1});
 
 	ecs::Builder::create(mRegistry)
 		.withName("editor/black_texture")
-		.withParent(texturesGroup)
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorBlackTexture>()
+		.with<ecs::tags::IsResource>()
 		.with<tags::IsEditorEntity>()
 		.with(ecs::RuntimeTexture{{0xFF000000}, 1});
 
 	ecs::Builder::create(mRegistry)
-		.withName("editor/grid_plane")
+		.withName("Grid Plane")
 		.with<tags::IsEditorEntity>()
 		.asTransform()
 		.withScale({100.0F, 1.0f, 100.0F})
@@ -378,13 +387,12 @@ void EditorSystem::createDefaultEditorEntities()
 	ecs::Builder::create(mRegistry)
 		.withName("SkyBox")
 		.asMeshInstance()
-		.withMesh(
-			ecs::Builder::create(mRegistry) //
-				.withName("editor/skybox_mesh")
-				.with<tags::IsEditorEntity>()
-				.asMesh()
-				.withVertexData(gSkyboxVertexData)
-				.withIndexData(gSkyboxIndexData))
+		.withMesh(ecs::Builder::create(mRegistry)
+					  .withName("editor/skybox_mesh")
+					  .with<tags::IsEditorEntity>()
+					  .asMesh()
+					  .withVertexData(gSkyboxVertexData)
+					  .withIndexData(gSkyboxIndexData))
 		.withDefaultMaterialInstance(ecs::Builder::create(mRegistry)
 										 .withName("SkyBox Material")
 										 .asMaterialInstance()
@@ -392,7 +400,7 @@ void EditorSystem::createDefaultEditorEntities()
 										 .with(SkyBoxMaterial{
 											 false,
 											 math::vec4{math::vec3{0.3f}, 1.0f},
-											 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(
+											 ecs::FileSystemResource::findOrCreate<ecs::tags::IsCubeMapTexture>(
 												 mRegistry, "editor/textures/skybox/texture.ktx"),
 										 }))
 		.withShadowOptions(false, false)
@@ -404,8 +412,8 @@ void EditorSystem::createDefaultEditorEntities()
 		.with<tags::IsEditorEntity>()
 		.with<tags::IsEditorView>()
 		.with<ecs::tags::IsRenderedToTarget>()
-		.asScene()
-		.withDimensions(gUltraWideScreenAspectRatio.toVector() * 240.0)
+		.asView()
+		.withDimensions(gUltraWideAspectRatio.toVector() * 240.0)
 		.withDefaultAttachments()
 		.withIndirectLight(ecs::Builder::create(mRegistry)
 							   .withName("Indirect Light")
@@ -420,7 +428,7 @@ void EditorSystem::createDefaultEditorEntities()
 						.asTransform()
 						.withPosition({3.0F, 3.0F, 20.0F})
 						.asPerspectiveCamera()
-						.withAspectRatio(gUltraWideScreenAspectRatio));
+						.withAspectRatio(gUltraWideAspectRatio));
 }
 
 } // namespace spatial::editor

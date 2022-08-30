@@ -136,11 +136,11 @@ bool EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::PointLight>(registry, entity);
 	componentCollapse<ecs::IndirectLight>(registry, entity, icons);
 	componentCollapse<ecs::SunLight>(registry, entity);
-	componentCollapse<ecs::Resource>(registry, entity);
+	componentCollapse<ecs::FileSystemResource>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity, icons);
 	componentCollapse<ecs::MeshPrimitive>(registry, entity, icons);
 	componentCollapse<ecs::MaterialInstance>(registry, entity, icons);
-	componentCollapse<ecs::Scene>(registry, entity, icons);
+	componentCollapse<ecs::View>(registry, entity, icons);
 	componentCollapse<ecs::AttachmentTexture>(registry, entity);
 	componentCollapse<ecs::tags::IsImageTexture>(registry, entity);
 
@@ -238,8 +238,8 @@ void EntityProperties::addComponentMenu(ecs::Registry& registry, ecs::Entity ent
 
 	ImGui::Separator();
 
-	if (!registry.hasAnyComponent<ecs::Scene>(entity) && menu.item("Scene View"))
-		registry.addComponent<ecs::Scene>(entity);
+	if (!registry.hasAnyComponent<ecs::View>(entity) && menu.item("Scene View"))
+		registry.addComponent<ecs::View>(entity);
 }
 
 void EntityProperties::popup(ecs::Registry& registry, ecs::Entity entity)
@@ -377,11 +377,13 @@ bool SceneTree::displayTree(ecs::Registry& registry, ecs::Entity& selectedEntity
 		};
 
 		if (showDebugEntities)
-			registry.getEntities<const ecs::Name>(ecs::ExcludeComponents<ecs::Resource, ecs::Child>).each(onEachNodeFn);
-		else
 			registry
+				.getEntities<const ecs::Name>(ecs::Exclude<ecs::tags::IsResource, ecs::View, ecs::Child>) //
+				.each(onEachNodeFn);
+		else
+			registry //
 				.getEntities<const ecs::Name>(
-					ecs::ExcludeComponents<ecs::Resource, editor::tags::IsEditorEntity, ecs::Child>)
+					ecs::Exclude<ecs::tags::IsResource, ecs::View, editor::tags::IsEditorEntity, ecs::Child>)
 				.each(onEachNodeFn);
 
 		ImGui::EndTable();
@@ -431,14 +433,10 @@ bool SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity, ecs::En
 
 	if (registry.hasAnyComponent<ecs::tags::IsMainView>(entity))
 		ImGui::TextDisabled("Main View");
-	else if (registry.hasAnyComponent<editor::tags::IsEditorView>(entity))
-		ImGui::TextDisabled("Editor View");
 	else if (registry.hasAnyComponent<ecs::tags::IsCamera>(entity))
 		ImGui::TextDisabled("Camera");
 	else if (registry.hasAnyComponent<ecs::tags::IsLight>(entity))
 		ImGui::TextDisabled("Light");
-	else if (registry.hasAnyComponent<editor::tags::IsEditorEntity>(entity))
-		ImGui::TextDisabled("Editor");
 	else if (registry.hasAnyComponent<ecs::tags::IsRenderable>(entity))
 		ImGui::TextDisabled("Renderable");
 
@@ -490,13 +488,7 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
-		const auto eachFn = [&](ecs::Entity entity, const auto& resource, const auto& name) {
-			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "editor/"))
-				return;
-
-			if (!showEditorEntities && starts_with(resource.relativePath.c_str(), "engine/"))
-				return;
-
+		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
 			if (!icontains(name.name, search))
 				return;
 
@@ -529,7 +521,9 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 				changed |= true;
 			}
 
-			ui::Popup::show("ResourcePopup", [&]() { ImGui::Text("%s", resource.relativePath.c_str()); });
+			const auto* resource = registry.tryGetComponent<const ecs::FileSystemResource>(entity);
+			if (resource != nullptr)
+				ui::Popup::show("ResourcePopup", [&]() { ImGui::Text("%s", resource->relativePath.c_str()); });
 
 			ImGui::TableNextColumn();
 			std::string_view typeText;
@@ -549,7 +543,12 @@ bool ResourceManager::list(const ecs::Registry& registry, ecs::Entity& selectedE
 			ImGui::TextDisabled("%s", typeText.data());
 		};
 
-		registry.getEntities<const ecs::Resource, const ecs::Name>().each(eachFn);
+		if (showEditorEntities)
+			registry.getEntities<const ecs::tags::IsResource, const ecs::Name>().each(eachFn);
+		else
+			registry
+				.getEntities<const ecs::tags::IsResource, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>)
+				.each(eachFn);
 
 		ImGui::EndTable();
 	}
@@ -572,7 +571,7 @@ bool MaterialsManager::createMenu(ecs::Registry& registry, ecs::Entity& selected
 			return std::string{materialName};
 	};
 
-	auto menu = ui::Menu("New");
+	auto menu = ui::Menu("Create");
 	if (!menu.isOpen())
 		return false;
 
@@ -657,8 +656,81 @@ bool MaterialsManager::list(const ecs::Registry& registry, ecs::Entity& selected
 			registry.getEntities<const ecs::MaterialInstance, const ecs::Name>().each(eachFn);
 		else
 			registry
-				.getEntities<const ecs::MaterialInstance, const ecs::Name>(
-					ecs::ExcludeComponents<editor::tags::IsEditorEntity>)
+				.getEntities<const ecs::MaterialInstance, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>)
+				.each(eachFn);
+
+		ImGui::EndTable();
+	}
+
+	return changed;
+}
+
+bool ViewsManager::createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity)
+{
+	bool changed = false;
+	ecs::Entity newEntity = ecs::NullEntity;
+
+	auto menu = ui::Menu("Create");
+	if (!menu.isOpen())
+		return false;
+
+	if (menu.item("View"))
+	{
+		newEntity = ecs::Builder::create(registry)
+						.withName("Scene View")
+						.with<ecs::tags::IsRenderedToTarget>()
+						.asView()
+						.withDefaultAttachments();
+		changed = true;
+	}
+
+	if (changed)
+		selectedEntity = newEntity;
+
+	return changed;
+}
+
+bool ViewsManager::list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+						bool showEditorEntities)
+{
+	using namespace boost::algorithm;
+	using namespace std::string_view_literals;
+
+	bool changed = false;
+
+	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
+										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
+										 | ImGuiTableFlags_NoBordersInBody;
+
+	if (ImGui::BeginTable("ViewsTable", 1, flags))
+	{
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
+
+		const auto eachFn = [&](ecs::Entity entity, const auto&, const auto& name) {
+			if (!icontains(name.name, search))
+				return;
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+
+			const auto selectedFlags = selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None;
+			ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
+												| ImGuiTreeNodeFlags_SpanFullWidth | selectedFlags);
+			if (ImGui::IsItemClicked())
+			{
+				selectedEntity = entity;
+				changed |= true;
+			}
+		};
+
+		if (showEditorEntities)
+			registry
+				.getEntities<const ecs::View, const ecs::Name>() //
+				.each(eachFn);
+		else
+			registry
+				.getEntities<const ecs::View, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>) //
 				.each(eachFn);
 
 		ImGui::EndTable();
@@ -709,13 +781,13 @@ bool EditorDragAndDrop::loadScriptResource(ecs::Registry& registry, ecs::Entity&
 
 	if (result && boost::algorithm::ends_with(result->c_str(), ".js"))
 	{
-		selectedEntity =
-			ecs::Builder::create(registry).asResource().withPath(result.value()).with<ecs::tags::IsScript>();
+		selectedEntity = ecs::Builder::create(registry) //
+							 .asFileSystemResource()
+							 .withPath(result.value())
+							 .with<ecs::tags::IsScript>();
 
 		if (type != ResourceManager::ResourceType::All)
-		{
 			type = ResourceManager::ResourceType::Script;
-		}
 
 		return true;
 	}
@@ -732,16 +804,6 @@ bool SceneOptionsMenu::createEntitiesMenu(ecs::Registry& registry, ecs::Entity& 
 	if (Menu::itemButton("Empty"))
 	{
 		newEntity = ecs::Builder::create(registry).withName("Empty Entity").with<ecs::tags::IsRenderable>();
-		changed = true;
-	}
-
-	if (Menu::itemButton("Scene View"))
-	{
-		newEntity = ecs::Builder::create(registry)
-						.withName("Scene View")
-						.with<ecs::tags::IsRenderedToTarget>()
-						.asScene()
-						.withDefaultAttachments();
 		changed = true;
 	}
 
@@ -778,8 +840,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
 						.withMesh("editor/meshes/cube.filamesh")
-						.withShadowOptions(true, true)
-						.withSubMesh(0, 1);
+						.withShadowOptions(true, true);
 		changed = true;
 	}
 
@@ -791,8 +852,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
 						.withMesh("editor/meshes/plane.filamesh")
-						.withShadowOptions(true, true)
-						.withSubMesh(0, 1);
+						.withShadowOptions(true, true);
 		changed = true;
 	}
 
@@ -804,8 +864,7 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
 						.withMesh("editor/meshes/sphere.filamesh")
-						.withShadowOptions(true, true)
-						.withSubMesh(0, 1);
+						.withShadowOptions(true, true);
 		changed = true;
 	}
 
@@ -817,29 +876,29 @@ bool SceneOptionsMenu::createMeshMenu(ecs::Registry& registry, ecs::Entity& sele
 						.withPosition(createEntitiesPosition)
 						.asMeshInstance()
 						.withMesh("editor/meshes/cylinder.filamesh")
-						.withShadowOptions(true, true)
-						.withSubMesh(0, 1);
+						.withShadowOptions(true, true);
 		changed = true;
 	}
 
 	if (menu.item("Skybox"))
 	{
-		newEntity = ecs::Builder::create(registry)
-						.withName("Skybox")
-						.asMeshInstance()
-						.withMesh("engine/skybox")
-						.withDefaultMaterialInstance(ecs::Builder::create(registry)
-														 .withName("Skybox Material")
-														 .asMaterialInstance()
-														 .withMaterial("editor/materials/skybox.filamat")
-														 .with(editor::SkyBoxMaterial{
-															 false,
-															 {math::vec3{.0f}, 1.0f},
-															 ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(
-																 registry, "editor/textures/skybox/texture.ktx"),
-														 }))
-						.withCulling(false)
-						.withPriority(0x7);
+		newEntity =
+			ecs::Builder::create(registry)
+				.withName("Skybox")
+				.asMeshInstance()
+				.withMesh("engine/skybox")
+				.withDefaultMaterialInstance(ecs::Builder::create(registry)
+												 .withName("Skybox Material")
+												 .asMaterialInstance()
+												 .withMaterial("editor/materials/skybox.filamat")
+												 .with(editor::SkyBoxMaterial{
+													 false,
+													 {math::vec3{.0f}, 1.0f},
+													 ecs::FileSystemResource::findOrCreate<ecs::tags::IsCubeMapTexture>(
+														 registry, "editor/textures/skybox/texture.ktx"),
+												 }))
+				.withCulling(false)
+				.withPriority(0x7);
 		changed = true;
 	}
 
@@ -993,13 +1052,11 @@ bool EditorMainMenu::fileMenu(graphics::OptionalTexture icons, EditorMainMenu::A
 {
 	bool changed = false;
 
-	ImGui::SetCursorPosY(1.5f);
 	ui::image(std::move(icons), math::vec2{20.0f}, Icons::logo.uv());
-	ImGui::SetCursorPosY(0.0f);
 
 	{
 		auto menu = ui::Menu{"File"};
-		if (menu.item("Open Project", "CTRL+SHIFT+O"))
+		if (menu.item("Open Project", fmt::format("CTRL+SHIFT+O")))
 		{
 			action = Action::OpenProject;
 			changed = true;

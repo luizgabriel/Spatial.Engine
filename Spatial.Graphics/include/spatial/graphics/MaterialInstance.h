@@ -17,6 +17,8 @@ class MaterialInstance
 
 	MaterialInstance(filament::Engine& engine, SharedMaterial material, filament::MaterialInstance* materialInstance);
 
+	~MaterialInstance();
+
 	MaterialInstance(MaterialInstance&& other) noexcept;
 
 	MaterialInstance& operator=(MaterialInstance&& other) noexcept;

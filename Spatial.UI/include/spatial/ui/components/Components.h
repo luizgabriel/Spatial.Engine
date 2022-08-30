@@ -9,9 +9,9 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
-#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/ecs/View.h>
 #include <spatial/graphics/TextureUtils.h>
 #include <spatial/ui/components/CollapsingHeader.h>
 #include <spatial/ui/components/DirectionInput.h>
@@ -136,7 +136,7 @@ struct ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Resource>
+struct ComponentInputImpl<ecs::FileSystemResource>
 {
 	static constexpr auto sName = "Resource";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity);
@@ -185,7 +185,7 @@ struct ComponentInputImpl<ecs::MaterialInstance, graphics::OptionalTexture>
 };
 
 template <>
-struct ComponentInputImpl<ecs::Scene, graphics::OptionalTexture>
+struct ComponentInputImpl<ecs::View, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Scene";
 	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);

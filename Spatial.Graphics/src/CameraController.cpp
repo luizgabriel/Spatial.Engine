@@ -10,7 +10,7 @@ namespace spatial::graphics
 void CameraController::deleteCameras(ecs::Registry& registry)
 {
 	auto view = registry.getEntities<SharedCamera>(
-		ecs::ExcludeComponents<ecs::OrthographicCamera, ecs::CustomCamera, ecs::PerspectiveCamera>);
+		ecs::Exclude<ecs::OrthographicCamera, ecs::CustomCamera, ecs::PerspectiveCamera>);
 	registry.removeComponent<SharedCamera>(view.begin(), view.end());
 }
 
@@ -49,11 +49,11 @@ void CameraController::createCameras(filament::Engine& engine, ecs::Registry& re
 		updateCamera(component, camera);
 	};
 
-	registry.getEntities<const Entity, const ecs::OrthographicCamera>(ecs::ExcludeComponents<SharedCamera>)
+	registry.getEntities<const Entity, const ecs::OrthographicCamera>(ecs::Exclude<SharedCamera>)
 		.each(createCameraFn);
-	registry.getEntities<const Entity, const ecs::PerspectiveCamera>(ecs::ExcludeComponents<SharedCamera>)
+	registry.getEntities<const Entity, const ecs::PerspectiveCamera>(ecs::Exclude<SharedCamera>)
 		.each(createCameraFn);
-	registry.getEntities<const Entity, const ecs::CustomCamera>(ecs::ExcludeComponents<SharedCamera>)
+	registry.getEntities<const Entity, const ecs::CustomCamera>(ecs::Exclude<SharedCamera>)
 		.each(createCameraFn);
 }
 
