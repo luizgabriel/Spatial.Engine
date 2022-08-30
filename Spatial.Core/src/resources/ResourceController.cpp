@@ -13,8 +13,8 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 	using FutureData = std::future<std::vector<uint8_t>>;
 
 	registry
-		.getEntities<const ecs::Resource>(
-			ecs::ExcludeComponents<FutureData, ecs::ResourceData, ecs::tags::IsResourceLoaded>)
+		.getEntities<const ecs::FileSystemResource>(
+			ecs::Exclude<FutureData, ecs::FileSystemResourceData, ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const auto& resource) {
 			if (resource.relativePath.empty())
 				return;
@@ -23,7 +23,7 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 			registry.addComponent(entity, std::move(futureData));
 		});
 
-	registry.getEntities<const ecs::Resource, FutureData>(ecs::ExcludeComponents<ecs::ResourceData, ecs::tags::IsResourceLoaded>)
+	registry.getEntities<const ecs::FileSystemResource, FutureData>(ecs::Exclude<ecs::FileSystemResourceData, ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const auto& resource, auto& futureData) {
 			if (futureData.wait_for(10us) != std::future_status::ready)
 				return;
@@ -35,7 +35,7 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 				registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 			} else {
 				registry.removeComponent<ecs::ResourceError>(entity);
-				registry.addComponent<ecs::ResourceData>(entity, std::move(data));
+				registry.addComponent<ecs::FileSystemResourceData>(entity, std::move(data));
 			}
 
 			registry.removeComponent<FutureData>(entity);

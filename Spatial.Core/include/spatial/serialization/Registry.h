@@ -4,13 +4,13 @@
 #include <spatial/serialization/BoundingBox.h>
 #include <spatial/serialization/Camera.h>
 #include <spatial/serialization/Light.h>
+#include <spatial/serialization/Material.h>
 #include <spatial/serialization/Mesh.h>
 #include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
 #include <spatial/serialization/Scene.h>
 #include <spatial/serialization/Texture.h>
 #include <spatial/serialization/Transform.h>
-#include <spatial/serialization/Material.h>
 
 namespace spatial::ecs
 {
@@ -33,8 +33,8 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::MeshPart>(ar);
 	snapshot.template component<ecs::Parent>(ar);
 	snapshot.template component<ecs::Child>(ar);
-	snapshot.template component<ecs::Resource>(ar);
-	snapshot.template component<ecs::Scene>(ar);
+	snapshot.template component<ecs::FileSystemResource>(ar);
+	snapshot.template component<ecs::View>(ar);
 	snapshot.template component<ecs::RuntimeTexture>(ar);
 	snapshot.template component<ecs::AttachmentTexture>(ar);
 	snapshot.template component<ecs::Mesh>(ar);
@@ -43,6 +43,7 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsMaterial>(ar);
 	snapshot.template component<ecs::tags::IsMesh>(ar);
 	snapshot.template component<ecs::tags::IsRenderable>(ar);
+	snapshot.template component<ecs::tags::IsResource>(ar);
 	snapshot.template component<ecs::tags::IsCamera>(ar);
 	snapshot.template component<ecs::tags::IsLight>(ar);
 	snapshot.template component<ecs::tags::IsMainView>(ar);

@@ -58,6 +58,13 @@ void MaterialInstance::setScissor(uint32_t left, uint32_t bottom, uint32_t width
 	get()->setScissor(left, bottom, width, height);
 }
 
+MaterialInstance::~MaterialInstance()
+{
+	mInstance.reset();
+	for (auto& [key, texture] : mTextureParameters)
+		texture.reset();
+}
+
 SharedMaterialInstance toShared(MaterialInstance&& materialInstance)
 {
 	return std::make_shared<MaterialInstance>(std::move(materialInstance));

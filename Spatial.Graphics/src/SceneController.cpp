@@ -1,7 +1,7 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Texture.h>
+#include <spatial/ecs/View.h>
 #include <spatial/graphics/Entity.h>
 #include <spatial/graphics/Resources.h>
 #include <spatial/graphics/SceneController.h>
@@ -9,13 +9,13 @@
 namespace spatial::graphics
 {
 
-inline filament::View::BlendMode toFilament(ecs::Scene::BlendMode blendMode)
+inline filament::View::BlendMode toFilament(ecs::View::BlendMode blendMode)
 {
 	switch (blendMode)
 	{
-	case ecs::Scene::BlendMode::Opaque:
+	case ecs::View::BlendMode::Opaque:
 		return filament::BlendMode::OPAQUE;
-	case ecs::Scene::BlendMode::Translucent:
+	case ecs::View::BlendMode::Translucent:
 		return filament::BlendMode::TRANSLUCENT;
 	}
 }
@@ -33,7 +33,7 @@ inline filament::RenderTarget::AttachmentPoint toFilament(ecs::AttachmentTexture
 
 void SceneController::createRenderables(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<ecs::tags::IsRenderable>(ecs::ExcludeComponents<Entity>).each([&](ecs::Entity entity) {
+	registry.getEntities<ecs::tags::IsRenderable>(ecs::Exclude<Entity>).each([&](ecs::Entity entity) {
 		registry.addComponent(entity, createEntity(engine));
 	});
 }
@@ -57,7 +57,7 @@ void SceneController::cleanUpDestroyableEntities(ecs::Registry& registry)
 
 void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<Entity>(ecs::ExcludeComponents<ecs::tags::AddedToScene>);
+	auto view = registry.getEntities<Entity>(ecs::Exclude<ecs::tags::AddedToScene>);
 
 	view.each([&](auto& renderEntity) {
 		registry.getEntities<const SharedScene>().each([&](const auto& scene) {
@@ -73,7 +73,7 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 void SceneController::renderViews(filament::Renderer& renderer, const ecs::Registry& registry)
 {
 	registry
-		.getEntities<const ecs::Scene, const SharedView>()	//
+		.getEntities<const ecs::View, const SharedView>()	//
 		.each([&](const auto& scene, const auto& view) { //
 			if (registry.hasComponent<SharedCamera>(scene.camera))
 				renderer.render(view.get());
@@ -82,7 +82,7 @@ void SceneController::renderViews(filament::Renderer& renderer, const ecs::Regis
 
 void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
 {
-	auto sceneViews = registry.getEntities<const ecs::Scene>(ecs::ExcludeComponents<SharedScene>);
+	auto sceneViews = registry.getEntities<const ecs::View>(ecs::Exclude<SharedScene>);
 	if (sceneViews.size_hint() > 0)
 		registry.removeComponentFromEntities<ecs::tags::AddedToScene>();
 
@@ -96,11 +96,11 @@ void SceneController::createScenes(filament::Engine& engine, ecs::Registry& regi
 	});
 
 	registry
-		.getEntities<ecs::tags::IsRenderedToTarget, const ecs::Scene, const SharedView>(
-			ecs::ExcludeComponents<SharedRenderTarget>)
+		.getEntities<ecs::tags::IsRenderedToTarget, const ecs::View, const SharedView>(
+			ecs::Exclude<SharedRenderTarget>)
 		.each([&](ecs::Entity entity, const auto&, const auto& view) {
 			auto builder = filament::RenderTarget::Builder();
-			auto attachments = ecs::Scene::getAttachments(registry, entity);
+			auto attachments = ecs::View::getAttachments(registry, entity);
 			if (attachments.size() < 2)
 				return;
 
@@ -122,12 +122,12 @@ void SceneController::createScenes(filament::Engine& engine, ecs::Registry& regi
 
 void SceneController::updateScenes(const ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::Scene, const SharedScene>().each([&](const auto& sceneView, const auto& scene) {
+	registry.getEntities<const ecs::View, const SharedScene>().each([&](const auto& sceneView, const auto& scene) {
 		auto* indirectLight = registry.tryGetComponent<const SharedIndirectLight>(sceneView.indirectLight);
 		scene->setIndirectLight(indirectLight != nullptr ? indirectLight->get() : nullptr);
 	});
 
-	registry.getEntities<const ecs::Scene, const SharedView>().each([&](const auto& scene, const auto& view) {
+	registry.getEntities<const ecs::View, const SharedView>().each([&](const auto& scene, const auto& view) {
 		const auto* camera = registry.tryGetComponent<const SharedCamera>(scene.camera);
 		auto blendMode = toFilament(scene.blendMode);
 

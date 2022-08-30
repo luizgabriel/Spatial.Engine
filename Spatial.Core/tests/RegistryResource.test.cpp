@@ -5,7 +5,7 @@ using namespace spatial;
 
 TEST(RegistryResource, OnlyFile)
 {
-	auto resource = ecs::Resource{"file.txt"};
+	auto resource = ecs::FileSystemResource{"file.txt"};
 	ASSERT_EQ(resource.filename(), "file.txt");
 	ASSERT_EQ(resource.extension(), ".txt");
 	ASSERT_EQ(resource.stem(), "file");
@@ -13,7 +13,7 @@ TEST(RegistryResource, OnlyFile)
 
 TEST(RegistryResource, Empty)
 {
-	auto resource = ecs::Resource{""};
+	auto resource = ecs::FileSystemResource{""};
 	ASSERT_EQ(resource.filename(), "");
 	ASSERT_EQ(resource.extension(), "");
 	ASSERT_EQ(resource.stem(), "");
@@ -21,7 +21,7 @@ TEST(RegistryResource, Empty)
 
 TEST(RegistryResource, BasicPath)
 {
-	auto resource = ecs::Resource{"some/test/folder/file.txt"};
+	auto resource = ecs::FileSystemResource{"some/test/folder/file.txt"};
 	ASSERT_EQ(resource.filename(), "file.txt");
 	ASSERT_EQ(resource.extension(), ".txt");
 	ASSERT_EQ(resource.stem(), "file");
@@ -29,7 +29,7 @@ TEST(RegistryResource, BasicPath)
 
 TEST(RegistryResource, StrangeFileName)
 {
-	auto resource = ecs::Resource{"some/test/folder/image..txt..png"};
+	auto resource = ecs::FileSystemResource{"some/test/folder/image..txt..png"};
 	ASSERT_EQ(resource.filename(), "image..txt..png");
 	ASSERT_EQ(resource.extension(), "..txt..png");
 	ASSERT_EQ(resource.stem(), "image");
@@ -37,7 +37,7 @@ TEST(RegistryResource, StrangeFileName)
 
 TEST(RegistryResource, NoExtension)
 {
-	auto resource = ecs::Resource{"some/test/folder/noext"};
+	auto resource = ecs::FileSystemResource{"some/test/folder/noext"};
 	ASSERT_EQ(resource.filename(), "noext");
 	ASSERT_EQ(resource.extension(), "");
 	ASSERT_EQ(resource.stem(), "noext");
@@ -45,7 +45,7 @@ TEST(RegistryResource, NoExtension)
 
 TEST(RegistryResource, HiddenFile)
 {
-	auto resource = ecs::Resource{"some/test/folder/.hidden"};
+	auto resource = ecs::FileSystemResource{"some/test/folder/.hidden"};
 	ASSERT_EQ(resource.filename(), ".hidden");
 	ASSERT_EQ(resource.extension(), ".hidden");
 	ASSERT_EQ(resource.stem(), "");
@@ -53,7 +53,7 @@ TEST(RegistryResource, HiddenFile)
 
 TEST(RegistryResource, StrangePath)
 {
-	auto resource = ecs::Resource{"C:\\some//a/image..txt..jpg"};
+	auto resource = ecs::FileSystemResource{"C:\\some//a/image..txt..jpg"};
 	ASSERT_EQ(resource.filename(), "image..txt..jpg");
 	ASSERT_EQ(resource.extension(), "..txt..jpg");
 	ASSERT_EQ(resource.stem(), "image");

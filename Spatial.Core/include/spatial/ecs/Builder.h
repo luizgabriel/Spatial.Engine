@@ -8,9 +8,9 @@
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Resource.h>
-#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/ecs/View.h>
 
 namespace spatial::ecs
 {
@@ -27,7 +27,7 @@ class DirectionalLightBuilder;
 class SunLightBuilder;
 class IndirectLightBuilder;
 
-class ResourceBuilder;
+class FileSystemResourceBuilder;
 
 class MaterialInstanceBuilder;
 
@@ -37,7 +37,7 @@ class MeshInstanceBuilder;
 
 class MeshPrimitiveBuilder;
 
-class SceneBuilder;
+class ViewBuilder;
 
 class Builder
 {
@@ -80,9 +80,9 @@ class Builder
 	DirectionalLightBuilder asDirectionalLight();
 	SunLightBuilder asSunLight();
 	IndirectLightBuilder asIndirectLight();
-	SceneBuilder asScene();
+	ViewBuilder asView();
 
-	ResourceBuilder asResource();
+	FileSystemResourceBuilder asFileSystemResource();
 
 	MeshBuilder asMesh();
 	MeshInstanceBuilder asMeshInstance();
@@ -251,14 +251,14 @@ class MaterialInstanceBuilder : public BasicBuilder<MaterialInstance>
 	MaterialInstanceBuilder& withScissor(MaterialInstance::Scissor scissor);
 };
 
-class ResourceBuilder : public BasicBuilder<Resource>
+class FileSystemResourceBuilder : public BasicBuilder<FileSystemResource>
 {
   public:
-	using Base = BasicBuilder<Resource>;
+	using Base = BasicBuilder<FileSystemResource>;
 
-	ResourceBuilder(Registry& registry, Entity entity);
+	FileSystemResourceBuilder(Registry& registry, Entity entity);
 
-	ResourceBuilder& withPath(std::string_view relativePath);
+	FileSystemResourceBuilder& withPath(std::string_view relativePath);
 };
 
 class MeshInstanceBuilder : public BasicBuilder<MeshInstance>
@@ -303,20 +303,20 @@ class MeshBuilder : public BasicBuilder<Mesh>
 	MeshBuilder& withBoundingBox(math::AxisAlignedBoundingBox boundingBox);
 };
 
-class SceneBuilder : public BasicBuilder<Scene>
+class ViewBuilder : public BasicBuilder<View>
 {
   public:
-	using Base = BasicBuilder<Scene>;
+	using Base = BasicBuilder<View>;
 
-	SceneBuilder(Registry& registry, Entity entity);
-	SceneBuilder& withDimensions(math::uvec2 dimensions);
-	SceneBuilder& withCamera(Entity cameraEntity);
-	SceneBuilder& withIndirectLight(Entity indirectLightEntity);
-	SceneBuilder& withBlendMode(Scene::BlendMode blendMode);
-	SceneBuilder& withShadowingDisabled();
-	SceneBuilder& withPostProcessingDisabled();
-	SceneBuilder& withDefaultAttachments();
-	SceneBuilder& withAttachment(Entity attachmentTexture);
+	ViewBuilder(Registry& registry, Entity entity);
+	ViewBuilder& withDimensions(math::uvec2 dimensions);
+	ViewBuilder& withCamera(Entity cameraEntity);
+	ViewBuilder& withIndirectLight(Entity indirectLightEntity);
+	ViewBuilder& withBlendMode(View::BlendMode blendMode);
+	ViewBuilder& withShadowingDisabled();
+	ViewBuilder& withPostProcessingDisabled();
+	ViewBuilder& withDefaultAttachments();
+	ViewBuilder& withAttachment(Entity attachmentTexture);
 };
 
 

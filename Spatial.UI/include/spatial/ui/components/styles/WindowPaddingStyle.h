@@ -5,11 +5,9 @@
 namespace spatial::ui
 {
 
-class WindowPaddingStyle
+struct WindowPaddingStyle
 {
-  public:
-	WindowPaddingStyle();
-	WindowPaddingStyle(const math::vec2& padding);
+	WindowPaddingStyle(math::vec2 padding = math::vec2{.0f});
 	~WindowPaddingStyle();
 };
 

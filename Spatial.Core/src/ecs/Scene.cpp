@@ -1,24 +1,24 @@
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
-#include <spatial/ecs/Scene.h>
 #include <spatial/ecs/Texture.h>
+#include <spatial/ecs/View.h>
 
 namespace spatial::ecs
 {
 
-void Scene::addAttachment(Registry& registry, Entity sceneView, Entity attachmentEntity)
+void View::addAttachment(Registry& registry, Entity sceneView, Entity attachmentEntity)
 {
 	ecs::Parent::addChild(registry, sceneView, attachmentEntity);
 }
 
-std::vector<Entity> Scene::getAttachments(const Registry& registry, Entity sceneView)
+std::vector<Entity> View::getAttachments(const Registry& registry, Entity sceneView)
 {
 	return ecs::Parent::getChildren(registry, sceneView);
 }
 
-void Scene::resizeAttachments(Registry& registry, Entity sceneViewEntity)
+void View::resizeAttachments(Registry& registry, Entity sceneViewEntity)
 {
-	const auto& sceneView = registry.getComponent<const ecs::Scene>(sceneViewEntity);
+	const auto& sceneView = registry.getComponent<const ecs::View>(sceneViewEntity);
 	auto attachments = getAttachments(registry, sceneViewEntity);
 	for (auto attachmentEntity : attachments)
 	{

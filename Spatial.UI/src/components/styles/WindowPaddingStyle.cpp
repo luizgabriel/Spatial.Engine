@@ -4,11 +4,7 @@
 namespace spatial::ui
 {
 
-WindowPaddingStyle::WindowPaddingStyle() : WindowPaddingStyle{math::vec2{.0f}}
-{
-}
-
-WindowPaddingStyle::WindowPaddingStyle(const math::vec2& padding)
+WindowPaddingStyle::WindowPaddingStyle(math::vec2 padding)
 {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding.x, padding.y));
 }

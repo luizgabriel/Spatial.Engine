@@ -16,9 +16,9 @@ namespace spatial::script
 void ScriptController::loadScripts(ecs::Registry& registry, FileSystem& fileSystem, Isolate& isolate)
 {
 	registry
-		.getEntities<const ecs::Resource, const ecs::ResourceData, ecs::tags::IsScript>(
-			ecs::ExcludeComponents<ecs::tags::IsResourceLoaded>)
-		.each([&](ecs::Entity entity, const ecs::Resource& resource, const ecs::ResourceData& data) {
+		.getEntities<const ecs::FileSystemResource, const ecs::FileSystemResourceData, ecs::tags::IsScript>(
+			ecs::Exclude<ecs::tags::IsResourceLoaded>)
+		.each([&](ecs::Entity entity, const ecs::FileSystemResource& resource, const ecs::FileSystemResourceData& data) {
 			const auto scriptDefaultName = registry.hasAllComponents<ecs::Name>(entity)
 											   ? registry.getComponent<ecs::Name>(entity).name
 											   : resource.stem();

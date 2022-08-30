@@ -105,6 +105,14 @@ class MaterialsManager
 					 bool showEditorEntities);
 };
 
+class ViewsManager
+{
+  public:
+	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+					 bool showEditorEntities);
+};
+
 class EditorDragAndDrop
 {
   public:

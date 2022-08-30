@@ -28,13 +28,16 @@ DETECTED_OS = OS_PRESET_MAP[platform.system()]
 DEFAULT_BUILD_TYPE = "Release"
 
 
-# <editor-fold desc="Data Objects">
-
-
 @dataclass(init=True)
 class Package:
     name: str
     version: str
+
+VENDOR_PACKAGES = [
+    Package("filament", "1.25.6"),
+    Package("v8", "10.1.69"),
+    Package("imgui", "docking"),
+]
 
 
 @dataclass(init=True)
@@ -79,9 +82,6 @@ class CommandResult:
 @dataclass(init=True)
 class Command:
     expression: str
-
-
-# </editor-fold>
 
 
 def run(command: Command) -> CommandResult:
@@ -188,15 +188,9 @@ def make_preset(system: str, build_type: str) -> str:
     return "%s-%s" % (system, build_type)
 
 
-def setup_cli(args: Arguments) -> CommandResult:
+def setup_cli(args: Arguments, packages=VENDOR_PACKAGES) -> CommandResult:
     # run(conan_add_remote(Remote("spatial",
     #                            "https://luizgabriel.jfrog.io/artifactory/api/conan/spatial-conan")))
-
-    packages = [
-        Package("filament", "1.23.2"),
-        Package("v8", "10.1.69"),
-        Package("imgui", "docking"),
-    ]
 
     to_export = to_package_export(args.source_path)
 

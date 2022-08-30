@@ -35,7 +35,7 @@ SharedFileSystem createDefaultFileSystem(const editor::Settings& settings)
 {
 	auto fileSystem = std::make_shared<AggregateFileSystem>();
 	fileSystem->mount("editor", createEditorFileSystem());
-	fileSystem->mount<PhysicalFileSystem>("project", settings.projectFolder);
+	fileSystem->mount<PhysicalFileSystem>("project", settings.projectFolder.value_or(""));
 
 	return fileSystem;
 }

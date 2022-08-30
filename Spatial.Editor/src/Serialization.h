@@ -12,7 +12,7 @@
 namespace spatial::editor
 {
 
-ecs::Registry parseRegistry(std::istream& istream);
+ecs::Registry parseRegistry(std::istream&& istream);
 void writeRegistry(const ecs::Registry& registry, std::ostream& ostream);
 
 } // namespace spatial::editor

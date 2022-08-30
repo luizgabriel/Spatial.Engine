@@ -80,12 +80,12 @@ IndirectLightBuilder Builder::asIndirectLight()
 	return {mRegistry, mEntity};
 }
 
-SceneBuilder Builder::asScene()
+ViewBuilder Builder::asView()
 {
 	return {mRegistry, mEntity};
 }
 
-ResourceBuilder Builder::asResource()
+FileSystemResourceBuilder Builder::asFileSystemResource()
 {
 	return {mRegistry, mEntity};
 }
@@ -347,7 +347,7 @@ IndirectLightBuilder& IndirectLightBuilder::withIntensity(float intensity)
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(std::string_view path)
 {
-	return withReflectionsTexture(ecs::Resource::findOrCreate<ecs::tags::IsCubeMapTexture>(mRegistry, path));
+	return withReflectionsTexture(ecs::FileSystemResource::findOrCreate<ecs::tags::IsCubeMapTexture>(mRegistry, path));
 }
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity resource)
@@ -358,7 +358,7 @@ IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity r
 
 IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(std::string_view path)
 {
-	return withIrradianceValues(ecs::Resource::findOrCreate<ecs::tags::IsIrradianceValues>(mRegistry, path));
+	return withIrradianceValues(ecs::FileSystemResource::findOrCreate<ecs::tags::IsIrradianceValues>(mRegistry, path));
 }
 
 IndirectLightBuilder& IndirectLightBuilder::withIrradianceValues(ecs::Entity resource)
@@ -374,13 +374,13 @@ MeshInstanceBuilder::MeshInstanceBuilder(Registry& registry, Entity entity) : Ba
 
 MeshInstanceBuilder& MeshInstanceBuilder::withMesh(std::string_view resource)
 {
-	return withMesh(ecs::Resource::findOrCreate<ecs::tags::IsMesh>(mRegistry, resource));
+	return withMesh(ecs::FileSystemResource::findOrCreate<ecs::tags::IsMesh>(mRegistry, resource));
 }
 
 MeshInstanceBuilder& MeshInstanceBuilder::withMesh(Entity resource)
 {
-	if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAllComponents<Name>(mEntity))
-		withName(mRegistry.getComponent<Resource>(resource).stem());
+	if (mRegistry.hasAllComponents<FileSystemResource>(resource) && !mRegistry.hasAllComponents<Name>(mEntity))
+		withName(mRegistry.getComponent<FileSystemResource>(resource).stem());
 
 	getComponent().meshSource = resource;
 	return *this;
@@ -426,53 +426,53 @@ MeshInstanceBuilder& MeshInstanceBuilder::withMaterialAt(uint32_t primitiveIndex
 	return *this;
 }
 
-SceneBuilder::SceneBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+ViewBuilder::ViewBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
 }
 
-SceneBuilder& SceneBuilder::withCamera(ecs::Entity cameraEntity)
+ViewBuilder& ViewBuilder::withCamera(ecs::Entity cameraEntity)
 {
 	getComponent().camera = cameraEntity;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
+ViewBuilder& ViewBuilder::withIndirectLight(ecs::Entity indirectLightEntity)
 {
 	getComponent().indirectLight = indirectLightEntity;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withDimensions(math::uvec2 dimensions)
+ViewBuilder& ViewBuilder::withDimensions(math::uvec2 dimensions)
 {
 	getComponent().size = dimensions;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withBlendMode(Scene::BlendMode blendMode)
+ViewBuilder& ViewBuilder::withBlendMode(View::BlendMode blendMode)
 {
 	getComponent().blendMode = blendMode;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withShadowingDisabled()
+ViewBuilder& ViewBuilder::withShadowingDisabled()
 {
 	getComponent().isShadowingEnabled = false;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withPostProcessingDisabled()
+ViewBuilder& ViewBuilder::withPostProcessingDisabled()
 {
 	getComponent().isPostProcessingEnabled = false;
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withAttachment(ecs::Entity attachmentTexture)
+ViewBuilder& ViewBuilder::withAttachment(ecs::Entity attachmentTexture)
 {
-	ecs::Scene::addAttachment(mRegistry, mEntity, attachmentTexture);
+	ecs::View::addAttachment(mRegistry, mEntity, attachmentTexture);
 	return *this;
 }
 
-SceneBuilder& SceneBuilder::withDefaultAttachments()
+ViewBuilder& ViewBuilder::withDefaultAttachments()
 {
 	const auto& size = getComponent().size;
 	assert(size.x > 0 && size.y > 0);
@@ -522,11 +522,12 @@ MeshPrimitiveBuilder& MeshPrimitiveBuilder::withBlendOrder(uint16_t blendOrder)
 	return *this;
 }
 
-ResourceBuilder::ResourceBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
+FileSystemResourceBuilder::FileSystemResourceBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
+	with<ecs::tags::IsResource>();
 }
 
-ResourceBuilder& ResourceBuilder::withPath(std::string_view relativePath)
+FileSystemResourceBuilder& FileSystemResourceBuilder::withPath(std::string_view relativePath)
 {
 	getComponent().relativePath = relativePath;
 
@@ -544,14 +545,14 @@ MaterialInstanceBuilder::MaterialInstanceBuilder(Registry& registry, Entity enti
 
 MaterialInstanceBuilder& MaterialInstanceBuilder::withMaterial(std::string_view relativeResourcePath)
 {
-	withMaterial(ecs::Resource::findOrCreate<ecs::tags::IsMaterial>(mRegistry, relativeResourcePath));
+	withMaterial(ecs::FileSystemResource::findOrCreate<ecs::tags::IsMaterial>(mRegistry, relativeResourcePath));
 	return *this;
 }
 
 MaterialInstanceBuilder& MaterialInstanceBuilder::withMaterial(Entity resource)
 {
-	if (mRegistry.hasAllComponents<Resource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
-		withName(mRegistry.getComponent<Resource>(resource).stem());
+	if (mRegistry.hasAllComponents<FileSystemResource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
+		withName(mRegistry.getComponent<FileSystemResource>(resource).stem());
 
 	ecs::MaterialInstance::changeMaterialSource(mRegistry, mEntity, resource);
 	return *this;
@@ -565,7 +566,7 @@ MaterialInstanceBuilder& MaterialInstanceBuilder::withScissor(MaterialInstance::
 
 MeshBuilder::MeshBuilder(Registry& registry, Entity entity) : Base(registry, entity)
 {
-	with<ecs::tags::IsMesh>();
+	with<ecs::tags::IsMesh>().with<ecs::tags::IsResource>();
 }
 
 MeshBuilder& MeshBuilder::withVertexData(ecs::VertexData vertexData)

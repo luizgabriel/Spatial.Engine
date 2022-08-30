@@ -13,11 +13,16 @@ Settings Settings::load(int argc, char** argv)
 	const auto executablePath = fs::path{args[0]}.parent_path();
 
 	auto config = Settings{};
-	args({"-w", "--width"}) >> config.windowDimensions.x;
-	args({"-h", "--height"}) >> config.windowDimensions.y;
+	auto dim = math::uvec2{};
+	args({"-w", "--width"}) >> dim.x;
+	args({"-h", "--height"}) >> dim.y;
+
+	if (dim.x > 0 && dim.y > 0)
+		config.windowDimensions = std::move(dim);
 
 	std::filesystem::path projectFolder = args[1];
-	config.projectFolder = fs::is_directory(projectFolder) ? projectFolder : "";
+	if (fs::is_directory(projectFolder))
+		config.projectFolder = std::move(projectFolder);
 
 	return config;
 }

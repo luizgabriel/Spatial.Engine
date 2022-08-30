@@ -45,7 +45,7 @@ class ImGuiRenderer
 	ImGuiRenderer(const ImGuiRenderer& other) = delete;
 	ImGuiRenderer& operator=(const ImGuiRenderer& other) = delete;
 
-	void setViewport(const math::vec2& windowSize, const math::vec2& frameBufferSize);
+	void setViewport(const math::uvec2& windowSize, const math::uvec2& frameBufferSize);
 
 	void setMaterial(const uint8_t* data, size_t size);
 

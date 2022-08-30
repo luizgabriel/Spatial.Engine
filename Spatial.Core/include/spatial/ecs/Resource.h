@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <vector>
 
@@ -13,11 +14,16 @@ struct IsResourceLoaded
 {
 };
 
+struct IsResource
+{
+	constexpr static auto typeName = "is_resource";
+};
+
 } // namespace tags
 
-struct Resource
+struct FileSystemResource
 {
-	constexpr static auto typeName = "resource";
+	constexpr static auto typeName = "file_system_resource";
 	constexpr static auto SEPARATOR = "/";
 
 	std::string relativePath;
@@ -54,7 +60,7 @@ struct Resource
 	static Entity createEmpty(Registry& registry, std::string_view resource);
 };
 
-struct ResourceData
+struct FileSystemResourceData
 {
 	std::vector<uint8_t> data;
 };

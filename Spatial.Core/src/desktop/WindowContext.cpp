@@ -36,44 +36,44 @@ PlatformContext::~PlatformContext()
 		glfwTerminate();
 }
 
-void PlatformContext::setupCallbacks(GLFWwindow* window)
+void PlatformContext::setupCallbacks(const Window& window)
 {
 	if (!sValid)
 		return;
 
-	glfwSetWindowCloseCallback(window, [](auto* win) { sEventQueue.enqueue<WindowClosedEvent>(); });
+	glfwSetWindowCloseCallback(window.getHandle(), [](auto* win) { sEventQueue.enqueue<WindowClosedEvent>(); });
 
-	glfwSetCharCallback(window, [](auto* win, unsigned int codepoint) {
+	glfwSetCharCallback(window.getHandle(), [](auto* win, unsigned int codepoint) {
 		auto ss = std::wstringstream{};
 		ss << static_cast<wchar_t>(codepoint);
 
 		sEventQueue.enqueue<TextEvent>(boost::locale::conv::utf_to_utf<char>(ss.str()));
 	});
 
-	glfwSetKeyCallback(window, [](auto* win, int key, int scancode, int action, int mods) {
+	glfwSetKeyCallback(window.getHandle(), [](auto* win, int key, int scancode, int action, int mods) {
 		const auto spatialKey = mapKeyFromScancode(key);
 		const auto spatialAction = mapActionFromCode(action);
 		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
 	});
 
-	glfwSetMouseButtonCallback(window, [](auto* win, int button, int action, int mods) {
+	glfwSetMouseButtonCallback(window.getHandle(), [](auto* win, int button, int action, int mods) {
 		const auto spatialKey = mapKeyFromMouseButton(button);
 		const auto spatialAction = mapActionFromCode(action);
 		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
 	});
 
-	glfwSetScrollCallback(window, [](auto* win, double xOffset, double yOffset) {
+	glfwSetScrollCallback(window.getHandle(), [](auto* win, double xOffset, double yOffset) {
 		sEventQueue.enqueue<MouseScrolledEvent>(math::dvec2{xOffset, yOffset});
 	});
 
-	glfwSetWindowSizeCallback(window, [](auto* win, int width, int height) {
+	glfwSetWindowSizeCallback(window.getHandle(), [](auto* win, int width, int height) {
 		int frameBufferWidth, frameBufferHeight;
 		glfwGetFramebufferSize(win, &frameBufferWidth, &frameBufferHeight);
 		sEventQueue.enqueue<WindowResizedEvent>(math::uvec2{width, height},
 												math::uvec2{frameBufferWidth, frameBufferHeight});
 	});
 
-	glfwSetCursorPosCallback(window, [](auto* win, double xPos, double yPos) {
+	glfwSetCursorPosCallback(window.getHandle(), [](auto* win, double xPos, double yPos) {
 		sEventQueue.enqueue<MouseMovedEvent>(math::dvec2{xPos, yPos});
 	});
 }
@@ -92,14 +92,19 @@ void PlatformContext::onStartFrame(float)
 
 Window PlatformContext::createWindow(math::uvec2 dimensions, std::string_view title) const noexcept
 {
-	auto window = glfwCreateWindow(dimensions.x, dimensions.y, title.data(), nullptr, nullptr);
-
-	int frameBufferWidth, frameBufferHeight;
-	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	sEventQueue.enqueue<WindowResizedEvent>(dimensions, math::uvec2{frameBufferWidth, frameBufferHeight});
-
+	auto window = Window{glfwCreateWindow(dimensions.x, dimensions.y, title.data(), nullptr, nullptr)};
 	setupCallbacks(window);
-	return Window{window};
+	sEventQueue.enqueue<WindowResizedEvent>(window.getSize(), window.getFrameBufferSize());
+
+	return window;
+}
+
+math::uvec2 PlatformContext::getMonitorSize()
+{
+	auto* monitor = glfwGetPrimaryMonitor();
+
+	const auto* mode = glfwGetVideoMode(monitor);
+	return {mode->width, mode->height};
 }
 
 Key mapKeyFromScancode(const int scanCode) noexcept

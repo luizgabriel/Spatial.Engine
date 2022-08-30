@@ -86,15 +86,20 @@ istream& operator>>(istream& stream, spatial::FilameshFile& filamesh)
 	return stream;
 }
 
-FilameshFile loadFilameshFromMemory(const uint8_t* data, std::size_t size)
+FilameshFile loadFilameshFromMemory(const std::vector<uint8_t>& data)
 {
 	auto filamesh = FilameshFile{};
 
-	const auto s = std::string{reinterpret_cast<const char*>(data), size};
+	const auto s = std::string{data.begin(), data.end()};
 	auto stream = std::istringstream{s};
 	stream >> filamesh;
 
 	return filamesh;
+}
+
+std::future<FilameshFile> loadFilameshFromMemoryAsync(std::vector<uint8_t>&& data)
+{
+	return std::async(std::launch::async, [data = std::move(data)]() { return loadFilameshFromMemory(data); });
 }
 
 } // namespace spatial

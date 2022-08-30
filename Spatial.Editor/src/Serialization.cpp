@@ -20,7 +20,7 @@ void serializeEditorComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<tags::IsEditorBlackTexture>(ar);
 }
 
-ecs::Registry parseRegistry(std::istream& istream)
+ecs::Registry parseRegistry(std::istream&& istream)
 {
 	auto registry = ecs::Registry{};
 

@@ -7,7 +7,7 @@ namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::ecs::Resource& resource)
+void serialize(Archive& ar, spatial::ecs::FileSystemResource& resource)
 {
 	ar(make_nvp("relativePath", resource.relativePath));
 }

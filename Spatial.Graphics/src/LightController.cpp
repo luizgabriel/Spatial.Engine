@@ -45,7 +45,7 @@ void update(const ecs::SpotLight& data, Light& light)
 template <typename Component, Light::Type type>
 void createComponentLights(ecs::Registry& registry, filament::Engine& engine)
 {
-	auto view = registry.getEntities<Entity, Component>(ecs::ExcludeComponents<Light>);
+	auto view = registry.getEntities<Entity, Component>(ecs::Exclude<Light>);
 
 	for (auto entity : view)
 	{
@@ -63,13 +63,13 @@ void updateComponentLights(ecs::Registry& registry)
 template <typename... Component>
 void clearRemovedLights(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<Light>(ecs::ExcludeComponents<Component...>);
+	auto view = registry.getEntities<Light>(ecs::Exclude<Component...>);
 	registry.removeComponent<Light>(view.begin(), view.end());
 }
 
 void LightController::createLights(filament::Engine& engine, ecs::Registry& registry)
 {
-	registry.getEntities<const ecs::IndirectLight>(ecs::ExcludeComponents<SharedIndirectLight>)
+	registry.getEntities<const ecs::IndirectLight>(ecs::Exclude<SharedIndirectLight>)
 		.each([&](ecs::Entity entity, const ecs::IndirectLight& component) {
 			const auto* reflectionsTexture =
 				registry.tryGetComponent<const SharedTexture>(component.reflectionsTexture);
@@ -107,13 +107,13 @@ void LightController::updateLights(ecs::Registry& registry)
 	updateComponentLights<ecs::SunLight>(registry);
 	updateComponentLights<ecs::SpotLight>(registry);
 
-	registry.getEntities<ecs::Transform, Light>(ecs::ExcludeComponents<ecs::DirectionalLight>)
+	registry.getEntities<ecs::Transform, Light>(ecs::Exclude<ecs::DirectionalLight>)
 		.each([](const auto& transform, auto& light) { light.setPosition(transform.position); });
 }
 
 void LightController::deleteLights(ecs::Registry& registry)
 {
-	auto view = registry.getEntities<IndirectLight>(ecs::ExcludeComponents<ecs::IndirectLight>);
+	auto view = registry.getEntities<IndirectLight>(ecs::Exclude<ecs::IndirectLight>);
 	registry.removeComponent<Camera>(view.begin(), view.end());
 
 	clearRemovedLights<ecs::DirectionalLight, ecs::PointLight, ecs::SunLight, ecs::SpotLight>(registry);

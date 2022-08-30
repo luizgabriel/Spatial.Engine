@@ -37,9 +37,9 @@ struct CanDestroy
 
 } // namespace tags
 
-struct Scene
+struct View
 {
-	constexpr static auto typeName = "scene";
+	constexpr static auto typeName = "view";
 
 	enum class BlendMode {
 		Opaque,

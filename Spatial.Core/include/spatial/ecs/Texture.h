@@ -49,7 +49,7 @@ struct AttachmentTexture
 	};
 
 	Type type{Type::Color};
-	math::uvec2 size{gUltraWideScreenAspectRatio.toVector() * 240.0};
+	math::uvec2 size{gUltraWideAspectRatio.toVector() * 240.0};
 };
 
 } // namespace spatial::ecs

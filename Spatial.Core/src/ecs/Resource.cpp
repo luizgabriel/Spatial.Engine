@@ -4,13 +4,13 @@
 namespace spatial::ecs
 {
 
-Entity Resource::find(const Registry& registry, std::string_view resource)
+Entity FileSystemResource::find(const Registry& registry, std::string_view resource)
 {
-	const auto view = registry.getEntities<const ecs::Resource>();
+	const auto view = registry.getEntities<const ecs::FileSystemResource>();
 
 	// TODO: Can optimize to log(n) search if resources are always sorted
 	auto it = std::find_if(view.begin(), view.end(), [&](ecs::Entity entity) {
-		auto& res = registry.getComponent<const ecs::Resource>(entity);
+		auto& res = registry.getComponent<const ecs::FileSystemResource>(entity);
 		return res.relativePath == resource;
 	});
 
@@ -20,7 +20,7 @@ Entity Resource::find(const Registry& registry, std::string_view resource)
 	return *it;
 }
 
-std::string Resource::stem() const
+std::string FileSystemResource::stem() const
 {
 	if (relativePath.empty())
 		return "";
@@ -29,7 +29,7 @@ std::string Resource::stem() const
 	return firstDot == std::string::npos ? fileName : fileName.substr(0, firstDot);
 }
 
-std::string Resource::extension() const
+std::string FileSystemResource::extension() const
 {
 	if (relativePath.empty())
 		return "";
@@ -38,7 +38,7 @@ std::string Resource::extension() const
 	return firstDot == std::string::npos ? "" : fileName.substr(firstDot);
 }
 
-std::string Resource::filename() const
+std::string FileSystemResource::filename() const
 {
 	if (relativePath.empty())
 		return "";
@@ -46,14 +46,14 @@ std::string Resource::filename() const
 	return relativePath.substr(lastSeparator + 1);
 }
 
-bool Resource::exists(const Registry& registry, std::string_view resource)
+bool FileSystemResource::exists(const Registry& registry, std::string_view resource)
 {
 	return registry.isValid(find(registry, resource));
 }
 
-Entity Resource::createEmpty(Registry& registry, std::string_view resource)
+Entity FileSystemResource::createEmpty(Registry& registry, std::string_view resource)
 {
-	return ecs::Builder::create(registry).asResource().withPath(resource);
+	return ecs::Builder::create(registry).asFileSystemResource().withPath(resource);
 }
 
 } // namespace spatial::ecs

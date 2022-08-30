@@ -15,10 +15,12 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 
 	displayPathHeader(selectedPath, icons);
 
-	ImGui::Columns(std::max(4, static_cast<int>(ImGui::GetContentRegionAvail().x) / 70), "FilesExplorer", false);
+	ImGui::Columns(static_cast<int>(std::max(4.0f, ImGui::GetContentRegionAvail().x / 100.0f)), "FilesExplorer", false);
 
 	bool selected = false;
 	const auto size = math::vec2{std::clamp(ImGui::GetContentRegionAvail().x * 0.9f, 30.0f, 50.0f)};
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
+
 	for (const auto& entry : fileSystem.list(selectedPath))
 	{
 		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 5.0f);
@@ -74,6 +76,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 		ImGui::SetCursorPosX(ImGui::GetColumnOffset() + (ImGui::GetColumnWidth() - size.x) * 0.5f - 4.0f);
 		ImGui::TextWrapped("%s", entry.path.c_str());
 		ImGui::NextColumn();
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
 	}
 
 	ImGui::Columns(1);

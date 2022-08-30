@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <string>
 
 namespace spatial
@@ -126,5 +127,51 @@ enum class KeyAction
 	Pressed,
 	Released,
 };
+
+constexpr int gKeysCount = static_cast<size_t>(Key::Count);
+
+using KeyBitSet = std::bitset<gKeysCount>;
+
+template <typename... K>
+KeyBitSet bitsetOf(K... key)
+{
+	auto bit = KeyBitSet{};
+	(bit.set(static_cast<size_t>(key)), ...);
+	return bit;
+}
+
+template <size_t N>
+struct KeyCombination
+{
+	std::array<Key, N> keys{};
+
+	template <typename... K>
+	KeyCombination(K... keys) : keys{keys...}
+	{
+	}
+
+	template <size_t I = 0>
+	constexpr KeyBitSet getPressedBitset() const
+	{
+		if constexpr (I >= N - 1)
+			return KeyBitSet{};
+		else
+			return bitsetOf(keys.at(I)) | getPressedBitset<I + 1>();
+	}
+
+	constexpr KeyBitSet getReleasedBitset() const
+	{
+		return bitsetOf(keys.at(keys.size() - 1));
+	}
+};
+
+template <typename... K>
+KeyCombination(K...) -> KeyCombination<sizeof...(K)>;
+
+#ifdef SPATIAL_PLATFORM_OSX
+constexpr auto gControlKey = Key::System;
+#else
+constexpr auto gControlKey = Key::LControl;
+#endif
 
 } // namespace spatial
