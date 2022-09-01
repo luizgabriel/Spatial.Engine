@@ -1,4 +1,3 @@
-#include <filament/Fence.h>
 #include <spatial/graphics/TextureResources.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -37,8 +36,6 @@ Texture createTexture(filament::Engine& engine, const uint8_t* data, size_t size
 								 filament::Texture::InternalFormat::RGBA8, usage, sampler);
 	texture->setImage(engine, 0, std::move(bufferDescriptor));
 
-	filament::Fence::waitAndDestroy(engine.createFence());
-
 	return texture;
 }
 
@@ -56,8 +53,6 @@ Texture createTexture(filament::Engine& engine, const std::vector<uint32_t>& pix
 
 	texture->setImage(engine, 0, std::move(buffer));
 
-	filament::Fence::waitAndDestroy(engine.createFence());
-
 	return texture;
 }
 
@@ -70,8 +65,6 @@ Texture createDummyCubemap(filament::Engine& engine)
 	auto buffer = filament::Texture::PixelBufferDescriptor{&pixel, 4, filament::Texture::Format::RGBA,
 														   filament::Texture::Type::UBYTE};
 	texture->setImage(engine, 0, 0, 0, 1, 1, std::move(buffer));
-
-	filament::Fence::waitAndDestroy(engine.createFence());
 
 	return texture;
 }

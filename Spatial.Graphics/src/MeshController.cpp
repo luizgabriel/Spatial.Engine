@@ -249,18 +249,9 @@ template <typename T>
 filament::backend::BufferDescriptor makeBufferDescriptor(const std::vector<T>& source)
 {
 	auto sizeInBytes = source.size() * sizeof(T);
-	auto allocator = std::allocator<uint8_t>();
-	auto allocatedData = allocator.allocate(sizeInBytes);
 	auto sourceBegin = reinterpret_cast<const uint8_t*>(source.data());
-	auto sourceEnd = sourceBegin + sizeInBytes;
-	std::copy(sourceBegin, sourceEnd, allocatedData);
 
-	auto callback = [](void* buffer, size_t size, void*) {
-		auto allocator = std::allocator<T>();
-		allocator.deallocate(reinterpret_cast<T*>(buffer), size);
-	};
-
-	return {allocatedData, sizeInBytes, callback, nullptr};
+	return {sourceBegin, sizeInBytes, nullptr};
 }
 
 void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registry)
@@ -296,7 +287,6 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 		.each([&](ecs::Entity entity, const auto& mesh) {
 			auto vertexBuffer = toShared(createVertexBuffer(engine, makeVertexBuffer(mesh.vertexData)));
 			vertexBuffer->setBufferAt(engine, 0, makeBufferDescriptor(mesh.vertexData.data));
-			filament::Fence::waitAndDestroy(engine.createFence());
 
 			registry.addComponent(entity, std::move(vertexBuffer));
 		});
@@ -306,7 +296,6 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 		.each([&](ecs::Entity entity, const auto& mesh) {
 			auto indexBuffer = toShared(createIndexBuffer(engine, makeIndexBuffer(mesh.indexData)));
 			indexBuffer->setBuffer(engine, makeBufferDescriptor(mesh.indexData.data));
-			filament::Fence::waitAndDestroy(engine.createFence());
 
 			registry.addComponent(entity, std::move(indexBuffer));
 		});
