@@ -153,21 +153,6 @@ void EditorSystem::onDrawGui()
 			EditorCamera::replaceView(mRegistry, selectedView);
 	}
 
-	ui::Window::show("Scene Tree", [&]() {
-		static std::string search;
-		ui::Search::text(search, icons);
-		ui::SceneTree::displayTree(mRegistry, showDebugEntities, search);
-
-		ui::Popup::show("Scene Graph Popup", [&]() {
-			ui::Menu::show("Create", [&]() {
-				ui::CreateMenu::createMeshMenu(mRegistry, createEntityPosition);
-				ui::CreateMenu::createCameraMenu(mRegistry, createEntityPosition);
-				ui::CreateMenu::createLightMenu(mRegistry, createEntityPosition);
-			});
-			ui::CreateMenu::removeMenu(mRegistry);
-		});
-	});
-
 	ui::Window::show("Resources", [&]() {
 		static std::string search;
 		static auto type = ui::ResourceManager::ResourceType::All;
@@ -200,6 +185,21 @@ void EditorSystem::onDrawGui()
 		ui::Popup::show("MaterialsManagerPopup", [&]() {
 			ui::Menu::show("Create", [&]() { ui::CreateMenu::createMaterialsMenu(mRegistry); });
 
+			ui::CreateMenu::removeMenu(mRegistry);
+		});
+	});
+
+	ui::Window::show("Scene Tree", [&]() {
+		static std::string search;
+		ui::Search::text(search, icons);
+		ui::SceneTree::displayTree(mRegistry, showDebugEntities, search);
+
+		ui::Popup::show("Scene Graph Popup", [&]() {
+			ui::Menu::show("Create", [&]() {
+				ui::CreateMenu::createMeshMenu(mRegistry, createEntityPosition);
+				ui::CreateMenu::createCameraMenu(mRegistry, createEntityPosition);
+				ui::CreateMenu::createLightMenu(mRegistry, createEntityPosition);
+			});
 			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
