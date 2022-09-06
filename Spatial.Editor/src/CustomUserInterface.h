@@ -16,7 +16,7 @@ namespace spatial::ui
 class EntityProperties
 {
   public:
-	static bool displayComponents(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons,
+	static void displayComponents(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons,
 								  bool showDebugComponents = false);
 
 	static void popup(ecs::Registry& registry, ecs::Entity entity);
@@ -24,7 +24,7 @@ class EntityProperties
   private:
 	static void addComponentMenu(ecs::Registry& registry, ecs::Entity entity);
 
-	static bool displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
+	static void displayEntityName(ecs::Registry& registry, ecs::Entity selectedEntity);
 };
 
 struct EditorMainMenu
@@ -38,10 +38,9 @@ struct EditorMainMenu
 		SaveScene,
 	};
 
-	static bool fileMenu(graphics::OptionalTexture icons, Action& action);
-	static bool viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
-	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-						   const math::vec3& createEntitiesPosition);
+	static void fileMenu(graphics::OptionalTexture icons, Action& action);
+	static void viewOptionsMenu(bool& isEditorEntitiesShowing, bool& isEditorComponentsShowing);
+	static void createMenu(ecs::Registry& registry, const math::vec3& createEntitiesPosition);
 };
 
 struct EditorModals
@@ -52,37 +51,32 @@ struct EditorModals
 	static bool openProject(std::string& openPath);
 };
 
-class SceneOptionsMenu
+struct CreateMenu
 {
-  public:
-	static bool createEntitiesMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								   math::vec3 createEntitiesPosition, bool addAsChild = false);
+	static void createMeshMenu(ecs::Registry& registry, math::vec3 createEntitiesPosition);
 
-	static bool addChildMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition);
-	static bool removeMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
+	static void createLightMenu(ecs::Registry& registry, math::vec3 createEntitiesPosition);
 
-  private:
-	static bool createMeshMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition,
-							   bool addAsChild = false);
-	static bool createLightMenu(ecs::Registry& registry, ecs::Entity& selectedEntity, math::vec3 createEntitiesPosition,
-								bool addAsChild = false);
-	static bool createCameraMenu(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								 math::vec3 createEntitiesPosition, bool addAsChild = false);
+	static void createCameraMenu(ecs::Registry& registry, math::vec3 createEntitiesPosition);
+
+	static void createMaterialsMenu(ecs::Registry& registry);
+
+	static void createViewMenu(ecs::Registry& registry);
+
+	static void removeMenu(ecs::Registry& registry);
 };
 
 class SceneTree
 {
   public:
-	static bool displayTree(ecs::Registry& registry, ecs::Entity& selectedEntity, bool showDebugEntities = false,
-							std::string_view search = "");
+	static void displayTree(ecs::Registry& registry, bool showDebugEntities = false, std::string_view search = "");
 
   private:
-	static bool displayNode(ecs::Registry& registry, ecs::Entity entity, ecs::Entity& selectedEntity);
+	static void displayNode(ecs::Registry& registry, ecs::Entity entity);
 };
 
-class ResourceManager
+struct ResourceManager
 {
-  public:
 	enum class ResourceType
 	{
 		All,
@@ -92,70 +86,61 @@ class ResourceManager
 		Texture,
 	};
 
-	static bool header(std::string& search, ResourceType& filter, graphics::OptionalTexture icons);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
-					 ResourceManager::ResourceType type, bool showEditorEntities);
-};
-
-class MaterialsManager
-{
-  public:
-	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
+	static void header(std::string& search, ResourceType& filter, graphics::OptionalTexture icons);
+	static void list(ecs::Registry& registry, std::string_view search, ResourceManager::ResourceType type,
 					 bool showEditorEntities);
 };
 
-class ViewsManager
+struct MaterialsManager
 {
-  public:
-	static bool createMenu(ecs::Registry& registry, ecs::Entity& selectedEntity);
-	static bool list(const ecs::Registry& registry, ecs::Entity& selectedEntity, std::string_view search,
-					 bool showEditorEntities);
+	static void list(ecs::Registry& registry, std::string_view search, bool showEditorEntities);
 };
 
-class EditorDragAndDrop
+struct ViewsManager
 {
-  public:
-	static bool loadScene(std::string& scenePath, ecs::Entity& selectedEntity);
-	static bool loadMeshInstance(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								 math::vec3 createEntityPosition = {});
-	static bool loadScriptResource(ecs::Registry& registry, ecs::Entity& selectedEntity,
-								   ResourceManager::ResourceType& type);
+	static void list(ecs::Registry& registry, std::string_view search, bool showEditorEntities);
+};
+
+struct EditorDragAndDrop
+{
+	static bool loadScene(std::string& scenePath);
+	static void loadMeshInstance(ecs::Registry& registry, math::vec3 createEntityPosition = {});
+	static void loadScriptResource(ecs::Registry& registry, ResourceManager::ResourceType& type);
 };
 
 template <>
 struct ComponentInputImpl<editor::ColorMaterial>
 {
 	static constexpr auto sName = "Color Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::EditorCamera>
 {
 	static constexpr auto sName = "Editor Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::GridMaterial>
 {
 	static constexpr auto sName = "Grid Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<editor::SkyBoxMaterial, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "SkyBox Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<editor::StandardOpaqueMaterial, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Standard Opaque Material";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 } // namespace spatial::ui

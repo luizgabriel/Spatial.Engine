@@ -25,7 +25,7 @@
         22,
         23,
         24,
-        25,
+        1048601,
         26,
         27,
         28,
@@ -35,9 +35,37 @@
         32,
         33,
         34,
-        35
+        35,
+        1048612,
+        37,
+        38,
+        39
     ],
     "name": [
+        {
+            "key": 39,
+            "value": {
+                "name": "Perspective Camera"
+            }
+        },
+        {
+            "key": 38,
+            "value": {
+                "name": "Depth Texture"
+            }
+        },
+        {
+            "key": 37,
+            "value": {
+                "name": "Color Texture"
+            }
+        },
+        {
+            "key": 1048612,
+            "value": {
+                "name": "Test View"
+            }
+        },
         {
             "key": 35,
             "value": {
@@ -45,7 +73,7 @@
             }
         },
         {
-            "key": 34,
+            "key": 1048601,
             "value": {
                 "name": "Color Material (Sphere)"
             }
@@ -53,19 +81,19 @@
         {
             "key": 32,
             "value": {
-                "name": "sphere.filamesh"
+                "name": "Sphere"
             }
         },
         {
             "key": 31,
             "value": {
-                "name": "Sphere"
+                "name": "Directional Light"
             }
         },
         {
             "key": 30,
             "value": {
-                "name": "Ground_Wet_Rocks_height.png"
+                "name": "Ground_Wet_Rocks_normal.jpg"
             }
         },
         {
@@ -83,19 +111,19 @@
         {
             "key": 27,
             "value": {
-                "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
+                "name": "Ground_Wet_Rocks_height.png"
             }
         },
         {
             "key": 26,
             "value": {
-                "name": "Directional Light"
+                "name": "Ground_Wet_Rocks_ambientOcclusion.jpg"
             }
         },
         {
-            "key": 25,
+            "key": 33,
             "value": {
-                "name": "Ground_Wet_Rocks_normal.jpg"
+                "name": "sphere.filamesh"
             }
         },
         {
@@ -113,7 +141,7 @@
         {
             "key": 20,
             "value": {
-                "name": "Wet Ground"
+                "name": "WetGround"
             }
         },
         {
@@ -239,7 +267,27 @@
     ],
     "transform": [
         {
-            "key": 31,
+            "key": 39,
+            "value": {
+                "position": {
+                    "x": -0.08541493117809296,
+                    "y": 14.256179809570313,
+                    "z": -22.595378875732423
+                },
+                "rotation": {
+                    "x": -0.6167274713516235,
+                    "y": 3.1285316944122316,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            }
+        },
+        {
+            "key": 32,
             "value": {
                 "position": {
                     "x": 0.0,
@@ -282,13 +330,13 @@
             "key": 18,
             "value": {
                 "position": {
-                    "x": -8.594776153564454,
-                    "y": 3.4296393394470217,
-                    "z": -6.246479511260986
+                    "x": -5.6156439781188969,
+                    "y": 4.074945449829102,
+                    "z": -8.334835052490235
                 },
                 "rotation": {
-                    "x": -0.22959578037261964,
-                    "y": 10.387048721313477,
+                    "x": -0.2254083752632141,
+                    "y": 3.755011796951294,
                     "z": 0.0
                 },
                 "scale": {
@@ -321,6 +369,15 @@
     ],
     "perspective_camera": [
         {
+            "key": 39,
+            "value": {
+                "fieldOfView": 0.7853981633974483,
+                "aspectRatio": 1.7777777777777777,
+                "near": 0.1,
+                "far": 10000.0
+            }
+        },
+        {
             "key": 18,
             "value": {
                 "fieldOfView": 0.7853981633974483,
@@ -335,13 +392,13 @@
     "point_light": [],
     "directional_light": [
         {
-            "key": 26,
+            "key": 31,
             "value": {
-                "intensity": 16461.916015625,
+                "intensity": 10000.0,
                 "direction": {
-                    "x": 0.5361716747283936,
-                    "y": -0.48722371459007265,
-                    "z": -0.6892989277839661
+                    "x": 0.3654455542564392,
+                    "y": -0.8457417488098145,
+                    "z": -0.3888063430786133
                 },
                 "color": {
                     "x": 1.0,
@@ -366,10 +423,10 @@
     ],
     "mesh_instance": [
         {
-            "key": 31,
+            "key": 32,
             "value": {
-                "meshSource": 32,
-                "defaultMaterialInstance": 34,
+                "meshSource": 33,
+                "defaultMaterialInstance": 1048601,
                 "receiveShadows": true,
                 "castShadows": true,
                 "culling": true,
@@ -413,7 +470,7 @@
     "mesh_primitive": [],
     "mesh_part": [
         {
-            "key": 33,
+            "key": 34,
             "value": {
                 "minIndex": 0,
                 "indexCount": 2880
@@ -436,7 +493,31 @@
     ],
     "parent": [
         {
+            "key": 1048612,
+            "value": {
+                "childrenCount": 2,
+                "first": 37,
+                "last": 38
+            }
+        },
+        {
+            "key": 32,
+            "value": {
+                "childrenCount": 0,
+                "first": 4294967295,
+                "last": 4294967295
+            }
+        },
+        {
             "key": 35,
+            "value": {
+                "childrenCount": 1,
+                "first": 1048601,
+                "last": 1048601
+            }
+        },
+        {
+            "key": 33,
             "value": {
                 "childrenCount": 1,
                 "first": 34,
@@ -444,11 +525,11 @@
             }
         },
         {
-            "key": 32,
+            "key": 20,
             "value": {
-                "childrenCount": 1,
-                "first": 33,
-                "last": 33
+                "childrenCount": 0,
+                "first": 4294967295,
+                "last": 4294967295
             }
         },
         {
@@ -502,7 +583,23 @@
     ],
     "child": [
         {
-            "key": 34,
+            "key": 38,
+            "value": {
+                "parent": 1048612,
+                "next": 4294967295,
+                "previous": 37
+            }
+        },
+        {
+            "key": 37,
+            "value": {
+                "parent": 1048612,
+                "next": 38,
+                "previous": 4294967295
+            }
+        },
+        {
+            "key": 1048601,
             "value": {
                 "parent": 35,
                 "next": 4294967295,
@@ -510,9 +607,9 @@
             }
         },
         {
-            "key": 33,
+            "key": 34,
             "value": {
-                "parent": 32,
+                "parent": 33,
                 "next": 4294967295,
                 "previous": 4294967295
             }
@@ -582,7 +679,7 @@
             }
         },
         {
-            "key": 32,
+            "key": 33,
             "value": {
                 "relativePath": "editor/meshes/sphere.filamesh"
             }
@@ -590,7 +687,7 @@
         {
             "key": 30,
             "value": {
-                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
+                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
             }
         },
         {
@@ -608,13 +705,13 @@
         {
             "key": 27,
             "value": {
-                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
+                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_height.png"
             }
         },
         {
-            "key": 25,
+            "key": 26,
             "value": {
-                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_normal.jpg"
+                "relativePath": "project/textures/Ground_Wet_Rocks/Ground_Wet_Rocks_ambientOcclusion.jpg"
             }
         },
         {
@@ -668,6 +765,20 @@
     ],
     "view": [
         {
+            "key": 1048612,
+            "value": {
+                "size": {
+                    "x": 3840,
+                    "y": 2160
+                },
+                "blendMode": 0,
+                "isShadowingEnabled": true,
+                "isPostProcessingEnabled": true,
+                "camera": 39,
+                "indirectLight": 15
+            }
+        },
+        {
             "key": 12,
             "value": {
                 "size": {
@@ -703,6 +814,26 @@
         }
     ],
     "attachment_texture": [
+        {
+            "key": 38,
+            "value": {
+                "type": 1,
+                "size": {
+                    "x": 3840,
+                    "y": 2160
+                }
+            }
+        },
+        {
+            "key": 37,
+            "value": {
+                "type": 0,
+                "size": {
+                    "x": 3840,
+                    "y": 2160
+                }
+            }
+        },
         {
             "key": 14,
             "value": {
@@ -828,7 +959,7 @@
     ],
     "material_instance": [
         {
-            "key": 34,
+            "key": 1048601,
             "value": {
                 "scissor": {
                     "left": 0,
@@ -879,14 +1010,15 @@
         6
     ],
     "tag_is_mesh": [
-        32,
+        33,
         21,
         8,
         4
     ],
     "tag_is_renderable": [
+        39,
+        32,
         31,
-        26,
         20,
         18,
         15,
@@ -895,12 +1027,12 @@
     ],
     "is_resource": [
         35,
-        32,
+        33,
         30,
         29,
         28,
         27,
-        25,
+        26,
         24,
         21,
         17,
@@ -915,19 +1047,22 @@
         0
     ],
     "tag_is_camera": [
+        39,
         18
     ],
     "tag_is_light": [
-        26,
+        31,
         15
     ],
     "tag_is_main_view": [],
     "tag_is_image_texture": [
+        38,
+        37,
         30,
         29,
         28,
         27,
-        25,
+        26,
         14,
         13,
         2,
@@ -945,18 +1080,19 @@
         0
     ],
     "tag_is_rendered_to_target": [
+        1048612,
         12
     ],
     "color_material": [
         {
-            "key": 34,
+            "key": 1048601,
             "value": {
                 "baseColor": {
                     "x": 1.0,
                     "y": 1.0,
                     "z": 1.0
                 },
-                "roughness": 0.3700000047683716,
+                "roughness": 0.4099999964237213,
                 "metallic": 0.800000011920929,
                 "reflectance": 0.10000000149011612
             }
@@ -1018,8 +1154,8 @@
                 "roughnessMap": 28,
                 "reflectance": 0.0,
                 "reflectanceMap": 4294967295,
-                "ambientOcclusionMap": 27,
-                "normalMap": 25,
+                "ambientOcclusionMap": 26,
+                "normalMap": 30,
                 "emissive": {
                     "x": 0.0,
                     "y": 0.0,
@@ -1027,7 +1163,7 @@
                     "w": 0.0
                 },
                 "height": 1.0,
-                "heightMap": 30
+                "heightMap": 27
             }
         }
     ],
@@ -1051,7 +1187,10 @@
         1,
         0
     ],
-    "tag_is_editor_view": [
+    "tag_is_selected": [
+        1048612
+    ],
+    "tag_is_selected_view": [
         12
     ],
     "tag_is_editor_white_texture": [

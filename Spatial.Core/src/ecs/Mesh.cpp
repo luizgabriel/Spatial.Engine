@@ -34,12 +34,10 @@ size_t MeshInstance::getPrimitivesCount(const Registry& registry, Entity meshIns
 
 Entity MeshInstance::addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity)
 {
-	auto& mesh = registry.getOrAddComponent<ecs::MeshInstance>(meshInstanceEntity);
-	if (!registry.isValid(mesh.defaultMaterialInstance))
-	{
-		mesh.defaultMaterialInstance = materialInstanceEntity;
-		return ecs::NullEntity;
-	}
+	auto& meshInstance = registry.getOrAddComponent<ecs::MeshInstance>(meshInstanceEntity);
+
+	if (!registry.isValid(materialInstanceEntity))
+		materialInstanceEntity = meshInstance.defaultMaterialInstance;
 
 	return addMaterial(registry, meshInstanceEntity, materialInstanceEntity,
 					   getPrimitivesCount(registry, meshInstanceEntity));

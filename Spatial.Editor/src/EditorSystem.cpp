@@ -3,7 +3,6 @@
 #include "CustomUserInterface.h"
 #include "Materials.h"
 #include "Serialization.h"
-#include "Tags.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -20,6 +19,7 @@
 #include <spatial/graphics/MaterialController.h>
 #include <spatial/graphics/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
+#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Search.h>
@@ -78,8 +78,6 @@ void EditorSystem::onUpdateFrame(float delta)
 
 void EditorSystem::onDrawGui()
 {
-	static ecs::Entity selectedEntity{ecs::NullEntity};
-	static ecs::Entity selectedView{ecs::NullEntity};
 	static bool showDebugEntities{false};
 	static bool showDebugComponents{false};
 	static std::string rootPath = {};
@@ -94,7 +92,7 @@ void EditorSystem::onDrawGui()
 
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(icons, mMenuAction);
-		ui::EditorMainMenu::createMenu(mRegistry, selectedEntity, createEntityPosition);
+		ui::EditorMainMenu::createMenu(mRegistry, createEntityPosition);
 		ui::EditorMainMenu::viewOptionsMenu(showDebugEntities, showDebugComponents);
 	});
 
@@ -140,19 +138,17 @@ void EditorSystem::onDrawGui()
 		auto window = ui::Window{"Scene View", ui::WindowFlags::NoScrollbar};
 		mIsCameraViewWindowHovered = ImGui::IsWindowHovered();
 
+		auto selectedView = mRegistry.getFirstEntity<editor::tags::IsSelectedView>();
 		if (!mRegistry.isValid(selectedView))
-		{
-			selectedView = mRegistry.getFirstEntity<ecs::View, tags::IsEditorView>();
 			EditorCamera::replaceView(mRegistry, selectedView);
-		}
 
 		const auto imageSize = window.getSize() - math::vec2{0, 24};
 		ui::SceneView::image(mRegistry, selectedView, imageSize);
 
-		if (ui::EditorDragAndDrop::loadScene(mScenePath, selectedEntity))
+		if (ui::EditorDragAndDrop::loadScene(mScenePath))
 			mJobQueue.enqueue<LoadSceneEvent>(mScenePath);
 
-		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, selectedEntity, createEntityPosition);
+		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, createEntityPosition);
 		if (auto style2 = ui::WindowPaddingStyle{math::vec2{10.0f}}; ui::SceneView::selector(mRegistry, selectedView))
 			EditorCamera::replaceView(mRegistry, selectedView);
 	}
@@ -160,12 +156,15 @@ void EditorSystem::onDrawGui()
 	ui::Window::show("Scene Tree", [&]() {
 		static std::string search;
 		ui::Search::text(search, icons);
-		ui::SceneTree::displayTree(mRegistry, selectedEntity, showDebugEntities, search);
+		ui::SceneTree::displayTree(mRegistry, showDebugEntities, search);
 
 		ui::Popup::show("Scene Graph Popup", [&]() {
-			ui::SceneOptionsMenu::createEntitiesMenu(mRegistry, selectedEntity, createEntityPosition);
-			ui::SceneOptionsMenu::addChildMenu(mRegistry, selectedEntity, createEntityPosition);
-			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+			ui::Menu::show("Create", [&]() {
+				ui::CreateMenu::createMeshMenu(mRegistry, createEntityPosition);
+				ui::CreateMenu::createCameraMenu(mRegistry, createEntityPosition);
+				ui::CreateMenu::createLightMenu(mRegistry, createEntityPosition);
+			});
+			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
 
@@ -174,21 +173,21 @@ void EditorSystem::onDrawGui()
 		static auto type = ui::ResourceManager::ResourceType::All;
 
 		ui::ResourceManager::header(search, type, icons);
-		ui::ResourceManager::list(mRegistry, selectedEntity, search, type, showDebugEntities);
-		ui::EditorDragAndDrop::loadScriptResource(mRegistry, selectedEntity, type);
+		ui::ResourceManager::list(mRegistry, search, type, showDebugEntities);
+		ui::EditorDragAndDrop::loadScriptResource(mRegistry, type);
 
-		ui::Popup::show("AssetManagerPopup", [&]() { ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity); });
+		ui::Popup::show("AssetManagerPopup", [&]() { ui::CreateMenu::removeMenu(mRegistry); });
 	});
 
 	ui::Window::show("Views", [&]() {
 		static std::string search;
 
 		ui::Search::text(search, icons);
-		ui::ViewsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+		ui::ViewsManager::list(mRegistry, search, showDebugEntities);
 
 		ui::Popup::show("Asset Manager Popup", [&]() {
-			ui::ViewsManager::createMenu(mRegistry, selectedEntity);
-			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+			ui::Menu::show("Create", [&]() { ui::CreateMenu::createViewMenu(mRegistry); });
+			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
 
@@ -196,17 +195,20 @@ void EditorSystem::onDrawGui()
 		static std::string search;
 
 		ui::Search::text(search, icons);
-		ui::MaterialsManager::list(mRegistry, selectedEntity, search, showDebugEntities);
+		ui::MaterialsManager::list(mRegistry, search, showDebugEntities);
 
-		ui::Popup::show("Asset Manager Popup", [&]() {
-			ui::MaterialsManager::createMenu(mRegistry, selectedEntity);
-			ui::SceneOptionsMenu::removeMenu(mRegistry, selectedEntity);
+		ui::Popup::show("MaterialsManagerPopup", [&]() {
+			ui::Menu::show("Create", [&]() { ui::CreateMenu::createMaterialsMenu(mRegistry); });
+
+			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
 
 	ui::Window::show("Components", [&]() {
-		ui::EntityProperties::popup(mRegistry, selectedEntity);
-		ui::EntityProperties::displayComponents(mRegistry, selectedEntity, icons, showDebugComponents);
+		auto selected = mRegistry.getFirstEntity<editor::tags::IsSelected>();
+
+		ui::EntityProperties::popup(mRegistry, selected);
+		ui::EntityProperties::displayComponents(mRegistry, selected, icons, showDebugComponents);
 	});
 
 	ui::Window::show("Assets Explorer", [&]() {
@@ -410,7 +412,7 @@ void EditorSystem::createDefaultEditorEntities()
 	ecs::Builder::create(mRegistry)
 		.withName("Editor View")
 		.with<tags::IsEditorEntity>()
-		.with<tags::IsEditorView>()
+		.with<tags::IsSelectedView>()
 		.with<ecs::tags::IsRenderedToTarget>()
 		.asView()
 		.withDimensions(gUltraWideAspectRatio.toVector() * 240.0)

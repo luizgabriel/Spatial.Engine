@@ -264,7 +264,6 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 			ecs::Exclude<FutureFilamesh, ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, ecs::FileSystemResourceData& resource) {
 			registry.addComponent(entity, loadFilameshFromMemoryAsync(std::move(resource.data)));
-			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 		});
 
 	registry.getEntities<FutureFilamesh>(ecs::Exclude<ecs::tags::IsResourceLoaded>)
