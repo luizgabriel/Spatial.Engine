@@ -11,7 +11,6 @@ add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/EditorSystem.cpp
         src/EditorCameraController.h
         src/EditorCameraController.cpp
-        src/Components.h
         src/Jobs.h
         src/Materials.h
         src/Materials.cpp
@@ -23,6 +22,8 @@ add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/Settings.h
         src/FileSystem.h
         src/FileSystem.cpp
+        src/Components.h
+        src/Components.cpp
         ${SPATIAL_EDITOR_MACOS_ICON}
         ${SPATIAL_EDITOR_IMGUI_SETTINGS})
 
@@ -44,8 +45,8 @@ cmake_policy(SET CMP0091 NEW)
 set_property(
         TARGET Spatial.Editor
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-                 VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Spatial.Editor>"
-                 VS_DEBUGGER_COMMAND "$<TARGET_FILE:Spatial.Editor>")
+        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Spatial.Editor>"
+        VS_DEBUGGER_COMMAND "$<TARGET_FILE:Spatial.Editor>")
 
 install(TARGETS Spatial.Editor
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -53,7 +54,7 @@ install(TARGETS Spatial.Editor
         COMPONENT binaries)
 
 if (WIN32)
-        install(FILES assets/config/imgui.ini
-                DESTINATION ${CMAKE_INSTALL_BINDIR}
-                COMPONENT configs)
-endif()
+    install(FILES assets/config/imgui.ini
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT configs)
+endif ()

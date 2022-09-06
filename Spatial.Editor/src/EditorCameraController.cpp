@@ -39,20 +39,6 @@ void EditorCameraController::updateCameraTransforms(ecs::Registry& registry, flo
 	});
 }
 
-void EditorCamera::replaceCamera(ecs::Registry& registry, ecs::Entity newControlledEntity)
-{
-	registry.removeComponentFromEntities<editor::EditorCamera>();
-	if (registry.isValid(newControlledEntity))
-		registry.addComponent<editor::EditorCamera>(newControlledEntity);
-}
 
-void EditorCamera::replaceView(ecs::Registry& registry, ecs::Entity newControlledView)
-{
-	if (!registry.hasAllComponents<ecs::View>(newControlledView))
-		return;
-
-	auto& sceneView = registry.getComponent<ecs::View>(newControlledView);
-	replaceCamera(registry, sceneView.camera);
-}
 
 } // namespace spatial::editor

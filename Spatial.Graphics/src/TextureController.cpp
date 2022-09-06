@@ -58,7 +58,6 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 		.each([&](ecs::Entity entity, const ecs::FileSystemResourceData& resource) {
 			auto texture = toShared(createKtxTexture(engine, resource.data.data(), resource.data.size()));
 			registry.addOrReplaceComponent(entity, std::move(texture));
-			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
@@ -68,7 +67,6 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 		.each([&](ecs::Entity entity, const ecs::FileSystemResourceData& resource) {
 			auto texture = toShared(createTexture(engine, resource.data.data(), resource.data.size()));
 			registry.addOrReplaceComponent(entity, std::move(texture));
-			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
@@ -77,7 +75,6 @@ void TextureController::loadTextures(filament::Engine& engine, ecs::Registry& re
 			ecs::Exclude<ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const ecs::FileSystemResourceData& resource) {
 			registry.addOrReplaceComponent(entity, parseShFile(resource.data.data(), resource.data.size()));
-			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }

@@ -1,5 +1,5 @@
+#include "Components.h"
 #include "Materials.h"
-#include "Tags.h"
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/graphics/Resources.h>

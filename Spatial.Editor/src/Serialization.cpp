@@ -15,7 +15,8 @@ void serializeEditorComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<StandardOpaqueMaterial>(ar);
 	snapshot.template component<EditorCamera>(ar);
 	snapshot.template component<tags::IsEditorEntity>(ar);
-	snapshot.template component<tags::IsEditorView>(ar);
+	snapshot.template component<tags::IsSelected>(ar);
+	snapshot.template component<tags::IsSelectedView>(ar);
 	snapshot.template component<tags::IsEditorWhiteTexture>(ar);
 	snapshot.template component<tags::IsEditorBlackTexture>(ar);
 }

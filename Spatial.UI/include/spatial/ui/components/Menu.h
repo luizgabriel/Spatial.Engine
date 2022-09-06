@@ -21,6 +21,14 @@ class Menu
 
 	static bool itemButton(std::string_view name, std::string_view shortcut);
 
+	template <typename Function>
+	static void show(std::string_view name, Function func)
+	{
+		auto menu = ui::Menu{name};
+		if (menu.isOpen())
+			func();
+	}
+
   private:
 	bool mOpened{false};
 };

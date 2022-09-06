@@ -15,7 +15,6 @@ void MaterialController::loadMaterials(filament::Engine& engine, ecs::Registry& 
 			auto material = toShared(createMaterial(engine, resource.data.data(), resource.data.size()));
 
 			registry.addOrReplaceComponent<SharedMaterial>(entity, std::move(material));
-			registry.removeComponent<ecs::FileSystemResourceData>(entity);
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 }

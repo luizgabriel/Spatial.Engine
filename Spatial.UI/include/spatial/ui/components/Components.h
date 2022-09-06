@@ -42,7 +42,7 @@ template <typename Component, typename... Args>
 struct ComponentInputImpl
 {
 	static constexpr auto sName = Component::typeName;
-	static bool draw(ecs::Registry&, ecs::Entity, Args...) = delete;
+	static void draw(ecs::Registry&, ecs::Entity, Args...) = delete;
 };
 
 template <typename Component>
@@ -70,167 +70,162 @@ void componentTag(const ecs::Registry& registry, ecs::Entity entity)
 }
 
 template <typename Component, typename... Args>
-bool componentInput(ecs::Registry& registry, ecs::Entity entity, Args... args)
+void componentInput(ecs::Registry& registry, ecs::Entity entity, Args... args)
 {
-	return ComponentInputImpl<Component, Args...>::draw(registry, entity, std::forward<Args>(args)...);
+	ComponentInputImpl<Component, Args...>::draw(registry, entity, std::forward<Args>(args)...);
 }
 
 template <typename Component, typename... Args>
-bool componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args... args)
+void componentCollapse(ecs::Registry& registry, ecs::Entity entity, Args... args)
 {
-	bool changed = false;
-
 	if (registry.hasAllComponents<Component>(entity))
 	{
 		auto collapse = CollapsingHeader{ComponentInputImpl<Component, Args...>::sName};
 		if (collapse.isOpen())
 		{
 			spacing(3);
-			changed = componentInput<Component>(registry, entity, std::forward<Args>(args)...);
+			componentInput<Component>(registry, entity, std::forward<Args>(args)...);
 			spacing(3);
 		}
 
 		if (collapse.onClose())
 		{
 			registry.removeComponent<Component>(entity);
-			changed = true;
 		}
 	}
-
-	return changed;
 }
 
 template <>
 struct ComponentInputImpl<ecs::DirectionalLight>
 {
 	static constexpr auto sName = "Directional Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::PointLight>
 {
 	static constexpr auto sName = "Point Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::SpotLight>
 {
 	static constexpr auto sName = "Spot Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::SunLight>
 {
 	static constexpr auto sName = "Sun Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::IndirectLight, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Indirect Light";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::FileSystemResource>
 {
 	static constexpr auto sName = "Resource";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Mesh Instance";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::MeshPrimitive, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Mesh Primitive";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::Transform>
 {
 	static constexpr auto sName = "Transform";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::PerspectiveCamera>
 {
 	static constexpr auto sName = "Perspective Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::OrthographicCamera>
 {
 	static constexpr auto sName = "Orthographic Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::MaterialInstance, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Material Instance";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::View, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Scene";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::CustomCamera>
 {
 	static constexpr auto sName = "Custom Camera";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::ScriptModule>
 {
 	static constexpr auto sName = "Script Module";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::Parent, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Parent";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::Child, graphics::OptionalTexture>
 {
 	static constexpr auto sName = "Child";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 template <>
 struct ComponentInputImpl<ecs::AttachmentTexture>
 {
 	static constexpr auto sName = "Attachment Texture";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 template <>
 struct ComponentInputImpl<ecs::tags::IsImageTexture>
 {
 	static constexpr auto sName = "Image Texture";
-	static bool draw(ecs::Registry& registry, ecs::Entity entity);
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 
 } // namespace spatial::ui

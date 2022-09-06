@@ -2,7 +2,6 @@
 
 #include "Components.h"
 #include "Materials.h"
-#include "Tags.h"
 
 #include <cereal/cereal.hpp>
 #include <spatial/ecs/Registry.h>
