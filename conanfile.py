@@ -22,7 +22,7 @@ class SpatialEngineConan(ConanFile):
         "gtest/1.11.0",
         "spdlog/1.10.0",
         "stb/20200203",
-        "entt/3.10.1",
+        "entt/3.10.3",
         "cereal/1.3.1",
         "magic_enum/0.8.0",
         "glm/0.9.9.8",

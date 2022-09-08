@@ -466,9 +466,19 @@ ViewBuilder& ViewBuilder::withPostProcessingDisabled()
 	return *this;
 }
 
-ViewBuilder& ViewBuilder::withAttachment(ecs::Entity attachmentTexture)
+ViewBuilder& ViewBuilder::withAttachment(ecs::Entity attachmentTextureEntity)
 {
-	ecs::View::addAttachment(mRegistry, mEntity, attachmentTexture);
+	const auto& attachmentTexture = mRegistry.getComponent<ecs::AttachmentTexture>(attachmentTextureEntity);
+	switch (attachmentTexture.type)
+	{
+	case ecs::AttachmentTexture::Type::Color:
+		getComponent().colorAttachment = attachmentTextureEntity;
+		break;
+	case ecs::AttachmentTexture::Type::Depth:
+		getComponent().depthAttachment = attachmentTextureEntity;
+		break;
+	}
+
 	return *this;
 }
 
@@ -477,13 +487,17 @@ ViewBuilder& ViewBuilder::withDefaultAttachments()
 	const auto& size = getComponent().size;
 	assert(size.x > 0 && size.y > 0);
 
+	const auto& name = mRegistry.getComponent<ecs::Name>(mEntity);
+
 	auto colorAttachment = ecs::Builder::create(mRegistry)
-							   .withName("Color Texture")
+							   .withName(fmt::format("Color Texture ({})", name.c_str()))
+							   .with<ecs::tags::IsResource>()
 							   .with<ecs::tags::IsImageTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Color, size});
 
 	auto depthAttachment = ecs::Builder::create(mRegistry)
-							   .withName("Depth Texture")
+							   .withName(fmt::format("Depth Texture ({})", name.c_str()))
+							   .with<ecs::tags::IsResource>()
 							   .with<ecs::tags::IsImageTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Depth, size});
 

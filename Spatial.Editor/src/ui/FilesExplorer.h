@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filament/Texture.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/resources/FileSystem.h>
 
 namespace spatial::ui

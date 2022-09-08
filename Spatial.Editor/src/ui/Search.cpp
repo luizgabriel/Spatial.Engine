@@ -1,7 +1,7 @@
+#include "Search.h"
+#include "Icons.h"
+#include "spatial/ui/components/Basic.h"
 #include <imgui.h>
-#include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/Icons.h>
-#include <spatial/ui/components/Search.h>
 
 namespace spatial::ui
 {

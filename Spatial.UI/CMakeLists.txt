@@ -5,26 +5,21 @@ add_library(Spatial.UI
         include/spatial/ui/system/UserInterfaceSystem.h
         include/spatial/ui/system/ImGuiRenderer.h
 
+        include/spatial/ui/components/Basic.h
         include/spatial/ui/components/Window.h
         include/spatial/ui/components/CollapsingHeader.h
         include/spatial/ui/components/DockSpace.h
-        include/spatial/ui/components/Components.h
         include/spatial/ui/components/MenuBar.h
         include/spatial/ui/components/Menu.h
         include/spatial/ui/components/PopupModal.h
-        include/spatial/ui/components/FilesExplorer.h
         include/spatial/ui/components/DirectionInput.h
         include/spatial/ui/components/VectorInput.h
         include/spatial/ui/components/DragAndDrop.h
         include/spatial/ui/components/Popup.h
-        include/spatial/ui/components/Search.h
         include/spatial/ui/components/Combo.h
         include/spatial/ui/components/SceneView.h
-        include/spatial/ui/components/MaterialInputs.h
         include/spatial/ui/components/PreviewTexture.h
         include/spatial/ui/components/TreeNode.h
-
-        include/spatial/ui/components/Icons.h
 
         include/spatial/ui/components/styles/BorderlessWindowStyle.h
         include/spatial/ui/components/styles/WindowPaddingStyle.h
@@ -41,15 +36,12 @@ add_library(Spatial.UI
         src/components/MenuBar.cpp
         src/components/Menu.cpp
         src/components/PopupModal.cpp
-        src/components/FilesExplorer.cpp
         src/components/VectorInput.cpp
         src/components/DragAndDrop.cpp
         src/components/DirectionInput.cpp
         src/components/Popup.cpp
         src/components/Combo.cpp
         src/components/SceneView.cpp
-        src/components/Search.cpp
-        src/components/MaterialInputs.cpp
         src/components/PreviewTexture.cpp
         src/components/TreeNode.cpp
 

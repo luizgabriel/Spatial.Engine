@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components.h"
+#include "ecs/Components.h"
 #include <spatial/desktop/Window.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Transform.h>

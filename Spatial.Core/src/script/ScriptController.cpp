@@ -1,5 +1,4 @@
 #include "spatial/ecs/Resource.h"
-#include <boost/algorithm/string/predicate.hpp>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/script/Parsing.h>
@@ -7,8 +6,6 @@
 #include <spatial/script/ScriptSourceStream.h>
 #include <spatial/script/Utils.h>
 #include <variant>
-
-using namespace boost::algorithm;
 
 namespace spatial::script
 {

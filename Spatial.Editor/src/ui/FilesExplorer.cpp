@@ -1,9 +1,9 @@
+#include "FilesExplorer.h"
+#include "Icons.h"
+#include "spatial/ui/components/Basic.h"
+#include "spatial/ui/components/DragAndDrop.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <imgui.h>
-#include <spatial/ui/components/Components.h>
-#include <spatial/ui/components/DragAndDrop.h>
-#include <spatial/ui/components/FilesExplorer.h>
-#include <spatial/ui/components/Icons.h>
 
 namespace spatial::ui
 {
