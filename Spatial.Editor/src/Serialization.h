@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Components.h"
-#include "Materials.h"
+#include "ecs/Components.h"
+#include "ecs/Materials.h"
 
 #include <cereal/cereal.hpp>
 #include <spatial/ecs/Registry.h>

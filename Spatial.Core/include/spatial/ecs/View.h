@@ -52,10 +52,8 @@ struct View
 	bool isPostProcessingEnabled{true};
 	Entity camera{ecs::NullEntity};
 	Entity indirectLight{ecs::NullEntity};
-
-	static std::vector<Entity> getAttachments(const Registry& registry, Entity sceneView);
-
-	static void addAttachment(Registry& registry, Entity sceneView, Entity attachmentEntity);
+	Entity colorAttachment{ecs::NullEntity};
+	Entity depthAttachment{ecs::NullEntity};
 
 	static void resizeAttachments(Registry& registry, Entity sceneViewEntity);
 };

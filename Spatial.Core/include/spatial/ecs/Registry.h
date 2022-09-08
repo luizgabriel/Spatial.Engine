@@ -95,7 +95,7 @@ class Registry : private entt::registry
 	template <typename Component>
 	Component& getComponent(Entity entity)
 	{
-		assert(isValid(entity));
+		assert(hasComponent<Component>(entity));
 		return get<Component>(entity);
 	}
 
@@ -113,13 +113,6 @@ class Registry : private entt::registry
 		return remove<Component>(entity);
 	}
 
-	template <typename Component>
-	void removeComponentIfExists(Entity entity)
-	{
-		assert(isValid(entity));
-		remove_if_exists<Component>(entity);
-	}
-
 	template <typename Component, typename It>
 	size_t removeComponent(It begin, It end)
 	{
@@ -135,14 +128,14 @@ class Registry : private entt::registry
 	template <typename Component>
 	decltype(auto) addComponent(Entity entity, Component&& component)
 	{
-		assert(isValid(entity));
+		assert(!hasComponent<Component>(entity));
 		return emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) addComponent(Entity entity, Args&&... args)
 	{
-		assert(isValid(entity));
+		assert(!hasComponent<Component>(entity));
 		return emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 

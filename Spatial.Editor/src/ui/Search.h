@@ -1,14 +1,17 @@
 #pragma once
 
+#include "Icons.h"
+
 #include <boost/algorithm/string/predicate.hpp>
+#include <imgui.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Name.h>
 #include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Texture.h>
+#include <spatial/graphics/TextureUtils.h>
 #include <spatial/ui/components/Combo.h>
 #include <spatial/ui/components/DragAndDrop.h>
-#include <spatial/ui/components/Icons.h>
 #include <spatial/ui/components/PreviewTexture.h>
 #include <string>
 
@@ -21,8 +24,8 @@ class Search
 	static bool text(std::string& search, graphics::OptionalTexture icons);
 
 	template <typename FilterComponent>
-	static bool searchEntity(const std::string_view name, graphics::OptionalTexture icons, const ecs::Registry& registry,
-							 ecs::Entity& selectedEntity)
+	static bool searchEntity(const std::string_view name, graphics::OptionalTexture icons,
+							 const ecs::Registry& registry, ecs::Entity& selectedEntity)
 	{
 		bool changed = false;
 

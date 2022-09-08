@@ -8,9 +8,9 @@
 #include <spatial/serialization/Mesh.h>
 #include <spatial/serialization/Name.h>
 #include <spatial/serialization/Relation.h>
-#include <spatial/serialization/Scene.h>
 #include <spatial/serialization/Texture.h>
 #include <spatial/serialization/Transform.h>
+#include <spatial/serialization/View.h>
 
 namespace spatial::ecs
 {

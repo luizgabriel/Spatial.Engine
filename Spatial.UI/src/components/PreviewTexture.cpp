@@ -1,6 +1,6 @@
 #include <imgui.h>
 #include <spatial/graphics/TextureUtils.h>
-#include <spatial/ui/components/Components.h>
+#include <spatial/ui/components/Basic.h>
 #include <spatial/ui/components/PreviewTexture.h>
 
 namespace spatial::ui

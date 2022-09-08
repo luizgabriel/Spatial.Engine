@@ -12,18 +12,23 @@ add_executable(Spatial.Editor MACOSX_BUNDLE WIN32
         src/EditorCameraController.h
         src/EditorCameraController.cpp
         src/Jobs.h
-        src/Materials.h
-        src/Materials.cpp
         src/Serialization.h
         src/Serialization.cpp
-        src/CustomUserInterface.h
-        src/CustomUserInterface.cpp
         src/EditorSettings.cpp
         src/Settings.h
-        src/FileSystem.h
-        src/FileSystem.cpp
-        src/Components.h
-        src/Components.cpp
+        src/FileSystem.h src/FileSystem.cpp
+        src/ecs/Materials.h src/ecs/Materials.cpp
+        src/ecs/Components.h src/ecs/Components.cpp
+        src/ui/Icons.h
+        src/ui/Components.h src/ui/Components.cpp
+        src/ui/Managers.h src/ui/Managers.cpp
+        src/ui/Modals.h src/ui/Modals.cpp
+        src/ui/Menu.h src/ui/Menu.cpp
+        src/ui/EntityProperties.h src/ui/EntityProperties.cpp
+        src/ui/DragAndDrop.h src/ui/DragAndDrop.cpp
+        src/ui/Search.h src/ui/Search.cpp
+        src/ui/MaterialInputs.h src/ui/MaterialInputs.cpp
+        src/ui/FilesExplorer.h src/ui/FilesExplorer.cpp
         ${SPATIAL_EDITOR_MACOS_ICON}
         ${SPATIAL_EDITOR_IMGUI_SETTINGS})
 

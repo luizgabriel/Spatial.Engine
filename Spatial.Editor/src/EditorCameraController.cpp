@@ -1,5 +1,5 @@
 #include "EditorCameraController.h"
-#include "Components.h"
+#include "ecs/Components.h"
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/View.h>
 

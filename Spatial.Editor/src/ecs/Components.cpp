@@ -4,6 +4,14 @@
 namespace spatial::editor
 {
 
+void tags::IsSelected::toggle(ecs::Registry& registry, ecs::Entity entity)
+{
+	if (registry.hasComponent<IsSelected>(entity))
+		registry.removeComponent<IsSelected>(entity);
+	else
+		registry.addComponent<IsSelected>(entity);
+}
+
 void tags::IsSelected::replace(ecs::Registry& registry, ecs::Entity entity)
 {
 	registry.removeComponentFromEntities<IsSelected>();

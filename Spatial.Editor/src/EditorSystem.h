@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Components.h"
-#include "CustomUserInterface.h"
 #include "EditorCameraController.h"
 #include "Jobs.h"
 #include "Settings.h"
+#include "ecs/Components.h"
+#include "ui/Menu.h"
 
 #include <filament/Viewport.h>
 #include <spatial/input/InputState.h>

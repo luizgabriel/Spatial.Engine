@@ -15,6 +15,8 @@ void serialize(Archive& ar, spatial::ecs::View& sceneView)
 	ar(make_nvp("isPostProcessingEnabled", sceneView.isPostProcessingEnabled));
 	ar(make_nvp("camera", sceneView.camera));
 	ar(make_nvp("indirectLight", sceneView.indirectLight));
+	ar(make_nvp("colorAttachment", sceneView.colorAttachment));
+	ar(make_nvp("depthAttachment", sceneView.depthAttachment));
 }
 
 } // namespace cereal

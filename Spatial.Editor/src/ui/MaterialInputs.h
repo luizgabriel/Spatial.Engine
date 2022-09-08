@@ -3,6 +3,7 @@
 #include "Icons.h"
 #include <filament/Texture.h>
 #include <spatial/common/Math.h>
+#include <spatial/graphics/TextureUtils.h>
 
 namespace spatial::ui
 {

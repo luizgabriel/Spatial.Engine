@@ -274,11 +274,12 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 			auto filamesh = futureFilamesh.get();
 			registry.addOrReplaceComponent(
 				entity, ecs::Mesh{createVertexData(filamesh), createIndexData(filamesh), filamesh.header.aabb});
-			registry.removeComponent<FutureFilamesh>(entity);
-			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 
 			for (const auto& part : filamesh.parts)
 				ecs::Mesh::addPart(registry, entity, ecs::MeshPart{part.offset, part.count});
+
+			registry.removeComponent<FutureFilamesh>(entity);
+			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
 	// Create Vertex Buffers

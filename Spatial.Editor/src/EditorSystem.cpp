@@ -1,16 +1,14 @@
 #include "EditorSystem.h"
-#include "Components.h"
-#include "CustomUserInterface.h"
-#include "Materials.h"
 #include "Serialization.h"
+#include "ecs/Components.h"
+#include "ecs/Materials.h"
+#include "ui/DragAndDrop.h"
+#include "ui/EntityProperties.h"
+#include "ui/FilesExplorer.h"
+#include "ui/Modals.h"
+#include "ui/Search.h"
 
 #include <boost/algorithm/string/predicate.hpp>
-
-#include <spatial/ui/components/FilesExplorer.h>
-#include <spatial/ui/components/Window.h>
-
-#include <spatial/ui/components/styles/WindowPaddingStyle.h>
-
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Builder.h>
 #include <spatial/ecs/Relation.h>
@@ -21,8 +19,11 @@
 #include <spatial/resources/PhysicalFileSystem.h>
 #include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
+#include <spatial/ui/components/Popup.h>
+#include <spatial/ui/components/PopupModal.h>
 #include <spatial/ui/components/SceneView.h>
-#include <spatial/ui/components/Search.h>
+#include <spatial/ui/components/Window.h>
+#include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 namespace spatial::editor
 {
@@ -392,6 +393,7 @@ void EditorSystem::createDefaultEditorEntities()
 		.withMesh(ecs::Builder::create(mRegistry)
 					  .withName("editor/skybox_mesh")
 					  .with<tags::IsEditorEntity>()
+					  .with<tags::IsSkyboxMesh>()
 					  .asMesh()
 					  .withVertexData(gSkyboxVertexData)
 					  .withIndexData(gSkyboxIndexData))

@@ -73,11 +73,31 @@ void SceneController::organizeSceneRenderables(ecs::Registry& registry)
 void SceneController::renderViews(filament::Renderer& renderer, const ecs::Registry& registry)
 {
 	registry
-		.getEntities<const ecs::View, const SharedView>()	//
-		.each([&](const auto& scene, const auto& view) { //
+		.getEntities<const ecs::View, const SharedView>() //
+		.each([&](const auto& scene, const auto& view) {  //
 			if (registry.hasComponent<SharedCamera>(scene.camera))
 				renderer.render(view.get());
 		});
+}
+
+filament::RenderTarget::Builder makeRenderTargetBuilder(const ecs::Registry& registry, const ecs::View& view)
+{
+	auto builder = filament::RenderTarget::Builder();
+	auto attachments = std::array<ecs::Entity, 2>{view.colorAttachment, view.depthAttachment};
+
+	for (auto attachmentEntity : attachments)
+	{
+		if (!registry.hasComponent<ecs::AttachmentTexture>(attachmentEntity))
+			continue;
+
+		const auto& attachment = registry.getComponent<const ecs::AttachmentTexture>(attachmentEntity);
+		const auto* texture = registry.tryGetComponent<const SharedTexture>(attachmentEntity);
+		auto flAttachmentType = toFilament(attachment.type);
+
+		builder = builder.texture(flAttachmentType, texture != nullptr ? texture->get() : nullptr);
+	}
+
+	return builder;
 }
 
 void SceneController::createScenes(filament::Engine& engine, ecs::Registry& registry)
@@ -96,25 +116,10 @@ void SceneController::createScenes(filament::Engine& engine, ecs::Registry& regi
 	});
 
 	registry
-		.getEntities<ecs::tags::IsRenderedToTarget, const ecs::View, const SharedView>(
-			ecs::Exclude<SharedRenderTarget>)
-		.each([&](ecs::Entity entity, const auto&, const auto& view) {
-			auto builder = filament::RenderTarget::Builder();
-			auto attachments = ecs::View::getAttachments(registry, entity);
-			if (attachments.size() < 2)
-				return;
-
-			for (auto attachmentEntity : attachments)
-			{
-				const auto& attachment = registry.getComponent<const ecs::AttachmentTexture>(attachmentEntity);
-				const auto* texture = registry.tryGetComponent<const SharedTexture>(attachmentEntity);
-				auto flAttachmentType = toFilament(attachment.type);
-
-				builder = builder.texture(flAttachmentType, texture != nullptr ? texture->get() : nullptr);
-			}
-
-			auto renderTarget = toShared(createRenderTarget(engine, builder));
-			view->setRenderTarget(renderTarget.get());
+		.getEntities<ecs::tags::IsRenderedToTarget, const ecs::View, const SharedView>(ecs::Exclude<SharedRenderTarget>)
+		.each([&](ecs::Entity entity, const auto& view, const auto& renderView) {
+			auto renderTarget = toShared(createRenderTarget(engine, makeRenderTargetBuilder(registry, view)));
+			renderView->setRenderTarget(renderTarget.get());
 
 			registry.addComponent(entity, std::move(renderTarget));
 		});

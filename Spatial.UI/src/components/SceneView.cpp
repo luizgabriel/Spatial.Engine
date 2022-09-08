@@ -1,8 +1,7 @@
-#include "spatial/graphics/Resources.h"
+#include "spatial/ui/components/Basic.h"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <spatial/ecs/View.h>
-#include <spatial/ui/components/Components.h>
 #include <spatial/ui/components/SceneView.h>
 
 namespace spatial::ui
@@ -29,14 +28,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
 									 ImGui::GetCursorScreenPos().y));
 
-	auto attachments = ecs::View::getAttachments(registry, sceneViewEntity);
-	auto colorAttachmentEntityIt =
-		std::find_if(attachments.begin(), attachments.end(), [&](const auto attachmentEntity) {
-			auto& attachment = registry.getComponent<ecs::AttachmentTexture>(attachmentEntity);
-			return attachment.type == ecs::AttachmentTexture::Type::Color;
-		});
-
-	auto colorAttachment = colorAttachmentEntityIt != attachments.end() ? graphics::getTexture(registry, *colorAttachmentEntityIt) : std::nullopt;
+	auto colorAttachment = graphics::getTexture(registry, sceneView.colorAttachment);
 	ui::image(colorAttachment, imageSize, math::vec4{0, 1, 1, 0});
 }
 

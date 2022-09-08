@@ -1,42 +1,24 @@
 #pragma once
 
-#include <filament/Texture.h>
-#include <spatial/common/Math.h>
+#include "../ecs/Components.h"
+#include "../ecs/Materials.h"
+#include <imgui.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/Light.h>
 #include <spatial/ecs/Material.h>
 #include <spatial/ecs/Mesh.h>
-#include <spatial/ecs/Name.h>
+#include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Script.h>
-#include <spatial/ecs/Transform.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/ecs/View.h>
 #include <spatial/graphics/TextureUtils.h>
+#include <spatial/ui/components/Basic.h>
 #include <spatial/ui/components/CollapsingHeader.h>
-#include <spatial/ui/components/DirectionInput.h>
-#include <spatial/ui/components/SceneView.h>
-#include <spatial/ui/components/Search.h>
-#include <spatial/ui/components/VectorInput.h>
 
 namespace spatial::ui
 {
-
-void spanToAvailWidth(float weight = 1.0f);
-
-bool inputText(std::string_view label, std::string& value, std::string_view placeholder = "");
-
-bool inputPath(std::string_view label, std::string& value, std::string_view placeholder = "");
-
-void spacing(std::uint32_t times = 1);
-
-void separator(std::uint32_t spacing = 0);
-
-void image(graphics::OptionalTexture texture, math::vec2 size = math::vec2{0, 0},
-		   math::vec4 uv = math::vec4{0, 0, 1, 1});
-
-bool imageButton(graphics::OptionalTexture texture, math::vec2 size = math::vec2{0, 0},
-				 math::vec4 uv = math::vec4{0, 0, 1, 1});
 
 template <typename Component, typename... Args>
 struct ComponentInputImpl
@@ -63,7 +45,8 @@ struct ComponentTagImpl
 template <typename Component>
 void componentTag(const ecs::Registry& registry, ecs::Entity entity)
 {
-	if (registry.template hasComponent<Component>(entity)) {
+	if (registry.template hasComponent<Component>(entity))
+	{
 		ImGui::SameLine(.0, 2.0f);
 		ComponentTagImpl<Component>::draw(registry, entity);
 	}
@@ -226,6 +209,41 @@ struct ComponentInputImpl<ecs::tags::IsImageTexture>
 {
 	static constexpr auto sName = "Image Texture";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<editor::ColorMaterial>
+{
+	static constexpr auto sName = "Color Material";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<editor::EditorCamera>
+{
+	static constexpr auto sName = "Editor Camera";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<editor::GridMaterial>
+{
+	static constexpr auto sName = "Grid Camera";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<editor::SkyBoxMaterial, graphics::OptionalTexture>
+{
+	static constexpr auto sName = "SkyBox Material";
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
+};
+
+template <>
+struct ComponentInputImpl<editor::StandardOpaqueMaterial, graphics::OptionalTexture>
+{
+	static constexpr auto sName = "Standard Opaque Material";
+	static void draw(ecs::Registry& registry, ecs::Entity entity, graphics::OptionalTexture icons);
 };
 
 } // namespace spatial::ui

@@ -10,6 +10,11 @@ namespace spatial::editor
 namespace tags
 {
 
+struct IsSkyboxMesh
+{
+	constexpr static auto typeName = "tag_is_skybox_mesh";
+};
+
 struct IsEditorEntity
 {
 	constexpr static auto typeName = "tag_is_editor_entity";
@@ -29,6 +34,7 @@ struct IsSelected
 {
 	constexpr static auto typeName = "tag_is_selected";
 
+	static void toggle(ecs::Registry& registry, ecs::Entity entity);
 	static void replace(ecs::Registry& registry, ecs::Entity entity);
 };
 

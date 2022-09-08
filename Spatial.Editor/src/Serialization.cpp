@@ -19,6 +19,7 @@ void serializeEditorComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<tags::IsSelectedView>(ar);
 	snapshot.template component<tags::IsEditorWhiteTexture>(ar);
 	snapshot.template component<tags::IsEditorBlackTexture>(ar);
+	snapshot.template component<tags::IsSkyboxMesh>(ar);
 }
 
 ecs::Registry parseRegistry(std::istream&& istream)
