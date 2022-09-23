@@ -484,19 +484,21 @@ ViewBuilder& ViewBuilder::withAttachment(ecs::Entity attachmentTextureEntity)
 
 ViewBuilder& ViewBuilder::withDefaultAttachments()
 {
-	const auto& size = getComponent().size;
+	auto size = getComponent().size;
 	assert(size.x > 0 && size.y > 0);
 
 	const auto& name = mRegistry.getComponent<ecs::Name>(mEntity);
+	auto colorTextureName = fmt::format("Color Texture ({})", name.c_str());
+	auto depthTextureName = fmt::format("Depth Texture ({})", name.c_str());
 
 	auto colorAttachment = ecs::Builder::create(mRegistry)
-							   .withName(fmt::format("Color Texture ({})", name.c_str()))
+							   .withName(std::move(colorTextureName))
 							   .with<ecs::tags::IsResource>()
 							   .with<ecs::tags::IsImageTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Color, size});
 
 	auto depthAttachment = ecs::Builder::create(mRegistry)
-							   .withName(fmt::format("Depth Texture ({})", name.c_str()))
+							   .withName(std::move(depthTextureName))
 							   .with<ecs::tags::IsResource>()
 							   .with<ecs::tags::IsImageTexture>()
 							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Depth, size});

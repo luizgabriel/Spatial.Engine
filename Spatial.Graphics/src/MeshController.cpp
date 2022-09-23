@@ -32,15 +32,6 @@ void MeshController::updateMeshInstances(ecs::Registry& registry)
 			const auto& mesh = registry.getComponent<const ecs::Mesh>(meshInstance.meshSource);
 			renderable.setAxisAlignedBoundingBox(mesh.boundingBox);
 
-			if (registry.hasComponent<SharedMaterialInstance>(meshInstance.defaultMaterialInstance))
-			{
-				const auto& materialInstance =
-					registry.getComponent<const SharedMaterialInstance>(meshInstance.defaultMaterialInstance);
-
-				for (size_t i = 0; i < renderable.getPrimitiveCount(); i++)
-					renderable.setMaterialInstanceAt(i, materialInstance);
-			}
-
 			if (registry.hasAllComponents<SharedVertexBuffer, SharedIndexBuffer>(meshInstance.meshSource))
 			{
 				const auto& vertexBuffer = registry.getComponent<SharedVertexBuffer>(meshInstance.meshSource);
@@ -50,21 +41,31 @@ void MeshController::updateMeshInstances(ecs::Registry& registry)
 				{
 					renderable.setGeometryAt(0, Renderable::PrimitiveType::TRIANGLES, vertexBuffer, indexBuffer, 0,
 											 indexBuffer->getIndexCount());
-					return;
 				}
-
-				auto partsCount = meshInstance.partsCount > 0
-									  ? std::min(meshInstance.partsCount, renderable.getPrimitiveCount())
-									  : renderable.getPrimitiveCount();
-
-				auto parts = ecs::Mesh::getParts(registry, meshInstance.meshSource);
-				for (size_t primitiveIndex = 0; primitiveIndex < partsCount; primitiveIndex++)
+				else
 				{
-					auto partIdx = std::min(meshInstance.partsOffset + primitiveIndex, parts.size() - 1);
-					const auto& part = registry.getComponent<const ecs::MeshPart>(parts.at(partIdx));
-					renderable.setGeometryAt(primitiveIndex, Renderable::PrimitiveType::TRIANGLES, vertexBuffer,
-											 indexBuffer, part.minIndex, part.indexCount);
+					auto partsCount = meshInstance.partsCount > 0
+										  ? std::min(meshInstance.partsCount, renderable.getPrimitiveCount())
+										  : renderable.getPrimitiveCount();
+
+					auto parts = ecs::Mesh::getParts(registry, meshInstance.meshSource);
+					for (size_t primitiveIndex = 0; primitiveIndex < partsCount; primitiveIndex++)
+					{
+						auto partIdx = std::min(meshInstance.partsOffset + primitiveIndex, parts.size() - 1);
+						const auto& part = registry.getComponent<const ecs::MeshPart>(parts.at(partIdx));
+						renderable.setGeometryAt(primitiveIndex, Renderable::PrimitiveType::TRIANGLES, vertexBuffer,
+												 indexBuffer, part.minIndex, part.indexCount);
+					}
 				}
+			}
+
+			if (registry.hasComponent<SharedMaterialInstance>(meshInstance.defaultMaterialInstance))
+			{
+				const auto& materialInstance =
+					registry.getComponent<const SharedMaterialInstance>(meshInstance.defaultMaterialInstance);
+
+				for (size_t i = 0; i < renderable.getPrimitiveCount(); i++)
+					renderable.setMaterialInstanceAt(i, materialInstance);
 			}
 		});
 
@@ -282,23 +283,28 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 			registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 		});
 
-	// Create Vertex Buffers
-	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedVertexBuffer>)
-		.each([&](ecs::Entity entity, const auto& mesh) {
-			auto vertexBuffer = toShared(createVertexBuffer(engine, makeVertexBuffer(mesh.vertexData)));
-			vertexBuffer->setBufferAt(engine, 0, makeBufferDescriptor(mesh.vertexData.data));
+	auto shouldSyncThreads = false;
 
-			registry.addComponent(entity, std::move(vertexBuffer));
-		});
+	// Create Vertex Buffers
+	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedVertexBuffer>).each([&](ecs::Entity entity, const auto& mesh) {
+		auto vertexBuffer = toShared(createVertexBuffer(engine, makeVertexBuffer(mesh.vertexData)));
+		vertexBuffer->setBufferAt(engine, 0, makeBufferDescriptor(mesh.vertexData.data));
+
+		registry.addComponent(entity, std::move(vertexBuffer));
+		shouldSyncThreads = true;
+	});
 
 	// Create Index Buffers
-	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedIndexBuffer>)
-		.each([&](ecs::Entity entity, const auto& mesh) {
-			auto indexBuffer = toShared(createIndexBuffer(engine, makeIndexBuffer(mesh.indexData)));
-			indexBuffer->setBuffer(engine, makeBufferDescriptor(mesh.indexData.data));
+	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedIndexBuffer>).each([&](ecs::Entity entity, const auto& mesh) {
+		auto indexBuffer = toShared(createIndexBuffer(engine, makeIndexBuffer(mesh.indexData)));
+		indexBuffer->setBuffer(engine, makeBufferDescriptor(mesh.indexData.data));
 
-			registry.addComponent(entity, std::move(indexBuffer));
-		});
+		registry.addComponent(entity, std::move(indexBuffer));
+		shouldSyncThreads = true;
+	});
+
+	if (shouldSyncThreads)
+		filament::Fence::waitAndDestroy(engine.createFence());
 }
 
 } // namespace spatial::graphics
