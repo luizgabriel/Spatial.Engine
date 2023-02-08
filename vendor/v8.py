@@ -83,7 +83,7 @@ class V8Conan(ConanFile):
                 self.build_requires("flex/2.6.4")
 
     def _set_environment_vars(self):
-        """set the environment variables, such that the google tooling is found (including the bundled python2)"""
+        """set the environment variables, such that the Google tooling is found (including the bundled python2)"""
         os.environ["PATH"] = os.path.join(self.source_folder, "depot_tools") + os.pathsep + os.environ["PATH"]
         os.environ["DEPOT_TOOLS_PATH"] = os.path.join(self.source_folder, "depot_tools")
         if tools.os_info.is_windows:

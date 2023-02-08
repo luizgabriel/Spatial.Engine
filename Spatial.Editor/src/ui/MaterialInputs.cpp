@@ -16,8 +16,6 @@ bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& regis
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
 
-	bool changed = false;
-
 	constexpr auto size = math::vec2{20.0f};
 
 	ui::previewTexture(registry, resource, icons, Icons::picture.uv());
@@ -25,12 +23,12 @@ bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& regis
 	ImGui::SameLine();
 	ui::spanToAvailWidth();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
+	bool changed = ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
 
 	ImGui::NextColumn();
 	ui::image(icons, size, Icons::picker.uv());
 	ImGui::SameLine();
-	changed |= ImGui::ColorEdit3(label.data(), &color.r, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs);
+	changed = changed || ImGui::ColorEdit3(label.data(), &color.r, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs);
 	ImGui::Columns(1);
 	ImGui::PopID();
 
@@ -40,15 +38,11 @@ bool albedoInput(std::string_view label, math::vec3& color, ecs::Registry& regis
 bool mapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource, graphics::OptionalTexture icons,
 			  math::vec4 uv)
 {
-	bool changed = false;
-
 	ui::previewTexture(registry, resource, icons, uv);
 
 	ImGui::SameLine();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>(label.data(), icons, registry, resource);
-
-	return changed;
+	return ui::Search::searchResource<ecs::tags::IsImageTexture>(label.data(), icons, registry, resource);
 }
 
 bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs::Entity& resource,
@@ -57,18 +51,16 @@ bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs
 	ImGui::PushID(label.data());
 	ImGui::Columns(2);
 
-	bool changed = false;
-
 	ui::previewTexture(registry, resource, icons, uv);
 
 	ImGui::SameLine();
 	ui::spanToAvailWidth();
 
-	changed |= ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
+	bool changed = ui::Search::searchResource<ecs::tags::IsImageTexture>("##Path", icons, registry, resource);
 
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(ImGui::GetColumnWidth() * 0.4f);
-	changed |= ImGui::SliderFloat(label.data(), &value, .0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+	changed = changed || ImGui::SliderFloat(label.data(), &value, .0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 	ImGui::Columns(1);
 	ImGui::PopID();
 
@@ -77,45 +69,36 @@ bool mapInput(std::string_view label, float& value, ecs::Registry& registry, ecs
 
 bool colorPicker(std::string_view label, math::vec4& color, graphics::OptionalTexture icons)
 {
-	static constexpr auto size = math::vec2{20.0f};
-
-	bool changed = false;
+	static constexpr auto size = math::vec2{20.0F};
 
 	ui::image(icons, size, Icons::picker.uv());
 	ImGui::SameLine();
-	changed |= ImGui::ColorEdit4(label.data(), &color.r,
-								 ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs
-									 | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 
-	return changed;
+	return ImGui::ColorEdit4(label.data(), &color.r,
+							 ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs
+								 | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 }
 
 bool colorPicker(std::string_view label, math::vec3& color, graphics::OptionalTexture icons)
 {
-	static constexpr auto size = math::vec2{20.0f};
+	static constexpr auto size = math::vec2{20.0F};
 
-	bool changed = false;
-
-	ui::image(icons, size, Icons::picker.uv());
+	ui::image(std::move(icons), size, Icons::picker.uv());
 	ImGui::SameLine();
-	changed |= ImGui::ColorEdit3(label.data(), &color.r, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs);
 
-	return changed;
+	return ImGui::ColorEdit3(label.data(), &color.r, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_NoInputs);
 }
 
 bool cubemapInput(std::string_view label, ecs::Registry& registry, ecs::Entity& resource,
 				  graphics::OptionalTexture icons)
 {
-	static constexpr auto size = math::vec2{20.0f};
-
-	bool changed = false;
+	static constexpr auto size = math::vec2{20.0F};
 
 	ui::image(icons, size, Icons::cubemap.uv());
 
 	ImGui::SameLine();
-	changed |= ui::Search::searchResource<ecs::tags::IsCubeMapTexture>(label.data(), icons, registry, resource);
 
-	return changed;
+	return ui::Search::searchResource<ecs::tags::IsCubeMapTexture>(label.data(), std::move(icons), registry, resource);
 }
 
 } // namespace spatial::ui

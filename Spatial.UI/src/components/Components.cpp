@@ -49,7 +49,7 @@ bool inputPath(const std::string_view label, std::string& value, std::string_vie
 		auto result = dnd.getPayload();
 		if (result)
 		{
-			value = *result;
+			value = std::string{result->c_str()};
 			return true;
 		}
 	}

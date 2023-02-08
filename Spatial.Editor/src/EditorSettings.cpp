@@ -18,7 +18,7 @@ Settings Settings::load(int argc, char** argv)
 	args({"-h", "--height"}) >> dim.y;
 
 	if (dim.x > 0 && dim.y > 0)
-		config.windowDimensions = std::move(dim);
+		config.windowDimensions = dim;
 
 	std::filesystem::path projectFolder = args[1];
 	if (fs::is_directory(projectFolder))

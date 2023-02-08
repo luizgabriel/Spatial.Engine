@@ -8,10 +8,10 @@ using namespace std::chrono_literals;
 namespace spatial
 {
 
-Application::Application()
+Application::Application(float desiredDelta)
 	: mRunning{false},
 	  mClock{},
-	  mDesiredDelta{1.0f / 60.0f},
+	  mDesiredDelta{desiredDelta},
 	  mStartSignal{},
 	  mStartFrameSignal{},
 	  mUpdateFrameSignal{},
@@ -55,11 +55,6 @@ int Application::run()
 	mFinishSignal();
 
 	return 0;
-}
-
-void Application::setMaxFps(float fps)
-{
-	mDesiredDelta = fseconds{1.0f / fps};
 }
 
 } // namespace spatial

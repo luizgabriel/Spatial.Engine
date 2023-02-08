@@ -54,7 +54,7 @@ class Clock
 		mLag += mTimeStep;
 	}
 
-	bool hasLag(std::chrono::steady_clock::duration desiredDeltaTime)
+	bool hasLag(std::chrono::steady_clock::duration desiredDeltaTime) const
 	{
 		return mLag >= desiredDeltaTime;
 	}

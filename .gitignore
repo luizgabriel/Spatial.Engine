@@ -9,3 +9,4 @@ __tmp/
 *.log
 CMakeSettings.json
 .DS_Store
+doxygen/

@@ -22,7 +22,7 @@
 namespace spatial::ui
 {
 
-void spanToAvailWidth(float weight = 1.0f);
+void spanToAvailWidth(float weight = 1.0F);
 
 bool inputText(std::string_view label, std::string& value, std::string_view placeholder = "");
 

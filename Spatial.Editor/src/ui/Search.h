@@ -63,7 +63,7 @@ class Search
 					if constexpr (std::is_same_v<FilterComponent, ecs::tags::IsImageTexture>)
 					{
 						previewTexture(registry, entity, icons, Icons::picture.uv());
-						ImGui::SameLine(.0f, 5.0f);
+						ImGui::SameLine(.0f, 5.0F);
 					}
 
 					auto isSelected = selectedEntity == entity;

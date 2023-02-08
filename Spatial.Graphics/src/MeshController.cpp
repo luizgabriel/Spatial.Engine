@@ -150,6 +150,8 @@ constexpr filament::VertexAttribute toFilament(ecs::VertexAttribute type)
 	case ecs::VertexAttribute::Tangents:
 		return filament::VertexAttribute::TANGENTS;
 	}
+
+	return filament::VertexAttribute::POSITION;
 }
 
 constexpr filament::VertexBuffer::AttributeType toFilament(ecs::VertexAttributeType type)
@@ -176,6 +178,8 @@ constexpr filament::VertexBuffer::AttributeType toFilament(ecs::VertexAttributeT
 	case ecs::VertexAttributeType::Short4:
 		return filament::VertexBuffer::AttributeType::SHORT4;
 	}
+
+	return filament::VertexBuffer::AttributeType::FLOAT3;
 }
 
 constexpr filament::IndexBuffer::IndexType toFilament(ecs::IndexType type)
@@ -188,6 +192,8 @@ constexpr filament::IndexBuffer::IndexType toFilament(ecs::IndexType type)
 	case ecs::IndexType::UnsignedInt:
 		return filament::IndexBuffer::IndexType::UINT;
 	}
+
+	return filament::IndexBuffer::IndexType::USHORT;
 }
 
 filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexData)
@@ -246,13 +252,9 @@ filament::IndexBuffer::Builder makeIndexBuffer(const ecs::IndexData& data)
 		.bufferType(toFilament(data.type));
 }
 
-template <typename T>
-filament::backend::BufferDescriptor makeBufferDescriptor(const std::vector<T>& source)
+filament::backend::BufferDescriptor makeBufferDescriptor(const std::vector<uint8_t>& source)
 {
-	auto sizeInBytes = source.size() * sizeof(T);
-	auto sourceBegin = reinterpret_cast<const uint8_t*>(source.data());
-
-	return {sourceBegin, sizeInBytes, nullptr};
+	return {source.data(), source.size(), nullptr};
 }
 
 void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registry)

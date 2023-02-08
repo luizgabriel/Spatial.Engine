@@ -8,10 +8,10 @@ namespace cereal
 {
 
 template <typename Archive>
-void serialize(Archive& ar, spatial::math::AxisAlignedBoundingBox& box)
+void serialize(Archive& archive, spatial::math::AxisAlignedBoundingBox& box)
 {
-	ar(cereal::make_nvp("maximumPoint", box.maximumPoint));
-	ar(cereal::make_nvp("minimumPoint", box.minimumPoint));
+	archive(cereal::make_nvp("maximumPoint", box.maximumPoint));
+	archive(cereal::make_nvp("minimumPoint", box.minimumPoint));
 }
 
 } // namespace cereal

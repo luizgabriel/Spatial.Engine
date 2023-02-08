@@ -7,12 +7,12 @@ namespace spatial::ui
 
 float quatD(float w, float h)
 {
-	return std::min(std::abs(w), std::abs(h)) - 4.0f;
+	return std::min(std::abs(w), std::abs(h)) - 4.0F;
 }
 
 float quatPX(float x, float w, float h)
 {
-	return (x * 0.5f * quatD(w, h) + w * 0.5f + 0.5f);
+	return (x * 0.5f * quatD(w, h) + w * 0.5f + 0.5F);
 }
 
 float quatPY(float y, float w, float h)
@@ -157,7 +157,7 @@ void drawTriangles(ImDrawList* drawList, const ImVec2& offset, const ImVector<Im
 		ImVec2 d1 = v2 - v1;
 		ImVec2 d2 = v3 - v1;
 		float c = ImVec2Cross(d1, d2);
-		if (c > 0.0f)
+		if (c > 0.0F)
 		{
 			v2 = v1;
 			v3 = v1;
@@ -225,7 +225,10 @@ bool drawArrowWidget(math::vec3& direction, float widgetSize, std::uint32_t colo
 					angle *= 1.0f + 1.5f * (length(coord) - 1.0f);
 				}
 
-				math::quat qrot, qres, qorig;
+				math::quat qrot;
+				math::quat qres;
+				math::quat qorig;
+				
 				qrot = math::angleAxis(angle, axis);
 				float nqorig = sqrt(origQuat.x * origQuat.x + origQuat.y * origQuat.y + origQuat.z * origQuat.z
 									+ origQuat.w * origQuat.w);
