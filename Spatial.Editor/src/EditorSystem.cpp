@@ -31,18 +31,8 @@ namespace spatial::editor
 static auto gLogger = createDefaultLogger();
 
 EditorSystem::EditorSystem(FileSystem& fileSystem)
-	: mFileSystem{fileSystem},
-	  mPlatformContext{},
-
-	  mRegistry{},
-	  mEditorRegistry{},
-
-	  mIsolate{mPlatformContext.createIsolate()},
-
-	  mJobQueue{},
-
-	  mScenePath{},
-	  mCurrentPath{PROJECT_DIR}
+	: mFileSystem{fileSystem}
+	  // , mIsolate{mPlatformContext.createIsolate()}
 {
 }
 
@@ -66,7 +56,7 @@ void EditorSystem::onStartFrame(float)
 
 void EditorSystem::onUpdateFrame(float delta)
 {
-	script::ScriptController::loadScripts(mRegistry, mFileSystem, mIsolate);
+	// script::ScriptController::loadScripts(mRegistry, mFileSystem, mIsolate);
 
 	if (mIsCameraViewWindowHovered && mIsCameraControlEnabled)
 		EditorCameraController::updateCameraTransforms(mRegistry, delta);
@@ -87,8 +77,8 @@ void EditorSystem::onDrawGui()
 	const auto cameraEntity = mRegistry.getFirstEntity<const ecs::Transform, EditorCamera>();
 	const auto* cameraTransform = mRegistry.tryGetComponent<const ecs::Transform>(cameraEntity);
 	const auto createEntityPosition =
-		cameraTransform
-			? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0f) - (math::axisY * 0.1f))
+		cameraTransform != nullptr
+			? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0F) - (math::axisY * 0.1f))
 			: math::vec3{};
 
 	ui::MenuBar::show([&]() {
@@ -223,7 +213,7 @@ void EditorSystem::onDrawGui()
 	});
 }
 
-void EditorSystem::onPublishRegistry(std::function<void(ecs::Registry&)> publisher)
+void EditorSystem::onPublishRegistry(const std::function<void(ecs::Registry&)>& publisher)
 {
 	publisher(mRegistry);
 	publisher(mEditorRegistry);

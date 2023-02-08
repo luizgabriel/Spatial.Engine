@@ -1,9 +1,9 @@
 #pragma once
 
-#include <spatial/ecs/Registry.h>
-#include <spatial/common/AxisAlignedBoundingBox.h>
-#include <vector>
 #include <array>
+#include <spatial/common/AxisAlignedBoundingBox.h>
+#include <spatial/ecs/Registry.h>
+#include <vector>
 
 namespace spatial::ecs
 {
@@ -39,15 +39,15 @@ enum class VertexAttributeType : uint16_t
 {
 	None = 0,
 	// 		      (Order << 8) | (Dimension * DataSize)
-	Float2 			= (1 << 8) | (4 * 2),
-	Float3 			= (2 << 8) | (4 * 3),
-	UnsignedByte3 	= (3 << 8) | (3 * 1),
-	UnsignedByte4 	= (4 << 8) | (4 * 1),
-	Half2 			= (5 << 8) | (2 * 2),
-	Half4 			= (6 << 8) | (4 * 2),
-	Short2 			= (7 << 8) | (2 * 2),
-	Short3 			= (8 << 8) | (3 * 2),
-	Short4 			= (9 << 8) | (4 * 2),
+	Float2 = (1 << 8) | (4 * 2),
+	Float3 = (2 << 8) | (4 * 3),
+	UnsignedByte3 = (3 << 8) | (3 * 1),
+	UnsignedByte4 = (4 << 8) | (4 * 1),
+	Half2 = (5 << 8) | (2 * 2),
+	Half4 = (6 << 8) | (4 * 2),
+	Short2 = (7 << 8) | (2 * 2),
+	Short3 = (8 << 8) | (3 * 2),
+	Short4 = (9 << 8) | (4 * 2),
 };
 
 constexpr uint8_t getVertexAttributeSize(VertexAttributeType type)
@@ -64,12 +64,12 @@ struct VertexDescription
 	VertexAttributeType type{VertexAttributeType::None};
 	bool isNormalized{false};
 
-	constexpr uint8_t getTypeSizeInBytes() const
+	[[nodiscard]] constexpr uint8_t getTypeSizeInBytes() const
 	{
 		return getVertexAttributeSize(type);
 	}
 
-	constexpr bool empty() const
+	[[nodiscard]] constexpr bool empty() const
 	{
 		return getTypeSizeInBytes() == 0;
 	}
@@ -83,15 +83,24 @@ enum class VertexLayoutMode
 
 struct VertexLayout
 {
+	static constexpr uint8_t MAX_ATTRIBUTES = 5;
+
 	VertexLayoutMode mode{VertexLayoutMode::Interleaved};
-	std::array<VertexDescription, 5> description{};
+	std::array<VertexDescription, MAX_ATTRIBUTES> description{};
 };
+static_assert(std::is_trivially_copyable_v<VertexLayout>, "VertexLayout should be trivially copyable");
 
 constexpr uint8_t calculateInterleavedBytesStride(const VertexLayout& layout)
 {
 	uint8_t total = 0;
-	for (const auto& attr : layout.description)
-		total += attr.getTypeSizeInBytes();
+
+	for (const auto& desc : layout.description)
+	{
+		if (desc.empty())
+			break;
+
+		total += desc.getTypeSizeInBytes();
+	}
 
 	return total;
 }
@@ -104,12 +113,11 @@ struct VertexData
 
 	constexpr VertexData() = default;
 
-	VertexData(std::vector<uint8_t> data, VertexLayout layout)
-		: data{std::move(data)}, layout{std::move(layout)}
+	VertexData(std::vector<uint8_t> data, const VertexLayout& layout) : data{std::move(data)}, layout{layout}
 	{
 	}
 
-	constexpr size_t getDesiredBufferSize() const
+	[[nodiscard]] constexpr size_t getDesiredBufferSize() const
 	{
 		return std::max(minCount, data.size());
 	}
@@ -121,7 +129,7 @@ struct VertexData
 		const auto* endData = beginData + sizeof(T) * data.size();
 		auto buffer = std::vector<uint8_t>(beginData, endData);
 
-		return {std::move(buffer), std::move(layout)};
+		return {std::move(buffer), layout};
 	}
 };
 
@@ -144,13 +152,13 @@ struct IndexData
 	{
 	}
 
-	constexpr size_t getDesiredBufferSize() const
+	[[nodiscard]] constexpr size_t getDesiredBufferSize() const
 	{
 		return std::max(minCount, data.size());
 	}
 
 	template <typename T>
-	static IndexData create(const std::vector<T>& data)
+	static IndexData create(const std::vector<T>& data) noexcept
 	{
 		static_assert(std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t>, "Unsupported index data type");
 
@@ -158,10 +166,7 @@ struct IndexData
 		const auto* endData = beginData + sizeof(T) * data.size();
 		auto buffer = std::vector<uint8_t>(beginData, endData);
 
-		if constexpr (std::is_same_v<T, uint16_t>)
-			return {std::move(buffer), IndexType::UnsignedShort};
-
-		return {std::move(buffer), IndexType::UnsignedInt};
+		return {std::move(buffer), static_cast<IndexType>(sizeof(T))};
 	}
 };
 
@@ -203,7 +208,8 @@ struct MeshInstance
 
 	static size_t getPrimitivesCount(const Registry& registry, Entity meshInstanceEntity);
 
-	static Entity addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity, size_t primitiveIndex);
+	static Entity addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity,
+							  size_t primitiveIndex);
 
 	static Entity addMaterial(Registry& registry, Entity meshInstanceEntity, Entity materialInstanceEntity);
 

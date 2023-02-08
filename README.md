@@ -39,14 +39,14 @@ Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/
 
 ## Key Features
 
-* Cross platform
-    - Windows, macOS and Linux ready.
+* [WIP] Cross-platform
+    - Windows, macOS and Linux support.
 * Easy installation
     - All dependencies are resolved by [Conan](https://conan.io)
 * Google Filament Rendering Engine Support
-    - This engines makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
+    - This engine makes full use off the powerful [Google's rendering library](https://github.com/google/filament)
 * Full Entity-Component-System
-    - This engines uses the famous [ENTT library](https://github.com/skypjack/entt)
+    - This engine uses the famous [ENTT library](https://github.com/skypjack/entt)
 * Serialization System
     - Open and Save XML/JSON/binary scene files built in the editor.
 * [WIP] Javascript/WASM Scripting (With the [V8 Engine](https://github.com/v8/v8))
@@ -58,7 +58,7 @@ Take a look at the [Spatial Engine Documentation](https://luizgabriel.github.io/
 
 ## Inspiration
 
-This project was heavly inspired by
+This project was heavily inspired by
 the [Game Engine Series - by The Cherno](https://www.youtube.com/playlist?listImpl=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT)
 and I
 encourage you to take a look at his amazing YouTube channel.

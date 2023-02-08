@@ -8,8 +8,8 @@
 
 #include <filament/Viewport.h>
 #include <spatial/input/InputState.h>
-#include <spatial/script/PlatformContext.h>
-#include <spatial/script/ScriptController.h>
+// #include <spatial/script/PlatformContext.h>
+// #include <spatial/script/ScriptController.h>
 
 namespace fl = filament;
 
@@ -33,7 +33,7 @@ class EditorSystem
 
 	void onDrawGui();
 
-	void onPublishRegistry(std::function<void(ecs::Registry&)> publisher);
+	void onPublishRegistry(const std::function<void(ecs::Registry&)>& publisher);
 
 	void setRootPath(const std::filesystem::path& path);
 	void setScenePath(const std::string& path);
@@ -53,23 +53,22 @@ class EditorSystem
 	void createDefaultEditorEntities();
 
 	FileSystem& mFileSystem;
-	script::PlatformContext mPlatformContext;
+	// script::PlatformContext mPlatformContext{};
+	// script::Isolate mIsolate;
 
-	ecs::Registry mRegistry;
-	ecs::Registry mEditorRegistry;
+	ecs::Registry mRegistry{};
+	ecs::Registry mEditorRegistry{};
 	ecs::Entity mIconTexture{ecs::NullEntity};
 
-	script::Isolate mIsolate;
-
-	EventQueue mJobQueue;
+	EventQueue mJobQueue{};
 	ui::EditorMainMenu::Action mMenuAction{ui::EditorMainMenu::Action::None};
-	bool mIsCameraControlEnabled;
-	bool mIsCameraViewWindowHovered;
+	bool mIsCameraControlEnabled{false};
+	bool mIsCameraViewWindowHovered{false};
 
-	std::string mScenePath;
-	std::string mCurrentPath;
+	std::string mScenePath{};
+	std::string mCurrentPath{PROJECT_DIR};
 
-	std::string getScenePath() const;
+	[[nodiscard]] std::string getScenePath() const;
 };
 
 } // namespace spatial::editor

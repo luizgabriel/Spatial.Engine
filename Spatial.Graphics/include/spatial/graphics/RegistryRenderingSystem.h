@@ -5,7 +5,6 @@
 #include <functional>
 #include <spatial/common/Signal.h>
 #include <spatial/resources/FileSystem.h>
-#include <spatial/script/PlatformContext.h>
 
 namespace spatial::graphics
 {
@@ -28,7 +27,7 @@ class RegistryRenderingSystem
 
   private:
 	FileSystem& mFileSystem;
-	Signal<std::function<void(ecs::Registry&)>> mOnPublishRegistry;
+	Signal<const std::function<void(ecs::Registry&)>> mOnPublishRegistry;
 };
 
 } // namespace spatial::graphics

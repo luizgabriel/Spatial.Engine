@@ -58,12 +58,12 @@ add_library(Spatial.Core
         include/spatial/resources/ResourceController.h
         include/spatial/resources/MeshComponents.h
 
-        include/spatial/script/Isolate.h
-        include/spatial/script/PlatformContext.h
-        include/spatial/script/ScriptController.h
-        include/spatial/script/ScriptSourceStream.h
-        include/spatial/script/Utils.h
-        include/spatial/script/Parsing.h
+        # include/spatial/script/Isolate.h
+        # include/spatial/script/PlatformContext.h
+        # include/spatial/script/ScriptController.h
+        # include/spatial/script/ScriptSourceStream.h
+        # include/spatial/script/Utils.h
+        # include/spatial/script/Parsing.h
 
         ## SOURCES
         src/core/Application.cpp
@@ -75,22 +75,21 @@ add_library(Spatial.Core
         src/input/InputSystem.cpp
         src/input/InputState.cpp
 
-        src/ecs/EditorCamera.cpp
+        src/ecs/Transform.cpp
         src/ecs/Registry.cpp
         src/ecs/EntityBuilder.cpp
         src/ecs/Relation.cpp
         src/ecs/Mesh.cpp
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
-        src/ecs/Scene.cpp
         src/ecs/Material.cpp
 
-        src/script/PlatformContext.cpp
-        src/script/Isolate.cpp
-        src/script/ScriptController.cpp
-        src/script/ScriptSourceStream.cpp
-        src/script/Utils.cpp
-        src/script/Parsing.cpp
+        # src/script/PlatformContext.cpp
+        # src/script/Isolate.cpp
+        # src/script/ScriptController.cpp
+        # src/script/ScriptSourceStream.cpp
+        # src/script/Utils.cpp
+        # src/script/Parsing.cpp
 
         src/resources/FilameshFile.cpp
         src/resources/FileSystem.cpp
@@ -121,8 +120,7 @@ target_link_libraries(Spatial.Core
         CONAN_PKG::glfw
         CONAN_PKG::cereal
         CONAN_PKG::glm
-        CONAN_PKG::magic_enum
-        CONAN_PKG::v8)
+        CONAN_PKG::magic_enum)
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)

@@ -13,7 +13,7 @@ struct BaseAspectRatio
 
 	constexpr BaseAspectRatio() = default;
 
-	constexpr BaseAspectRatio(math::vec<2, T> dimensions) : width{dimensions.x}, height{dimensions.y}
+	constexpr explicit BaseAspectRatio(math::vec<2, T> dimensions) : width{dimensions.x}, height{dimensions.y}
 	{
 	}
 
@@ -21,7 +21,7 @@ struct BaseAspectRatio
 	{
 	}
 
-	constexpr auto toVector() const
+	[[nodiscard]] constexpr auto toVector() const
 	{
 		return math::vec<2, T>{width, height};
 	}
@@ -29,11 +29,6 @@ struct BaseAspectRatio
 	[[nodiscard]] constexpr T get() const
 	{
 		return width / height;
-	}
-
-	[[nodiscard]] constexpr T inv() const
-	{
-		return height / width;
 	}
 };
 

@@ -27,7 +27,7 @@ class Application
 	// endregion
 
   public:
-	Application();
+	explicit Application(float desiredDelta = 1.0F / 60.0F);
 	~Application();
 
 	Application(const Application& other) = delete;
@@ -43,8 +43,6 @@ class Application
 	}
 
 	void onEvent(const WindowClosedEvent& event);
-
-	void setMaxFps(float fps);
 
 	auto& getStartSignal()
 	{

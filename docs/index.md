@@ -7,7 +7,7 @@ layout: default
 <div class="d-flex flex-column align-center">
     <img src="{{site.baseurl}}/assets/images/preview.png" alt="Engine Screenshot Preview"/>
     <p class="text-center">
-        Spatial is a cross-platform C++ game engine created on top off google's filament rendering engine.<br/>
+        Spatial is a cross-platform C++ game engine created on top off Google's filament rendering engine.<br/>
         This projects uses C++17 and modern cmake features.
     </p>
     <div class="d-flex">
@@ -26,7 +26,7 @@ But, if you need a simple visualization tool with game engine like tools and fun
 is a nice solution to consider.
 
 Programming a game engine is hard and the necessary skill are completely different from creating a game.
-The Spatial Engine is still pretty simple and also really far from complete, but it already do some neat things.
+The Spatial Engine is still pretty simple and also really far from complete, but it already does some neat things.
 
 ## The Project Structure
 
@@ -50,7 +50,7 @@ You can take a look at the `Spatial.Core` folder to understand how the darker de
 
 So, the first step to get used to this engine is to build it from source.
 We'll need to install the correct compiler, the package manager, run some installation scripts, wait for all required
-dependencies to build and finally you'll be able see something on your screen.
+dependencies to build, and finally you'll be able to see something on your screen.
 You might take some time in this step if you're not used to all complexities of a C++ project.
 
 When you get used with the engine, we can bootstrap a simple game project using the engine's core library.
@@ -58,7 +58,7 @@ When you get used with the engine, we can bootstrap a simple game project using 
 ## Let us known if you're having any trouble
 
 As a reminder, this engine is improving constantly and changes may happen which could deprecate this tutorial steps.
-So, if you have any problems, feel free to leave an issue on Github.
+So, if you have any problems, feel free to leave an issue on GitHub.
 
 [Create a Github Issue](https://github.com/luizgabriel/Spatial.Engine/issues/new){: .btn }
 
