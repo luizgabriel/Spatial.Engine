@@ -4,6 +4,8 @@ layout: default
 nav_order: 1
 ---
 
+## Building the Editor
+
 ## Table of contents
 
 {: .no_toc .text-delta }
