@@ -1,3 +1,9 @@
+---
+title: Generate Doxygen Documentation
+layout: default
+nav_order: 2
+---
+
 ## Generate Doxygen Documentation
 
 Make sure to install [Doxygen](https://www.doxygen.nl/) and [Graphviz](https://graphviz.org/):
