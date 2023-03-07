@@ -8,5 +8,6 @@ imgui_log.txt
 __tmp/
 *.log
 CMakeSettings.json
+CMakeUserPresets.json
 .DS_Store
 doxygen/

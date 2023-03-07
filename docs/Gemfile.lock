@@ -121,6 +121,7 @@ DEPENDENCIES
   jekyll-titles-from-headings (~> 0.5.3)
   just-the-docs (~> 0.4.0)
   kramdown-parser-gfm (~> 1.1)
+  rouge (~> 4.0)
 
 BUNDLED WITH
    2.3.26

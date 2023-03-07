@@ -36,6 +36,7 @@
     {
       "name": "Windows-Base",
       "hidden": true,
+      "generator": "Visual Studio 17 2022",
       "inherits": [
         "Default"
       ],
@@ -45,8 +46,7 @@
       "cacheVariables": {
         "WARNINGS_AS_ERRORS": "OFF",
         "CPACK_GENERATOR": "ZIP;WIX",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl"
+        "MSVC_TOOLSET_VERSION": "143"
       },
       "condition": {
         "type": "equals",

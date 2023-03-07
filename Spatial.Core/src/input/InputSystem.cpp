@@ -1,4 +1,4 @@
-#include "spatial/input/InputSystem.h"
+#include <spatial/input/InputSystem.h>
 
 namespace spatial::desktop
 {

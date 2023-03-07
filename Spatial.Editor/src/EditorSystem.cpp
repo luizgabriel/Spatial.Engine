@@ -81,6 +81,8 @@ void EditorSystem::onDrawGui()
 			? (cameraTransform->position + (cameraTransform->getForwardVector() * 10.0F) - (math::axisY * 0.1f))
 			: math::vec3{};
 
+    ImGui::ShowDemoWindow();
+
 	ui::MenuBar::show([&]() {
 		ui::EditorMainMenu::fileMenu(icons, mMenuAction);
 		ui::EditorMainMenu::createMenu(mRegistry, createEntityPosition);
@@ -235,6 +237,12 @@ void EditorSystem::onUpdateInput(const desktop::InputState& input)
 
 	if (input.combined(gControlKey, Key::O))
 		mMenuAction = ui::EditorMainMenu::Action::OpenScene;
+
+    if (input.combined(gControlKey, Key::C))
+        ImGui::LogToClipboard();
+
+    if (input.combined(gControlKey, Key::V))
+        ImGui::LogToTTY();
 }
 
 void EditorSystem::setScenePath(const std::string& path)

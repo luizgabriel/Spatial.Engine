@@ -57,14 +57,21 @@ class Arguments:
     source_path: str
     generate_docs: bool
     build_tests: bool
+    conan_profile: str
 
     def with_tests(self):
-        return Arguments(self.preset, self.source_path, self.generate_docs, True)
+        return Arguments(
+            preset=self.preset, 
+            source_path=self.source_path, 
+            generate_docs=self.generate_docs, 
+            conan_profile=self.conan_profile,
+            build_tests=True)
 
     @property
     def example_args(self) -> str:
         docs = "--docs" if self.generate_docs else ""
         tests = "--tests" if self.build_tests else ""
+        profile = "--profile" if self.conan_profile else ""
         return f"--preset={self.preset} {docs} {tests}"
 
 
@@ -151,7 +158,8 @@ def to_package_export(source_path):
 
 def cmake_configure(options: Arguments) -> Command:
     docs = ["-DSPATIAL_ENABLE_DOXYGEN=ON"] if options.generate_docs else []
-    return Command(["cmake", "-S", options.source_path, "--preset", options.preset] + docs)
+    profile = [f"-DCONAN_PROFILE={options.conan_profile}"]
+    return Command(["cmake", "-S", options.source_path, "--preset", options.preset] + docs + profile)
 
 
 def cmake_build(options: Arguments) -> Command:
@@ -209,7 +217,8 @@ def parse_args(args: list[str]) -> Arguments:
         source_path=parse_option_value("source-path")(args),
         preset=parse_option_value("preset")(args),
         generate_docs=parse_option_bool("docs")(args),
-        build_tests=parse_option_bool("tests")(args)
+        build_tests=parse_option_bool("tests")(args),
+        conan_profile=parse_option_value("profile")(args),
     )
 
 

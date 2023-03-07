@@ -1,17 +1,9 @@
 ---
-title: Building the Editor
+title: Linux
 layout: default
-nav_order: 1
+nav_order: 3
+parent: Building the Editor
 ---
-
-## Building the Editor
-
-## Table of contents
-
-{: .no_toc .text-delta }
-
-1. TOC
-   {:toc}
 
 ## Installing Requirements
 
@@ -38,6 +30,13 @@ Install all these tools:
 - [CMake](https://cmake.org/download/)
 - [Conan](https://conan.io/downloads.html)
 - [Visual Studio 2022 Community](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
+
+## Configuring Conan Profile
+
+You must create a default conan profile:
+```sh
+conan profile new default --detect
+```
 
 > **V8 Library Requirement:**
 >

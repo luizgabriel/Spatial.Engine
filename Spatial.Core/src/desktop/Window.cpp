@@ -28,7 +28,7 @@ Window::Window(Window&& other) noexcept : mWindowHandle(std::exchange(other.mWin
 
 Window& Window::operator=(Window&& other) noexcept
 {
-	if (mWindowHandle)
+	if (mWindowHandle != nullptr)
 		glfwDestroyWindow(mWindowHandle);
 
 	mWindowHandle = std::exchange(other.mWindowHandle, nullptr);
@@ -38,13 +38,14 @@ Window& Window::operator=(Window&& other) noexcept
 
 Window::~Window()
 {
-	if (mWindowHandle)
+	if (mWindowHandle != nullptr)
 		glfwDestroyWindow(mWindowHandle);
 }
 
 math::uvec2 Window::getFrameBufferSize() const
 {
-	int dsw, dsh;
+	int dsw;
+	int dsh;
 	glfwGetFramebufferSize(mWindowHandle, &dsw, &dsh);
 
 	return {dsw, dsh};
@@ -52,7 +53,8 @@ math::uvec2 Window::getFrameBufferSize() const
 
 math::uvec2 Window::getSize() const
 {
-	int w, h;
+	int w;
+	int h;
 	glfwGetWindowSize(mWindowHandle, &w, &h);
 
 	return {w, h};
@@ -60,7 +62,8 @@ math::uvec2 Window::getSize() const
 
 math::dvec2 Window::getMousePosition() const
 {
-	double xPos, yPos;
+	double xPos;
+	double yPos;
 	glfwGetCursorPos(mWindowHandle, &xPos, &yPos);
 
 	return {xPos, yPos};
@@ -105,6 +108,19 @@ void Window::setIcon(FileSystem& fileSystem, std::string_view resourcePath)
 	auto iconData = fileSystem.readBinary(resourcePath);
 	assert(!iconData.empty());
 	setIcon(iconData.data(), iconData.size());
+}
+
+void Window::setClipboardText(const std::string &text) {
+    glfwSetClipboardString(mWindowHandle, text.c_str());
+}
+
+std::optional<std::string> Window::getClipboardText() const {
+    const auto *text = glfwGetClipboardString(mWindowHandle);
+    if (text == nullptr) {
+        return std::nullopt;
+    }
+
+    return std::make_optional(std::string(text));
 }
 
 } // namespace spatial::desktop

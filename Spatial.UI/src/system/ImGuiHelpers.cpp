@@ -22,17 +22,17 @@ void imguiRefreshDeltaTime(float delta)
 
 math::vec2 imguiGetFrameSize()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	auto fw = io.DisplaySize.x * io.DisplayFramebufferScale.x;
-	auto fh = io.DisplaySize.y * io.DisplayFramebufferScale.y;
+	auto& io = ImGui::GetIO();
+	auto frameWidth = io.DisplaySize.x * io.DisplayFramebufferScale.x;
+	auto frameHeight = io.DisplaySize.y * io.DisplayFramebufferScale.y;
 
-	return {fw, fh};
+	return {frameWidth, frameHeight};
 }
 
 bool imguiIsMinimized()
 {
-	auto fs = imguiGetFrameSize();
-	return fs.x == 0 && fs.y == 0;
+	auto frameSize = imguiGetFrameSize();
+	return frameSize.x == 0 && frameSize.y == 0;
 }
 
 graphics::VertexBuffer imguiCreateVertexBuffer(fl::Engine& engine, uint32_t capacity)
@@ -81,7 +81,7 @@ graphics::Texture imguiCreateTextureAtlas(fl::Engine& engine)
 	auto textureSize = width * height * bpp;
 	auto pb = fl::Texture::PixelBufferDescriptor{imageData, static_cast<size_t>(textureSize), fl::Texture::Format::RGBA,
 												 fl::Texture::Type::UBYTE};
-	const auto texture = fl::Texture::Builder()
+	auto *const texture = fl::Texture::Builder()
 							 .width(static_cast<uint32_t>(width))
 							 .height(static_cast<uint32_t>(height))
 							 .levels(static_cast<uint8_t>(1))

@@ -41,6 +41,10 @@ class Window
 		return mWindowHandle;
 	}
 
+    void setClipboardText(const std::string& text);
+
+    [[nodiscard]] std::optional<std::string> getClipboardText() const;
+
 	math::uvec2 getFrameBufferSize() const;
 	math::uvec2 getSize() const;
 	math::dvec2 getMousePosition() const;
