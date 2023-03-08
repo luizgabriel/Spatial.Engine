@@ -158,7 +158,7 @@ def to_package_export(source_path):
 
 def cmake_configure(options: Arguments) -> Command:
     docs = ["-DSPATIAL_ENABLE_DOXYGEN=ON"] if options.generate_docs else []
-    profile = [f"-DCONAN_PROFILE={options.conan_profile}"]
+    profile = [f"-DCONAN_PROFILE={options.conan_profile}"] if options.conan_profile else []
     return Command(["cmake", "-S", options.source_path, "--preset", options.preset] + docs + profile)
 
 
