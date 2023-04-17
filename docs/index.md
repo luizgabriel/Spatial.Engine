@@ -11,7 +11,7 @@ layout: default
         This projects uses C++17 and modern cmake features.
     </p>
     <div class="d-flex">
-        <a href="{{site.baseurl}}/docs/01-building-editor" class="btn btn-blue">Building the Editor</a>
+        <a href="{{site.baseurl}}/docs/building-editor/index/" class="btn btn-blue">Building the Editor</a>
         <a href="https://github.com/luizgabriel/Spatial.Engine" class="btn ml-2">View on Github</a>
     </div>
 </div>
@@ -64,4 +64,4 @@ So, if you have any problems, feel free to leave an issue on GitHub.
 
 ## Now, let's build the Editor
 
-<a href="{{site.baseurl}}/docs/01-building-editor" class="btn btn-blue">Go To: "Building the Editor"</a>
+<a href="{{site.baseurl}}/docs/building-editor/index/" class="btn btn-blue">Go To: "Building the Editor"</a>
