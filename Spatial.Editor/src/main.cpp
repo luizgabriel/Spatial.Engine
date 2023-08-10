@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
 	ui.setMaterial(*fileSystem, "editor/materials/ui_blit.filamat");
 	ui.addFont(*fileSystem, "editor/fonts/roboto_medium.ttf");
 	ui.getRenderer().createFontTextureAtlas();
-    ui.setClipboardController(ui::getClipboardControllerFromWindow(window));
 
 	auto editor = editor::EditorSystem{*fileSystem};
 
