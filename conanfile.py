@@ -7,7 +7,7 @@ from conan.tools.files import copy
 
 class SpatialRecipe(ConanFile):
     name = "spatial"
-    version = "1.3.13"
+    version = "1.3.14"
     package_type = "application"
 
     # Optional metadata
@@ -60,7 +60,7 @@ class SpatialRecipe(ConanFile):
         cpack_generator = self.cpack_generators.get(str(self.settings.os))
         if cpack_generator is not None:
             tc.variables["CPACK_GENERATOR"] = cpack_generator
-            
+
         tc.generate()
 
         for dep in self.dependencies.values():
