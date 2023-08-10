@@ -17,6 +17,7 @@ Install all these tools:
 ## Using Chocolatey
 
 You can also install these dependencies using the [Chocolatey](https://chocolatey.org/install)
+
 > Make sure to run this command using PowerShell (in Administrator mode)
 
 ```ps
@@ -31,36 +32,8 @@ choco install conan
 You must create a default conan profile:
 
 ```sh
-conan profile new default --detect
+conan profile detect
 ```
-
-This will create a file in: `C:/Users/{YourUser}/.conan/profiles/default`
-Change profile might look like this:
-
-```
-[settings]
-arch=x86_64
-build_type=Release
-compiler=msvc
-compiler.cppstd=14
-compiler.runtime=dynamic
-compiler.version=193
-os=Windows
-```
-
-## Install V8 Library Requirement
-
-You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows"
-feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
-
-```ps
-choco install windows-sdk-10-version-2004-windbg
-```
-
-If you already the SDK installed, here
-is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
-
-Now, go to [Building the Engine](#building-the-engine) topic.
 
 ## Cloning the Engine Respository
 
@@ -77,7 +50,15 @@ Now, inside the project's folder. Run this script install all required conan dep
 by default.
 
 ```
-python ./cli.py run-editor --profile=default
+conan install . --build=missing -s build_type=Debug
+cmake --preset conan-debug
+cmake --build . --preset conan-debug
+```
+
+## Running the Engine Editor
+
+```
+cmake --build . --preset conan-debug --package Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.

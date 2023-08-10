@@ -24,7 +24,7 @@ xcode-select --install
 You must create a default conan profile:
 
 ```sh
-conan profile new default --detect
+conan profile detect
 ```
 
 ## Cloning the Engine Respository
@@ -42,7 +42,15 @@ Now, inside the project's folder. Run this script install all required conan dep
 by default.
 
 ```
-python ./cli.py run-editor
+conan install . --build=missing -s build_type=Debug
+cmake --preset conan-debug
+cmake --build . --preset conan-debug
+```
+
+## Running the Engine Editor
+
+```
+cmake --build . --preset conan-debug --package Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.
