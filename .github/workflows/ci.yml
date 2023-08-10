@@ -61,7 +61,9 @@ jobs:
 
       - name: (Conan) Build Dependencies
         shell: bash
-        run: conan install . --build=missing -s build_type=${{ matrix.config.build_type }}
+        run: |
+          conan profile detect 
+          conan install . --build=missing -s build_type=${{ matrix.config.build_type }}
       
       - name: (Cmake) Configure
         shell: bash
