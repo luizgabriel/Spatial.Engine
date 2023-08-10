@@ -23,6 +23,12 @@ class SpatialRecipe(ConanFile):
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "CMake/*", "docs/*", "vendor/*", "Spatial.Core/*", "Spatial.Editor/*", "Spatial.Game/*", "Spatial.Graphics/*", \
         "Spatial.Res/*", "Spatial.UI/*"
+    
+    cpack_generators = {
+        "Windows": "ZIP;WIX",
+        "Macos": "TGZ;DragNDrop",
+        "Linux": "TGZ;DEB"
+    }
 
     def build_requirements(self):
         self.tool_requires("cmake/3.22.6")
@@ -51,6 +57,10 @@ class SpatialRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        cpack_generator = self.cpack_generators.get(str(self.settings.os))
+        if cpack_generator is not None:
+            tc.variables["CPACK_GENERATOR"] = cpack_generator
+            
         tc.generate()
 
         for dep in self.dependencies.values():

@@ -3,6 +3,7 @@ set(CPACK_PACKAGE_DESCRIPTION "Spatial is a cross-platform C++ game engine creat
 set(CMAKE_PROJECT_HOMEPAGE_URL "https://luizgabriel.github.io/Spatial.Engine/")
 set(CPACK_VERBATIM_VARIABLES TRUE)
 set(CPACK_CREATE_DESKTOP_LINKS TRUE)
+
 set(CPACK_DMG_BACKGROUND_IMAGE ${PROJECT_SOURCE_DIR}/Spatial.Editor/assets/BundleBackground.png)
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/Spatial.Editor/assets/AppIcon.bmp)
 set(CPACK_WIX_PRODUCT_ICON ${PROJECT_SOURCE_DIR}/Spatial.Editor/assets/AppIcon.ico)

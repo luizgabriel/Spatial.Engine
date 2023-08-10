@@ -16,7 +16,7 @@ jobs:
       matrix:
         config:
           # - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
-          - { name: "MacOS-Clang", os: macos-11, preset: "MacOS-Release" }
+          - { name: "MacOS-Clang", os: macos-11, build_type: "Release", conan_preset: "conan-release" }
           # - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
           # - { name: "Windows-2019-MSVC", os: windows-2019, preset: "Windows-2019-Release" }
 
@@ -30,8 +30,6 @@ jobs:
 
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
-        with:
-          version: 1.58.0
 
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -59,22 +57,26 @@ jobs:
           version: latest
           platform: x64
 
-      - name: Configure
+      - name: (Conan) Build Dependencies
         shell: bash
-        run: python ./cli.py configure --preset=${{ matrix.config.preset }} --tests
-
-      - name: Build
+        run: conan --install . --build=missing -s build_type=${{ matrix.config.build_type }}
+      
+      - name: (Cmake) Configure
         shell: bash
-        run: python ./cli.py build --tests
+        run: cmake --preset ${{ matrix.config.conan_preset }}
 
-      - name: Run Tests
+      - name: (Cmake) Build
         shell: bash
-        run: python ./cli.py test --preset=${{ matrix.config.preset }}
+        run: cmake --build . --preset ${{ matrix.config.conan_preset }}
 
-      - name: Generate Package
+      - name: (CTest) Run Tests
+        shell: bash
+        run: pushd out/build/${{ matrix.config.build_type }} && ctest --output-on-failure && popd
+
+      - name: (CPack) Generate Package
         if: contains(github.ref, 'tags/v')
         shell: bash
-        run: python ./cli.py package --preset=${{ matrix.config.preset }}
+        run: cmake --build . --preset ${{ matrix.config.conan_preset }} --target package
 
       - name: Get the version
         if: contains(github.ref, 'tags/v')
