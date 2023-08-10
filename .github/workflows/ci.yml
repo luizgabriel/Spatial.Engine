@@ -15,9 +15,9 @@ jobs:
     strategy:
       matrix:
         config:
-          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
+          - { name: "Ubuntu-Clang", os: ubuntu-20.04, preset: "Linux-Release" }
           - { name: "MacOS-Clang", os: macos-11, build_type: "Release", conan_preset: "conan-release" }
-          # - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
+          - { name: "Windows-MSVC", os: windows-2022, preset: "Windows-Release" }
           # - { name: "Windows-2019-MSVC", os: windows-2019, preset: "Windows-2019-Release" }
 
     steps:
