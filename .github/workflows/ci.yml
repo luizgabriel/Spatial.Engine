@@ -95,7 +95,9 @@ jobs:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
           path: |
-            ${{ github.workspace }}/out/package/${{ matrix.config.preset }}/*.dmg
+            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.zip
+            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.tar.gz
+            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.dmg
 
   release:
     if: contains(github.ref, 'tags/v')
