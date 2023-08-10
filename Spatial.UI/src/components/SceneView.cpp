@@ -29,7 +29,7 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 									 ImGui::GetCursorScreenPos().y));
 
 	auto colorAttachment = graphics::getTexture(registry, sceneView.colorAttachment);
-	ui::image(colorAttachment, imageSize, math::vec4{0, 1, 1, 0});
+	ui::image(colorAttachment, imageSize);
 }
 
 bool SceneView::selector(const ecs::Registry& registry, ecs::Entity& sceneViewEntity)

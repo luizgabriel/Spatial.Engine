@@ -13,7 +13,7 @@ set_property(
 target_link_libraries(Spatial.Core.Tests
         PUBLIC
             Spatial.Core
-            CONAN_PKG::gtest)
+            gtest::gtest)
 
 gtest_discover_tests(Spatial.Core.Tests)
 

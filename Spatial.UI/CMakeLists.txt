@@ -56,9 +56,6 @@ set_property(
         TARGET Spatial.UI
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-target_compile_definitions(Spatial.UI PUBLIC "ImTextureID=std::shared_ptr<void>")
-target_compile_definitions(Spatial.UI PUBLIC "IMGUI_USER_CONFIG=<memory>")
-
 target_include_directories(Spatial.UI
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -70,9 +67,11 @@ target_link_libraries(Spatial.UI
         Spatial.Core
         Spatial.Graphics)
 
+find_package(imgui REQUIRED)
+
 target_link_libraries(Spatial.UI
         PUBLIC
-        CONAN_PKG::imgui)
+        imgui::imgui)
 
 install(
         TARGETS Spatial.UI

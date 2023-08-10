@@ -1,10 +1,9 @@
 #pragma once
 
-#include <filament/Engine.h>
 #include <filament/Material.h>
 #include <filament/MaterialInstance.h>
-#include <spatial/graphics/Resources.h>
 #include <memory>
+#include <spatial/graphics/Resources.h>
 #include <unordered_map>
 
 namespace spatial::graphics
@@ -42,13 +41,12 @@ class MaterialInstance
 	void setParameter(std::string_view parameter, math::vec2 value);
 	void setParameter(std::string_view parameter, math::vec3 value);
 	void setParameter(std::string_view parameter, math::vec4 value);
-	void setParameter(std::string_view parameter, SharedTexture texture, filament::TextureSampler sampler);
+	void setParameter(std::string_view parameter, filament::Texture* texture, filament::TextureSampler sampler);
 
   private:
 	filament::Engine& mEngine;
 	SharedMaterial mMaterial;
 	MaterialInstanceResource mInstance;
-	std::unordered_map<std::string, graphics::SharedTexture> mTextureParameters;
 
 	filament::MaterialInstance* get() noexcept
 	{

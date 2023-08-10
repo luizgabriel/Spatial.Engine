@@ -41,8 +41,8 @@ class RenderingSystem
 
   private:
 	graphics::Engine mEngine;
-	graphics::SwapChain mSwapChain;
 	graphics::Renderer mRenderer;
+	graphics::SwapChain mSwapChain;
 	Signal<filament::Renderer&> mOnRenderSignal;
 };
 

@@ -18,22 +18,25 @@ Install all these tools:
 
 You can also install these dependencies using the [Chocolatey](https://chocolatey.org/install)
 > Make sure to run this command using PowerShell (in Administrator mode)
+
 ```ps
 choco install python
 choco install ninja
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-choco install conan --version=1.58.0
+choco install conan
 ```
 
 ## Configuring Conan Profile
 
 You must create a default conan profile:
+
 ```sh
 conan profile new default --detect
 ```
 
 This will create a file in: `C:/Users/{YourUser}/.conan/profiles/default`
 Change profile might look like this:
+
 ```
 [settings]
 arch=x86_64
@@ -47,14 +50,17 @@ os=Windows
 
 ## Install V8 Library Requirement
 
-You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows" feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
+You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows"
+feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
+
 ```ps
 choco install windows-sdk-10-version-2004-windbg
 ```
 
-If you already the SDK installed, here is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
+If you already the SDK installed, here
+is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
 
-Now, go to [Building the Engine](#building-the-engine) topic. 
+Now, go to [Building the Engine](#building-the-engine) topic.
 
 ## Cloning the Engine Respository
 

@@ -47,10 +47,10 @@ void MaterialInstance::setParameter(std::string_view parameter, math::vec4 value
 	mInstance->setParameter(parameter.data(), toFilament(value));
 }
 
-void MaterialInstance::setParameter(std::string_view parameter, SharedTexture texture, filament::TextureSampler sampler)
+void MaterialInstance::setParameter(std::string_view parameter, filament::Texture* texture,
+									filament::TextureSampler sampler)
 {
-	get()->setParameter(parameter.data(), texture.get(), std::move(sampler));
-	mTextureParameters.emplace(std::string{parameter}, std::move(texture));
+	get()->setParameter(parameter.data(), texture, std::move(sampler));
 }
 
 void MaterialInstance::setScissor(uint32_t left, uint32_t bottom, uint32_t width, uint32_t height)
@@ -61,8 +61,6 @@ void MaterialInstance::setScissor(uint32_t left, uint32_t bottom, uint32_t width
 MaterialInstance::~MaterialInstance()
 {
 	mInstance.reset();
-	for (auto& [key, texture] : mTextureParameters)
-		texture.reset();
 }
 
 SharedMaterialInstance toShared(MaterialInstance&& materialInstance)

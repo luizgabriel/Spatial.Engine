@@ -101,6 +101,9 @@ add_library(Spatial.Core
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 
+set_property(TARGET Spatial.Core PROPERTY
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 target_precompile_headers(Spatial.Core
         PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits> <set> <random> <array> <functional>)
 
@@ -110,37 +113,40 @@ target_include_directories(Spatial.Core
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
         PRIVATE src)
 
+find_package(boost REQUIRED)
+find_package(EnTT REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(stb REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(cereal REQUIRED)
+find_package(glm REQUIRED)
+find_package(magic_enum REQUIRED)
+
 # LINK PLATFORM INDEPENDENT DEPENDENCIES
 target_link_libraries(Spatial.Core
         PUBLIC
-        CONAN_PKG::boost
-        CONAN_PKG::entt
-        CONAN_PKG::spdlog
-        CONAN_PKG::stb
-        CONAN_PKG::glfw
-        CONAN_PKG::cereal
-        CONAN_PKG::glm
-        CONAN_PKG::magic_enum)
+        boost::boost
+        EnTT::EnTT
+        spdlog::spdlog
+        stb::stb
+        glfw
+        cereal::cereal
+        glm::glm
+        magic_enum::magic_enum)
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
     message(STATUS "Detected Linux Device")
     target_compile_definitions(Spatial.Core PRIVATE SPATIAL_PLATFORM_UNIX)
-
     find_package(Threads REQUIRED)
     target_link_libraries(Spatial.Core PRIVATE Threads::Threads)
 elseif (WIN32)
     message(STATUS "Detected Windows Device")
-
     target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_WINDOWS)
-
     target_link_libraries(Spatial.Core PRIVATE Shlwapi)
 elseif (APPLE)
     message(STATUS "Detected Apple Device")
     target_compile_definitions(Spatial.Core PUBLIC SPATIAL_PLATFORM_OSX)
-
-    target_sources(Spatial.Core PRIVATE src/desktop/native/WindowHelperCocoa.mm)
-    set_source_files_properties(src/desktop/native/WindowHelperCocoa.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 else ()
     message(FATAL_ERROR "Unsupported platform")
 endif ()

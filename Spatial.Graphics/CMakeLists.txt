@@ -22,6 +22,7 @@ add_library(Spatial.Graphics
         include/spatial/graphics/MathConversionUtils.h
         include/spatial/graphics/TextureResources.h
         include/spatial/graphics/MeshResources.h
+        include/spatial/graphics/native/CocoaHelper.h
 
         ## SOURCES
         src/Resources.cpp
@@ -62,13 +63,17 @@ target_include_directories(Spatial.Graphics
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
         PRIVATE src)
 
+find_package(filament REQUIRED)
+
 target_link_libraries(Spatial.Graphics
         PUBLIC
         Spatial.Core
-        CONAN_PKG::filament)
+        filament::filament)
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(Spatial.Graphics PRIVATE OpenGL::GL)
+find_package(OpenGL)
+if (OpenGL_FOUND)
+    target_link_libraries(Spatial.Graphics PRIVATE OpenGL::GL)
+endif ()
 
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
@@ -87,9 +92,12 @@ elseif (APPLE)
     message(STATUS "Detected Apple Device")
     target_compile_definitions(Spatial.Graphics PUBLIC SPATIAL_PLATFORM_OSX)
 
+    target_sources(Spatial.Graphics PRIVATE src/CocoaHelper.mm)
+
     target_link_libraries(Spatial.Graphics PRIVATE
             "-framework Cocoa"
             "-framework Metal"
+            "-framework QuartzCore"
             "-framework CoreVideo"
             "-framework Carbon"
             "-framework IOKit"

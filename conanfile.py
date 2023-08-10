@@ -1,58 +1,82 @@
-from conans import ConanFile, CMake, tools
+import os
+
+from conan import ConanFile
+from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
+from conan.tools.files import copy
 
 
-class SpatialEngineConan(ConanFile):
+class SpatialRecipe(ConanFile):
     name = "spatial"
-    version = "1.3.12"
+    version = "1.3.13"
+    package_type = "application"
+
+    # Optional metadata
     license = "Apache 2.0"
+    author = "Luiz Gabriel luizgabriel.info@gmail.com"
     url = "https://github.com/luizgabriel/Spatial.Engine"
-    description = "Spatial is a cross-platform c++ game engine created on top off google's [filament](" \
-                  "https://github.com/google/filament) rendering engine. This projects uses C++17 and modern cmake " \
-                  "features. "
+    description = "Spatial is a cross-platform C++ game engine created on top off google's filament rendering engine."
+    topics = ("cross-platform", "graphics", "engine", "glfw", "spatial", "conan", "cpp17", "3d", "filament", "entt")
+
+    # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {"editor": [True, False]}
-    default_options = {"editor": True}
-    generators = "cmake"
-    build_requires = "cmake/3.19.8"
-    exports_sources = "*"
-    requires = [
-        "boost/1.79.0",
-        "argh/1.3.1",
-        "glfw/3.3.7",
-        "gtest/1.11.0",
-        "spdlog/1.10.0",
-        "stb/20200203",
-        "entt/3.10.3",
-        "cereal/1.3.1",
-        "magic_enum/0.8.0",
-        "glm/0.9.9.8",
 
-        # "assimp/5.1.0",
+    # Sources are located in the same place as this recipe, copy them to the recipe
+    exports_sources = "CMakeLists.txt", "CMake/*", "docs/*", "vendor/*", "Spatial.Core/*", "Spatial.Editor/*", "Spatial.Game/*", "Spatial.Graphics/*", \
+        "Spatial.Res/*", "Spatial.UI/*"
 
-        # Remember to run 'setup.py' to make these dependencies available
-        "filament/1.25.6@spatial/stable",  # Installed with vendor/filament.py
-        # "v8/10.1.69@spatial/stable",       # Installed with vendor/v8.py
-        "imgui/docking@spatial/stable",    # Installed with vendor/imgui.py
-    ]
+    def build_requirements(self):
+        self.tool_requires("cmake/3.22.6")
 
-    def imports(self):
-        self.copy("*", dst="bin", src="bin")
-        self.copy("*.dll", dst="lib", src="lib", keep_path=False)
-        self.copy("*.dylib*", dst="lib", src="lib", keep_path=False)
+    def requirements(self):
+        self.requires("boost/1.81.0")
+        self.requires("argh/1.3.1")
+        self.requires("glfw/3.3.8")
+        self.requires("gtest/1.11.0")
+        self.requires("spdlog/1.10.0")
+        self.requires("stb/cci.20220909")
+        self.requires("entt/3.11.1")
+        self.requires("cereal/1.3.1")
+        self.requires("magic_enum/0.8.0")
+        self.requires("glm/0.9.9.8")
+        self.requires("imgui/cci.20230105+1.89.2.docking")
+        self.requires_local("filament/1.40.4", options={
+            "supports_metal": self.settings.os == "Macos",
+            "supports_opengl": self.settings.os == "Windows"
+        })
 
-    def _cmake(self):
-        cmake = CMake(self)
-        cmake.configure()
+    def layout(self):
+        cmake_layout(self)
 
-        return cmake
+    def generate(self):
+        deps = CMakeDeps(self)
+        deps.generate()
+        tc = CMakeToolchain(self)
+        tc.generate()
+
+        for dep in self.dependencies.values():
+            for f in dep.cpp_info.bindirs:
+                copy(self, "*", f, self.generators_folder)
 
     def build(self):
-        cmake = self._cmake()
+        cmake = CMake(self)
+        cmake.configure()
         cmake.build()
 
     def package(self):
-        cmake = self._cmake()
+        cmake = CMake(self)
         cmake.install()
 
-    def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+    def requires_local(self, package, options=None):
+        if options is None:
+            options = {}
+
+        name, version = package.split("/")
+        recipes_path = os.path.join(self.folders.source, "vendor")
+        self.run("conan export %s.py --user user --channel stable" % name, cwd=recipes_path)
+        self.requires("%s/%s@user/stable" % (name, version), options=options)
+
+
+
+    
+
+    

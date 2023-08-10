@@ -1,3 +1,11 @@
+if (UNIX AND NOT APPLE)
+        set(MATC_PLATFORM "opengl")
+elseif (WIN32)
+        set(MATC_PLATFORM "opengl")
+elseif (APPLE)
+        set(MATC_PLATFORM "metal")
+endif ()
+
 find_program(CMGEN_COMMAND cmgen)
 add_custom_command(
         OUTPUT
@@ -24,11 +32,11 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/materials/ui_blit.mat
         ${CMAKE_CURRENT_SOURCE_DIR}/materials/grid.mat
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/materials/
-        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/skybox.filamat materials/skybox.mat
-        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/color.filamat materials/color.mat
-        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/standard_lit.filamat materials/standard_lit.mat
-        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat materials/ui_blit.mat
-        COMMAND ${MATC_COMMAND} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/grid.filamat materials/grid.mat
+        COMMAND ${MATC_COMMAND} -a ${MATC_PLATFORM} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/skybox.filamat materials/skybox.mat
+        COMMAND ${MATC_COMMAND} -a ${MATC_PLATFORM} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/color.filamat materials/color.mat
+        COMMAND ${MATC_COMMAND} -a ${MATC_PLATFORM} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/standard_lit.filamat materials/standard_lit.mat
+        COMMAND ${MATC_COMMAND} -a ${MATC_PLATFORM} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/ui_blit.filamat materials/ui_blit.mat
+        COMMAND ${MATC_COMMAND} -a ${MATC_PLATFORM} -o ${CMAKE_CURRENT_BINARY_DIR}/materials/grid.filamat materials/grid.mat
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

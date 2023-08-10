@@ -3,7 +3,6 @@
 #include <utility>
 
 #if defined(SPATIAL_PLATFORM_OSX)
-#include <spatial/desktop/native/CocoaHelper.h>
 #define GLFW_EXPOSE_NATIVE_COCOA
 #elif defined(SPATIAL_PLATFORM_WINDOWS)
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -77,7 +76,7 @@ bool Window::hasFocus() const
 void* Window::getNativeHandle() const
 {
 #if defined(SPATIAL_PLATFORM_OSX)
-	return ::cocoaGetContentViewFromWindow(glfwGetCocoaWindow(mWindowHandle));
+	return (void*)glfwGetCocoaWindow(mWindowHandle);
 #elif defined(SPATIAL_PLATFORM_WINDOWS)
 	return (void*)glfwGetWin32Window(mWindowHandle);
 #elif defined(SPATIAL_PLATFORM_UNIX)
@@ -110,17 +109,20 @@ void Window::setIcon(FileSystem& fileSystem, std::string_view resourcePath)
 	setIcon(iconData.data(), iconData.size());
 }
 
-void Window::setClipboardText(const std::string &text) {
-    glfwSetClipboardString(mWindowHandle, text.c_str());
+void Window::setClipboardText(const std::string& text)
+{
+	glfwSetClipboardString(mWindowHandle, text.c_str());
 }
 
-std::optional<std::string> Window::getClipboardText() const {
-    const auto *text = glfwGetClipboardString(mWindowHandle);
-    if (text == nullptr) {
-        return std::nullopt;
-    }
+std::optional<std::string> Window::getClipboardText() const
+{
+	const auto* text = glfwGetClipboardString(mWindowHandle);
+	if (text == nullptr)
+	{
+		return std::nullopt;
+	}
 
-    return std::make_optional(std::string(text));
+	return std::make_optional(std::string(text));
 }
 
 } // namespace spatial::desktop

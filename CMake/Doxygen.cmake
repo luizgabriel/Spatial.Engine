@@ -12,12 +12,12 @@ if (SPATIAL_ENABLE_DOXYGEN)
     set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${PROJECT_SOURCE_DIR}/README.md)
 
     find_package(Doxygen REQUIRED dot)
-    doxygen_add_docs(Spatial.Docs 
-        ${PROJECT_SOURCE_DIR}/README.md 
-        ${PROJECT_SOURCE_DIR}/Spatial.Core 
-        ${PROJECT_SOURCE_DIR}/Spatial.Graphics
-        ${PROJECT_SOURCE_DIR}/Spatial.Res
-        ${PROJECT_SOURCE_DIR}/Spatial.UI
-        ${PROJECT_SOURCE_DIR}/Spatial.Editor
-    COMMENT "Generating doxygen for Spatial.Engine")
+    doxygen_add_docs(Spatial.Docs
+            ${PROJECT_SOURCE_DIR}/README.md
+            ${PROJECT_SOURCE_DIR}/Spatial.Core
+            ${PROJECT_SOURCE_DIR}/Spatial.Graphics
+            ${PROJECT_SOURCE_DIR}/Spatial.Res
+            ${PROJECT_SOURCE_DIR}/Spatial.UI
+            ${PROJECT_SOURCE_DIR}/Spatial.Editor
+            COMMENT "Generating doxygen for Spatial.Engine")
 endif ()

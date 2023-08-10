@@ -33,7 +33,6 @@ Entity createEntity(filament::Engine& engine) noexcept
 	return Entity{engine, utils::EntityManager::get().create()};
 }
 
-
 Material createMaterial(filament::Engine& engine, const uint8_t* data, size_t size)
 {
 	auto material = filament::Material::Builder().package(data, size).build(engine);

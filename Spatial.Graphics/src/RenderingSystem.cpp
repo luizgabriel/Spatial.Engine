@@ -1,3 +1,7 @@
+#if defined(SPATIAL_PLATFORM_OSX)
+#include <spatial/graphics/native/CocoaHelper.h>
+#endif
+
 #include <spatial/graphics/RenderingSystem.h>
 #include <spatial/graphics/Resources.h>
 
@@ -8,9 +12,18 @@ namespace spatial::graphics
 {
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle)
-	: mEngine{createEngine(nativeWindowHandle ? Backend::OPENGL : Backend::NOOP)},
-	  mSwapChain{createSwapChain(getEngine(), nativeWindowHandle)},
+	: mEngine{createEngine()},
 	  mRenderer{createRenderer(getEngine())},
+	  mSwapChain{[&]() {
+#if defined(SPATIAL_PLATFORM_OSX)
+		  ::cocoaPrepareWindowColorSpace(nativeWindowHandle);
+
+		  auto* metalLayer = ::cocoaSetUpMetalLayer(nativeWindowHandle);
+		  return createSwapChain(getEngine(), metalLayer);
+#else
+		  return createSwapChain(getEngine(), nativeWindowHandle);
+#endif
+	  }()},
 	  mOnRenderSignal{}
 {
 	mRenderer->setClearOptions({{.0f, .0f, .0f, 1.0f}, true, false});

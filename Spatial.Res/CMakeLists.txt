@@ -2,7 +2,10 @@ add_executable(Spatial.Res src/main.cpp)
 set_project_warnings(Spatial.Res)
 enable_sanitizers(Spatial.Res)
 
-target_link_libraries(Spatial.Res PUBLIC CONAN_PKG::argh CONAN_PKG::fmt)
+find_package(argh REQUIRED)
+find_package(fmt REQUIRED)
+
+target_link_libraries(Spatial.Res PUBLIC argh fmt::fmt)
 set_property(
         TARGET Spatial.Res
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

@@ -34,6 +34,7 @@ Install all these tools:
 ## Configuring Conan Profile
 
 You must create a default conan profile:
+
 ```sh
 conan profile new default --detect
 ```
@@ -43,7 +44,8 @@ conan profile new default --detect
 > You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows"
 > feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
 > > If you already the SDK installed, here
-> > is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
+> >
+is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
 
 Now, go to [Building the Engine](#building-the-engine) topic.
 

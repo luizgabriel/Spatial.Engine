@@ -13,6 +13,6 @@ struct FilamentEngineDeleter
 
 using Engine = std::unique_ptr<filament::Engine, FilamentEngineDeleter>;
 
-Engine createEngine(filament::backend::Backend backend);
+Engine createEngine(filament::backend::Backend backend = filament::backend::Backend::DEFAULT);
 
 } // namespace spatial::graphics

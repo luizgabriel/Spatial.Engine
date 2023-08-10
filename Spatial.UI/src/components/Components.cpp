@@ -62,7 +62,7 @@ void image(graphics::OptionalTexture texture, math::vec2 size, math::vec4 uv)
 	if (!texture)
 		return;
 
-	ImGui::Image(*texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+	ImGui::Image((void*)texture->get(), ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 }
 
 bool imageButton(graphics::OptionalTexture texture, math::vec2 size, math::vec4 uv)
@@ -70,7 +70,7 @@ bool imageButton(graphics::OptionalTexture texture, math::vec2 size, math::vec4 
 	if (!texture)
 		return false;
 
-	return ImGui::ImageButton(*texture, ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
+	return ImGui::ImageButton((void*)texture->get(), ImVec2(size.x, size.y), ImVec2(uv.x, uv.y), ImVec2(uv.z, uv.w));
 }
 
 void spanToAvailWidth(float weight)

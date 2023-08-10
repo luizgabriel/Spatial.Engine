@@ -8,5 +8,5 @@ has_toc: true
 
 ## Building the Editor
 
-The process of building the error require some environment configuration. 
+The process of building the error require some environment configuration.
 Please, make sure to follow the instructions described for each platform:

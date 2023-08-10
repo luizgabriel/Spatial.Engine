@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(SpatialEngine LANGUAGES CXX VERSION 1.3.12)
-cmake_policy(SET CMP0091 NEW)
+project(SpatialEngine LANGUAGES CXX OBJCXX VERSION 1.3.12)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake)
 
 include(GNUInstallDirs)
-include(SetupConan)
 include(CompilerWarnings)
 include(Doxygen)
 include(Sanitizers)
@@ -17,6 +15,7 @@ include(GoogleTest)
 
 set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CTest)
+find_package(gtest REQUIRED)
 enable_testing()
 
 add_subdirectory(Spatial.Core)
