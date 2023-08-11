@@ -12,10 +12,14 @@ Make sure to install [Doxygen](https://www.doxygen.nl/) and [Graphviz](https://g
 brew install doxygen graphviz
 ```
 
-Build the project with the docs
-
+Build the project with the docs:
 ```sh
+conan install . --build=missing -s build_type=Debug
 cmake --preset conan-debug -DSPATIAL_ENABLE_DOXYGEN=ON
 cmake --build . --preset conan-debug --target Spatial.Docs
+```
+
+Run the documentation webserver:
+```
 python3 -m http.server --directory ./build/Debug/html
 ```
