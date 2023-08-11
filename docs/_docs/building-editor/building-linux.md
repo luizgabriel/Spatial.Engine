@@ -74,7 +74,27 @@ sudo apt-get install libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev li
 pip install conan
 ```
 
-Now, go to [Building the Engine](#building-the-engine) topic.
+## Configuring Conan Profile
+
+You must create a default conan profile:
+
+```sh
+conan profile detect
+```
+
+This will create a file in: `~/.conan2/profiles/default`
+Change profile might look like this:
+
+```
+[settings]
+arch=x86_64
+build_type=Release
+compiler=clang
+compiler.cppstd=17
+compiler.libcxx=libc++
+compiler.version=10
+os=Linux
+```
 
 ## Building the Engine
 

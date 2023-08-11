@@ -35,6 +35,20 @@ You must create a default conan profile:
 conan profile detect
 ```
 
+This will create a file in: `C:/Users/{YourUser}/.conan2/profiles/default`
+Change profile might look like this:
+
+```
+[settings]
+arch=x86_64
+build_type=Release
+compiler=msvc
+compiler.cppstd=17
+compiler.runtime=dynamic
+compiler.version=193
+os=Windows
+```
+
 ## Cloning the Engine Respository
 
 First, let's clone the repository:
