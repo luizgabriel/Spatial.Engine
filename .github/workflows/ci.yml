@@ -50,7 +50,7 @@ jobs:
       - name: (Linux) Setup Linux Dependencies
         if: contains(matrix.config.os, 'ubuntu')
         shell: bash
-        run: sudo apt-get install libglu1-mesa-dev libxi-dev libxcomposite-dev libxxf86vm-dev
+        run: sudo apt-get install libglu1-mesa-dev libxi-dev libxcomposite-dev libxxf86vm-dev libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev
 
       - name: (Linux) Set up Clang
         if: contains(matrix.config.os, 'ubuntu')
