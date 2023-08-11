@@ -3,7 +3,7 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.scm import Git
 from conan.tools.files import replace_in_file
 from conan.tools.system.package_manager import Apt
-
+from conan.tools.build import check_min_cppstd
 
 class FilamentConan(ConanFile):
     name = "filament"
@@ -61,6 +61,9 @@ class FilamentConan(ConanFile):
         "skip_samples": True,
         "skip_sdl2": True,
     }
+
+    def validate(self):
+        check_min_cppstd(self, "20")
 
     def system_requirements(self):
         # https://github.com/google/filament/blob/main/BUILDING.md#linux

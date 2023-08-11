@@ -90,7 +90,7 @@ Change profile might look like this:
 arch=x86_64
 build_type=Release
 compiler=clang
-compiler.cppstd=17
+compiler.cppstd=20
 compiler.libcxx=libc++
 compiler.version=10
 os=Linux

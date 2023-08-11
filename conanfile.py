@@ -3,7 +3,7 @@ import os
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import copy
-
+from conan.tools.build import check_min_cppstd
 
 class SpatialRecipe(ConanFile):
     name = "spatial"
@@ -29,6 +29,9 @@ class SpatialRecipe(ConanFile):
         "Macos": "TGZ;DragNDrop",
         "Linux": "TGZ;DEB"
     }
+
+    def validate(self):
+        check_min_cppstd(self, "20")
 
     def build_requirements(self):
         self.tool_requires("cmake/3.22.6")
