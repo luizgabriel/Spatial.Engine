@@ -69,7 +69,6 @@ jobs:
           path: .github/workflows/profiles/${{ matrix.config.name }}.txt
 
       - name: (Linux) Set up Conan Profile
-        if: contains(matrix.config.os, 'ubuntu')
         shell: bash
         run: |
           conan profile detect
