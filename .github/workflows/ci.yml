@@ -89,7 +89,7 @@ jobs:
 
       - name: (CTest) Run Tests
         shell: bash
-        run: pushd out/build/${{ matrix.config.build_type }} && ctest --output-on-failure && popd
+        run: pushd build/${{ matrix.config.build_type }} && ctest --output-on-failure && popd
 
       - name: (CPack) Generate Package
         if: contains(github.ref, 'tags/v')
