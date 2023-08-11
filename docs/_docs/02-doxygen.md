@@ -19,7 +19,7 @@ cmake --preset conan-debug -DSPATIAL_ENABLE_DOXYGEN=ON
 cmake --build . --preset conan-debug --target Spatial.Docs
 ```
 
-Run the documentation webserver:
+Run the documentation web server:
 ```
 python3 -m http.server --directory ./build/Debug/html
 ```
