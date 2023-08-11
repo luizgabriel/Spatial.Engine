@@ -62,10 +62,23 @@ jobs:
           version: latest
           platform: x64
 
+      - name: Read Conan Profile
+        id: conan_profile
+        uses: jaywcjlove/github-action-read-file@main
+        with:
+          path: .github/workflows/profiles/${{ matrix.config.name }}.txt
+
+      - name: (Linux) Set up Conan Profile
+        if: contains(matrix.config.os, 'ubuntu')
+        shell: bash
+        run: |
+          conan profile detect
+          echo "Overwriting Conan Profile with: ${{ steps.conan_profile.outputs.content }}"
+          echo "${{ steps.conan_profile.outputs.content }}" > $(conan profile path default)
+
       - name: (Conan) Build Dependencies
         shell: bash
         run: |
-          conan profile detect 
           conan install . --build=missing -s build_type=${{ matrix.config.build_type }} -c tools.system.package_manager:mode=check
       
       - name: (Cmake) Configure
