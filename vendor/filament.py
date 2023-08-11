@@ -79,7 +79,7 @@ class FilamentConan(ConanFile):
         replace_in_file(self,
                         file_path="filament/backend/CMakeLists.txt",
                         search="-Wdeprecated",
-                        replace="-Wno-deprecated")
+                        replace="-Wno-deprecated -Wno-deprecated-this-capture")
 
     def layout(self):
         cmake_layout(self)
