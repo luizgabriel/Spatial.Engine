@@ -3,6 +3,6 @@ arch=x86_64
 build_type=Release
 compiler=clang
 compiler.cppstd=gnu17
-compiler.libcxx=libc++17
+compiler.libcxx=libc++
 compiler.version=10.0
 os=Linux
