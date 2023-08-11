@@ -66,7 +66,7 @@ class FilamentConan(ConanFile):
         # https://github.com/google/filament/blob/main/BUILDING.md#linux
         if self.settings.os == "Linux":
             apt = Apt(self)
-            apt.install(["libglu1-mesa-dev", "libc++-14-dev", "libc++abi-14-dev", "libxi-dev", "libxcomposite-dev", "libxxf86vm-dev"])
+            apt.install(["libglu1-mesa-dev", "libxi-dev", "libxcomposite-dev", "libxxf86vm-dev"])
 
     def source(self):
         git = Git(self)
