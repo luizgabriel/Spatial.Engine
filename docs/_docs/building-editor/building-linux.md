@@ -56,10 +56,19 @@ After, install [CMake](https://cmake.org/install/).
 
 ```sh
 # Install some build dependencies
-sudo apt-get install ninja-build build-essential mesa-common-dev libxi-dev libxxf86vm-dev
+sudo apt-get install ninja-build build-essential
 
 # Install LLVM Clang (Because it's required to build the filament library)
 sudo apt-get install clang libc++-dev libc++abi-dev
+
+# Install X11 Core Libraries
+sudo apt-get install libglu1-mesa-dev libxi-dev libxcomposite-dev libxxf86vm-dev libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev
+
+# Install X11 Additional Libraries
+sudo apt-get install libxaw7-dev libxcursor-dev libxdamage-dev libxinerama-dev libxmuu-dev libxrandr-dev libxres-dev libxss-dev libxtst-dev libxv-dev libxvmc-dev
+
+# Install XCB Libraries
+sudo apt-get install libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev libxcb-cursor-dev libxcb-util-dev
 
 # Install conan
 pip install conan
