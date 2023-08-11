@@ -34,11 +34,24 @@ Change profile might look like this:
 [settings]
 arch=x86_64
 build_type=Release
-compiler=msvc
+compiler=apple-clang
+compiler.cppstd=gnu17
+compiler.libcxx=libc++
+compiler.version=13
+os=Macos
+```
+
+For Apple Silicon chips (M1, M2, etc...):
+
+```
+[settings]
+arch=armv8
+build_type=Release
+compiler=clang
 compiler.cppstd=20
-compiler.runtime=dynamic
-compiler.version=193
-os=Windows
+compiler.libcxx=libc++
+compiler.version=13
+os=Macos
 ```
 
 ## Cloning the Engine Respository
