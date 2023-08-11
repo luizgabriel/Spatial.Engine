@@ -63,7 +63,7 @@ class FilamentConan(ConanFile):
     }
 
     def validate(self):
-        check_min_cppstd(self, "20")
+        check_min_cppstd(self, "17")
 
     def system_requirements(self):
         # https://github.com/google/filament/blob/main/BUILDING.md#linux
