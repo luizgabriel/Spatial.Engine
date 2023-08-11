@@ -319,5 +319,4 @@ class ViewBuilder : public BasicBuilder<View>
 	ViewBuilder& withAttachment(Entity attachmentTexture);
 };
 
-
 } // namespace spatial::ecs

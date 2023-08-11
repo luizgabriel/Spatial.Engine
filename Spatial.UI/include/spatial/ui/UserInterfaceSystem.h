@@ -5,7 +5,7 @@
 #include <spatial/common/Signal.h>
 #include <spatial/desktop/PlatformEvent.h>
 #include <spatial/resources/FileSystem.h>
-#include <spatial/ui/system/ImGuiRenderer.h>
+#include <spatial/ui/ImGuiRenderer.h>
 
 #include <string_view>
 

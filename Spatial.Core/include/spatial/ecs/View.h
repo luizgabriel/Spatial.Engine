@@ -1,10 +1,10 @@
 #pragma once
 
+#include <spatial/common/AspectRatio.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Registry.h>
-#include <spatial/common/AspectRatio.h>
-#include <vector>
 #include <string_view>
+#include <vector>
 
 namespace spatial::ecs
 {
@@ -41,7 +41,8 @@ struct View
 {
 	constexpr static auto typeName = "view";
 
-	enum class BlendMode {
+	enum class BlendMode
+	{
 		Opaque,
 		Translucent,
 	};
@@ -57,7 +58,5 @@ struct View
 
 	static void resizeAttachments(Registry& registry, Entity sceneViewEntity);
 };
-
-
 
 } // namespace spatial::ecs

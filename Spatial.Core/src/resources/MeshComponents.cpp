@@ -20,18 +20,17 @@ ecs::VertexData createVertexData(const FilameshFile& filamesh)
 
 	auto layout =
 		ecs::VertexLayout{layoutMode,
-						  {
-							  ecs::VertexDescription{ecs::VertexAttribute::Position, ecs::VertexAttributeType::Half4},
-							  {ecs::VertexAttribute::Tangents, ecs::VertexAttributeType::Short4, true},
-							  {ecs::VertexAttribute::Color, ecs::VertexAttributeType::UnsignedByte4, true},
-							  {ecs::VertexAttribute::UV0, uvType, uvNormalized},
-							  {ecs::VertexAttribute::UV1, ecs::VertexAttributeType::None}
-						  }};
+						  {ecs::VertexDescription{ecs::VertexAttribute::Position, ecs::VertexAttributeType::Half4},
+						   {ecs::VertexAttribute::Tangents, ecs::VertexAttributeType::Short4, true},
+						   {ecs::VertexAttribute::Color, ecs::VertexAttributeType::UnsignedByte4, true},
+						   {ecs::VertexAttribute::UV0, uvType, uvNormalized},
+						   {ecs::VertexAttribute::UV1, ecs::VertexAttributeType::None}}};
 
 	if (filamesh.header.offsetUV1 != std::numeric_limits<uint32_t>::max()
 		&& filamesh.header.strideUV1 != std::numeric_limits<uint32_t>::max())
 	{
-		layout.description[4] = ecs::VertexDescription{ecs::VertexAttribute::UV1, ecs::VertexAttributeType::Half2, uvNormalized};
+		layout.description[4] =
+			ecs::VertexDescription{ecs::VertexAttribute::UV1, ecs::VertexAttributeType::Half2, uvNormalized};
 	}
 
 	return ecs::VertexData::create(filamesh.vertexData, std::move(layout));
@@ -43,4 +42,4 @@ ecs::IndexData createIndexData(const FilameshFile& filamesh)
 						  filamesh.header.indexType ? ecs::IndexType::UnsignedShort : ecs::IndexType::UnsignedInt};
 }
 
-}
+} // namespace spatial

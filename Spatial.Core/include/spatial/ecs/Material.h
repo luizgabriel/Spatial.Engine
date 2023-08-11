@@ -2,20 +2,25 @@
 
 #include <spatial/ecs/Registry.h>
 
-namespace spatial::ecs {
+namespace spatial::ecs
+{
 
-namespace tags {
+namespace tags
+{
 
-struct IsMaterial {
+struct IsMaterial
+{
 	constexpr static auto typeName = "tag_is_material";
 };
 
 } // namespace tags
 
-struct MaterialInstance {
+struct MaterialInstance
+{
 	constexpr static auto typeName = "material_instance";
 
-	struct Scissor {
+	struct Scissor
+	{
 		uint32_t left{};
 		uint32_t bottom{};
 		uint32_t width{};
@@ -26,6 +31,5 @@ struct MaterialInstance {
 
 	static void changeMaterialSource(Registry& registry, entt::entity materialInstance, Entity newMaterialSource);
 };
-
 
 } // namespace spatial::ecs

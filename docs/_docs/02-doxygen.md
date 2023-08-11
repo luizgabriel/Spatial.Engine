@@ -15,7 +15,7 @@ brew install doxygen graphviz
 Build the project with the docs
 
 ```sh
-python3 cli.py configure --docs
-python3 cli.py build --docs
-python3 -m http.server --directory ./out/build/MacOS-Release/html
+cmake --preset conan-debug
+cmake --build . --preset conan-debug -DSPATIAL_ENABLE_DOXYGEN=ON
+python3 -m http.server --directory ./build/Debug/html
 ```

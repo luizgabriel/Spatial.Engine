@@ -3,8 +3,8 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <entt/entity/snapshot.hpp>
-#include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Mesh.h>
+#include <spatial/ecs/Registry.h>
 #include <spatial/ecs/Resource.h>
 
 namespace cereal
@@ -27,15 +27,20 @@ struct ConstComponentRegistry
 template <typename Archive, typename Component>
 void save(Archive& ar, const ConstComponentRegistry<Component>& registry)
 {
-	if constexpr (std::is_same_v<Component, spatial::ecs::Mesh>) {
-		// ecs::Mesh is a huge component, there is no need to storage in the scene file if there is a FileSystemResource attached
-		auto view = registry.reg.template getEntities<const Component>(spatial::ecs::Exclude<spatial::ecs::FileSystemResource>);
+	if constexpr (std::is_same_v<Component, spatial::ecs::Mesh>)
+	{
+		// ecs::Mesh is a huge component, there is no need to storage in the scene file if there is a FileSystemResource
+		// attached
+		auto view =
+			registry.reg.template getEntities<const Component>(spatial::ecs::Exclude<spatial::ecs::FileSystemResource>);
 		ar(cereal::make_size_tag(view.size_hint()));
 
 		view.each([&](spatial::ecs::Entity entity, const Component& component) {
 			ar(cereal::make_map_item(entity, component));
 		});
-	} else {
+	}
+	else
+	{
 		auto view = registry.reg.template getEntities<const Component>();
 		ar(cereal::make_size_tag(view.size()));
 
@@ -46,15 +51,13 @@ void save(Archive& ar, const ConstComponentRegistry<Component>& registry)
 				ar(cereal::make_map_item(entity, component));
 			});
 	}
-
-
 }
 
 template <typename Archive, typename Component>
 void load(Archive& ar, ComponentRegistry<Component>& registry)
 {
 	auto entitiesCount = cereal::size_type{};
-    ar(cereal::make_size_tag(entitiesCount));
+	ar(cereal::make_size_tag(entitiesCount));
 
 	for (size_t i = 0; i < entitiesCount; i++)
 	{

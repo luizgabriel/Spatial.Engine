@@ -4,10 +4,10 @@
 #include <spatial/resources/BoundingBox.h>
 
 #include <cstdint>
+#include <future>
 #include <istream>
 #include <string>
 #include <vector>
-#include <future>
 
 namespace spatial
 {

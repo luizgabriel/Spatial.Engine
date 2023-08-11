@@ -1,5 +1,5 @@
-#include <spatial/ui/system/ImGuiHelpers.h>
-#include <spatial/ui/system/ImGuiRenderer.h>
+#include <spatial/ui/ImGuiHelpers.h>
+#include <spatial/ui/ImGuiRenderer.h>
 
 #include <spatial/common/Math.h>
 

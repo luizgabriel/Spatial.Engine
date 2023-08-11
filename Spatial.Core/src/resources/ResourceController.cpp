@@ -23,17 +23,22 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 			registry.addComponent(entity, std::move(futureData));
 		});
 
-	registry.getEntities<const ecs::FileSystemResource, FutureData>(ecs::Exclude<ecs::FileSystemResourceData, ecs::tags::IsResourceLoaded>)
+	registry
+		.getEntities<const ecs::FileSystemResource, FutureData>(
+			ecs::Exclude<ecs::FileSystemResourceData, ecs::tags::IsResourceLoaded>)
 		.each([&](ecs::Entity entity, const auto& resource, auto& futureData) {
 			if (futureData.wait_for(10us) != std::future_status::ready)
 				return;
 
 			auto data = futureData.get();
 
-			if (data.empty()) {
+			if (data.empty())
+			{
 				registry.addComponent<ecs::ResourceError>(entity, "Empty resource");
 				registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
-			} else {
+			}
+			else
+			{
 				registry.removeComponent<ecs::ResourceError>(entity);
 				registry.addComponent<ecs::FileSystemResourceData>(entity, std::move(data));
 			}

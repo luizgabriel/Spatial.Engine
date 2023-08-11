@@ -1,6 +1,6 @@
 #include <spatial/ui/components/DockSpace.h>
-#include <spatial/ui/system/ImGuiHelpers.h>
-#include <spatial/ui/system/UserInterfaceSystem.h>
+#include <spatial/ui/ImGuiHelpers.h>
+#include <spatial/ui/UserInterfaceSystem.h>
 
 namespace spatial::ui {
 
@@ -13,19 +13,6 @@ namespace spatial::ui {
 
         imguiSetupTheme();
         imguiSetupInput();
-
-        io.SetClipboardTextFn = [](void *userData, const char *text) {
-            auto &self = *static_cast<UserInterfaceSystem *>(userData);
-            self.mClipboardController.set(text);
-        };
-
-        io.GetClipboardTextFn = [](void *userData) -> const char * {
-            auto &self = *static_cast<UserInterfaceSystem *>(userData);
-            auto text = self.mClipboardController.get();
-            if (text) return text->c_str();
-
-            return nullptr;
-        };
     }
 
     void UserInterfaceSystem::onEvent(const WindowResizedEvent &event) {
@@ -73,10 +60,6 @@ namespace spatial::ui {
         auto fontData = fileSystem.readBinary(fontPath);
         assert(!fontData.empty());
         mRenderer.addFont(fontData.data(), fontData.size());
-    }
-
-    void UserInterfaceSystem::setClipboardController(ClipboardController controller) {
-        mClipboardController = std::move(controller);
     }
 
 } // namespace spatial::ui

@@ -13,8 +13,8 @@
 #include <spatial/graphics/RenderingSystemUtils.h>
 #include <spatial/input/InputSystem.h>
 #include <spatial/input/InputSystemUtils.h>
-#include <spatial/ui/system/UserInterfaceSystem.h>
-#include <spatial/ui/system/UserInterfaceUtils.h>
+#include <spatial/ui/UserInterfaceSystem.h>
+#include <spatial/ui/UserInterfaceUtils.h>
 
 using namespace spatial;
 

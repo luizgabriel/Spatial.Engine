@@ -88,9 +88,8 @@ struct Parent
 	template <typename Function>
 	static void forEachChild(const Registry& registry, Entity parentEntity, Function visitor)
 	{
-		static_assert(
-			std::is_invocable_v<Function, Entity, const Child&> || std::is_invocable_v<Function, Entity>,
-			"The visitor needs to be invocable with `visitor(Entity)` or `visitor(Entity, const Child&)`");
+		static_assert(std::is_invocable_v<Function, Entity, const Child&> || std::is_invocable_v<Function, Entity>,
+					  "The visitor needs to be invocable with `visitor(Entity)` or `visitor(Entity, const Child&)`");
 
 		if (!registry.hasComponent<ecs::Parent>(parentEntity))
 			return;

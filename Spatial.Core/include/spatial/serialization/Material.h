@@ -4,7 +4,8 @@
 #include <spatial/ecs/Material.h>
 #include <spatial/serialization/Math.h>
 
-namespace cereal {
+namespace cereal
+{
 
 template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MaterialInstance::Scissor& scissor)

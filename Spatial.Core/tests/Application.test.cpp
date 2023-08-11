@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 using namespace std::chrono_literals;
-using ::testing::AtLeast;
 using ::testing::_;
+using ::testing::AtLeast;
 
 std::thread startApplicationRuntime(spatial::Application& app)
 {

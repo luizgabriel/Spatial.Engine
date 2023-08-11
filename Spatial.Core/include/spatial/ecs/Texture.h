@@ -1,7 +1,7 @@
 #pragma once
 
-#include <spatial/common/Math.h>
 #include <spatial/common/AspectRatio.h>
+#include <spatial/common/Math.h>
 #include <vector>
 
 namespace spatial::ecs
@@ -43,7 +43,8 @@ struct RuntimeTexture
 struct AttachmentTexture
 {
 	constexpr static auto typeName = "attachment_texture";
-	enum class Type {
+	enum class Type
+	{
 		Color,
 		Depth
 	};
