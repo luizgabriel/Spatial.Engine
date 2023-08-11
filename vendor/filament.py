@@ -2,6 +2,7 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.scm import Git
 from conan.tools.files import replace_in_file
+from conan.tools.system.package_manager import Apt
 
 
 class FilamentConan(ConanFile):
@@ -60,6 +61,12 @@ class FilamentConan(ConanFile):
         "skip_samples": True,
         "skip_sdl2": True,
     }
+
+    def system_requirements(self):
+        # https://github.com/google/filament/blob/main/BUILDING.md#linux
+        if self.settings.os == "Linux":
+            apt = Apt(self)
+            apt.install(["libglu1-mesa-dev", "libc++-14-dev", "libc++abi-14-dev", "libxi-dev", "libxcomposite-dev", "libxxf86vm-dev"])
 
     def source(self):
         git = Git(self)
