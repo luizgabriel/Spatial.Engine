@@ -1,9 +1,10 @@
 add_library(Spatial.UI
 
         ## HEADERS
-        include/spatial/ui/system/ImGuiHelpers.h
-        include/spatial/ui/system/UserInterfaceSystem.h
-        include/spatial/ui/system/ImGuiRenderer.h
+        include/spatial/ui/ImGuiHelpers.h
+        include/spatial/ui/UserInterfaceSystem.h
+        include/spatial/ui/ImGuiRenderer.h
+        include/spatial/ui/UserInterfaceUtils.h
 
         include/spatial/ui/components/Basic.h
         include/spatial/ui/components/Window.h
@@ -25,9 +26,9 @@ add_library(Spatial.UI
         include/spatial/ui/components/styles/WindowPaddingStyle.h
 
         ## SOURCES
-        src/system/ImGuiHelpers.cpp
-        src/system/UserInterfaceSystem.cpp
-        src/system/ImGuiRenderer.cpp
+        src/ImGuiHelpers.cpp
+        src/UserInterfaceSystem.cpp
+        src/ImGuiRenderer.cpp
 
         src/components/Window.cpp
         src/components/CollapsingHeader.cpp

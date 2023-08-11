@@ -47,11 +47,6 @@ jobs:
         shell: bash
         run: choco install windows-sdk-10-version-2004-windbg
 
-      - name: (Linux) Setup Linux Dependencies
-        if: contains(matrix.config.os, 'ubuntu')
-        shell: bash
-        run: sudo apt-get install mesa-common-dev libxi-dev libxxf86vm-dev
-
       - name: (Linux) Set up Clang
         if: contains(matrix.config.os, 'ubuntu')
         uses: egor-tensin/setup-clang@v1
@@ -63,7 +58,7 @@ jobs:
         shell: bash
         run: |
           conan profile detect 
-          conan install . --build=missing -s build_type=${{ matrix.config.build_type }}
+          conan install . --build=missing -s build_type=${{ matrix.config.build_type }} -c tools.system.package_manager:mode=install
       
       - name: (Cmake) Configure
         shell: bash
