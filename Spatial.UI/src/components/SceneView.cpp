@@ -16,16 +16,20 @@ void SceneView::image(const ecs::Registry& registry, ecs::Entity sceneViewEntity
 		ImGui::GetWindowDrawList()->AddRectFilled(currentPosition, rectMax, IM_COL32(34, 34, 34, 255));
 	}
 
-	const auto& sceneView = registry.getComponent<const ecs::View>(sceneViewEntity);
+    if (!registry.hasComponent<ecs::View>(sceneViewEntity)) {
+        return;
+    }
+
+	const auto& sceneView = registry.getComponent<ecs::View>(sceneViewEntity);
 	auto aspectRatio = 1.0;
-	const auto* perspectiveCamera = registry.tryGetComponent<const ecs::PerspectiveCamera>(sceneView.camera);
-	if (perspectiveCamera)
+	const auto* perspectiveCamera = registry.tryGetComponent<ecs::PerspectiveCamera>(sceneView.camera);
+	if (perspectiveCamera != nullptr)
 		aspectRatio = perspectiveCamera->aspectRatio;
 
 	const auto imageSize = aspectRatio >= 1 ? math::uvec2{static_cast<double>(size.y) * aspectRatio, size.y}
 											: math::uvec2{size.x, static_cast<double>(size.x) / aspectRatio};
 
-	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5f,
+	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + (size.x - static_cast<float>(imageSize.x)) * 0.5F,
 									 ImGui::GetCursorScreenPos().y));
 
 	auto colorAttachment = graphics::getTexture(registry, sceneView.colorAttachment);

@@ -15,7 +15,7 @@ add_custom_command(
 )
 
 add_custom_target(Spatial.Game
-    COMMAND $<TARGET_FILE:Spatial.Editor> ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND $<TARGET_FILE:Spatial.Editor>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS
         meshes/plane_hd.filamesh
