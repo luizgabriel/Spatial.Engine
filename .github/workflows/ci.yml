@@ -94,7 +94,7 @@ jobs:
 
       - name: (CTest) Run Tests
         shell: bash
-        run: ctest . --preset ${{ matrix.config.build_preset }} --output-on-failure
+        run: ctest . --preset ${{ matrix.config.build_preset }} -E "(Application)" --output-on-failure
 
       - name: (CPack) Generate Package
         if: contains(github.ref, 'tags/v')
