@@ -50,7 +50,7 @@ class SpatialRecipe(ConanFile):
         self.requires("imgui/cci.20230105+1.89.2.docking")
         self.requires_local("filament/1.40.4", options={
             "supports_metal": self.settings.os == "Macos",
-            "supports_opengl": self.settings.os == "Windows"
+            "supports_opengl": self.settings.os == "Windows" or self.settings.os == "Linux",
         })
 
     def layout(self):

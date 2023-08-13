@@ -204,10 +204,7 @@ void ComponentInputImpl<ecs::MeshInstance, graphics::OptionalTexture>::draw(ecs:
 
 					auto& meshPrimitive = registry.getComponent<ecs::MeshPrimitive>(child);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
 					ImGui::PushID((int)child);
-#pragma clang diagnostic pop
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();

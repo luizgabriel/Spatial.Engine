@@ -15,9 +15,9 @@ jobs:
     strategy:
       matrix:
         config:
-          - { name: "Ubuntu-Clang", os: ubuntu-20.04, build_type: "Release", conan_preset: "conan-release" }
-          - { name: "MacOS-Clang", os: macos-11, build_type: "Release", conan_preset: "conan-release" }
-          - { name: "Windows-MSVC", os: windows-2022, build_type: "Release", conan_preset: "conan-release" }
+          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, build_type: "Release", conan_preset: "conan-release" }
+          - { name: "MacOS-Clang", os: macos-11, build_dir: "build/Release", config_preset: "conan-release", build_preset: "conan-release" }
+          - { name: "Windows-MSVC", os: windows-2022, build_dir: "build", config_preset: "conan-default", build_preset: "conan-release" }
 
     steps:
       - uses: actions/checkout@v3
@@ -45,6 +45,11 @@ jobs:
         if: contains(matrix.config.os, 'windows')
         shell: bash
         run: choco install windows-sdk-10-version-2004-windbg
+
+      - name: (Windows) Setup WIX Toolset
+        if: contains(matrix.config.os, 'windows')
+        shell: bash
+        run: choco install wixtoolset
 
       - name: (Linux) Setup Linux Dependencies
         if: contains(matrix.config.os, 'ubuntu')
@@ -77,24 +82,24 @@ jobs:
       - name: (Conan) Build Dependencies
         shell: bash
         run: |
-          conan install . --build=missing -s build_type=${{ matrix.config.build_type }} -c tools.system.package_manager:mode=check
+          conan install . --build=missing
       
       - name: (Cmake) Configure
         shell: bash
-        run: cmake --preset ${{ matrix.config.conan_preset }}
+        run: cmake --preset ${{ matrix.config.config_preset }}
 
       - name: (Cmake) Build
         shell: bash
-        run: cmake --build . --preset ${{ matrix.config.conan_preset }}
+        run: cmake --build . --preset ${{ matrix.config.build_preset }}
 
       - name: (CTest) Run Tests
         shell: bash
-        run: pushd build/${{ matrix.config.build_type }} && ctest --output-on-failure && popd
+        run: ctest . --preset ${{ matrix.config.build_preset }} --output-on-failure
 
       - name: (CPack) Generate Package
         if: contains(github.ref, 'tags/v')
         shell: bash
-        run: cmake --build . --preset ${{ matrix.config.conan_preset }} --target package
+        run: cmake --build . --preset ${{ matrix.config.build_preset }} --target package
 
       - name: Get the version
         if: contains(github.ref, 'tags/v')
@@ -109,9 +114,9 @@ jobs:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
           path: |
-            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.zip
-            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.tar.gz
-            ${{ github.workspace }}/build/${{ matrix.config.build_type }}/*.dmg
+            ${{ github.workspace }}/${{ matrix.config.build_dir }}/*.zip
+            ${{ github.workspace }}/${{ matrix.config.build_dir }}/*.tar.gz
+            ${{ github.workspace }}/${{ matrix.config.build_dir }}/*.dmg
 
   release:
     if: contains(github.ref, 'tags/v')

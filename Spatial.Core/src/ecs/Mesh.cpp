@@ -8,7 +8,7 @@ namespace spatial::ecs
 Entity Mesh::addPart(Registry& registry, Entity meshEntity, MeshPart part)
 {
 	auto partEntity = registry.createEntity();
-	registry.addComponent<ecs::MeshPart>(partEntity, std::move(part));
+	registry.addComponent<ecs::MeshPart>(partEntity, part);
 	ecs::Parent::addChild(registry, meshEntity, partEntity);
 
 	return partEntity;

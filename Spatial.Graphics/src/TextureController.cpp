@@ -1,10 +1,10 @@
-#include "spatial/graphics/TextureResources.h"
 #include <spatial/core/Logger.h>
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/graphics/Resources.h>
 #include <spatial/graphics/SkyboxResources.h>
 #include <spatial/graphics/TextureController.h>
+#include <spatial/graphics/TextureResources.h>
 
 namespace spatial::graphics
 {
@@ -13,6 +13,7 @@ filament::Texture::Builder makeAttachmentTexture(const ecs::AttachmentTexture& a
 {
 	switch (attachmentTexture.type)
 	{
+	default:
 	case ecs::AttachmentTexture::Type::Color:
 		return filament::Texture::Builder()
 			.width(attachmentTexture.size.x)

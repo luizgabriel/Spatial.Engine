@@ -64,10 +64,7 @@ void imguiAddFont(const uint8_t* data, size_t size, float fontSize)
 	auto config = ImFontConfig{};
 	config.FontDataOwnedByAtlas = false;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast"
 	io.Fonts->AddFontFromMemoryTTF((void*)data, static_cast<int>(size), fontSize, &config);
-#pragma clang diagnostic pop
 }
 
 graphics::Texture imguiCreateTextureAtlas(fl::Engine& engine)

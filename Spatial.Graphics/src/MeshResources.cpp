@@ -14,6 +14,7 @@ filament::VertexBuffer::Builder createVertexBufferBuilder(const FilameshFileHead
 	}
 
 	bool uvNormalized = header.flags & FLAG_SNORM16_UV;
+	assert(header.vertexCount != 0);
 
 	auto vbBuilder = filament::VertexBuffer::Builder()
 						 .vertexCount(header.vertexCount)
@@ -56,6 +57,8 @@ VertexBuffer createVertexBuffer(filament::Engine& engine, const FilameshFile& fi
 
 filament::IndexBuffer::Builder createIndexBufferBuilder(const FilameshFileHeader& header)
 {
+	assert(header.indexCount != 0);
+
 	return filament::IndexBuffer::Builder()
 		.indexCount(header.indexCount)
 		.bufferType(header.indexType ? filament::IndexBuffer::IndexType::USHORT

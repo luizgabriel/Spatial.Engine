@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <spatial/ui/components/DirectionInput.h>
 #include <spatial/ui/components/VectorInput.h>
+#include <algorithm>
 
 namespace spatial::ui
 {

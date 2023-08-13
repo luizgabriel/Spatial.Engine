@@ -33,50 +33,44 @@ class Registry : private entt::registry
 
 	[[nodiscard]] const ecs::Entity* getEntities() const;
 
-	template <typename Component>
-	[[nodiscard]] size_t getEntitiesCount() const noexcept
-	{
-		return size<Component>();
-	}
-
 	template <typename... Components>
 	[[nodiscard]] bool hasAnyEntity() const noexcept
 	{
-		return isValid(getFirstEntity<Components...>());
+		return this->isValid(getFirstEntity<Components...>());
 	}
 
 	template <typename Component>
-	auto getOnConstructSignal()
+	[[nodiscard]] auto getOnConstructSignal()
 	{
-		return on_construct<Component>();
+		return this->on_construct<Component>();
 	}
 
 	template <typename Component>
-	auto getOnUpdateSignal()
+	[[nodiscard]] auto getOnUpdateSignal()
 	{
-		return on_update<Component>();
+		return this->on_update<Component>();
 	}
 
 	template <typename Component>
-	auto getOnDestroySignal()
+	[[nodiscard]] auto getOnDestroySignal()
 	{
-		return on_destroy<Component>();
+		return this->on_destroy<Component>();
 	}
 
 	template <typename... Component, typename... Exclude>
-	auto getEntities(ExcludeComponentsType<Exclude...> excludes = {}) const
+	[[nodiscard]] auto getEntities(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
-		return view<Component...>(std::move(excludes));
+		return this->view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
-	auto getEntities(ExcludeComponentsType<Exclude...> excludes = {})
+	[[nodiscard]] auto getEntities(ExcludeComponentsType<Exclude...> excludes = {})
 	{
-		return view<Component...>(std::move(excludes));
+		return this->view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
-	Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
+	[[nodiscard]] Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
 	{
 		auto view = getEntities<std::add_const_t<Component>...>(std::move(excludes));
 		for (auto entity : view)
@@ -86,85 +80,85 @@ class Registry : private entt::registry
 	}
 
 	template <typename Component>
-	const Component& getComponent(Entity entity) const
+	[[nodiscard]] const Component& getComponent(Entity entity) const
 	{
 		assert(isValid(entity));
-		return get<Component>(entity);
+		return this->get<Component>(entity);
 	}
 
 	template <typename Component>
-	Component& getComponent(Entity entity)
+	[[nodiscard]] Component& getComponent(Entity entity)
 	{
 		assert(hasComponent<Component>(entity));
-		return get<Component>(entity);
+		return this->get<Component>(entity);
 	}
 
 	template <typename... Component>
 	size_t removeComponentFromEntities()
 	{
 		auto view = getEntities<Component...>();
-		return remove<Component...>(view.begin(), view.end());
+		return this->remove<Component...>(view.begin(), view.end());
 	}
 
 	template <typename Component>
 	size_t removeComponent(Entity entity)
 	{
 		assert(isValid(entity));
-		return remove<Component>(entity);
+		return this->remove<Component>(entity);
 	}
 
 	template <typename Component, typename It>
 	size_t removeComponent(It begin, It end)
 	{
-		return remove<Component>(begin, end);
+		return this->remove<Component>(begin, end);
 	}
 
 	template <typename Component, typename It>
 	void insertComponent(It begin, It end, const Component& component = {})
 	{
-		return insert<Component>(begin, end, component);
+		return this->insert<Component>(begin, end, component);
 	}
 
 	template <typename Component>
 	decltype(auto) addComponent(Entity entity, Component&& component)
 	{
 		assert(!hasComponent<Component>(entity));
-		return emplace<Component>(entity, std::forward<Component>(component));
+		return this->emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) addComponent(Entity entity, Args&&... args)
 	{
 		assert(!hasComponent<Component>(entity));
-		return emplace<Component>(entity, std::forward<Args>(args)...);
+		return this->emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) addOrReplaceComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
-		return emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
+		return this->emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component>
 	decltype(auto) addOrReplaceComponent(Entity entity, Component&& component)
 	{
 		assert(isValid(entity));
-		return emplace_or_replace<Component>(entity, std::forward<Component>(component));
+		return this->emplace_or_replace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
 	decltype(auto) getOrAddComponent(Entity entity, Args&&... args)
 	{
 		assert(isValid(entity));
-		return get_or_emplace<Component>(entity, std::forward<Args>(args)...);
+		return this->get_or_emplace<Component>(entity, std::forward<Args>(args)...);
 	}
 
 	template <typename Component>
 	decltype(auto) getOrAddComponent(Entity entity, Component&& component)
 	{
 		assert(isValid(entity));
-		return get_or_emplace<Component>(entity, std::forward<Component>(component));
+		return this->get_or_emplace<Component>(entity, std::forward<Component>(component));
 	}
 
 	template <typename Component, typename... Args>
@@ -190,7 +184,7 @@ class Registry : private entt::registry
 	template <typename... Component>
 	[[nodiscard]] bool hasAllComponents(Entity entity) const
 	{
-		return isValid(entity) && all_of<Component...>(entity);
+		return isValid(entity) && all_of<Component...> (entity);
 	}
 
 	template <typename... Component>
@@ -204,7 +198,7 @@ class Registry : private entt::registry
 	template <typename It>
 	void destroyEntities(It first, It last)
 	{
-		destroy<It>(first, last);
+		this->destroy<It>(first, last);
 	}
 
 	template <typename... Component, typename... Exclude>
@@ -217,13 +211,15 @@ class Registry : private entt::registry
 	template <typename Component>
 	const Component* tryGetComponent(Entity entity) const
 	{
-		return isValid(entity) ? try_get<const Component>(entity) : nullptr;
+		return isValid(entity) ? this->try_get<const Component>(entity)
+							   : nullptr;
 	}
 
 	template <typename Component>
 	Component* tryGetComponent(Entity entity)
 	{
-		return isValid(entity) ? try_get<Component>(entity) : nullptr;
+		return isValid(entity) ? this->try_get<Component>(entity)
+							   : nullptr;
 	}
 
 	template <typename... Component>
@@ -235,14 +231,15 @@ class Registry : private entt::registry
 	template <typename... Component, typename... Exclude>
 	void destroyEntitiesWith(ExcludeComponentsType<Exclude...> excludes = {})
 	{
-		auto view = getEntities<const Component...>(excludes);
-		destroy(view.begin(), view.end());
+		auto view = getEntities<const Component...>
+					(excludes);
+		this->destroy(view.begin(), view.end());
 	}
 
 	template <typename Component, typename Compare, typename Sort = entt::std_sort, typename... Args>
 	void sortComponent(Compare compare, Sort algo = Sort{}, Args&&... args)
 	{
-		sort<Component>(std::forward<Compare>(compare), std::forward<Sort>(algo), std::forward<Args>(args)...);
+		this->sort<Component>(std::forward<Compare>(compare), std::forward<Sort>(algo), std::forward<Args>(args)...);
 	}
 
 	friend class SnapshotLoader;

@@ -14,7 +14,7 @@ Install all these tools:
 - [Visual Studio 2022 Community](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
 - [Python 3](https://www.python.org/downloads/)
 
-## Using Chocolatey
+### Using Chocolatey
 
 You can also install these dependencies using the [Chocolatey](https://chocolatey.org/install)
 
@@ -27,7 +27,7 @@ choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 choco install conan
 ```
 
-## Configuring Conan Profile
+## Configuring a Conan Profile
 
 You must create a default conan profile:
 
@@ -60,19 +60,18 @@ cd Spatial.Engine
 
 ## Building the Engine from the Command Line
 
-Now, inside the project's folder. Run this script install all required conan dependencies which are not found by conan
-by default.
+Now, inside the project's folder.
 
 ```
-conan install . --build=missing -s build_type=Debug
-cmake --preset conan-debug
-cmake --build . --preset conan-debug
+conan install . --build=missing
+cmake --preset conan-default
+cmake --build . --preset conan-default
 ```
 
 ## Running the Engine Editor
 
 ```
-cmake --build . --preset conan-debug --package Spatial.Game
+cmake --build . --preset conan-default --package Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.

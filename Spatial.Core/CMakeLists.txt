@@ -101,9 +101,6 @@ add_library(Spatial.Core
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)
 
-set_property(TARGET Spatial.Core PROPERTY
-  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
 target_precompile_headers(Spatial.Core
         PRIVATE <memory> <vector> <unordered_map> <unordered_set> <future> <optional> <filesystem> <chrono> <utility> <type_traits> <set> <random> <array> <functional>)
 

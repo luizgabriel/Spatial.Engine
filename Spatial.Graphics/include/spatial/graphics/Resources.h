@@ -20,6 +20,7 @@
 #include <spatial/graphics/Entity.h>
 
 #include <string_view>
+#include <vector>
 
 namespace spatial::graphics
 {

@@ -50,9 +50,9 @@ enum class VertexAttributeType : uint16_t
 	Short4 = (9 << 8) | (4 * 2),
 };
 
-constexpr uint8_t getVertexAttributeSize(VertexAttributeType type)
+constexpr size_t getVertexAttributeSize(VertexAttributeType type)
 {
-	return static_cast<uint8_t>(0x00FF & static_cast<uint16_t>(type));
+	return static_cast<size_t>(0x00FF & static_cast<uint16_t>(type));
 }
 
 static_assert(getVertexAttributeSize(VertexAttributeType::Float2) == 8, "Float2 should be 8 bytes");
@@ -64,7 +64,7 @@ struct VertexDescription
 	VertexAttributeType type{VertexAttributeType::None};
 	bool isNormalized{false};
 
-	[[nodiscard]] constexpr uint8_t getTypeSizeInBytes() const
+	[[nodiscard]] constexpr auto getTypeSizeInBytes() const
 	{
 		return getVertexAttributeSize(type);
 	}
@@ -90,9 +90,9 @@ struct VertexLayout
 };
 static_assert(std::is_trivially_copyable_v<VertexLayout>, "VertexLayout should be trivially copyable");
 
-constexpr uint8_t calculateInterleavedBytesStride(const VertexLayout& layout)
+constexpr size_t calculateInterleavedBytesStride(const VertexLayout& layout)
 {
-	uint8_t total = 0;
+    size_t total = 0;
 
 	for (const auto& desc : layout.description)
 	{
@@ -125,9 +125,9 @@ struct VertexData
 	template <typename T>
 	static VertexData create(const std::vector<T>& data, VertexLayout layout)
 	{
-		const auto* beginData = reinterpret_cast<const uint8_t*>(data.data());
-		const auto* endData = beginData + sizeof(T) * data.size();
-		auto buffer = std::vector<uint8_t>(beginData, endData);
+        const auto size = data.size() * sizeof(T);
+        auto buffer = std::vector<uint8_t>(size);
+        std::memcpy(buffer.data(), data.data(), size);
 
 		return {std::move(buffer), layout};
 	}
@@ -162,12 +162,13 @@ struct IndexData
 	{
 		static_assert(std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t>, "Unsupported index data type");
 
-		const auto* beginData = reinterpret_cast<const uint8_t*>(data.data());
-		const auto* endData = beginData + sizeof(T) * data.size();
-		auto buffer = std::vector<uint8_t>(beginData, endData);
+        const auto size = data.size() * sizeof(T);
+        auto buffer = std::vector<uint8_t>(size);
+        std::memcpy(buffer.data(), data.data(), size);
 
 		return {std::move(buffer), static_cast<IndexType>(sizeof(T))};
 	}
+
 };
 
 struct MeshPart

@@ -13,6 +13,7 @@ inline filament::View::BlendMode toFilament(ecs::View::BlendMode blendMode)
 {
 	switch (blendMode)
 	{
+	default:
 	case ecs::View::BlendMode::Opaque:
 		return filament::BlendMode::OPAQUE;
 	case ecs::View::BlendMode::Translucent:
@@ -24,6 +25,7 @@ inline filament::RenderTarget::AttachmentPoint toFilament(ecs::AttachmentTexture
 {
 	switch (attachmentType)
 	{
+	default:
 	case ecs::AttachmentTexture::Type::Color:
 		return filament::RenderTarget::AttachmentPoint::COLOR;
 	case ecs::AttachmentTexture::Type::Depth:

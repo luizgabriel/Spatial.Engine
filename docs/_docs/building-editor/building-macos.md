@@ -7,11 +7,7 @@ parent: Building the Editor
 
 ## Installing Requirements
 
-First of all. Make sure your graphics card supports OpenGL 4.1+.
-
-- [MacOS OpenGL Version Support](https://support.apple.com/HT202823)
-
-Now, install all these tools using [Homebrew](https://brew.sh/):
+Install all these tools using [Homebrew](https://brew.sh/):
 
 ```sh
 brew update
@@ -19,7 +15,7 @@ brew install cmake conan llvm ninja
 xcode-select --install
 ```
 
-## Configuring Conan Profile
+## Configuring a Conan Profile
 
 You must create a default conan profile:
 
@@ -65,13 +61,12 @@ cd Spatial.Engine
 
 ## Building the Engine from the Command Line
 
-Now, inside the project's folder. Run this script install all required conan dependencies which are not found by conan
-by default.
+Now, inside the project's folder.
 
 ```
-conan install . --build=missing -s build_type=Debug
-cmake --preset conan-debug
-cmake --build . --preset conan-debug
+conan install . --build=missing
+cmake --preset conan-release
+cmake --build . --preset conan-release
 ```
 
 ## Running the Engine Editor

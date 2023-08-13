@@ -6,10 +6,6 @@ add_executable(Spatial.Core.Tests
         FileSystem.test.cpp
         main.cpp)
 
-set_property(
-        TARGET Spatial.Core.Tests
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
 target_link_libraries(Spatial.Core.Tests
         PUBLIC
             Spatial.Core

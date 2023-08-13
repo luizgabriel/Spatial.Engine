@@ -7,52 +7,17 @@ parent: Building the Editor
 
 ## Installing Requirements
 
-First of all. Make sure your graphics card supports OpenGL 4.1+.
-
-- [MacOS OpenGL Version Support](https://support.apple.com/HT202823)
-
-### MacOS
-
-Now, install all these tools:
-
-```sh
-brew update
-brew install cmake conan
-xcode-select --install
-```
-
-Now, go to [Building the Engine](#building-the-engine) topic.
-
-### Windows
-
-Install all these tools:
+First, you need to install cmake:
 
 - [CMake](https://cmake.org/download/)
-- [Conan](https://conan.io/downloads.html)
-- [Visual Studio 2022 Community](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
 
-## Configuring Conan Profile
-
-You must create a default conan profile:
-
-```sh
-conan profile detect
 ```
-
-> **V8 Library Requirement:**
->
-> You must install "Windows 10 SDK version 10.0.19041.0" including the "Debugging Tools for Windows"
-> feature [(Choco Package)](https://community.chocolatey.org/packages/windows-sdk-10-version-2004-windbg).
->
-> > If you already the SDK installed, here
-> >
-> > is [how to enable to "Debugging Tools for Windows"](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools#:~:text=If%20the%20Windows%20SDK%20is,add%20Debugging%20Tools%20for%20Windows.)
-
-Now, go to [Building the Engine](#building-the-engine) topic.
+sudo snap install cmake --classic
+```
 
 ### Linux
 
-After, install [CMake](https://cmake.org/install/).
+Then you'll need to install a bunch of system dependencies:
 
 ```sh
 # Install some build dependencies
@@ -69,12 +34,15 @@ sudo apt-get install libxaw7-dev libxcursor-dev libxdamage-dev libxinerama-dev l
 
 # Install XCB Libraries
 sudo apt-get install libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev libxcb-cursor-dev libxcb-util-dev
+```
 
-# Install conan
+Use `pip` to install the [Conan Package Manager](https://conan.io/):
+
+```
 pip install conan
 ```
 
-## Configuring Conan Profile
+## Configuring a Conan Profile
 
 You must create a default conan profile:
 
@@ -107,19 +75,18 @@ cd Spatial.Engine
 
 ## Building the Engine from the Command Line
 
-Now, inside the project's folder. Run this script install all required conan dependencies which are not found by conan
-by default.
+Now, inside the project's folder.
 
 ```
-conan install . --build=missing -s build_type=Debug
-cmake --preset conan-debug
-cmake --build . --preset conan-debug
+conan install . --build=missing
+cmake --preset conan-release
+cmake --build . --preset conan-release
 ```
 
 ## Running the Engine Editor
 
 ```
-cmake --build . --preset conan-debug --package Spatial.Game
+cmake --build . --preset conan-release --package Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.

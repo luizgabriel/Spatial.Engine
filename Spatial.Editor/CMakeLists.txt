@@ -49,12 +49,13 @@ target_link_libraries(Spatial.Editor PRIVATE
         fmt::fmt
         argh)
 
-cmake_policy(SET CMP0091 NEW)
 set_property(
         TARGET Spatial.Editor
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Spatial.Editor>"
-        VS_DEBUGGER_COMMAND "$<TARGET_FILE:Spatial.Editor>")
+        PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:Spatial.Editor>")
+
+set_property(
+        TARGET Spatial.Editor
+        PROPERTY VS_DEBUGGER_COMMAND "$<TARGET_FILE:Spatial.Editor>")
 
 install(TARGETS Spatial.Editor
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

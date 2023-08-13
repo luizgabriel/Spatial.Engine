@@ -1,5 +1,6 @@
 #include <filament/Fence.h>
 #include <future>
+#include <spatial/core/Logger.h>
 #include <spatial/ecs/Mesh.h>
 #include <spatial/ecs/Relation.h>
 #include <spatial/ecs/Resource.h>
@@ -198,11 +199,15 @@ constexpr filament::IndexBuffer::IndexType toFilament(ecs::IndexType type)
 
 filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexData)
 {
-	auto builder = filament::VertexBuffer::Builder() //
-					   .vertexCount(static_cast<uint32_t>(vertexData.getDesiredBufferSize()))
-					   .bufferCount(1);
+	auto bufferSize = vertexData.getDesiredBufferSize();
+	assert(bufferSize != 0);
+
+	auto builder = filament::VertexBuffer::Builder();
+    builder.vertexCount(static_cast<uint32_t>(bufferSize));
+    builder.bufferCount(1);
 
 	const auto structSize = calculateInterleavedBytesStride(vertexData.layout);
+	assert(structSize != 0);
 	assert(vertexData.data.size() % structSize == 0);
 
 	if (vertexData.layout.mode == ecs::VertexLayoutMode::Interleaved)
@@ -213,9 +218,8 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 			if (attr.empty())
 				continue;
 
-			builder = builder //
-						  .attribute(toFilament(attr.attribute), 0, toFilament(attr.type), lastOffset, structSize)
-						  .normalized(toFilament(attr.attribute), attr.isNormalized);
+			builder.attribute(toFilament(attr.attribute), 0, toFilament(attr.type), lastOffset, static_cast<uint8_t>(structSize));
+            builder.normalized(toFilament(attr.attribute), attr.isNormalized);
 
 			lastOffset += attr.getTypeSizeInBytes();
 		}
@@ -226,16 +230,18 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 	if (vertexData.layout.mode == ecs::VertexLayoutMode::Separate)
 	{
 		const auto vertexCount = vertexData.data.size() / structSize;
+		assert(vertexCount != 0);
+
 		uint32_t lastOffset = 0;
 		for (const auto& attr : vertexData.layout.description)
 		{
 			if (attr.empty())
 				continue;
 
-			builder = builder //
-						  .attribute(toFilament(attr.attribute), 0, toFilament(attr.type), lastOffset,
-									 attr.getTypeSizeInBytes())
-						  .normalized(toFilament(attr.attribute), attr.isNormalized);
+			builder.attribute(toFilament(attr.attribute), 0, toFilament(attr.type), lastOffset,
+									 static_cast<uint8_t>(attr.getTypeSizeInBytes()));
+            builder.normalized(toFilament(attr.attribute), attr.isNormalized);
+
 			lastOffset += vertexCount * attr.getTypeSizeInBytes();
 		}
 
@@ -247,8 +253,11 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 
 filament::IndexBuffer::Builder makeIndexBuffer(const ecs::IndexData& data)
 {
+	auto bufferSize = data.getDesiredBufferSize();
+	assert(bufferSize != 0);
+
 	return filament::IndexBuffer::Builder()
-		.indexCount(static_cast<uint32_t>(data.getDesiredBufferSize()))
+		.indexCount(static_cast<uint32_t>(bufferSize))
 		.bufferType(toFilament(data.type));
 }
 
@@ -288,22 +297,24 @@ void MeshController::loadMeshes(filament::Engine& engine, ecs::Registry& registr
 	auto shouldSyncThreads = false;
 
 	// Create Vertex Buffers
-	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedVertexBuffer>).each([&](ecs::Entity entity, const auto& mesh) {
-		auto vertexBuffer = toShared(createVertexBuffer(engine, makeVertexBuffer(mesh.vertexData)));
-		vertexBuffer->setBufferAt(engine, 0, makeBufferDescriptor(mesh.vertexData.data));
+	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedVertexBuffer>)
+		.each([&](ecs::Entity entity, const auto& mesh) {
+			auto vertexBuffer = toShared(createVertexBuffer(engine, makeVertexBuffer(mesh.vertexData)));
+			vertexBuffer->setBufferAt(engine, 0, makeBufferDescriptor(mesh.vertexData.data));
 
-		registry.addComponent(entity, std::move(vertexBuffer));
-		shouldSyncThreads = true;
-	});
+			registry.addComponent(entity, std::move(vertexBuffer));
+			shouldSyncThreads = true;
+		});
 
 	// Create Index Buffers
-	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedIndexBuffer>).each([&](ecs::Entity entity, const auto& mesh) {
-		auto indexBuffer = toShared(createIndexBuffer(engine, makeIndexBuffer(mesh.indexData)));
-		indexBuffer->setBuffer(engine, makeBufferDescriptor(mesh.indexData.data));
+	registry.getEntities<const ecs::Mesh>(ecs::Exclude<SharedIndexBuffer>)
+		.each([&](ecs::Entity entity, const auto& mesh) {
+			auto indexBuffer = toShared(createIndexBuffer(engine, makeIndexBuffer(mesh.indexData)));
+			indexBuffer->setBuffer(engine, makeBufferDescriptor(mesh.indexData.data));
 
-		registry.addComponent(entity, std::move(indexBuffer));
-		shouldSyncThreads = true;
-	});
+			registry.addComponent(entity, std::move(indexBuffer));
+			shouldSyncThreads = true;
+		});
 
 	if (shouldSyncThreads)
 		filament::Fence::waitAndDestroy(engine.createFence());

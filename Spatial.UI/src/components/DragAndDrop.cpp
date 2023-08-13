@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <spatial/ui/components/DragAndDrop.h>
 #include <string>
+#include <iterator>
 
 namespace spatial::ui
 {

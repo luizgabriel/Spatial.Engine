@@ -25,39 +25,39 @@ class InputState
 
 	void setMousePosition(math::vec2 position);
 
-	constexpr auto getMousePosition() const
+	auto getMousePosition() const
 	{
 		return mCurrentMousePosition;
 	}
 
-	constexpr auto getMouseLastPosition() const
+	auto getMouseLastPosition() const
 	{
 		return mLastMousePosition;
 	}
 
-	constexpr auto getMouseOffset() const
+	auto getMouseOffset() const
 	{
 		return getMouseLastPosition() - getMousePosition();
 	}
 
-	constexpr bool released(Key key) const
+	bool released(Key key) const
 	{
 		return mKeyReleased.test(static_cast<size_t>(key));
 	}
 
-	constexpr bool pressed(Key key) const
+	bool pressed(Key key) const
 	{
 		return mKeyPressed.test(static_cast<size_t>(key));
 	}
 
 	template <typename... K>
-	constexpr bool combined(K... keys) const
+	bool combined(K... keys) const
 	{
 		auto combination = KeyCombination{std::forward<K>(keys)...};
 		return (mKeyPressed == combination.getPressedBitset()) && (mKeyReleased == combination.getReleasedBitset());
 	}
 
-	constexpr float axis(Key positive, Key negative) const
+	float axis(Key positive, Key negative) const
 	{
 		if (pressed(positive))
 			return 1.0f;

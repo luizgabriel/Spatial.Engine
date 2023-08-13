@@ -102,6 +102,9 @@ class FilamentConan(ConanFile):
             "filaflat", "gltfio", "meshoptimizer", "utils",
         ]
 
+        if self.options.get_safe("supports_opengl", False) == True:
+            self.cpp.package.libs.append("bluegl")
+
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()
@@ -123,4 +126,4 @@ class FilamentConan(ConanFile):
         cmake.install()
 
     def build_requirements(self):
-        self.tool_requires("cmake/3.22.6")
+        self.tool_requires("cmake/3.26.4")

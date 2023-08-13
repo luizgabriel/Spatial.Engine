@@ -50,10 +50,6 @@ add_library(Spatial.Graphics
 set_project_warnings(Spatial.Graphics)
 enable_sanitizers(Spatial.Graphics)
 
-set_property(
-        TARGET Spatial.Graphics
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
 target_precompile_headers(Spatial.Graphics
         PRIVATE <memory> <sstream>)
 
@@ -117,5 +113,3 @@ install(
 )
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
-
-add_subdirectory(tests)

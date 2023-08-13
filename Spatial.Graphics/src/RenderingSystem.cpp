@@ -12,9 +12,14 @@ namespace spatial::graphics
 {
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle)
-	: mEngine{createEngine()},
+	: mEngine{createEngine(nativeWindowHandle == nullptr ? bk::Backend::NOOP : bk::Backend::DEFAULT)},
 	  mRenderer{createRenderer(getEngine())},
 	  mSwapChain{[&]() {
+		  if (nativeWindowHandle == nullptr)
+		  {
+			  return createSwapChain(getEngine(), nullptr);
+		  }
+
 #if defined(SPATIAL_PLATFORM_OSX)
 		  ::cocoaPrepareWindowColorSpace(nativeWindowHandle);
 

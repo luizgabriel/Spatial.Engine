@@ -52,11 +52,6 @@ add_library(Spatial.UI
 set_project_warnings(Spatial.UI)
 enable_sanitizers(Spatial.UI)
 
-cmake_policy(SET CMP0091 NEW)
-set_property(
-        TARGET Spatial.UI
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
 target_include_directories(Spatial.UI
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
