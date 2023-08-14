@@ -63,7 +63,6 @@ class SpatialRecipe(ConanFile):
         cpack_generator = self.cpack_generators.get(str(self.settings.os))
         if cpack_generator is not None:
             tc.variables["CPACK_GENERATOR"] = cpack_generator
-
         tc.generate()
 
         for dep in self.dependencies.values():
