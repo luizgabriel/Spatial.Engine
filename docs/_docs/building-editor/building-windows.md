@@ -71,7 +71,7 @@ cmake --build . --preset conan-default
 ## Running the Engine Editor
 
 ```
-cmake --build . --preset conan-default --package Spatial.Game
+cmake --build . --preset conan-default --target Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.

@@ -86,7 +86,7 @@ cmake --build . --preset conan-release
 ## Running the Engine Editor
 
 ```
-cmake --build . --preset conan-release --package Spatial.Game
+cmake --build . --preset conan-release --target Spatial.Game
 ```
 
 > The first time you run takes a lot of time to download and build the external dependencies.
