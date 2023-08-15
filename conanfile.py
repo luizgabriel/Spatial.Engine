@@ -25,9 +25,9 @@ class SpatialRecipe(ConanFile):
         "Spatial.Res/*", "Spatial.UI/*"
     
     cpack_generators = {
-        "Windows": "ZIP;WIX",
-        "Macos": "TGZ;DragNDrop",
-        "Linux": "TGZ;DEB"
+        "Windows": "WIX",
+        "Macos": "DragNDrop",
+        "Linux": "DEB"
     }
 
     def validate(self):
