@@ -20,7 +20,7 @@ Settings Settings::load(int argc, char** argv)
 	if (dim.x > 0 && dim.y > 0)
 		config.windowDimensions = dim;
 
-	auto projectFolder = args[1].empty() ? fs::current_path() : fs::path{args[1]};
+	auto projectFolder = fs::path{args[1]};
 	if (fs::is_directory(projectFolder))
 		config.projectFolder = std::move(projectFolder);
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(SpatialEngine LANGUAGES CXX OBJCXX VERSION 1.3.15)
+project(SpatialEngine LANGUAGES CXX OBJCXX VERSION 1.3.16)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake)
 
