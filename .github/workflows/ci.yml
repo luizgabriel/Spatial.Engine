@@ -30,7 +30,7 @@ jobs:
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
         with:
-          version: 2.0.4
+          version: 2.0.9
 
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -106,8 +106,8 @@ jobs:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
           if-no-files-found: error
           path: |
-            build/**/package/*.dmg
-            build/**/package/*.deb
+            build/Release/package/*.dmg
+            build/Release/package/*.deb
             build/package/*.msi
 
   release:

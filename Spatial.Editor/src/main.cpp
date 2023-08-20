@@ -45,22 +45,10 @@ int main(int argc, char* argv[])
 	auto editor = editor::EditorSystem{*fileSystem};
 
 	// Connect all Systems to the Application Main Loop
-	app >> desktopContext >> input >> rendering >> ui >> scene >> editor;
+	app >> desktopContext;
 
 	// Connect Desktop Events to All Systems
-	desktopContext >> app >> input >> rendering >> ui >> editor;
-
-	// Connect Gui Render to Editor
-	ui >> editor;
-
-	// Connect Rendering to Scene Rendering Bridge and UI
-	rendering >> scene >> ui;
-
-	// Connect Scene Rendering Bridge to Editor
-	scene >> editor;
-
-	// Connect Input to Editor
-	input >> editor;
+	desktopContext >> app;
 
 	return app.run();
 }

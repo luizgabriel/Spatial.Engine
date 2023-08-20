@@ -48,7 +48,7 @@ class SpatialRecipe(ConanFile):
         self.requires("magic_enum/0.8.0")
         self.requires("glm/0.9.9.8")
         self.requires("imgui/cci.20230105+1.89.2.docking")
-        self.requires_local("filament/1.40.4", options={
+        self.requires_local("filament/1.41.0", options={
             "supports_metal": self.settings.os == "Macos",
             "supports_opengl": self.settings.os == "Windows" or self.settings.os == "Linux",
         })

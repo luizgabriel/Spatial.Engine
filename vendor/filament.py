@@ -1,13 +1,13 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.scm import Git
-from conan.tools.files import replace_in_file
+from conan.tools.files import replace_in_file, collect_libs
 from conan.tools.system.package_manager import Apt
 from conan.tools.build import check_min_cppstd
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.40.4"
+    version = "1.41.0"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"
@@ -88,10 +88,12 @@ class FilamentConan(ConanFile):
     def layout(self):
         cmake_layout(self)
         if str(self.settings.arch).startswith("arm"):
-            self.cpp.package.libdirs = ["lib/arm64"]
+            lib_dir = "lib/arm64"
         else:
-            self.cpp.package.libdirs = ["lib/x86_64"]
+            lib_dir = "lib/x86_64"
 
+        self.cpp.package.libdirs = [lib_dir]
+        
         self.cpp.package.libs = [
             "backend", "filamat", "gltfio_core", "mikktspace", "viewer",
             "basis_transcoder", "filamat_lite", "ibl-lite", "shaders", "vkshaders",
@@ -102,8 +104,12 @@ class FilamentConan(ConanFile):
             "filaflat", "gltfio", "meshoptimizer", "utils",
         ]
 
-        if self.options.get_safe("supports_opengl", False) == True:
+        if self.options.get_safe("supports_opengl", False):
             self.cpp.package.libs.append("bluegl")
+
+        if self.options.get_safe("supports_vulkan", False):
+            self.cpp.package.libs.append("bluevk")
+
 
     def generate(self):
         deps = CMakeDeps(self)

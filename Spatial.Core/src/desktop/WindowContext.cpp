@@ -24,6 +24,7 @@ PlatformContext::PlatformContext()
 	if (!sValid)
 		sValid = glfwInit() == GLFW_TRUE;
 
+	assert(sValid);
 	glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
