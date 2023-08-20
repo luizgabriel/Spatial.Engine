@@ -221,7 +221,7 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 			builder.attribute(toFilament(attr.attribute), 0, toFilament(attr.type), lastOffset, static_cast<uint8_t>(structSize));
             builder.normalized(toFilament(attr.attribute), attr.isNormalized);
 
-			lastOffset += attr.getTypeSizeInBytes();
+			lastOffset += static_cast<uint32_t>(attr.getTypeSizeInBytes());
 		}
 
 		assert(lastOffset == structSize);
@@ -229,7 +229,7 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 
 	if (vertexData.layout.mode == ecs::VertexLayoutMode::Separate)
 	{
-		const auto vertexCount = vertexData.data.size() / structSize;
+		const uint32_t vertexCount = vertexData.data.size() / structSize;
 		assert(vertexCount != 0);
 
 		uint32_t lastOffset = 0;
@@ -242,7 +242,7 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 									 static_cast<uint8_t>(attr.getTypeSizeInBytes()));
             builder.normalized(toFilament(attr.attribute), attr.isNormalized);
 
-			lastOffset += vertexCount * attr.getTypeSizeInBytes();
+			lastOffset += vertexCount * static_cast<uint32_t>(attr.getTypeSizeInBytes());
 		}
 
 		assert(lastOffset == structSize * vertexCount);

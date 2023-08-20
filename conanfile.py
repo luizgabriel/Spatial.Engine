@@ -30,11 +30,25 @@ class SpatialRecipe(ConanFile):
         "Linux": "DEB"
     }
 
+    options = {
+        "backend": ["opengl", "vulkan", "metal"],
+    }
+
     def validate(self):
         check_min_cppstd(self, "20")
 
     def build_requirements(self):
         self.tool_requires("cmake/3.26.4")
+
+    def get_default_backend(self):
+        if self.settings.os == "Macos":
+            return "metal"
+        else:
+            return "opengl"
+
+    @property
+    def graphics_backend(self):
+        return self.options.get_safe("backend", default=self.get_default_backend())
 
     def requirements(self):
         self.requires("boost/1.81.0")
@@ -49,8 +63,7 @@ class SpatialRecipe(ConanFile):
         self.requires("glm/0.9.9.8")
         self.requires("imgui/cci.20230105+1.89.2.docking")
         self.requires_local("filament/1.41.0", options={
-            "supports_metal": self.settings.os == "Macos",
-            "supports_opengl": self.settings.os == "Windows" or self.settings.os == "Linux",
+            f"supports_{self.graphics_backend}": True,
         })
 
     def layout(self):
@@ -63,6 +76,7 @@ class SpatialRecipe(ConanFile):
         cpack_generator = self.cpack_generators.get(str(self.settings.os))
         if cpack_generator is not None:
             tc.variables["CPACK_GENERATOR"] = cpack_generator
+        tc.variables["SPATIAL_GRAPHICS_BACKEND"] =  self.graphics_backend
         tc.generate()
 
         for dep in self.dependencies.values():

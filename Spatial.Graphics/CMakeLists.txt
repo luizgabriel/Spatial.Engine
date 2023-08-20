@@ -71,6 +71,25 @@ if (OpenGL_FOUND)
     target_link_libraries(Spatial.Graphics PRIVATE OpenGL::GL)
 endif ()
 
+option(SPATIAL_GRAPHICS_BACKEND "The graphics backend to use (opengl, metal or vulkan)")
+
+if (NOT SPATIAL_GRAPHICS_BACKEND)
+    if (APPLE)
+        set(DEFAULT_BACKEND "metal")
+    else ()
+        set(DEFAULT_BACKEND "opengl")
+    endif ()
+
+    message(STATUS "No graphics backend specified, using default: ${DEFAULT_BACKEND}")
+    set(SPATIAL_GRAPHICS_BACKEND ${DEFAULT_BACKEND})
+
+else ()
+    message(STATUS "Selected graphics backend: ${SPATIAL_GRAPHICS_BACKEND}")
+endif ()
+
+string(TOUPPER ${SPATIAL_GRAPHICS_BACKEND} SPATIAL_GRAPHICS_BACKEND_UPPER)
+target_compile_definitions(Spatial.Graphics PUBLIC SPATIAL_GRAPHICS_BACKEND_${SPATIAL_GRAPHICS_BACKEND_UPPER})
+
 # ADD PLATFORM FLAGS AND PLATFORM SPECIFIC DEPENDENCIES
 if (UNIX AND NOT APPLE)
     message(STATUS "Detected Linux Device")
