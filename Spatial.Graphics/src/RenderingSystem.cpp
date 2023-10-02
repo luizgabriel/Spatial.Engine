@@ -12,22 +12,22 @@ namespace spatial::graphics
 {
 
 RenderingSystem::RenderingSystem(void* nativeWindowHandle)
-	: mEngine{createEngine([&](){
-        if (nativeWindowHandle == nullptr)
-        {
-            return bk::Backend::NOOP;
-        }
+	: mEngine{createEngine([&]() {
+		  if (nativeWindowHandle == nullptr)
+		  {
+			  return bk::Backend::NOOP;
+		  }
 
-#if defined(SPATIAL_GRAPHICS_BACKEN_OPENGL)
-        return bk::Backend::OPENGL;
+#if defined(SPATIAL_GRAPHICS_BACKEND_OPENGL)
+		  return bk::Backend::OPENGL;
 #elif defined(SPATIAL_GRAPHICS_BACKEND_VULKAN)
-        return bk::Backend::VULKAN;
+		  return bk::Backend::VULKAN;
 #elif defined(SPATIAL_GRAPHICS_BACKEND_METAL)
-        return bk::Backend::METAL;
+		  return bk::Backend::METAL;
 #else
-        static_assert(false, "Unknown backend");
+		  static_assert(false, "Unknown backend");
 #endif
-    }())},
+	  }())},
 	  mRenderer{createRenderer(getEngine())},
 	  mSwapChain{[&]() {
 		  if (nativeWindowHandle == nullptr)
