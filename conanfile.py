@@ -7,7 +7,7 @@ from conan.tools.build import check_min_cppstd
 
 class SpatialRecipe(ConanFile):
     name = "spatial"
-    version = "1.3.16"
+    version = "1.3.17"
     package_type = "application"
 
     # Optional metadata
@@ -60,7 +60,7 @@ class SpatialRecipe(ConanFile):
         self.requires("magic_enum/0.8.0")
         self.requires("glm/0.9.9.8")
         self.requires("imgui/cci.20230105+1.89.2.docking")
-        self.requires_local("filament/1.41.0", options={
+        self.requires_local("filament/1.43.1", options={
             f"supports_{self.options.backend}": True,
         })
 

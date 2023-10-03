@@ -7,7 +7,7 @@ from conan.tools.build import check_min_cppstd
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.41.0"
+    version = "1.43.1"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"
