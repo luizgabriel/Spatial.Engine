@@ -2,24 +2,22 @@
 #include <QuartzCore/QuartzCore.h>
 #include <spatial/graphics/native/CocoaHelper.h>
 
-void* cocoaGetContentViewFromWindow(void* id)
+void* cocoaGetContentViewFromWindow(void* windowId)
 {
-	NSWindow* win = (NSWindow*)id;
+	NSWindow* win = (NSWindow*)windowId;
 	NSView* view = [win contentView];
 	return view;
 }
 
-void cocoaPrepareWindowColorSpace(void* id)
+void cocoaPrepareWindowColorSpace(void* windowId)
 {
-	NSWindow* win = (NSWindow*)id;
+	NSWindow* win = (NSWindow*)windowId;
 	[win setColorSpace:[NSColorSpace sRGBColorSpace]];
 }
 
-void* cocoaSetUpMetalLayer(void* id)
+void* cocoaSetUpMetalLayer(void* viewId)
 {
-	NSWindow* win = (NSWindow*)id;
-	NSView* view = [win contentView];
-
+	NSView* view = (NSView*)viewId;
 	[view setWantsLayer:YES];
 	CAMetalLayer* metalLayer = [CAMetalLayer layer];
 	metalLayer.bounds = view.bounds;
@@ -41,5 +39,16 @@ void* cocoaSetUpMetalLayer(void* id)
 
 	[view setLayer:metalLayer];
 
+	return metalLayer;
+}
+
+void* cocoaResizeMetalLayer(void* viewId)
+{
+	NSView* view = (NSView*)viewId;
+	CAMetalLayer* metalLayer = (CAMetalLayer*)view.layer;
+	CGSize viewSize = view.bounds.size;
+	NSSize newDrawableSize = [view convertSizeToBacking:viewSize];
+	metalLayer.drawableSize = newDrawableSize;
+	metalLayer.contentsScale = view.window.backingScaleFactor;
 	return metalLayer;
 }

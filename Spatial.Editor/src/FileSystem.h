@@ -1,11 +1,15 @@
 #pragma once
 
 #include "Settings.h"
-#include <spatial/resources/FileSystem.h>
+#include <spatial/resources/AggregateFileSystem.h>
+#include <spatial/resources/PhysicalFileSystem.h>
+#include <utility>
 
 namespace spatial::editor
 {
 
-SharedFileSystem createDefaultFileSystem(const editor::Settings& settings);
+SharedFileSystem createEditorFileSystem();
+
+std::optional<SharedFileSystem> createProjectFileSystem(const editor::Settings& settings);
 
 } // namespace spatial::editor

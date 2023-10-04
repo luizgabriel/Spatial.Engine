@@ -3,8 +3,10 @@ add_executable(Spatial.Core.Tests
         RegistrySerialization.test.cpp
         RegistryRelation.test.cpp
         RegistryResource.test.cpp
-        FileSystem.test.cpp
-        main.cpp)
+        PhysicalFileSystem.test.cpp
+        main.cpp
+        MemoryFileSystem.test.cpp
+        AggregateFileSystem.cpp)
 
 target_link_libraries(Spatial.Core.Tests
         PUBLIC

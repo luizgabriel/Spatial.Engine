@@ -7,7 +7,6 @@
 #include <spatial/common/Signal.h>
 #include <spatial/resources/FileSystem.h>
 #include <string_view>
-#include <type_traits>
 
 namespace spatial::desktop
 {
@@ -24,10 +23,13 @@ class Window
 {
   private:
 	GLFWwindow* mWindowHandle;
+	EventQueue mEventQueue;
 
 	explicit Window(GLFWwindow* windowHandle);
 
 	friend class PlatformContext;
+
+	void setupCallbacks();
 
   public:
 	~Window();
@@ -35,8 +37,8 @@ class Window
 	void setIcon(const uint8_t* pixelsData, uint32_t size);
 	void setIcon(FileSystem& fileSystem, std::string_view resourcePath);
 
-	void* getNativeHandle() const;
-	GLFWwindow* getHandle() const
+	[[nodiscard]] void* getNativeHandle() const;
+	[[nodiscard]] GLFWwindow* getHandle() const
 	{
 		return mWindowHandle;
 	}
@@ -58,6 +60,13 @@ class Window
 	Window& operator=(const Window& w) = delete;
 
 	void warpMouse(const math::vec2& position) const;
+
+	void onStartFrame(float);
+
+	auto& getEventQueue()
+	{
+		return mEventQueue;
+	}
 };
 
 class PlatformContext
@@ -68,7 +77,7 @@ class PlatformContext
 
 	void onStartFrame(float);
 
-	[[nodiscard]] Window createWindow(math::uvec2 dimensions, std::string_view title) const noexcept;
+	[[nodiscard]] Window createWindow(math::uvec2 dimensions, std::string_view title) const;
 
 	PlatformContext(const PlatformContext& c) = delete;
 	PlatformContext& operator=(const PlatformContext& w) = delete;
@@ -76,18 +85,7 @@ class PlatformContext
 	PlatformContext(PlatformContext&& c) noexcept = delete;
 	PlatformContext& operator=(PlatformContext&& other) noexcept = delete;
 
-	auto& getEventQueue()
-	{
-		return sEventQueue;
-	}
-
 	math::uvec2 getMonitorSize();
-
-  private:
-	static bool sValid;
-	static EventQueue sEventQueue;
-
-	static void setupCallbacks(const Window& window);
 };
 
 } // namespace spatial::desktop

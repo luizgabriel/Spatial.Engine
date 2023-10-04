@@ -8,6 +8,7 @@
 
 #include <filament/Viewport.h>
 #include <spatial/input/InputState.h>
+#include <spatial/resources/AggregateFileSystem.h>
 // #include <spatial/script/PlatformContext.h>
 // #include <spatial/script/ScriptController.h>
 
@@ -21,7 +22,7 @@ class EditorSystem
   public:
 	constexpr static auto PROJECT_DIR = "project";
 
-	explicit EditorSystem(FileSystem& fileSystem);
+	explicit EditorSystem();
 
 	void onStart();
 
@@ -44,6 +45,10 @@ class EditorSystem
 
 	friend class spatial::EventQueue;
 
+	auto& getFileSystem() {
+		return mFileSystem;
+	}
+
   private:
 	void onEvent(const ClearSceneEvent& event);
 	void onEvent(const LoadSceneEvent& event);
@@ -52,7 +57,7 @@ class EditorSystem
 
 	void createDefaultEditorEntities();
 
-	FileSystem& mFileSystem;
+	AggregateFileSystem mFileSystem;
 	// script::PlatformContext mPlatformContext{};
 	// script::Isolate mIsolate;
 

@@ -1,8 +1,6 @@
-#include <boost/locale.hpp>
 #include <spatial/common/Key.h>
-#include <spatial/desktop/PlatformEvent.h>
 #include <spatial/desktop/Window.h>
-#include <sstream>
+
 
 #if defined(SPATIAL_PLATFORM_OSX)
 #define GLFW_EXPOSE_NATIVE_COCOA
@@ -16,15 +14,11 @@
 namespace spatial::desktop
 {
 
-bool PlatformContext::sValid{false};
-EventQueue PlatformContext::sEventQueue{};
-
 PlatformContext::PlatformContext()
 {
-	if (!sValid)
-		sValid = glfwInit() == GLFW_TRUE;
+	if (glfwInit() != GLFW_TRUE)
+		throw new std::runtime_error("Could not initialize GLFW");
 
-	assert(sValid);
 	glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -33,71 +27,17 @@ PlatformContext::PlatformContext()
 
 PlatformContext::~PlatformContext()
 {
-	if (sValid)
-		glfwTerminate();
-}
-
-void PlatformContext::setupCallbacks(const Window& window)
-{
-	if (!sValid)
-		return;
-
-	glfwSetWindowCloseCallback(window.getHandle(), [](auto* win) { sEventQueue.enqueue<WindowClosedEvent>(); });
-
-	glfwSetCharCallback(window.getHandle(), [](auto* win, unsigned int codepoint) {
-		auto ss = std::wstringstream{};
-		ss << static_cast<wchar_t>(codepoint);
-
-		sEventQueue.enqueue<TextEvent>(boost::locale::conv::utf_to_utf<char>(ss.str()));
-	});
-
-	glfwSetKeyCallback(window.getHandle(), [](auto* win, int key, int scancode, int action, int mods) {
-		const auto spatialKey = mapKeyFromScancode(key);
-		const auto spatialAction = mapActionFromCode(action);
-		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
-	});
-
-	glfwSetMouseButtonCallback(window.getHandle(), [](auto* win, int button, int action, int mods) {
-		const auto spatialKey = mapKeyFromMouseButton(button);
-		const auto spatialAction = mapActionFromCode(action);
-		sEventQueue.enqueue<KeyEvent>(spatialKey, spatialAction);
-	});
-
-	glfwSetScrollCallback(window.getHandle(), [](auto* win, double xOffset, double yOffset) {
-		sEventQueue.enqueue<MouseScrolledEvent>(math::dvec2{xOffset, yOffset});
-	});
-
-	glfwSetWindowSizeCallback(window.getHandle(), [](auto* win, int width, int height) {
-		int frameBufferWidth, frameBufferHeight;
-		glfwGetFramebufferSize(win, &frameBufferWidth, &frameBufferHeight);
-		sEventQueue.enqueue<WindowResizedEvent>(math::uvec2{width, height},
-												math::uvec2{frameBufferWidth, frameBufferHeight});
-	});
-
-	glfwSetCursorPosCallback(window.getHandle(), [](auto* win, double xPos, double yPos) {
-		sEventQueue.enqueue<MouseMovedEvent>(math::dvec2{xPos, yPos});
-	});
+	glfwTerminate();
 }
 
 void PlatformContext::onStartFrame(float)
 {
-	if (!sValid)
-		return;
-
 	glfwPollEvents();
-
-	sEventQueue.update<WindowResizedEvent>();
-	sEventQueue.update<MouseMovedEvent>();
-	sEventQueue.update();
 }
 
-Window PlatformContext::createWindow(math::uvec2 dimensions, std::string_view title) const noexcept
+Window PlatformContext::createWindow(math::uvec2 dimensions, std::string_view title) const
 {
-	auto window = Window{glfwCreateWindow(dimensions.x, dimensions.y, title.data(), nullptr, nullptr)};
-	setupCallbacks(window);
-	sEventQueue.enqueue<WindowResizedEvent>(window.getSize(), window.getFrameBufferSize());
-
-	return window;
+	return Window{glfwCreateWindow(dimensions.x, dimensions.y, title.data(), nullptr, nullptr)};
 }
 
 math::uvec2 PlatformContext::getMonitorSize()

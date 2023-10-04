@@ -21,7 +21,7 @@ void simulateRuntime(spatial::Application& app, const std::chrono::nanoseconds& 
 {
 	auto runtime = startApplicationRuntime(app);
 	std::this_thread::sleep_for(duration);
-	app.onEvent(spatial::WindowClosedEvent{});
+	app.onEvent(spatial::desktop::WindowClosedEvent{nullptr});
 	runtime.join();
 }
 
@@ -33,7 +33,7 @@ TEST(Application, CreateAndStop)
 	auto runtime = startApplicationRuntime(app);
 	ASSERT_EQ(app.isRunning(), true);
 
-	app.onEvent(spatial::WindowClosedEvent{});
+	app.onEvent(spatial::desktop::WindowClosedEvent{nullptr});
 	runtime.join();
 
 	ASSERT_EQ(app.isRunning(), false);

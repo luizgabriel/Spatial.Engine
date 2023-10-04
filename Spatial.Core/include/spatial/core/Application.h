@@ -42,7 +42,7 @@ class Application
 		return mRunning;
 	}
 
-	void onEvent(const WindowClosedEvent& event);
+	void onEvent(const desktop::WindowClosedEvent& event);
 
 	auto& getStartSignal()
 	{

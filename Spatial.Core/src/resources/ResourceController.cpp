@@ -7,6 +7,8 @@
 namespace spatial
 {
 
+auto gLogger = createDefaultLogger();
+
 void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& registry)
 {
 	using namespace std::chrono_literals;
@@ -34,6 +36,7 @@ void ResourceController::loadResources(FileSystem& fileSystem, ecs::Registry& re
 
 			if (data.empty())
 			{
+				gLogger.warn("Failed to read resource: {}", resource.relativePath);
 				registry.addComponent<ecs::ResourceError>(entity, "Empty resource");
 				registry.addComponent<ecs::tags::IsResourceLoaded>(entity);
 			}

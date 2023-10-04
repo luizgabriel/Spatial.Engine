@@ -22,7 +22,7 @@ Application::Application(float desiredDelta)
 
 Application::~Application() = default;
 
-void Application::onEvent(const WindowClosedEvent& event)
+void Application::onEvent(const desktop::WindowClosedEvent& event)
 {
 	stop();
 }

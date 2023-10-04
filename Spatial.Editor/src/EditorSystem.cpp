@@ -30,7 +30,7 @@ namespace spatial::editor
 
 static auto gLogger = createDefaultLogger();
 
-EditorSystem::EditorSystem(FileSystem& fileSystem) : mFileSystem{fileSystem}
+EditorSystem::EditorSystem() : mFileSystem{}
 // , mIsolate{mPlatformContext.createIsolate()}
 {
 }
@@ -45,7 +45,7 @@ void EditorSystem::onStart()
 	createDefaultEditorEntities();
 
 	mIconTexture =
-		ecs::FileSystemResource::create<ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons.png");
+		ecs::FileSystemResource::create<ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons/icons.png");
 }
 
 void EditorSystem::onStartFrame(float)
@@ -151,7 +151,7 @@ void EditorSystem::onDrawGui()
 		ui::ResourceManager::list(mRegistry, search, type, showDebugEntities);
 		ui::EditorDragAndDrop::loadScriptResource(mRegistry, type);
 
-		ui::Popup::show("AssetManagerPopup", [&]() { ui::CreateMenu::removeMenu(mRegistry); });
+		ui::Popup::show("Resources Popup", [&]() { ui::CreateMenu::removeMenu(mRegistry); });
 	});
 
 	ui::Window::show("Views", [&]() {
@@ -160,7 +160,7 @@ void EditorSystem::onDrawGui()
 		ui::Search::text(search, icons);
 		ui::ViewsManager::list(mRegistry, search, showDebugEntities);
 
-		ui::Popup::show("Asset Manager Popup", [&]() {
+		ui::Popup::show("Views Popup", [&]() {
 			ui::Menu::show("Create", [&]() { ui::CreateMenu::createViewMenu(mRegistry); });
 			ui::CreateMenu::removeMenu(mRegistry);
 		});
@@ -172,9 +172,8 @@ void EditorSystem::onDrawGui()
 		ui::Search::text(search, icons);
 		ui::MaterialsManager::list(mRegistry, search, showDebugEntities);
 
-		ui::Popup::show("MaterialsManagerPopup", [&]() {
+		ui::Popup::show("Materials Popup", [&]() {
 			ui::Menu::show("Create", [&]() { ui::CreateMenu::createMaterialsMenu(mRegistry); });
-
 			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
@@ -184,7 +183,7 @@ void EditorSystem::onDrawGui()
 		ui::Search::text(search, icons);
 		ui::SceneTree::displayTree(mRegistry, showDebugEntities, search);
 
-		ui::Popup::show("Scene Graph Popup", [&]() {
+		ui::Popup::show("Scene Popup", [&]() {
 			ui::Menu::show("Create", [&]() {
 				ui::CreateMenu::createMeshMenu(mRegistry, createEntityPosition);
 				ui::CreateMenu::createCameraMenu(mRegistry, createEntityPosition);
@@ -205,9 +204,10 @@ void EditorSystem::onDrawGui()
 		ui::FilesExplorer::displayFiles(mFileSystem, mCurrentPath, icons);
 		if (mFileSystem.list(PROJECT_DIR).empty())
 		{
-			ImGui::Text("No files inside this project.");
 			if (ImGui::Button("Open Project"))
 				mMenuAction = ui::EditorMainMenu::Action::OpenProject;
+			ImGui::SameLine();
+			ImGui::Text("No files inside this project.");
 		}
 	});
 }
@@ -314,8 +314,7 @@ void EditorSystem::setRootPath(const std::filesystem::path& path)
 		return;
 
 	mCurrentPath = PROJECT_DIR;
-	auto result = mFileSystem.resolve(PROJECT_DIR);
-	dynamic_cast<PhysicalFileSystem*>(&result.fileSystem)->setRootPath(path);
+	mFileSystem.mount(PROJECT_DIR, std::make_shared<PhysicalFileSystem>(path));
 }
 
 void EditorSystem::onEvent(const ClearSceneEvent&)

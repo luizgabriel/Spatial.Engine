@@ -6,18 +6,22 @@
 
 namespace spatial::graphics
 {
+using Backend = filament::backend::Backend;
+
+#if defined(SPATIAL_GRAPHICS_BACKEND_OPENGL)
+static Backend gDefaultBackend = Backend::OPENGL;
+#elif defined(SPATIAL_GRAPHICS_BACKEND_VULKAN)
+static Backend gDefaultBackend = Backend::VULKAN;
+#elif defined(SPATIAL_GRAPHICS_BACKEND_METAL)
+static Backend gDefaultBackend = Backend::METAL;
+#else
+static_assert(false, "Unknown backend");
+#endif
 
 class RenderingSystem
 {
   public:
-	using Backend = filament::backend::Backend;
-
-	explicit RenderingSystem(void* nativeWindowHandle);
-
-	template <typename WindowImpl>
-	explicit RenderingSystem(WindowImpl& window) : RenderingSystem(window.getNativeHandle())
-	{
-	}
+	explicit RenderingSystem(Backend backend = gDefaultBackend);
 
 	RenderingSystem(const RenderingSystem& other) = delete;
 	RenderingSystem& operator=(const RenderingSystem& w) = delete;
@@ -39,11 +43,15 @@ class RenderingSystem
 		return mOnRenderSignal;
 	}
 
-  private:
-	graphics::Engine mEngine;
-	graphics::Renderer mRenderer;
-	graphics::SwapChain mSwapChain;
-	Signal<filament::Renderer&> mOnRenderSignal;
+	void onEvent(const desktop::WindowResizedEvent& event);
+
+	void attach(const desktop::Window& window);
+
+	private:
+		graphics::Engine mEngine;
+		graphics::Renderer mRenderer;
+		graphics::SwapChain mSwapChain;
+		Signal<filament::Renderer&> mOnRenderSignal;
 };
 
 } // namespace spatial::graphics

@@ -1,6 +1,8 @@
 #include <cassert>
 #include <spatial/desktop/Window.h>
 #include <utility>
+#include <sstream>
+#include <boost/locale.hpp>
 
 #if defined(SPATIAL_PLATFORM_OSX)
 #define GLFW_EXPOSE_NATIVE_COCOA
@@ -9,6 +11,7 @@
 #elif defined(SPATIAL_PLATFORM_UNIX)
 #define GLFW_EXPOSE_NATIVE_X11
 #endif
+#include "spatial/desktop/PlatformEvent.h"
 #include <GLFW/glfw3native.h>
 #include <array>
 #include <stb_image.h>
@@ -16,9 +19,11 @@
 namespace spatial::desktop
 {
 
-Window::Window(GLFWwindow* windowHandle) : mWindowHandle{windowHandle}
+Window::Window(GLFWwindow* windowHandle) : mWindowHandle{windowHandle}, mEventQueue{}
 {
 	assert(mWindowHandle != nullptr);
+	mEventQueue.enqueue<WindowResizedEvent>(this, getSize(), getFrameBufferSize());
+	setupCallbacks();
 }
 
 Window::Window(Window&& other) noexcept : mWindowHandle(std::exchange(other.mWindowHandle, nullptr))
@@ -114,6 +119,13 @@ void Window::setClipboardText(const std::string& text)
 	glfwSetClipboardString(mWindowHandle, text.c_str());
 }
 
+void Window::onStartFrame(float)
+{
+	mEventQueue.template update<WindowResizedEvent>();
+	mEventQueue.template update<MouseMovedEvent>();
+	mEventQueue.update();
+}
+
 std::optional<std::string> Window::getClipboardText() const
 {
 	const auto* text = glfwGetClipboardString(mWindowHandle);
@@ -123,6 +135,70 @@ std::optional<std::string> Window::getClipboardText() const
 	}
 
 	return std::make_optional(std::string(text));
+}
+
+void Window::setupCallbacks()
+{
+	glfwSetWindowUserPointer(getHandle(), this);
+
+	glfwSetWindowCloseCallback(getHandle(), [](auto* win) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		window->getEventQueue().enqueue<WindowClosedEvent>(window);
+	});
+
+	glfwSetCharCallback(getHandle(), [](auto* win, unsigned int codepoint) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		auto ss = std::wstringstream{};
+		ss << static_cast<wchar_t>(codepoint);
+
+		window->getEventQueue().enqueue<TextEvent>(window, boost::locale::conv::utf_to_utf<char>(ss.str()));
+	});
+
+	glfwSetKeyCallback(getHandle(), [](auto* win, int key, int scancode, int action, int mods) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		const auto spatialKey = mapKeyFromScancode(key);
+		const auto spatialAction = mapActionFromCode(action);
+		window->getEventQueue().enqueue<KeyEvent>(window, spatialKey, spatialAction);
+	});
+
+	glfwSetMouseButtonCallback(getHandle(), [](auto* win, int button, int action, int mods) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		const auto spatialKey = mapKeyFromMouseButton(button);
+		const auto spatialAction = mapActionFromCode(action);
+		window->getEventQueue().enqueue<KeyEvent>(window, spatialKey, spatialAction);
+	});
+
+	glfwSetScrollCallback(getHandle(), [](auto* win, double xOffset, double yOffset) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		window->getEventQueue().enqueue<MouseScrolledEvent>(window, math::dvec2{xOffset, yOffset});
+	});
+
+	glfwSetWindowSizeCallback(getHandle(), [](auto* win, int width, int height) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		int frameBufferWidth, frameBufferHeight;
+		glfwGetFramebufferSize(win, &frameBufferWidth, &frameBufferHeight);
+		window->getEventQueue().enqueue<WindowResizedEvent>(window, math::uvec2{width, height},
+												math::uvec2{frameBufferWidth, frameBufferHeight});
+	});
+
+	glfwSetCursorPosCallback(getHandle(), [](auto* win, double xPos, double yPos) {
+		auto* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(win));
+		assert(window != nullptr);
+
+		window->getEventQueue().enqueue<MouseMovedEvent>(window, math::dvec2{xPos, yPos});
+	});
 }
 
 } // namespace spatial::desktop

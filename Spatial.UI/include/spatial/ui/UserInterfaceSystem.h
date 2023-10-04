@@ -27,15 +27,15 @@ class UserInterfaceSystem
 
 	void onRender(filament::Renderer& renderer) const;
 
-	void onEvent(const WindowResizedEvent& event);
+	void onEvent(const desktop::WindowResizedEvent& event);
 
-	void onEvent(const MouseMovedEvent& event);
+	void onEvent(const desktop::MouseMovedEvent& event);
 
-	void onEvent(const MouseScrolledEvent& event);
+	void onEvent(const desktop::MouseScrolledEvent& event);
 
-	void onEvent(const KeyEvent& event);
+	void onEvent(const desktop::KeyEvent& event);
 
-	void onEvent(const TextEvent& event);
+	void onEvent(const desktop::TextEvent& event);
 
 	auto& getRenderer()
 	{

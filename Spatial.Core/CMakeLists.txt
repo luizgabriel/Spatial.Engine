@@ -13,7 +13,7 @@ add_library(Spatial.Core
         include/spatial/core/Logger.h
 
         include/spatial/desktop/PlatformEvent.h
-        include/spatial/desktop/PlatformEventUtils.h
+        include/spatial/desktop/WindowEventUtils.h
         include/spatial/desktop/Window.h
 
         include/spatial/input/InputSystem.h
@@ -70,7 +70,7 @@ add_library(Spatial.Core
         src/core/Logger.cpp
 
         src/desktop/Window.cpp
-        src/desktop/WindowContext.cpp
+        src/desktop/PlatformContext.cpp
 
         src/input/InputSystem.cpp
         src/input/InputState.cpp
@@ -96,7 +96,9 @@ add_library(Spatial.Core
         src/resources/PhysicalFileSystem.cpp
         src/resources/MemoryFileSystem.cpp
         src/resources/ResourceController.cpp
-        src/resources/MeshComponents.cpp)
+        src/resources/MeshComponents.cpp
+        include/spatial/resources/AggregateFileSystem.h
+        src/resources/AggregateFileSystem.cpp)
 
 set_project_warnings(Spatial.Core)
 enable_sanitizers(Spatial.Core)

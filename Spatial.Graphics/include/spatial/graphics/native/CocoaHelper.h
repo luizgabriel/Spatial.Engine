@@ -1,16 +1,9 @@
 #pragma once
 
-/**
- * @description Returns the NSView from the NSWindow provided (native stuff)
- */
-extern "C" void* cocoaGetContentViewFromWindow(void* id);
+extern "C" void* cocoaGetContentViewFromWindow(void* windowId);
 
-/**
- * @description Sets the color space of the NSWindow provided (native stuff)
- */
-extern "C" void cocoaPrepareWindowColorSpace(void* id);
+extern "C" void cocoaPrepareWindowColorSpace(void* windowId);
 
-/**
- * @description Sets up the Metal layer of the NSWindow provided (native stuff)
- */
-extern "C" void* cocoaSetUpMetalLayer(void* id);
+extern "C" void* cocoaSetUpMetalLayer(void* viewId);
+
+extern "C" void* cocoaResizeMetalLayer(void* viewId);

@@ -8,13 +8,13 @@ PhysicalFileSystem::PhysicalFileSystem(std::filesystem::path rootPath) : mRootPa
 {
 }
 
-std::unique_ptr<std::istream> PhysicalFileSystem::openReadStreamImpl(std::string_view path) noexcept
+std::unique_ptr<std::istream> PhysicalFileSystem::openReadStream(std::string_view path) noexcept
 {
 	auto absolutePath = makeFullPath(path);
 	return std::make_unique<std::ifstream>(absolutePath, std::ios_base::binary);
 }
 
-std::unique_ptr<std::ostream> PhysicalFileSystem::openWriteStreamImpl(std::string_view path) noexcept
+std::unique_ptr<std::ostream> PhysicalFileSystem::openWriteStream(std::string_view path) noexcept
 {
 	auto absolutePath = makeFullPath(path);
 	return std::make_unique<std::ofstream>(absolutePath, std::ios_base::binary);
@@ -25,7 +25,7 @@ std::filesystem::path PhysicalFileSystem::makeFullPath(std::string_view path) co
 	return mRootPath / path;
 }
 
-std::set<FileSystem::Entry> PhysicalFileSystem::listImpl(std::string_view path) const
+std::set<FileSystem::Entry> PhysicalFileSystem::list(std::string_view path) const
 {
 	auto result = std::set<Entry>{};
 
@@ -37,7 +37,7 @@ std::set<FileSystem::Entry> PhysicalFileSystem::listImpl(std::string_view path) 
 
 	for (auto& entry : directoryView)
 		result.emplace(std::filesystem::relative(entry.path(), absolutePath).string(),
-					   entry.is_directory() ? FileSystem::FileType::Directory : FileSystem::FileType::File);
+					   entry.is_directory() ? FileSystem::EntryType::Directory : FileSystem::EntryType::File);
 
 	return result;
 }

@@ -15,23 +15,23 @@ namespace spatial::ui {
         imguiSetupInput();
     }
 
-    void UserInterfaceSystem::onEvent(const WindowResizedEvent &event) {
+    void UserInterfaceSystem::onEvent(const desktop::WindowResizedEvent &event) {
         getRenderer().setViewport(event.windowSize, event.frameBufferSize);
     }
 
-    void UserInterfaceSystem::onEvent(const MouseMovedEvent &event) {
+    void UserInterfaceSystem::onEvent(const desktop::MouseMovedEvent &event) {
         imguiSetMousePosition(event.position);
     }
 
-    void UserInterfaceSystem::onEvent(const KeyEvent &event) {
+    void UserInterfaceSystem::onEvent(const desktop::KeyEvent &event) {
         imguiSetKey(event.key, event.action);
     }
 
-    void UserInterfaceSystem::onEvent(const TextEvent &event) {
+    void UserInterfaceSystem::onEvent(const desktop::TextEvent &event) {
         imguiSetText(event.text);
     }
 
-    void UserInterfaceSystem::onEvent(const MouseScrolledEvent &event) {
+    void UserInterfaceSystem::onEvent(const desktop::MouseScrolledEvent &event) {
         imguiSetScrollOffset(event.offset);
     }
 

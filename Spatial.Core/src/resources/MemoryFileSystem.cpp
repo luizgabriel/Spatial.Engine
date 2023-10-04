@@ -1,4 +1,3 @@
-#include <boost/algorithm/string/predicate.hpp>
 #include <fmt/format.h>
 #include <spatial/resources/MemoryFileSystem.h>
 #include <sstream>
@@ -6,12 +5,16 @@
 namespace spatial
 {
 
-std::unique_ptr<std::istream> MemoryFileSystem::openReadStreamImpl(std::string_view path) noexcept
+MemoryFileSystem::MemoryFileSystem(std::initializer_list<MemoryFileSystem::FilesMap::value_type> files) : mMemoryMap{files}
+{
+}
+
+std::unique_ptr<std::istream> MemoryFileSystem::openReadStream(std::string_view path) noexcept
 {
 	return std::make_unique<std::stringstream>(openStream(path));
 }
 
-std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_view path) noexcept
+std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStream(std::string_view path) noexcept
 {
 	// TODO: Use span-stream on C++23
 	auto stream = std::make_unique<std::stringstream>();
@@ -19,31 +22,13 @@ std::unique_ptr<std::ostream> MemoryFileSystem::openWriteStreamImpl(std::string_
 	return stream;
 }
 
-std::set<FileSystem::Entry> MemoryFileSystem::listImpl(std::string_view path) const
+std::set<FileSystem::Entry> MemoryFileSystem::list(std::string_view path) const
 {
-	using namespace boost::algorithm;
-
 	auto result = std::set<Entry>();
 
 	for (auto& [k, _] : mMemoryMap)
 	{
-		if (path.empty() || starts_with(k, path))
-		{
-			auto entryPath = k.substr(path.length());
-			if (entryPath[0] == SEPARATOR)
-				entryPath = entryPath.substr(1);
-
-			auto separatorPos = entryPath.find(SEPARATOR);
-
-			if (separatorPos == std::string_view::npos)
-			{
-				result.emplace(entryPath, FileType::File);
-			}
-			else
-			{
-				result.emplace(entryPath.substr(0, separatorPos), FileType::Directory);
-			}
-		}
+		result.emplace(k, EntryType::File);
 	}
 
 	return result;
@@ -56,11 +41,7 @@ void MemoryFileSystem::define(const std::string& fileName, std::string&& value)
 
 void MemoryFileSystem::define(const std::string& fileName, const std::pair<const uint8_t*, size_t>& blob)
 {
-	auto value = std::string{};
-	value.reserve(blob.second);
-	std::copy(blob.first, blob.first + blob.second, std::back_inserter(value));
-
-	define(fileName, std::move(value));
+	define(fileName, toString(blob));
 }
 
 std::stringstream MemoryFileSystem::openStream(std::string_view path) const
@@ -76,6 +57,15 @@ std::stringstream MemoryFileSystem::openStream(std::string_view path) const
 		value.setstate(std::ios::badbit);
 		return value;
 	}
+}
+
+std::string toString(const std::pair<const uint8_t*, size_t> blob)
+{
+	auto value = std::string{};
+	value.reserve(blob.second);
+	std::copy(blob.first, blob.first + blob.second, std::back_inserter(value));
+
+	return value;
 }
 
 } // namespace spatial

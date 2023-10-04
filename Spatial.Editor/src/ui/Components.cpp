@@ -268,10 +268,10 @@ void ComponentInputImpl<ecs::MeshPrimitive, graphics::OptionalTexture>::draw(ecs
 	auto& meshPrimitive = registry.getComponent<ecs::MeshPrimitive>(entity);
 	const size_t smallStep = 1, largeStep = 1;
 
-	ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshPrimitive.primitiveIndex, &smallStep, &largeStep,
-					   "%lu");
 	ui::Search::searchEntity<ecs::MaterialInstance>("Material Instance", std::move(icons), registry,
 													meshPrimitive.materialInstance);
+	ImGui::InputScalar("Primitive Index", ImGuiDataType_U64, &meshPrimitive.primitiveIndex, &smallStep, &largeStep,
+					   "%lu");
 	ImGui::InputScalar("Blend Order", ImGuiDataType_U16, &meshPrimitive.blendOrder, &smallStep, &largeStep, "%u");
 }
 
@@ -342,6 +342,8 @@ void ComponentInputImpl<ecs::View, graphics::OptionalTexture>::draw(ecs::Registr
 	vec2Input("Size", sceneView.size);
 	Search::searchEntity<ecs::IndirectLight>("Indirect Light", icons, registry, sceneView.indirectLight);
 	Search::searchEntity<ecs::tags::IsCamera>("Camera", icons, registry, sceneView.camera);
+	ImGui::Checkbox("Post Processing Enabled", &sceneView.isPostProcessingEnabled);
+	ImGui::Checkbox("Shadowing Enabled", &sceneView.isShadowingEnabled);
 
 	ui::spacing();
 
