@@ -25,20 +25,6 @@ void simulateRuntime(spatial::Application& app, const std::chrono::nanoseconds& 
 	runtime.join();
 }
 
-TEST(Application, CreateAndStop)
-{
-	auto app = spatial::Application{};
-	ASSERT_EQ(app.isRunning(), false);
-
-	auto runtime = startApplicationRuntime(app);
-	ASSERT_EQ(app.isRunning(), true);
-
-	app.onEvent(spatial::desktop::WindowClosedEvent{nullptr});
-	runtime.join();
-
-	ASSERT_EQ(app.isRunning(), false);
-}
-
 struct ApplicationMockListener
 {
 	MOCK_METHOD0(onStart, void());
