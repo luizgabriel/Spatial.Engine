@@ -95,6 +95,11 @@ MeshBuilder Builder::asMesh()
 	return {mRegistry, mEntity};
 }
 
+AttachmentTextureBuilder Builder::asAttachmentTexture()
+{
+	return {mRegistry, mEntity};
+}
+
 Builder& Builder::withParent(Entity parent)
 {
 	ecs::Parent::addChild(mRegistry, parent, mEntity);
@@ -347,7 +352,7 @@ IndirectLightBuilder& IndirectLightBuilder::withIntensity(float intensity)
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(std::string_view path)
 {
-	return withReflectionsTexture(ecs::FileSystemResource::findOrCreate<ecs::tags::IsCubeMapTexture>(mRegistry, path));
+	return withReflectionsTexture(ecs::FileSystemResource::findOrCreate<ecs::tags::IsTexture, ecs::tags::IsCubeMapTexture>(mRegistry, path));
 }
 
 IndirectLightBuilder& IndirectLightBuilder::withReflectionsTexture(ecs::Entity resource)
@@ -482,31 +487,6 @@ ViewBuilder& ViewBuilder::withAttachment(ecs::Entity attachmentTextureEntity)
 	return *this;
 }
 
-ViewBuilder& ViewBuilder::withDefaultAttachments()
-{
-	auto size = getComponent().size;
-	assert(size.x > 0 && size.y > 0);
-
-	const auto& name = mRegistry.getComponent<ecs::Name>(mEntity);
-	auto colorTextureName = fmt::format("Color Texture ({})", name.c_str());
-	auto depthTextureName = fmt::format("Depth Texture ({})", name.c_str());
-
-	auto colorAttachment = ecs::Builder::create(mRegistry)
-							   .withName(std::move(colorTextureName))
-							   .with<ecs::tags::IsResource>()
-							   .with<ecs::tags::IsImageTexture>()
-							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Color, size});
-
-	auto depthAttachment = ecs::Builder::create(mRegistry)
-							   .withName(std::move(depthTextureName))
-							   .with<ecs::tags::IsResource>()
-							   .with<ecs::tags::IsImageTexture>()
-							   .with(ecs::AttachmentTexture{ecs::AttachmentTexture::Type::Depth, size});
-
-	return withAttachment(colorAttachment) //
-		.withAttachment(depthAttachment);
-}
-
 MeshPrimitiveBuilder::MeshPrimitiveBuilder(Registry& registry, Entity entity) : BasicBuilder(registry, entity)
 {
 }
@@ -570,7 +550,7 @@ MaterialInstanceBuilder& MaterialInstanceBuilder::withMaterial(Entity resource)
 	if (mRegistry.hasAllComponents<FileSystemResource>(resource) && !mRegistry.hasAnyComponent<Name>(mEntity))
 		withName(mRegistry.getComponent<FileSystemResource>(resource).stem());
 
-	ecs::MaterialInstance::changeMaterialSource(mRegistry, mEntity, resource);
+	getComponent().materialSource = resource;
 	return *this;
 }
 
@@ -603,4 +583,20 @@ MeshBuilder& MeshBuilder::withBoundingBox(math::AxisAlignedBoundingBox boundingB
 	return *this;
 }
 
+AttachmentTextureBuilder::AttachmentTextureBuilder(Registry& registry, Entity entity) : Base(registry, entity)
+{
+	withTags<ecs::tags::IsTexture, ecs::tags::IsImageTexture>();
+}
+
+AttachmentTextureBuilder& AttachmentTextureBuilder::withDimensions(math::uvec2 dimensions)
+{
+	getComponent().size = dimensions;
+	return *this;
+}
+
+AttachmentTextureBuilder& AttachmentTextureBuilder::withFormat(AttachmentTexture::Type format)
+{
+	getComponent().type = format;
+	return *this;
+}
 } // namespace spatial::ecs

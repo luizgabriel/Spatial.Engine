@@ -229,7 +229,7 @@ filament::VertexBuffer::Builder makeVertexBuffer(const ecs::VertexData& vertexDa
 
 	if (vertexData.layout.mode == ecs::VertexLayoutMode::Separate)
 	{
-		const uint32_t vertexCount = vertexData.data.size() / structSize;
+		const size_t vertexCount = vertexData.data.size() / structSize;
 		assert(vertexCount != 0);
 
 		uint32_t lastOffset = 0;

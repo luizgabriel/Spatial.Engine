@@ -1,4 +1,5 @@
-#include "spatial/ui/components/Basic.h"
+#include <spatial/ui/components/Basic.h>
+#include <spatial/ui/components/Combo.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <spatial/ecs/View.h>

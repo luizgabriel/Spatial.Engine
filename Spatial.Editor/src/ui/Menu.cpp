@@ -228,11 +228,22 @@ void CreateMenu::createViewMenu(ecs::Registry& registry)
 
 	if (Menu::itemButton("View"))
 	{
+		auto viewSize = gStandardAspectRatio.toVector() * 240.0;
 		createdEntity = ecs::Builder::create(registry)
 							.withName("View")
 							.with<ecs::tags::IsRenderedToTarget>()
 							.asView()
-							.withDefaultAttachments();
+							.withDimensions(viewSize)
+							.withAttachment(ecs::Builder::create(registry)
+												.withName("Color Attachment")
+												.asAttachmentTexture()
+												.withDimensions(viewSize)
+												.withFormat(ecs::AttachmentTexture::Type::Color))
+							.withAttachment(ecs::Builder::create(registry)
+												.withName("Depth Attachment")
+												.asAttachmentTexture()
+												.withDimensions(viewSize)
+												.withFormat(ecs::AttachmentTexture::Type::Depth));
 	}
 
 	if (registry.isValid(createdEntity))

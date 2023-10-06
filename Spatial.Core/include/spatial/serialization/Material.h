@@ -19,6 +19,7 @@ void serialize(Archive& ar, spatial::ecs::MaterialInstance::Scissor& scissor)
 template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MaterialInstance& light)
 {
+	ar(cereal::make_nvp("materialSource", light.materialSource));
 	ar(cereal::make_nvp("scissor", light.scissor));
 }
 

@@ -47,6 +47,7 @@ void serializeCoreComponents(Archive& ar, SnapshotType& snapshot)
 	snapshot.template component<ecs::tags::IsCamera>(ar);
 	snapshot.template component<ecs::tags::IsLight>(ar);
 	snapshot.template component<ecs::tags::IsMainView>(ar);
+	snapshot.template component<ecs::tags::IsTexture>(ar);
 	snapshot.template component<ecs::tags::IsImageTexture>(ar);
 	snapshot.template component<ecs::tags::IsCubeMapTexture>(ar);
 	snapshot.template component<ecs::tags::IsIrradianceValues>(ar);

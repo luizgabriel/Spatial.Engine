@@ -1,7 +1,10 @@
 #include "Components.h"
 #include "MaterialInputs.h"
+#include "Search.h"
+#include "../ecs/Components.h"
 #include <boost/algorithm/string/join.hpp>
 #include <spatial/ui/components/TreeNode.h>
+#include <spatial/ui/components/PreviewTexture.h>
 
 namespace spatial::ui
 {
@@ -120,6 +123,14 @@ void ComponentInputImpl<ecs::ScriptModule>::draw(ecs::Registry& registry, ecs::E
 
 		ImGui::EndTable();
 	}
+}
+
+void ComponentInputImpl<ecs::MeshPart>::draw(ecs::Registry& registry, ecs::Entity entity)
+{
+	auto& resource = registry.getComponent<ecs::MeshPart>(entity);
+
+	ImGui::InputScalar("Min Index", ImGuiDataType_U32, &resource.minIndex);
+	ImGui::InputScalar("Index Count", ImGuiDataType_U32, &resource.indexCount);
 }
 
 void ComponentInputImpl<ecs::FileSystemResource>::draw(ecs::Registry& registry, ecs::Entity entity)
@@ -427,12 +438,8 @@ void ComponentInputImpl<ecs::MaterialInstance, graphics::OptionalTexture>::draw(
 																				graphics::OptionalTexture icons)
 {
 	auto& materialInstance = registry.getComponent<ecs::MaterialInstance>(entity);
-	auto& child = registry.getComponent<ecs::Child>(entity);
 
-	auto parent = child.parent;
-	bool changed = ui::Search::searchResource<ecs::tags::IsMaterial>("Material", icons, registry, parent);
-	if (changed)
-		ecs::MaterialInstance::changeMaterialSource(registry, entity, parent);
+	ui::Search::searchResource<ecs::tags::IsMaterial>("Material", icons, registry, materialInstance.materialSource);
 
 	if (auto collapse = ui::TreeNode{"Scissor", false}; collapse.isOpen())
 	{

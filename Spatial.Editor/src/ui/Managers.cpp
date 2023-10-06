@@ -1,5 +1,4 @@
 #include "Managers.h"
-#include "../ecs/Components.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -11,54 +10,65 @@
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Texture.h>
 #include <spatial/ecs/View.h>
-#include <spatial/ui/components/Basic.h>
-#include <spatial/ui/components/Combo.h>
 #include <spatial/ui/components/DragAndDrop.h>
-#include <spatial/ui/components/Popup.h>
 
 namespace spatial::ui
 {
 
-void SceneTree::displayTree(ecs::Registry& registry, bool showDebugEntities, std::string_view search)
+ecs::RuntimeView getViewFromFilter(ecs::Registry& registry, const ComponentFilter& componentFilter,
+								   bool showEditorEntities) noexcept
 {
-	using namespace boost::algorithm;
+	auto runtimeView = ecs::RuntimeView{};
 
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
-		registry.removeComponentFromEntities<editor::tags::IsSelected>();
+	if (componentFilter == ComponentFilter::MeshInstances)
+		runtimeView.iterate(registry.getStorage<ecs::MeshInstance>());
 
-	const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable
-								  | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody;
+	if (componentFilter == ComponentFilter::Lights)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsLight>());
 
-	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
+	if (componentFilter == ComponentFilter::MaterialInstances)
+		runtimeView.iterate(registry.getStorage<ecs::MaterialInstance>());
+
+	if (componentFilter == ComponentFilter::Views)
+		runtimeView.iterate(registry.getStorage<ecs::View>());
+
+	if (componentFilter == ComponentFilter::Textures)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsTexture>());
+
+	if (componentFilter == ComponentFilter::Scripts)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsScript>());
+
+	if (componentFilter == ComponentFilter::Meshes)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsMesh>());
+
+	if (componentFilter == ComponentFilter::Cameras)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsCamera>());
+
+	if (componentFilter == ComponentFilter::Materials)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsMaterial>());
+
+	if (componentFilter == ComponentFilter::Resources)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsResource>());
+
+	if (componentFilter == ComponentFilter::Renderables)
+		runtimeView.iterate(registry.getStorage<ecs::tags::IsRenderable>());
+
+	if (componentFilter == ComponentFilter::All)
+		runtimeView.iterate(registry.getStorage<ecs::Name>());
+
+	runtimeView.exclude(registry.getStorage<ecs::Child>());
+
+	if (!showEditorEntities)
 	{
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableSetupColumn("Type");
-		ImGui::TableHeadersRow();
-
-		const auto onEachNodeFn = [&](ecs::Entity entity, const auto& name) {
-			if (!icontains(name.name, search))
-				return;
-
-			displayNode(registry, entity);
-		};
-
-		if (showDebugEntities)
-			registry
-				.getEntities<const ecs::Name>(ecs::Exclude<ecs::tags::IsResource, ecs::View, ecs::Child>) //
-				.each(onEachNodeFn);
-		else
-			registry //
-				.getEntities<const ecs::Name>(
-					ecs::Exclude<ecs::tags::IsResource, ecs::View, editor::tags::IsEditorEntity, ecs::Child>)
-				.each(onEachNodeFn);
-
-		ImGui::EndTable();
+		runtimeView.exclude(registry.getStorage<editor::tags::IsEditorEntity>());
 	}
+
+	return runtimeView;
 }
 
-void SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity)
+void displayNode(ecs::Registry& registry, ecs::Entity entity)
 {
-	const auto& name = registry.getComponent<ecs::Name>(entity);
+	const auto* name = registry.tryGetComponent<ecs::Name>(entity);
 
 	ImGui::TableNextRow();
 	ImGui::TableNextColumn();
@@ -74,7 +84,9 @@ void SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity)
 			: ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
 				  | ImGuiTreeNodeFlags_SpanFullWidth;
 
-	bool open = ImGui::TreeNodeEx(name.c_str(), childrenFlags | selectedFlags);
+	bool open = (name) ? ImGui::TreeNodeEx(name->c_str(), childrenFlags | selectedFlags)
+					   : ImGui::TreeNodeEx(fmt::format("Entity #{0}", static_cast<uint32_t>(entity)).c_str(), childrenFlags | selectedFlags);
+
 	auto shiftPressed = ImGui::IsKeyPressed(ImGuiKey_LeftShift);
 	if (ImGui::IsItemClicked() && shiftPressed)
 		registry.addComponent<editor::tags::IsSelected>(entity);
@@ -106,194 +118,71 @@ void SceneTree::displayNode(ecs::Registry& registry, ecs::Entity entity)
 		ImGui::TextDisabled("Camera");
 	else if (registry.hasAnyComponent<ecs::tags::IsLight>(entity))
 		ImGui::TextDisabled("Light");
+	else if (registry.hasAnyComponent<ecs::View>(entity))
+		ImGui::TextDisabled("View");
+	else if (registry.hasAnyComponent<ecs::tags::IsScript>(entity))
+		ImGui::TextDisabled("Script");
+	else if (registry.hasAnyComponent<ecs::tags::IsImageTexture>(entity))
+		ImGui::TextDisabled("Image Texture");
+	else if (registry.hasAnyComponent<ecs::tags::IsCubeMapTexture>(entity))
+		ImGui::TextDisabled("Cubemap Texture");
+	else if (registry.hasAnyComponent<ecs::tags::IsTexture>(entity))
+		ImGui::TextDisabled("Texture");
+	else if (registry.hasAnyComponent<ecs::MaterialInstance>(entity))
+		ImGui::TextDisabled("Material Instance");
+	else if (registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
+		ImGui::TextDisabled("Material");
+	else if (registry.hasAnyComponent<ecs::tags::IsMesh>(entity))
+		ImGui::TextDisabled("Mesh");
+	else if (registry.hasAnyComponent<ecs::MeshInstance>(entity))
+		ImGui::TextDisabled("MeshInstance");
+	else if (registry.hasAnyComponent<ecs::MeshPart>(entity))
+		ImGui::TextDisabled("Mesh Part");
+	else if (registry.hasAnyComponent<ecs::MeshPrimitive>(entity))
+		ImGui::TextDisabled("Mesh Primitive");
+	else if (registry.hasAnyComponent<ecs::tags::IsMaterial>(entity))
+		ImGui::TextDisabled("Material");
+	else if (registry.hasAnyComponent<ecs::tags::IsIrradianceValues>(entity))
+		ImGui::TextDisabled("Irradiance Values");
 	else if (registry.hasAnyComponent<ecs::tags::IsRenderable>(entity))
 		ImGui::TextDisabled("Renderable");
 
 	if (open && hasChildren)
 	{
-		ecs::Parent::forEachChild(registry, entity, [&](auto child) { SceneTree::displayNode(registry, child); });
+		ecs::Parent::forEachChild(registry, entity, [&](auto child) { displayNode(registry, child); });
 
 		ImGui::TreePop();
 	}
 }
 
-void ResourceManager::header(std::string& search, ResourceManager::ResourceType& filter,
-							 graphics::OptionalTexture icons)
-{
-	ImGui::Columns(2);
-	ImGui::SetColumnWidth(0, 100.0f);
-	ui::spanToAvailWidth();
-
-	ui::Combo::fromEnum("##ResourceTypeFilter", filter);
-
-	ImGui::NextColumn();
-	ui::Search::text(search, std::move(icons));
-
-	ImGui::Columns(1);
-}
-
-void ResourceManager::list(ecs::Registry& registry, std::string_view search, ResourceManager::ResourceType type,
+void RegistryManager::list(ecs::Registry& registry, std::string_view search, ComponentFilter componentFilter,
 						   bool showEditorEntities)
 {
 	using namespace boost::algorithm;
-	using namespace std::string_view_literals;
 
-	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-										 | ImGuiTableFlags_NoBordersInBody;
+	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+		registry.removeComponentFromEntities<editor::tags::IsSelected>();
 
-	if (ImGui::BeginTable("AssetsManagerTable", 2, flags))
+	const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable
+								  | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody;
+
+	if (ImGui::BeginTable("Scene Graph Entities", 2, flags))
 	{
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableSetupColumn("Type");
 		ImGui::TableHeadersRow();
 
-		const auto eachFn = [&](ecs::Entity entity, const auto& name) {
-			if (!icontains(name.name, search))
+		const auto onEachNodeFn = [&](ecs::Entity entity) {
+			const auto* name = registry.tryGetComponent<ecs::Name>(entity);
+
+			if (name && !icontains(name->c_str(), search))
 				return;
 
-			if (type != ResourceType::All)
-			{
-				if (type == ResourceType::Material && !registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
-					return;
-
-				if (type == ResourceType::Mesh && !registry.hasAllComponents<ecs::tags::IsMesh>(entity))
-					return;
-
-				if (type == ResourceType::Script && !registry.hasAllComponents<ecs::tags::IsScript>(entity))
-					return;
-
-				if (type == ResourceType::Texture
-					&& !registry.hasAnyComponent<ecs::tags::IsImageTexture, ecs::tags::IsCubeMapTexture,
-												 ecs::tags::IsIrradianceValues>(entity))
-					return;
-			}
-
-			ImGui::TableNextRow();
-			ImGui::TableNextColumn();
-
-			const auto selectedFlags = registry.hasComponent<editor::tags::IsSelected>(entity)
-										   ? ImGuiTreeNodeFlags_Selected
-										   : ImGuiTreeNodeFlags_None;
-			ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
-												| ImGuiTreeNodeFlags_SpanFullWidth | selectedFlags);
-			if (ImGui::IsItemClicked())
-				editor::tags::IsSelected::replace(registry, entity);
-
-			const auto* resource = registry.tryGetComponent<const ecs::FileSystemResource>(entity);
-			if (resource != nullptr)
-				ui::Popup::show("ResourcePopup", [&]() { ImGui::Text("%s", resource->relativePath.c_str()); });
-
-			ImGui::TableNextColumn();
-			std::string_view typeText;
-			if (registry.hasAllComponents<ecs::tags::IsMesh>(entity))
-				typeText = "Mesh"sv;
-			else if (registry.hasAllComponents<ecs::tags::IsMaterial>(entity))
-				typeText = "Material"sv;
-			else if (registry.hasAllComponents<ecs::tags::IsScript>(entity))
-				typeText = "Script"sv;
-			else if (registry.hasAnyComponent<ecs::tags::IsImageTexture>(entity))
-				typeText = "Image Texture"sv;
-			else if (registry.hasAnyComponent<ecs::tags::IsCubeMapTexture>(entity))
-				typeText = "CubeMap Texture"sv;
-			else if (registry.hasAnyComponent<ecs::tags::IsIrradianceValues>(entity))
-				typeText = "Irradiance Values"sv;
-
-			ImGui::TextDisabled("%s", typeText.data());
+			displayNode(registry, entity);
 		};
 
-		if (showEditorEntities)
-			registry.getEntities<const ecs::tags::IsResource, const ecs::Name>().each(eachFn);
-		else
-			registry
-				.getEntities<const ecs::tags::IsResource, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>)
-				.each(eachFn);
-
-		ImGui::EndTable();
-	}
-}
-
-void MaterialsManager::list(ecs::Registry& registry, std::string_view search, bool showEditorEntities)
-{
-	using namespace boost::algorithm;
-	using namespace std::string_view_literals;
-
-	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-										 | ImGuiTableFlags_NoBordersInBody;
-
-	if (ImGui::BeginTable("MaterialInstancesTable", 1, flags))
-	{
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableHeadersRow();
-
-		const auto eachFn = [&](ecs::Entity entity, const auto&, const auto& name) {
-			if (!icontains(name.name, search))
-				return;
-
-			ImGui::TableNextRow();
-			ImGui::TableNextColumn();
-
-			const auto selectedFlags = registry.hasComponent<editor::tags::IsSelected>(entity)
-										   ? ImGuiTreeNodeFlags_Selected
-										   : ImGuiTreeNodeFlags_None;
-			ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
-												| ImGuiTreeNodeFlags_SpanFullWidth | selectedFlags);
-
-			if (ImGui::IsItemClicked())
-				editor::tags::IsSelected::replace(registry, entity);
-		};
-
-		if (showEditorEntities)
-			registry.getEntities<const ecs::MaterialInstance, const ecs::Name>().each(eachFn);
-		else
-			registry
-				.getEntities<const ecs::MaterialInstance, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>)
-				.each(eachFn);
-
-		ImGui::EndTable();
-	}
-}
-
-void ViewsManager::list(ecs::Registry& registry, std::string_view search, bool showEditorEntities)
-{
-	using namespace boost::algorithm;
-	using namespace std::string_view_literals;
-
-	static const ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH
-										 | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-										 | ImGuiTableFlags_NoBordersInBody;
-
-	if (ImGui::BeginTable("ViewsTable", 1, flags))
-	{
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableHeadersRow();
-
-		const auto eachFn = [&](ecs::Entity entity, const auto&, const auto& name) {
-			if (!icontains(name.name, search))
-				return;
-
-			ImGui::TableNextRow();
-			ImGui::TableNextColumn();
-
-			const auto selectedFlags = registry.hasComponent<editor::tags::IsSelected>(entity)
-										   ? ImGuiTreeNodeFlags_Selected
-										   : ImGuiTreeNodeFlags_None;
-			ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen
-												| ImGuiTreeNodeFlags_SpanFullWidth | selectedFlags);
-
-			if (ImGui::IsItemClicked())
-				editor::tags::IsSelected::replace(registry, entity);
-		};
-
-		if (showEditorEntities)
-			registry
-				.getEntities<const ecs::View, const ecs::Name>() //
-				.each(eachFn);
-		else
-			registry
-				.getEntities<const ecs::View, const ecs::Name>(ecs::Exclude<editor::tags::IsEditorEntity>) //
-				.each(eachFn);
+		auto runtimeView = getViewFromFilter(registry, componentFilter, showEditorEntities);
+		runtimeView.each(onEachNodeFn);
 
 		ImGui::EndTable();
 	}

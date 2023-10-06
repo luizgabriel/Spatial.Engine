@@ -2,6 +2,7 @@
 
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/runtime_view.hpp>
 
 namespace spatial::ecs
 {
@@ -15,6 +16,8 @@ using ExcludeComponentsType = entt::exclude_t<Component...>;
 constexpr auto NullEntity = entt::null;
 
 using Entity = entt::entity;
+
+using RuntimeView = entt::runtime_view;
 
 class SnapshotLoader;
 
@@ -240,6 +243,18 @@ class Registry : private entt::registry
 	void sortComponent(Compare compare, Sort algo = Sort{}, Args&&... args)
 	{
 		this->sort<Component>(std::forward<Compare>(compare), std::forward<Sort>(algo), std::forward<Args>(args)...);
+	}
+
+	template <typename Component>
+	decltype(auto) getStorage()
+	{
+		return this->storage<Component>();
+	}
+
+	template <typename Component>
+	decltype(auto) getStorage() const
+	{
+		return this->storage<Component>();
 	}
 
 	friend class SnapshotLoader;

@@ -18,6 +18,7 @@ void EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 		return;
 	}
 
+	ImGui::Text("Entity ID: %d", entity);
 	displayEntityName(registry, entity);
 
 	componentCollapse<ecs::Transform>(registry, entity);
@@ -32,6 +33,7 @@ void EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentCollapse<ecs::FileSystemResource>(registry, entity);
 	componentCollapse<ecs::MeshInstance>(registry, entity, icons);
 	componentCollapse<ecs::MeshPrimitive>(registry, entity, icons);
+	componentCollapse<ecs::MeshPart>(registry, entity);
 	componentCollapse<ecs::MaterialInstance>(registry, entity, icons);
 	componentCollapse<ecs::View>(registry, entity, icons);
 	componentCollapse<ecs::AttachmentTexture>(registry, entity);
@@ -66,7 +68,6 @@ void EntityProperties::displayComponents(ecs::Registry& registry, ecs::Entity en
 	componentTag<ecs::tags::IsScript>(registry, entity);
 	componentTag<ecs::tags::IsLight>(registry, entity);
 
-	// componentTag<editor::tags::IsSelected>(registry, entity);
 	componentTag<editor::tags::IsSelectedView>(registry, entity);
 	componentTag<editor::tags::IsEditorEntity>(registry, entity);
 }

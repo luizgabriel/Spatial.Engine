@@ -10,6 +10,11 @@ namespace spatial::ecs
 namespace tags
 {
 
+struct IsTexture
+{
+	constexpr static auto typeName = "tag_is_texture";
+};
+
 struct IsImageTexture
 {
 	constexpr static auto typeName = "tag_is_image_texture";

@@ -20,6 +20,22 @@
 namespace spatial::ui
 {
 
+enum class ComponentFilter
+{
+	All,
+	Renderables,
+	Lights,
+	Cameras,
+	MeshInstances,
+	MaterialInstances,
+	Views,
+	Textures,
+	Resources,
+	Meshes,
+	Materials,
+	Scripts,
+};
+
 template <typename Component, typename... Args>
 struct ComponentInputImpl
 {
@@ -201,6 +217,13 @@ template <>
 struct ComponentInputImpl<ecs::AttachmentTexture>
 {
 	static constexpr auto sName = "Attachment Texture";
+	static void draw(ecs::Registry& registry, ecs::Entity entity);
+};
+
+template <>
+struct ComponentInputImpl<ecs::MeshPart>
+{
+	static constexpr auto sName = "SkyBox Material";
 	static void draw(ecs::Registry& registry, ecs::Entity entity);
 };
 

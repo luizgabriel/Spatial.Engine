@@ -1,5 +1,4 @@
 #include <imgui.h>
-#include <spatial/ecs/Texture.h>
 #include <spatial/ui/components/Basic.h>
 #include <spatial/ui/components/CollapsingHeader.h>
 #include <spatial/ui/components/DragAndDrop.h>

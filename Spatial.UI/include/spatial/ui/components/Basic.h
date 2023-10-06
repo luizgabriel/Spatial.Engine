@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../../../../Spatial.Editor/src/ui/Search.h"
 #include <filament/Texture.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>

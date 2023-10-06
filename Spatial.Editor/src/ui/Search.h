@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Components.h"
 #include "Icons.h"
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -97,6 +98,8 @@ class Search
 
 		return changed;
 	}
+
+	static void componentFilter(spatial::ui::ComponentFilter& componentFilter);
 };
 
 } // namespace spatial::ui

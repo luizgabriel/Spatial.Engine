@@ -27,9 +27,8 @@ struct MaterialInstance
 		uint32_t height{};
 	};
 
+	Entity materialSource{};
 	Scissor scissor{};
-
-	static void changeMaterialSource(Registry& registry, entt::entity materialInstance, Entity newMaterialSource);
 };
 
 } // namespace spatial::ecs

@@ -1,11 +1,13 @@
 #include "MaterialInputs.h"
+#include "../ecs/Components.h"
 #include "Icons.h"
-#include "spatial/ecs/Texture.h"
-#include "spatial/graphics/TextureUtils.h"
-#include "spatial/ui/components/Basic.h"
-#include "spatial/ui/components/DragAndDrop.h"
-#include "spatial/ui/components/PreviewTexture.h"
+#include "Search.h"
 #include <imgui.h>
+#include <spatial/ecs/Texture.h>
+#include <spatial/graphics/TextureUtils.h>
+#include <spatial/ui/components/Basic.h>
+#include <spatial/ui/components/DragAndDrop.h>
+#include <spatial/ui/components/PreviewTexture.h>
 
 namespace spatial::ui
 {

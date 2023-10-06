@@ -40,25 +40,4 @@ void EditorDragAndDrop::loadMeshInstance(ecs::Registry& registry, math::vec3 cre
 		editor::tags::IsSelected::replace(registry, createdEntity);
 }
 
-void EditorDragAndDrop::loadScriptResource(ecs::Registry& registry, ResourceManager::ResourceType& type)
-{
-	auto dnd = DragAndDropTarget{};
-	auto result = dnd.getPayload();
-	ecs::Entity createdEntity = ecs::NullEntity;
-
-	if (result && boost::algorithm::ends_with(result->c_str(), ".js"))
-	{
-		createdEntity = ecs::Builder::create(registry) //
-							.asFileSystemResource()
-							.withPath(result.value())
-							.with<ecs::tags::IsScript>();
-
-		if (type != ResourceManager::ResourceType::All)
-			type = ResourceManager::ResourceType::Script;
-	}
-
-	if (registry.isValid(createdEntity))
-		editor::tags::IsSelected::replace(registry, createdEntity);
-}
-
 } // namespace spatial::ui

@@ -2,6 +2,7 @@
 #include "Serialization.h"
 #include "ecs/Components.h"
 #include "ecs/Materials.h"
+#include "ui/Components.h"
 #include "ui/DragAndDrop.h"
 #include "ui/EntityProperties.h"
 #include "ui/FilesExplorer.h"
@@ -17,12 +18,12 @@
 #include <spatial/graphics/MaterialController.h>
 #include <spatial/graphics/TextureUtils.h>
 #include <spatial/resources/PhysicalFileSystem.h>
-#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/MenuBar.h>
 #include <spatial/ui/components/Popup.h>
 #include <spatial/ui/components/PopupModal.h>
 #include <spatial/ui/components/SceneView.h>
 #include <spatial/ui/components/Window.h>
+#include <spatial/ui/components/Menu.h>
 #include <spatial/ui/components/styles/WindowPaddingStyle.h>
 
 namespace spatial::editor
@@ -45,7 +46,7 @@ void EditorSystem::onStart()
 	createDefaultEditorEntities();
 
 	mIconTexture =
-		ecs::FileSystemResource::create<ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons/icons.png");
+		ecs::FileSystemResource::create<ecs::tags::IsTexture, ecs::tags::IsImageTexture>(mEditorRegistry, "editor/textures/icons/icons.png");
 }
 
 void EditorSystem::onStartFrame(float)
@@ -143,52 +144,26 @@ void EditorSystem::onDrawGui()
 			EditorCamera::replaceView(mRegistry, selectedView);
 	}
 
-	ui::Window::show("Resources", [&]() {
-		static std::string search;
-		static auto type = ui::ResourceManager::ResourceType::All;
-
-		ui::ResourceManager::header(search, type, icons);
-		ui::ResourceManager::list(mRegistry, search, type, showDebugEntities);
-		ui::EditorDragAndDrop::loadScriptResource(mRegistry, type);
-
-		ui::Popup::show("Resources Popup", [&]() { ui::CreateMenu::removeMenu(mRegistry); });
-	});
-
-	ui::Window::show("Views", [&]() {
+	ui::Window::show("Registry", [&]() {
 		static std::string search;
 
 		ui::Search::text(search, icons);
-		ui::ViewsManager::list(mRegistry, search, showDebugEntities);
 
-		ui::Popup::show("Views Popup", [&]() {
-			ui::Menu::show("Create", [&]() { ui::CreateMenu::createViewMenu(mRegistry); });
-			ui::CreateMenu::removeMenu(mRegistry);
-		});
-	});
+		static ui::ComponentFilter componentFilter = ui::ComponentFilter::Renderables;
+		ui::Search::componentFilter(componentFilter);
 
-	ui::Window::show("Materials", [&]() {
-		static std::string search;
+		ui::RegistryManager::list(mRegistry, search, componentFilter, showDebugEntities);
+		ui::EditorDragAndDrop::loadMeshInstance(mRegistry, createEntityPosition);
 
-		ui::Search::text(search, icons);
-		ui::MaterialsManager::list(mRegistry, search, showDebugEntities);
-
-		ui::Popup::show("Materials Popup", [&]() {
-			ui::Menu::show("Create", [&]() { ui::CreateMenu::createMaterialsMenu(mRegistry); });
-			ui::CreateMenu::removeMenu(mRegistry);
-		});
-	});
-
-	ui::Window::show("Scene Tree", [&]() {
-		static std::string search;
-		ui::Search::text(search, icons);
-		ui::SceneTree::displayTree(mRegistry, showDebugEntities, search);
-
-		ui::Popup::show("Scene Popup", [&]() {
+		ui::Popup::show("Registry Popup", [&]() {
 			ui::Menu::show("Create", [&]() {
 				ui::CreateMenu::createMeshMenu(mRegistry, createEntityPosition);
 				ui::CreateMenu::createCameraMenu(mRegistry, createEntityPosition);
 				ui::CreateMenu::createLightMenu(mRegistry, createEntityPosition);
+				ui::CreateMenu::createViewMenu(mRegistry);
+				ui::CreateMenu::createMaterialsMenu(mRegistry);
 			});
+
 			ui::CreateMenu::removeMenu(mRegistry);
 		});
 	});
@@ -346,12 +321,14 @@ void EditorSystem::createDefaultEditorEntities()
 	ecs::Builder::create(mRegistry)
 		.withName("editor/dummy_cubemap")
 		.with<tags::IsEditorEntity>()
+		.with<ecs::tags::IsTexture>()
 		.with<ecs::tags::IsCubeMapTexture>()
 		.with<ecs::tags::IsResource>()
 		.with<ecs::tags::IsDummyCubeMapTexture>();
 
 	ecs::Builder::create(mRegistry)
 		.withName("editor/white_texture")
+		.with<ecs::tags::IsTexture>()
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorWhiteTexture>()
 		.with<ecs::tags::IsResource>()
@@ -360,6 +337,7 @@ void EditorSystem::createDefaultEditorEntities()
 
 	ecs::Builder::create(mRegistry)
 		.withName("editor/black_texture")
+		.with<ecs::tags::IsTexture>()
 		.with<ecs::tags::IsImageTexture>()
 		.with<tags::IsEditorBlackTexture>()
 		.with<ecs::tags::IsResource>()
@@ -405,14 +383,26 @@ void EditorSystem::createDefaultEditorEntities()
 		.withCulling(false)
 		.withPriority(0x7);
 
+	auto viewSize = gUltraWideAspectRatio.toVector() * 240.0;
 	ecs::Builder::create(mRegistry)
 		.withName("Editor View")
 		.with<tags::IsEditorEntity>()
 		.with<tags::IsSelectedView>()
 		.with<ecs::tags::IsRenderedToTarget>()
 		.asView()
-		.withDimensions(gUltraWideAspectRatio.toVector() * 240.0)
-		.withDefaultAttachments()
+		.withDimensions(viewSize)
+		.withAttachment(ecs::Builder::create(mRegistry)
+							.withName("Color Attachment (Editor View)")
+							.with<tags::IsEditorEntity>()
+							.asAttachmentTexture()
+							.withDimensions(viewSize)
+							.withFormat(ecs::AttachmentTexture::Type::Color))
+		.withAttachment(ecs::Builder::create(mRegistry)
+							.withName("Depth Attachment (Editor View)")
+							.with<tags::IsEditorEntity>()
+							.asAttachmentTexture()
+							.withDimensions(viewSize)
+							.withFormat(ecs::AttachmentTexture::Type::Depth))
 		.withIndirectLight(ecs::Builder::create(mRegistry)
 							   .withName("Indirect Light")
 							   .with<tags::IsEditorEntity>()

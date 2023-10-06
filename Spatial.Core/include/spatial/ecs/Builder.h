@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/format.h>
 #include <spatial/common/Math.h>
 #include <spatial/ecs/Camera.h>
 #include <spatial/ecs/Light.h>
@@ -10,6 +11,7 @@
 #include <spatial/ecs/Resource.h>
 #include <spatial/ecs/Script.h>
 #include <spatial/ecs/Transform.h>
+#include <spatial/ecs/Texture.h>
 #include <spatial/ecs/View.h>
 
 namespace spatial::ecs
@@ -39,6 +41,8 @@ class MeshPrimitiveBuilder;
 
 class ViewBuilder;
 
+class AttachmentTextureBuilder;
+
 class Builder
 {
   public:
@@ -54,6 +58,13 @@ class Builder
 	}
 
 	Builder& withParent(Entity parent);
+
+	template <typename... Tags>
+	Builder& withTags()
+	{
+		(mRegistry.template addComponent<Tags>(mEntity), ...);
+		return *this;
+	}
 
 	template <typename Component, typename... Args>
 	Builder& with(Args&&... args)
@@ -89,6 +100,8 @@ class Builder
 	MeshPrimitiveBuilder asMeshPrimitive();
 
 	MaterialInstanceBuilder asMaterialInstance();
+
+	AttachmentTextureBuilder asAttachmentTexture();
 
 	[[nodiscard]] Entity get() const
 	{
@@ -315,8 +328,17 @@ class ViewBuilder : public BasicBuilder<View>
 	ViewBuilder& withBlendMode(View::BlendMode blendMode);
 	ViewBuilder& withShadowingDisabled();
 	ViewBuilder& withPostProcessingDisabled();
-	ViewBuilder& withDefaultAttachments();
 	ViewBuilder& withAttachment(Entity attachmentTexture);
+};
+
+class AttachmentTextureBuilder : public BasicBuilder<AttachmentTexture>
+{
+  public:
+	using Base = BasicBuilder<AttachmentTexture>;
+
+	AttachmentTextureBuilder(Registry& registry, Entity entity);
+	AttachmentTextureBuilder& withDimensions(math::uvec2 dimensions);
+	AttachmentTextureBuilder& withFormat(AttachmentTexture::Type format);
 };
 
 } // namespace spatial::ecs

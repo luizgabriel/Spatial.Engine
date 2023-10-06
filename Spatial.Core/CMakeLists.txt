@@ -82,7 +82,6 @@ add_library(Spatial.Core
         src/ecs/Mesh.cpp
         src/ecs/Script.cpp
         src/ecs/Resource.cpp
-        src/ecs/Material.cpp
 
         # src/script/PlatformContext.cpp
         # src/script/Isolate.cpp
