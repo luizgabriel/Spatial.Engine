@@ -61,8 +61,9 @@ void serialize(Archive& ar, spatial::ecs::MeshPart& part)
 template <typename Archive>
 void serialize(Archive& ar, spatial::ecs::MeshPrimitive& primitive)
 {
+	ar(make_nvp("materialInstance", primitive.materialInstance));
 	ar(make_nvp("primitiveIndex", primitive.primitiveIndex));
-	ar(make_nvp("material", primitive.materialInstance));
+	ar(make_nvp("blendOrder", primitive.blendOrder));
 }
 
 template <typename Archive>

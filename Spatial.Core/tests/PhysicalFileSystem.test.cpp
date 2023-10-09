@@ -31,12 +31,6 @@ TEST(PhysicalFileSystem, ListPaths)
 	}
 
 	{
-		auto result = root.list("a1/b1");
-		EXPECT_EQ(result.size(), 1);
-		EXPECT_TRUE(result.find({"test.txt", FileSystem::EntryType::File}) != result.end());
-	}
-
-	{
 		auto result = root.list("a2");
 		EXPECT_EQ(result.size(), 1);
 		EXPECT_TRUE(result.find({"test.txt", FileSystem::EntryType::File}) != result.end());

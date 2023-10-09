@@ -1,8 +1,8 @@
+#include <boost/locale.hpp>
 #include <cassert>
 #include <spatial/desktop/Window.h>
-#include <utility>
 #include <sstream>
-#include <boost/locale.hpp>
+#include <utility>
 
 #if defined(SPATIAL_PLATFORM_OSX)
 #define GLFW_EXPOSE_NATIVE_COCOA
@@ -11,7 +11,7 @@
 #elif defined(SPATIAL_PLATFORM_UNIX)
 #define GLFW_EXPOSE_NATIVE_X11
 #endif
-#include "spatial/desktop/PlatformEvent.h"
+#include <spatial/desktop/PlatformEvent.h>
 #include <GLFW/glfw3native.h>
 #include <array>
 #include <stb_image.h>
@@ -130,9 +130,7 @@ std::optional<std::string> Window::getClipboardText() const
 {
 	const auto* text = glfwGetClipboardString(mWindowHandle);
 	if (text == nullptr)
-	{
 		return std::nullopt;
-	}
 
 	return std::make_optional(std::string(text));
 }
@@ -190,7 +188,7 @@ void Window::setupCallbacks()
 		int frameBufferWidth, frameBufferHeight;
 		glfwGetFramebufferSize(win, &frameBufferWidth, &frameBufferHeight);
 		window->getEventQueue().enqueue<WindowResizedEvent>(window, math::uvec2{width, height},
-												math::uvec2{frameBufferWidth, frameBufferHeight});
+															math::uvec2{frameBufferWidth, frameBufferHeight});
 	});
 
 	glfwSetCursorPosCallback(getHandle(), [](auto* win, double xPos, double yPos) {

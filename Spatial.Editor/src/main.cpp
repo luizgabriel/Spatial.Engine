@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	auto window = desktopContext.createWindow(config.windowDimensions.value_or(desktopContext.getMonitorSize()),
 											  config.windowTitle);
 #if defined(SPATIAL_PLATFORM_WINDOWS)
-	window.setIcon(*fileSystem, "editor/AppIcon.png");
+	window.setIcon(*editorFs, "textures/icons/AppIcon.png");
 #endif
 
 	auto rendering = graphics::RenderingSystem{};

@@ -1,10 +1,10 @@
 #include "Components.h"
+#include "../ecs/Components.h"
 #include "MaterialInputs.h"
 #include "Search.h"
-#include "../ecs/Components.h"
 #include <boost/algorithm/string/join.hpp>
-#include <spatial/ui/components/TreeNode.h>
 #include <spatial/ui/components/PreviewTexture.h>
+#include <spatial/ui/components/TreeNode.h>
 
 namespace spatial::ui
 {
@@ -278,6 +278,12 @@ void ComponentInputImpl<ecs::MeshPrimitive, graphics::OptionalTexture>::draw(ecs
 {
 	auto& meshPrimitive = registry.getComponent<ecs::MeshPrimitive>(entity);
 	const size_t smallStep = 1, largeStep = 1;
+
+	auto& child = registry.getComponent<ecs::Child>(entity);
+
+	auto meshInstance = child.parent;
+	if (ui::Search::searchEntity<ecs::MeshInstance>("Mesh Instance", icons, registry, meshInstance))
+		ecs::MeshPrimitive::changeMeshInstance(registry, entity, meshInstance);
 
 	ui::Search::searchEntity<ecs::MaterialInstance>("Material Instance", std::move(icons), registry,
 													meshPrimitive.materialInstance);

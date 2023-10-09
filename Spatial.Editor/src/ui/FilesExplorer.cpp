@@ -61,7 +61,7 @@ bool FilesExplorer::displayFiles(FileSystem& fileSystem, std::string& selectedPa
 				fileButton(Icons::ktxFile.uv());
 			else if (ends_with(entry.path, ".spatial.json"))
 				fileButton(Icons::sceneFile.uv());
-			else if (ends_with(entry.path, ".filamesh") || ends_with(entry.path, ".obj"))
+			else if (ends_with(entry.path, ".filamesh"))
 				fileButton(Icons::meshFile.uv());
 			else
 				fileButton(Icons::unknownFile.uv());

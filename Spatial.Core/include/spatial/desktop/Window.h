@@ -7,6 +7,7 @@
 #include <spatial/common/Signal.h>
 #include <spatial/resources/FileSystem.h>
 #include <string_view>
+#include <optional>
 
 namespace spatial::desktop
 {
