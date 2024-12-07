@@ -37,7 +37,7 @@ jobs:
 
       - name: (Windows) Setup MSBuild
         if: contains(matrix.config.os, 'windows')
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
         with:
           msbuild-architecture: x64
 
