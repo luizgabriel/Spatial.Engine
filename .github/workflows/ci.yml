@@ -54,8 +54,7 @@ jobs:
           sudo apt-get install libxaw7-dev libxcursor-dev libxdamage-dev libxinerama-dev libxmuu-dev libxrandr-dev libxres-dev libxss-dev libxtst-dev libxv-dev libxvmc-dev
           sudo apt-get install libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev libxcb-cursor-dev libxcb-util-dev
 
-      - name: (Linux) Set up Clang
-        if: contains(matrix.config.os, 'ubuntu')
+      - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
           version: latest

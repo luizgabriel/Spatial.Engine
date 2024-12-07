@@ -7,7 +7,7 @@ from conan.tools.build import check_min_cppstd
 
 class FilamentConan(ConanFile):
     name = "filament"
-    version = "1.43.1"
+    version = "1.55.0"
     license = "Apache License 2.0"
     homepage = "https://github.com/google/filament"
     url = "https://github.com/luizgabriel/conan-filament"
@@ -30,6 +30,7 @@ class FilamentConan(ConanFile):
         "FILAMENT_ENABLE_ASAN_UBSAN",  # Enable Address and Undefined Behavior Sanitizers
         "FILAMENT_SUPPORTS_OPENGL",  # By default, build with support for OpenGL on all platforms.
         "FILAMENT_SUPPORTS_METAL",  # Build with Metal support on non-WebGL Apple platforms.
+        "FILAMENT_INSTALL_BACKEND_TEST", # Install the backend test library so it can be consumed on iOS
         "FILAMENT_SUPPORTS_VULKAN",
         # build with Vulkan support on desktop platforms, although clients must request to use it at run time.
         "FILAMENT_BUILD_FILAMAT",
@@ -55,11 +56,13 @@ class FilamentConan(ConanFile):
         "supports_vulkan": [True, False, None],
         "build_filamat": [True, False, None],
         "disable_matopt": [True, False, None],
+        "install_backend_test": [True, False, None],
     }
 
     default_options = {
         "skip_samples": True,
         "skip_sdl2": True,
+        "install_backend_test": False,
     }
 
     def validate(self):
@@ -69,7 +72,8 @@ class FilamentConan(ConanFile):
         # https://github.com/google/filament/blob/main/BUILDING.md#linux
         if self.settings.os == "Linux":
             apt = Apt(self)
-            apt.install(["libglu1-mesa-dev", "libxi-dev", "libxcomposite-dev", "libxxf86vm-dev"])
+            apt.install(["mesa-common-dev", "libxi-dev", "libxxf86vm-dev"])
+              
 
     def source(self):
         git = Git(self)
@@ -96,7 +100,7 @@ class FilamentConan(ConanFile):
         
         self.cpp.package.libs = [
             "backend", "filamat", "gltfio_core", "mikktspace", "viewer",
-            "basis_transcoder", "filamat_lite", "ibl-lite", "shaders", "vkshaders",
+            "basis_transcoder", "ibl-lite", "shaders", "vkshaders",
             "camutils", "filament-iblprefilter", "ibl", "smol-v", "zstd",
             "civetweb", "filament", "image", "stb",
             "dracodec", "filameshio", "ktxreader", "uberarchive",
@@ -112,8 +116,6 @@ class FilamentConan(ConanFile):
 
 
     def generate(self):
-        deps = CMakeDeps(self)
-        deps.generate()
         tc = CMakeToolchain(self)
         for variable in self.cmake_variables:
             value = self.options.get_safe(variable.replace("FILAMENT_", "").lower(), None)

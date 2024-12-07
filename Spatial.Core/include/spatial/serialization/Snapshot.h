@@ -131,7 +131,7 @@ class SnapshotLoader
 		std::vector<ecs::Entity> entities{};
 		archive(cereal::make_nvp("entities", entities));
 
-		reg.assign(entities.cbegin(), entities.cend(), entt::tombstone);
+		reg.storage<Entity>().push(entities.cbegin(), entities.cend());
 
 		return *this;
 	}

@@ -55,12 +55,12 @@ class SpatialRecipe(ConanFile):
         self.requires("gtest/1.11.0")
         self.requires("spdlog/1.10.0")
         self.requires("stb/cci.20220909")
-        self.requires("entt/3.11.1")
+        self.requires("entt/3.14.0")
         self.requires("cereal/1.3.1")
         self.requires("magic_enum/0.8.0")
         self.requires("glm/0.9.9.8")
         self.requires("imgui/cci.20230105+1.89.2.docking")
-        self.requires_local("filament/1.43.1", options={
+        self.requires_local("filament/1.55.0", options={
             f"supports_{self.options.backend}": True,
         })
 

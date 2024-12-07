@@ -61,19 +61,21 @@ class Registry : private entt::registry
 	}
 
 	template <typename... Component, typename... Exclude>
-	[[nodiscard]] auto getEntities(ExcludeComponentsType<Exclude...> excludes = {}) const
+	[[nodiscard]] auto getEntities(
+		ExcludeComponentsType<Exclude...> excludes = ExcludeComponentsType<Exclude...>{}) const
 	{
 		return this->view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
-	[[nodiscard]] auto getEntities(ExcludeComponentsType<Exclude...> excludes = {})
+	[[nodiscard]] auto getEntities(ExcludeComponentsType<Exclude...> excludes = ExcludeComponentsType<Exclude...>{})
 	{
 		return this->view<Component...>(std::move(excludes));
 	}
 
 	template <typename... Component, typename... Exclude>
-	[[nodiscard]] Entity getFirstEntity(ExcludeComponentsType<Exclude...> excludes = {}) const
+	[[nodiscard]] Entity getFirstEntity(
+		ExcludeComponentsType<Exclude...> excludes = ExcludeComponentsType<Exclude...>{}) const
 	{
 		auto view = getEntities<std::add_const_t<Component>...>(std::move(excludes));
 		for (auto entity : view)
@@ -187,7 +189,7 @@ class Registry : private entt::registry
 	template <typename... Component>
 	[[nodiscard]] bool hasAllComponents(Entity entity) const
 	{
-		return isValid(entity) && all_of<Component...> (entity);
+		return isValid(entity) && all_of<Component...>(entity);
 	}
 
 	template <typename... Component>
@@ -214,15 +216,13 @@ class Registry : private entt::registry
 	template <typename Component>
 	const Component* tryGetComponent(Entity entity) const
 	{
-		return isValid(entity) ? this->try_get<const Component>(entity)
-							   : nullptr;
+		return isValid(entity) ? this->try_get<const Component>(entity) : nullptr;
 	}
 
 	template <typename Component>
 	Component* tryGetComponent(Entity entity)
 	{
-		return isValid(entity) ? this->try_get<Component>(entity)
-							   : nullptr;
+		return isValid(entity) ? this->try_get<Component>(entity) : nullptr;
 	}
 
 	template <typename... Component>
@@ -234,8 +234,7 @@ class Registry : private entt::registry
 	template <typename... Component, typename... Exclude>
 	void destroyEntitiesWith(ExcludeComponentsType<Exclude...> excludes = {})
 	{
-		auto view = getEntities<const Component...>
-					(excludes);
+		auto view = getEntities<const Component...>(excludes);
 		this->destroy(view.begin(), view.end());
 	}
 

@@ -19,7 +19,7 @@ bool Registry::isValid(Entity entity) const noexcept
 
 size_t Registry::getEntitiesCount() const noexcept
 {
-	return size();
+	return this->storage<Entity>()->size();
 }
 
 void Registry::destroyEntity(Entity entity)
@@ -29,7 +29,7 @@ void Registry::destroyEntity(Entity entity)
 
 const ecs::Entity* Registry::getEntities() const
 {
-	return data();
+	return this->storage<Entity>()->data();
 }
 
 } // namespace spatial::ecs
