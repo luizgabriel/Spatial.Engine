@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 #include <string_view>
 
 namespace spatial::ui
@@ -28,7 +29,7 @@ class DragAndDropTarget
 
 	[[nodiscard]] bool isStarted() const;
 
-	std::optional<std::string> getPayload() const;
+	[[nodiscard]] std::optional<std::string> getPayload() const;
 
   private:
 	bool mStarted;
