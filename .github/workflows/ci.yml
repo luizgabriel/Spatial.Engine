@@ -115,13 +115,12 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
 
       - name: List Artifacts
-        run: ls -R
-        working-directory: artifacts
+        run: ls -R artifacts
 
       - name: Release
         uses: fnkr/github-action-ghr@v1
