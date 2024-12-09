@@ -16,7 +16,7 @@ jobs:
       matrix:
         config:
           # - { name: "Ubuntu-Clang", os: ubuntu-20.04, build_type: "Release", conan_preset: "conan-release" }
-          - { name: "MacOS-Clang", os: macos-11, build_dir: "build/Release", config_preset: "conan-release", build_preset: "conan-release" }
+          - { name: "MacOS-Clang", os: macos-14, build_dir: "build/Release", config_preset: "conan-release", build_preset: "conan-release" }
           - { name: "Windows-MSVC", os: windows-2022, build_dir: "build", config_preset: "conan-default", build_preset: "conan-release" }
 
     steps:
