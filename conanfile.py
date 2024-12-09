@@ -49,7 +49,11 @@ class SpatialRecipe(ConanFile):
                 self.options.backend = "opengl"
 
     def requirements(self):
-        self.requires("boost/1.86.0")
+        self.requires("boost/1.86.0", options={
+            "without_locale": True,
+            "without_stacktrace": True,
+        })
+        
         self.requires("argh/1.3.1")
         self.requires("glfw/3.3.8")
         self.requires("gtest/1.11.0")
