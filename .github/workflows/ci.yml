@@ -17,9 +17,9 @@ jobs:
     strategy:
       matrix:
         config:
-          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, build_type: "Release", conan_preset: "conan-release" }
-          - { name: "MacOS-Clang", os: macos-14, build_dir: "build/Release", config_preset: "conan-release", build_preset: "conan-release" }
-          - { name: "Windows-MSVC", os: windows-2022, build_dir: "build", config_preset: "conan-default", build_preset: "conan-release" }
+          - { name: "Windows-MSVC", os: windows-2022, build_dir: "build", config_preset: "conan-default", build_preset: "conan-release", artifact: "build/package/SpatialEngine-*.msi" }
+          - { name: "MacOS-Clang", os: macos-14, build_dir: "build/Release", config_preset: "conan-release", build_preset: "conan-release", artifact: "build/Release/package/SpatialEngine-*.dmg" }
+          # - { name: "Ubuntu-Clang", os: ubuntu-20.04, build_type: "Release", conan_preset: "conan-release", build_preset: "conan-release", artifact: "build/Release/package/SpatialEngine-*.deb" }
 
     steps:
       - uses: actions/checkout@v4
@@ -105,17 +105,14 @@ jobs:
           else
               echo "tag=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           fi
-      
+
       - name: Upload artifacts
-        if: contains(github.ref, 'refs/tags/')
+        if: contains(github.ref, 'tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.tag }}
           if-no-files-found: error
-          path: |
-            build/package/*.msi
-            build/Release/package/*.dmg  
-            build/Release/package/*.deb
+          path: ${{ matrix.config.artifact }}
       
   release:
     if: contains(github.ref, 'refs/tags/')
@@ -130,7 +127,7 @@ jobs:
           path: artifacts
 
       - name: List Artifacts
-        run: ls -R ${{ steps.download.outputs.download-path }}
+        run: ls -R artifacts/
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -138,6 +135,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.build.outputs.tag }}
-          files: ${{ steps.download.outputs.download-path }}/*
+          files: artifacts/*
           draft: false
           prerelease: false
