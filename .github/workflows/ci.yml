@@ -12,6 +12,8 @@ jobs:
   build:
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ${{ matrix.config.os }}
+    outputs:
+      tag: ${{ steps.get_version.outputs.tag }}
     strategy:
       matrix:
         config:
@@ -90,39 +92,33 @@ jobs:
         run: ctest . --preset ${{ matrix.config.build_preset }} -E "(Application|PhysicalFileSystem)" --output-on-failure
 
       - name: (CPack) Generate Package
-        if: contains(github.ref, 'tags/v')
+        if: contains(github.ref, 'refs/tags/')
         shell: bash
         run: cmake --build . --preset ${{ matrix.config.build_preset }} --target package
 
-      - id: get_version
-        uses: battila7/get-version-action@v2
-
-      - name: (MacOS) Upload artifacts
-        if: ${{ contains(github.ref, 'tags/v') && contains(matrix.config.os, 'macos') }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.dmg
-          if-no-files-found: error
-          path: build/Release/package/*.dmg
-
-      - name: (Windows) Upload artifacts
-        if: contains(github.ref, 'tags/v') && contains(matrix.config.os, 'windows')
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.dmg
-          if-no-files-found: error
-          path: build/package/*.msi
+      - name: Get Version Tag
+        id: get_version
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" =~ tags/(.*) ]]; then
+              echo "tag=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+              echo "tag=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          fi
       
-      - name: (Ubuntu) Upload artifacts
-        if: contains(github.ref, 'tags/v') && contains(matrix.config.os, 'ubuntu')
-        uses: actions/upload-artifact@v3
+      - name: Upload artifacts
+        if: contains(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.deb
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.tag }}
           if-no-files-found: error
-          path: build/Release/package/*.deb
+          path: |
+            build/package/*.msi
+            build/Release/package/*.dmg  
+            build/Release/package/*.deb
       
   release:
-    if: contains(github.ref, 'tags/v')
+    if: contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     needs: build
 
@@ -130,12 +126,18 @@ jobs:
       - name: Download artifact
         id: download
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: List Artifacts
         run: ls -R ${{ steps.download.outputs.download-path }}
 
       - name: Release
-        uses: fnkr/github-action-ghr@v1
+        uses: softprops/action-gh-release@v2
         env:
-          GHR_PATH: ${{ steps.download.outputs.download-path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.build.outputs.tag }}
+          files: ${{ steps.download.outputs.download-path }}/*
+          draft: false
+          prerelease: false

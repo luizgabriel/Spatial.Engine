@@ -7,7 +7,7 @@ from conan.tools.build import check_min_cppstd
 
 class SpatialRecipe(ConanFile):
     name = "spatial"
-    version = "1.3.20"
+    version = "1.3.21"
     package_type = "application"
 
     # Optional metadata
