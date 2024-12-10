@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
@@ -97,17 +97,30 @@ jobs:
       - id: get_version
         uses: battila7/get-version-action@v2
 
-      - name: Upload artifacts
-        if: contains(github.ref, 'tags/v')
+      - name: (MacOS) Upload artifacts
+        if: ${{ contains(github.ref, 'tags/v') && contains(matrix.config.os, 'macos') }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.dmg
           if-no-files-found: error
-          path: |
-            build/Release/package/*.dmg
-            build/Release/package/*.deb
-            build/package/*.msi
+          path: build/Release/package/*.dmg
 
+      - name: (Windows) Upload artifacts
+        if: contains(github.ref, 'tags/v') && contains(matrix.config.os, 'windows')
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.dmg
+          if-no-files-found: error
+          path: build/package/*.msi
+      
+      - name: (Ubuntu) Upload artifacts
+        if: contains(github.ref, 'tags/v') && contains(matrix.config.os, 'ubuntu')
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.config.name }}-${{ steps.get_version.outputs.VERSION }}.deb
+          if-no-files-found: error
+          path: build/Release/package/*.deb
+      
   release:
     if: contains(github.ref, 'tags/v')
     runs-on: ubuntu-latest
@@ -115,15 +128,14 @@ jobs:
 
     steps:
       - name: Download artifact
+        id: download
         uses: actions/download-artifact@v4
-        with:
-          path: artifacts
 
       - name: List Artifacts
-        run: ls -R artifacts
+        run: ls -R ${{ steps.download.outputs.download-path }}
 
       - name: Release
         uses: fnkr/github-action-ghr@v1
         env:
-          GHR_PATH: artifacts/
+          GHR_PATH: ${{ steps.download.outputs.download-path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
